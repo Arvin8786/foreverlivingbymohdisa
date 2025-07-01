@@ -4,119 +4,145 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Forever Living Store</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <title>Forever Living Malaysia</title>
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      background: #f9f9f9;
-      color: #333;
-    }
-    header {
-      background: #007f5f;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    .container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      padding: 2rem;
-    }
-    .card {
-      background: white;
-      border-radius: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 1rem;
-    }
-    .card h2 {
-      font-size: 1.2rem;
-      margin: 0.5rem 0;
-    }
-    .card p {
-      font-size: 0.9rem;
-    }
-    .btn {
-      display: inline-block;
-      background: #007f5f;
-      color: white;
-      padding: 0.5rem 1rem;
-      margin-top: 0.5rem;
-      text-decoration: none;
-      border-radius: 0.5rem;
-    }
-    .badge {
-      display: inline-block;
-      background: #28a745;
-      color: white;
-      padding: 0.25rem 0.5rem;
-      font-size: 0.75rem;
-      border-radius: 0.25rem;
-      margin-bottom: 0.5rem;
-    }
-    .floating-whatsapp {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #25D366;
-      color: white;
-      padding: 1rem;
-      border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      font-size: 1.5rem;
-      text-decoration: none;
-      z-index: 999;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; color: #333; }
+    header { background: #028d5b; color: white; padding: 20px; text-align: center; }
+    .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
+    .card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .card h2 { margin: 0; font-size: 1.2em; }
+    .card .price { color: #028d5b; font-weight: bold; margin-top: 5px; }
+    .card p { font-size: 0.9em; margin-top: 10px; }
+    .card .label { display: inline-block; margin: 8px 0; background: #28a745; color: white; padding: 4px 8px; font-size: 0.75em; border-radius: 5px; }
+    .btn { background: #028d5b; color: white; padding: 8px 16px; text-decoration: none; display: inline-block; margin-top: 10px; border-radius: 5px; }
+    .floating-whatsapp { position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; padding: 15px; border-radius: 50%; font-size: 24px; text-decoration: none; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Forever Living Products</h1>
-    <p>100% Halal Certified | Direct Order via WhatsApp | Bundle Offers Available</p>
-  </header>
 
-  <main class="container">
+<header>
+  <h1>Forever Living Products - Malaysia</h1>
+  <p>100% Halal | Flat Shipping RM10 | Order Direct via WhatsApp</p>
+</header>
+
+<main class="container">
+
     <div class="card">
-      <span class="badge">Halal Certified</span>
-      <h2>Aloe Vera Gel (1L)</h2>
-      <p>Supports digestion, hydration, and gut health. 99.7% pure aloe. No sugar or preservatives.</p>
-      <a href="https://wa.me/601111033154?text=I'm%20interested%20in%20Aloe%20Vera%20Gel" class="btn">Order on WhatsApp</a>
+      <span class="label">Halal Certified</span>
+      <h2>Aloe Vera Gel</h2>
+      <div class="price">RM98 + RM10 Shipping</div>
+      <p><strong>Health Benefits:</strong> Supports digestion, boosts immunity, hydrates skin.</p>
+      <p><strong>How to Use:</strong> Drink 30–60ml daily in the morning.</p>
+      <p><strong>Suggested Add-on:</strong> Pair with Bee Honey or Forever Fiber.</p>
+      <a class="btn" href="https://wa.me/601111033154?text=I'm%20interested%20in%20Aloe Vera Gel">Order via WhatsApp</a>
     </div>
+    
     <div class="card">
-      <span class="badge">Halal Certified</span>
+      <span class="label">Halal Certified</span>
+      <h2>Aloe Berry Nectar</h2>
+      <div class="price">RM103 + RM10 Shipping</div>
+      <p><strong>Health Benefits:</strong> Antioxidants from cranberry & apple, supports urinary health.</p>
+      <p><strong>How to Use:</strong> Drink 60ml daily, chilled or room temp.</p>
+      <p><strong>Suggested Add-on:</strong> Combine with Forever Immublend for added immune support.</p>
+      <a class="btn" href="https://wa.me/601111033154?text=I'm%20interested%20in%20Aloe Berry Nectar">Order via WhatsApp</a>
+    </div>
+    
+    <div class="card">
+      <span class="label">Halal Certified</span>
+      <h2>Aloe Peaches</h2>
+      <div class="price">RM103 + RM10 Shipping</div>
+      <p><strong>Health Benefits:</strong> Rich in antioxidants and vitamin A, great for skin and digestion.</p>
+      <p><strong>How to Use:</strong> Drink 40–80ml in the morning or evening.</p>
+      <p><strong>Suggested Add-on:</strong> Best when mixed with Forever Bee Honey.</p>
+      <a class="btn" href="https://wa.me/601111033154?text=I'm%20interested%20in%20Aloe Peaches">Order via WhatsApp</a>
+    </div>
+    
+    <div class="card">
+      <span class="label">Halal Certified</span>
       <h2>Forever Bright Toothgel</h2>
-      <p>Fluoride-free, aloe-based toothpaste for clean, fresh, healthy gums.</p>
-      <a href="https://wa.me/601111033154?text=I'm%20interested%20in%20Toothgel" class="btn">Order on WhatsApp</a>
+      <div class="price">RM27 + RM10 Shipping</div>
+      <p><strong>Health Benefits:</strong> Fluoride-free. Maintains healthy gums, fresh breath, and clean teeth.</p>
+      <p><strong>How to Use:</strong> Brush twice a day, suitable for kids and adults.</p>
+      <p><strong>Suggested Add-on:</strong> Use with Forever Aloe Lips for full oral care.</p>
+      <a class="btn" href="https://wa.me/601111033154?text=I'm%20interested%20in%20Forever Bright Toothgel">Order via WhatsApp</a>
     </div>
+    
     <div class="card">
-      <span class="badge">Halal Certified</span>
-      <h2>Bee Honey</h2>
-      <p>Pure natural honey to support energy and gut. Perfect to mix with aloe for Teh Tarik!</p>
-      <a href="https://wa.me/601111033154?text=I'm%20interested%20in%20Bee%20Honey" class="btn">Order on WhatsApp</a>
+      <span class="label">Halal Certified</span>
+      <h2>Forever Bee Honey</h2>
+      <div class="price">RM65 + RM10 Shipping</div>
+      <p><strong>Health Benefits:</strong> Natural energy booster, aids digestion and immunity.</p>
+      <p><strong>How to Use:</strong> Take 1–2 tablespoons daily. Mix with aloe or tea.</p>
+      <p><strong>Suggested Add-on:</strong> Great with Aloe Vera Gel or in Teh Tarik.</p>
+      <a class="btn" href="https://wa.me/601111033154?text=I'm%20interested%20in%20Forever Bee Honey">Order via WhatsApp</a>
     </div>
+    
     <div class="card">
-      <span class="badge">Bundle Offer</span>
-      <h2>Teh Tarik Combo</h2>
-      <p>Aloe Vera Gel + Bee Honey combo. Morning detox in Malaysian style. Save RM19!</p>
-      <a href="https://wa.me/601111033154?text=I'm%20interested%20in%20Teh%20Tarik%20Combo" class="btn">Order on WhatsApp</a>
+      <span class="label">Halal Certified</span>
+      <h2>Forever Immublend</h2>
+      <div class="price">RM96 + RM10 Shipping</div>
+      <p><strong>Health Benefits:</strong> Supports and balances immune system with mushrooms, zinc, and vitamin C.</p>
+      <p><strong>How to Use:</strong> Take 1–2 tablets daily with meals.</p>
+      <p><strong>Suggested Add-on:</strong> Pair with Aloe Berry Nectar for enhanced results.</p>
+      <a class="btn" href="https://wa.me/601111033154?text=I'm%20interested%20in%20Forever Immublend">Order via WhatsApp</a>
     </div>
-  </main>
+    
+    <div class="card">
+      <span class="label">Halal Certified</span>
+      <h2>Forever Arctic Sea</h2>
+      <div class="price">RM123 + RM10 Shipping</div>
+      <p><strong>Health Benefits:</strong> Omega-3 fish oil supports heart, brain, and joints.</p>
+      <p><strong>How to Use:</strong> Take 2 softgels daily after food.</p>
+      <p><strong>Suggested Add-on:</strong> Bundle with Forever Calcium for bone health.</p>
+      <a class="btn" href="https://wa.me/601111033154?text=I'm%20interested%20in%20Forever Arctic Sea">Order via WhatsApp</a>
+    </div>
+    
+    <div class="card">
+      <span class="label">Halal Certified</span>
+      <h2>Forever Fields of Greens</h2>
+      <div class="price">RM58 + RM10 Shipping</div>
+      <p><strong>Health Benefits:</strong> Barley, wheat grass, cayenne — supports digestion and metabolism.</p>
+      <p><strong>How to Use:</strong> Take 1 tablet 2–3 times daily.</p>
+      <p><strong>Suggested Add-on:</strong> Great combo with Aloe Vera Gel or Garcinia Plus.</p>
+      <a class="btn" href="https://wa.me/601111033154?text=I'm%20interested%20in%20Forever Fields of Greens">Order via WhatsApp</a>
+    </div>
+    
+    <div class="card">
+      <span class="label">Halal Certified</span>
+      <h2>Forever Aloe Lips</h2>
+      <div class="price">RM15 + RM10 Shipping</div>
+      <p><strong>Health Benefits:</strong> Soothes dry, cracked lips with jojoba and aloe.</p>
+      <p><strong>How to Use:</strong> Apply as needed throughout the day.</p>
+      <p><strong>Suggested Add-on:</strong> Pair with Bright Toothgel for full oral care.</p>
+      <a class="btn" href="https://wa.me/601111033154?text=I'm%20interested%20in%20Forever Aloe Lips">Order via WhatsApp</a>
+    </div>
+    
+    <div class="card">
+      <span class="label">Halal Certified</span>
+      <h2>Teh Tarik</h2>
+      <div class="price">RM113 + RM10 Shipping</div>
+      <p><strong>Health Benefits:</strong> Morning detox drink using Aloe Vera Gel + Bee Honey. Boosts energy and digestion.</p>
+      <p><strong>How to Use:</strong> Mix 60ml Aloe + 1 tbsp Bee Honey + hot water. Stir and enjoy.</p>
+      <p><strong>Suggested Add-on:</strong> Add Fiber sachet to enhance cleansing effect.</p>
+      <a class="btn" href="https://wa.me/601111033154?text=I'm%20interested%20in%20Teh Tarik">Order via WhatsApp</a>
+    </div>
+    
+</main>
 
-  <a href="https://wa.me/601111033154?text=Hi%2C%20I'm%20interested%20in%20Forever%20Living%20products" class="floating-whatsapp" title="Chat with us on WhatsApp">💬</a>
+<a href="https://wa.me/601111033154" class="floating-whatsapp" title="Chat with us on WhatsApp">💬</a>
 
-  <!-- Live Chat (Tawk.to) -->
-  <script type="text/javascript">
-  var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-  (function(){
-  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-  s1.async=true;
-  s1.src='https://embed.tawk.to/64bfb675cc26a871b028061e/1h5gdb2to';
-  s1.charset='UTF-8';
-  s1.setAttribute('crossorigin','*');
-  s0.parentNode.insertBefore(s1,s0);
-  })();
-  </script>
+<!-- Live Chat (Tawk.to) -->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/64bfb675cc26a871b028061e/1h5gdb2to';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+
 </body>
 </html>
