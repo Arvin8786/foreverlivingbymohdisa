@@ -42,25 +42,73 @@
 </main>
 
 <div class="combo-section">
-  <h2>🎉 Limited Time Offer – 15% OFF Combos!</h2>
+  <h2>🔥 Special Combos – 10% OFF!</h2>
   <div class="combo-grid">
-    <div class="combo-card">
-      <h3>Immune Boost Pack</h3>
-      <p>Aloe Vera Gel + Bee Honey + Absorbent-C</p>
-      <p><del>RM330.14</del> <strong>RM280.62</strong></p>
+    <div class="combo-card" onclick="toggleDetails('combo1')">
+      <h3>💪 Everyday Boost Pack</h3>
+      <p>Aloe Vera Gel + Fields of Greens</p>
+      <p><del>RM202.89</del> <strong>RM182.60</strong></p>
+      <div id="combo1" style="display:none;text-align:left;margin-top:10px">
+        <ul>
+          <li>✔️ Aids digestion & nutrient absorption</li>
+          <li>✔️ Strengthens immune system</li>
+          <li>✔️ Supports energy metabolism</li>
+          <li>✔️ Detoxifies & alkalizes body</li>
+          <li>✔️ Great for daily wellness</li>
+        </ul>
+      </div>
     </div>
-    <div class="combo-card">
-      <h3>Weight Wellness Combo</h3>
-      <p>Garcinia Plus + Fields of Greens + Herbal Tea</p>
-      <p><del>RM337.80</del> <strong>RM287.13</strong></p>
+    <div class="combo-card" onclick="toggleDetails('combo2')">
+      <h3>🧠 Men's Vitality Duo</h3>
+      <p>Arctic Sea + Vitolize Men</p>
+      <p><del>RM273.00</del> <strong>RM245.70</strong></p>
+      <div id="combo2" style="display:none;text-align:left;margin-top:10px">
+        <ul>
+          <li>✔️ Promotes brain & heart health</li>
+          <li>✔️ Enhances stamina & libido</li>
+          <li>✔️ Improves hormonal balance</li>
+          <li>✔️ Supports prostate health</li>
+          <li>✔️ Boosts daily performance</li>
+        </ul>
+      </div>
     </div>
-    <div class="combo-card">
-      <h3>Energy & Vitality Set</h3>
-      <p>Multi-Maca + Royal Jelly + Vitolize</p>
-      <p><del>RM409.30</del> <strong>RM347.91</strong></p>
+    <div class="combo-card" onclick="toggleDetails('combo3')">
+      <h3>💃 Women's Wellness Kit</h3>
+      <p>Royal Jelly + Vitolize Women</p>
+      <p><del>RM274.80</del> <strong>RM247.32</strong></p>
+      <div id="combo3" style="display:none;text-align:left;margin-top:10px">
+        <ul>
+          <li>✔️ Enhances skin & hair glow</li>
+          <li>✔️ Regulates hormonal cycles</li>
+          <li>✔️ Improves immunity & mood</li>
+          <li>✔️ Boosts vitality & energy</li>
+          <li>✔️ Great for monthly support</li>
+        </ul>
+      </div>
+    </div>
+    <div class="combo-card" onclick="toggleDetails('combo4')">
+      <h3>🌿 Digest & Detox Set</h3>
+      <p>Herbal Tea + Bee Honey</p>
+      <p><del>RM228.17</del> <strong>RM205.35</strong></p>
+      <div id="combo4" style="display:none;text-align:left;margin-top:10px">
+        <ul>
+          <li>✔️ Natural gut detox</li>
+          <li>✔️ Antioxidant-rich drink</li>
+          <li>✔️ Helps relieve bloating</li>
+          <li>✔️ Supports digestion</li>
+          <li>✔️ Caffeine-free & soothing</li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+  function toggleDetails(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+</script>
 
 <div class="cart">
   <h2>Your Cart</h2>
