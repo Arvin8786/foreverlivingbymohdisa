@@ -1,4 +1,216 @@
-<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8' /><meta name='viewport' content='width=device-width, initial-scale=1.0'/><title>Forever Living by Mohd Arvind Isa</title></head><body><h1>Forever Living Preview</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Forever Living by Mohd Arvind Isa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; margin: 0; background: #f5f7fa; color: #333; }
+    header, footer { background: #0f766e; color: white; padding: 20px; text-align: center; }
+    h1, h2 { margin: 0; }
+    .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; padding: 30px 20px; }
+    .card { background: white; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); padding: 20px; transition: transform 0.3s ease; position: relative; overflow: hidden; }
+    .card:hover { transform: translateY(-5px); }
+    .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
+    .card h3 { margin-top: 0; font-size: 1.2rem; }
+    .btn { background: #0f766e; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; margin-top: 10px; font-weight: 600; transition: background 0.3s; }
+    .btn:hover { background: #115e59; }
+    .promo, .cart, .points, .code-form, .rewards { padding: 20px; text-align: center; background: #d1fae5; margin: 30px 20px 0; border-radius: 16px; }
+    .floating-cart { position: fixed; bottom: 20px; right: 20px; background: #0f766e; color: white; padding: 12px 18px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 1000; }
+    .section-title { font-size: 1.5rem; margin-bottom: 10px; color: #0f766e; }
+    .combo-section { padding: 30px 20px; background: #fef9c3; border-top: 2px solid #fcd34d; }
+    .combo-section h2 { color: #92400e; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Forever Living by Mohd Arvind Isa</h1>
+  <p>Halal Certified • RM10 Flat Shipping • Points Rewards System</p>
+</header>
+
+<div class="promo">
+  <h2 class="section-title">Nak jana pendapatan 5 angka sebulan?</h2>
+  <a class="btn" href="https://wa.me/601111033154?text=Hai,%20saya%20berminat%20nak%20jadi%20rakan%20niaga">Join As Business Partner</a>
+</div>
+
+<main class="container">
+  <div class="card"><img src="aloe-vera-gel.jpg" alt="Aloe Vera Gel">
+    <h3>Aloe Vera Gel</h3>
+    <p><strong>Price:</strong> RM116.79</p>
+    <p>Supports digestion, boosts immunity, hydrates skin</p>
+    <button class="btn" onclick="addToCart('Aloe Vera Gel', 116.79)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="aloe-berry-nectar.jpg" alt="Aloe Berry Nectar">
+    <h3>Aloe Berry Nectar</h3>
+    <p><strong>Price:</strong> RM116.79</p>
+    <p>Rich in antioxidants, supports urinary health</p>
+    <button class="btn" onclick="addToCart('Aloe Berry Nectar', 116.79)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="aloe-peaches.jpg" alt="Aloe Peaches">
+    <h3>Aloe Peaches</h3>
+    <p><strong>Price:</strong> RM116.79</p>
+    <p>Great for skin, vision, and immune system</p>
+    <button class="btn" onclick="addToCart('Aloe Peaches', 116.79)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="toothgel.jpg" alt="Forever Bright Toothgel">
+    <h3>Forever Bright Toothgel</h3>
+    <p><strong>Price:</strong> RM41.29</p>
+    <p>Fluoride-free, promotes gum health</p>
+    <button class="btn" onclick="addToCart('Bright Toothgel', 41.29)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="bee-honey.jpg" alt="Forever Bee Honey">
+    <h3>Forever Bee Honey</h3>
+    <p><strong>Price:</strong> RM132.57</p>
+    <p>Natural energy source, improves digestion</p>
+    <button class="btn" onclick="addToCart('Bee Honey', 132.57)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="absorbent-c.jpg" alt="Forever Absorbent-C">
+    <h3>Forever Absorbent-C</h3>
+    <p><strong>Price:</strong> RM80.78</p>
+    <p>Supports immune health and collagen</p>
+    <button class="btn" onclick="addToCart('Absorbent-C', 80.78)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="arctic-sea.jpg" alt="Forever Arctic Sea">
+    <h3>Forever Arctic Sea</h3>
+    <p><strong>Price:</strong> RM130.10</p>
+    <p>Omega-3 for brain, heart & joints</p>
+    <button class="btn" onclick="addToCart('Arctic Sea', 130.10)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="fields-of-greens.jpg" alt="Fields of Greens">
+    <h3>Fields of Greens</h3>
+    <p><strong>Price:</strong> RM86.10</p>
+    <p>Supports digestion, rich in nutrients</p>
+    <button class="btn" onclick="addToCart('Fields of Greens', 86.10)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="aloe-lips.jpg" alt="Aloe Lips">
+    <h3>Aloe Lips</h3>
+    <p><strong>Price:</strong> RM20.33</p>
+    <p>Moisturizes and soothes dry lips</p>
+    <button class="btn" onclick="addToCart('Aloe Lips', 20.33)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="teh-tarik.jpg" alt="Teh Tarik Halia">
+    <h3>Teh Tarik Halia</h3>
+    <p><strong>Price:</strong> RM25.90</p>
+    <p>Morning detox with aloe & ginger</p>
+    <button class="btn" onclick="addToCart('Teh Tarik', 25.90)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="nature-min.jpg" alt="Forever Nature-Min">
+    <h3>Forever Nature-Min</h3>
+    <p><strong>Price:</strong> RM96.80</p>
+    <p>Supports bones, metabolism, and mineral balance</p>
+    <button class="btn" onclick="addToCart('Nature-Min', 96.80)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="forever-calcium.jpg" alt="Forever Calcium">
+    <h3>Forever Calcium</h3>
+    <p><strong>Price:</strong> RM111.10</p>
+    <p>Builds strong bones and supports nerve function</p>
+    <button class="btn" onclick="addToCart('Forever Calcium', 111.10)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="aloe-herbal-tea.jpg" alt="Aloe Herbal Tea">
+    <h3>Aloe Herbal Tea</h3>
+    <p><strong>Price:</strong> RM95.60</p>
+    <p>Caffeine-free detox and antioxidant support</p>
+    <button class="btn" onclick="addToCart('Aloe Herbal Tea', 95.60)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="active-pro-b.jpg" alt="Active Pro-B">
+    <h3>Active Pro-B</h3>
+    <p><strong>Price:</strong> RM197.00</p>
+    <p>Advanced probiotics for gut and immunity</p>
+    <button class="btn" onclick="addToCart('Active Pro-B', 197.00)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="forever-move.jpg" alt="Forever Move">
+    <h3>Forever Move</h3>
+    <p><strong>Price:</strong> RM306.00</p>
+    <p>Supports joint health and mobility</p>
+    <button class="btn" onclick="addToCart('Forever Move', 306.00)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="multi-maca.jpg" alt="Forever Multi-Maca">
+    <h3>Forever Multi-Maca</h3>
+    <p><strong>Price:</strong> RM134.50</p>
+    <p>Natural energy booster for vitality and libido</p>
+    <button class="btn" onclick="addToCart('Multi-Maca', 134.50)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="royal-jelly.jpg" alt="Royal Jelly">
+    <h3>Forever Royal Jelly</h3>
+    <p><strong>Price:</strong> RM131.90</p>
+    <p>Boosts stamina and immune system</p>
+    <button class="btn" onclick="addToCart('Royal Jelly', 131.90)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="vitolize-men.jpg" alt="Vitolize Men">
+    <h3>Vitolize for Men</h3>
+    <p><strong>Price:</strong> RM142.90</p>
+    <p>Supports male hormonal and prostate health</p>
+    <button class="btn" onclick="addToCart('Vitolize Men', 142.90)">Add to Cart</button>
+  </div>
+  <div class="card"><img src="vitolize-women.jpg" alt="Vitolize Women">
+    <h3>Vitolize for Women</h3>
+    <p><strong>Price:</strong> RM142.90</p>
+    <p>Supports hormonal balance and wellbeing</p>
+    <button class="btn" onclick="addToCart('Vitolize Women', 142.90)">Add to Cart</button>
+  </div>
+</main>
+
+<div class="combo-section">
+  <h2>Combo & Bundle Offers</h2>
+  <ul>
+    <li><strong>Immune Boost Pack:</strong> Aloe Vera Gel + Bee Honey + Absorbent-C – RM250 (Save RM20)</li>
+    <li><strong>Weight Wellness Combo:</strong> Garcinia Plus + Fields of Greens + Herbal Tea – RM330 (Save RM30)</li>
+    <li><strong>Energy & Vitality Set:</strong> Multi-Maca + Royal Jelly + Vitolize – RM380 (Save RM25)</li>
+  </ul>
+</div>
+
+<div class="cart">
+  <h2>Your Cart</h2>
+  <ul id="cart-list"></ul>
+  <p><strong>Total:</strong> RM<span id="cart-total">0.00</span></p>
+  <p>🎁 Points Earned: <span id="points">0</span></p>
+  <a id="checkout-btn" class="btn" href="#" target="_blank">Checkout via WhatsApp</a>
+</div>
+
+<div class="code-form">
+  <h3>Submit Confirmation Code</h3>
+  <form action="https://formsubmit.co/arvin8786@gmail.com" method="POST">
+    <input type="text" name="name" placeholder="Your Name" required /><br><br>
+    <input type="email" name="email" placeholder="Your Email" required /><br><br>
+    <input type="text" name="phone" placeholder="Phone Number" required /><br><br>
+    <input type="text" name="code" placeholder="Confirmation Code" required /><br><br>
+    <input type="submit" class="btn" value="Submit for Points" />
+  </form>
+</div>
+
+<div class="rewards">
+  <h2>🎁 Rewards Programme</h2>
+  <p>Coming Soon – collect points now to redeem FL products later!</p>
+</div>
+
+<a class="floating-cart" href="#cart">🛒 View Cart</a>
+
+<script>
+  let cart = [];
+  function addToCart(product, price) {
+    cart.push({ product, price });
+    updateCart();
+  }
+
+  function updateCart() {
+    let list = document.getElementById('cart-list');
+    let total = 0;
+    list.innerHTML = '';
+    cart.forEach(item => {
+      total += item.price;
+      list.innerHTML += `<li>${item.product} - RM${item.price.toFixed(2)}</li>`;
+    });
+    document.getElementById('cart-total').innerText = total.toFixed(2);
+    let points = Math.floor(total / 10);
+    document.getElementById('points').innerText = points;
+
+    const msg = cart.map(item => `• ${item.product} - RM${item.price.toFixed(2)}`).join('%0A');
+    const link = `https://wa.me/601111033154?text=Hi%2C%20I%20would%20like%20to%20order%3A%0A${msg}%0A%0ATotal%3A%20RM${total.toFixed(2)}%0AFlat%20Shipping%3A%20RM10%0APoints%20Earned%3A%20${points}`;
+    document.getElementById('checkout-btn').href = link;
+  }
+</script>
+
 <footer>
   <p>© 2025 Forever Living by Mohd Arvind Isa • FL ID: 600900135042</p>
 </footer>
