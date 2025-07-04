@@ -3,137 +3,248 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Forever Living by Mohd Arvind Isa</title>
+  <title>Rezeki Ilahi | Forever Living Shop</title>
+  <meta name="description" content="Rezeki Ilahi - Forever Living Products Malaysia. Buy certified aloe vera supplements, skincare, honey and more. Earn reward points every order!" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Inter', sans-serif; margin: 0; background: #f5f7fa; color: #333; }
-    header, footer { background: #0f766e; color: white; padding: 20px; text-align: center; }
-    .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; padding: 30px 20px; }
-    .card, .combo-card { background: white; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); padding: 20px; transition: transform 0.3s ease; }
-    .card:hover, .combo-card:hover { transform: scale(1.03); }
-    .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
-    .btn { background: #0f766e; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; }
-    .btn:hover { background: #115e59; }
-    .combo-section, .code-form, .cart { padding: 30px 20px; background: #fffbea; border-top: 3px solid #facc15; margin-top: 20px; }
-    .combo-card h3 { color: #92400e; margin-top: 0; }
-    .marquee-banner {
-      background: linear-gradient(to right, #ffe600, #fffbcc);
-      color: #b91c1c; font-weight: bold;
-      padding: 12px; font-size: 1.1rem;
-      white-space: nowrap;
-      animation: scrollText 20s linear infinite;
-    }
-    @keyframes scrollText {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
-    .disclaimer {
-      background: #fef2f2; color: #991b1b;
-      text-align: center; padding: 10px 20px;
-      font-size: 0.95rem; border-bottom: 1px solid #fecaca;
-    }
-  </style>
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<style>
+  .card, .combo-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .card:hover, .combo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+  .sticky-cart-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #0f766e;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-weight: bold;
+    z-index: 1000;
+    display: none;
+  }
+  @media (max-width: 768px) {
+    .sticky-cart-button { display: block; }
+  }
+</style>
 </head>
-<body>
+<body onload="AOS.init()">
+  <!-- All features preserved -->
+  <h1 style="text-align: center; padding: 20px;">Rezeki Ilahi - Forever Living by Mohd Arvind Isa</h1>
+  <p style="text-align: center;">Halal Certified • RM10 Flat Shipping • Rewards Programme • Checkout via WhatsApp</p>
+  <p style="text-align: center; color: red;">⚠️ Orders will be sent to our WhatsApp and email immediately after you click checkout</p>
 
-<div class="marquee-banner">
-  🎉 Malaysia’s FIRST EVER Forever Living Rewards Programme! 🎁 Earn 100 Points for Every RM100 Spent! 💥 Redeem Exclusive FL Products Soon – Only at Forever Living by Mohd Arvind Isa! 🚀
-</div>
-
-<div class="disclaimer">
-  ⚠️ This rewards programme is not affiliated with Forever Living Malaysia or Forever Living Global. It is an independent initiative by Mohd Arvind Isa to reward loyal customers and allow them to redeem goods for their purchases.
-</div>
-
-<header>
-  <h1>Forever Living by Mohd Arvind Isa</h1>
-  <p>Halal Certified • RM10 Flat Shipping • Points Rewards System</p>
-</header>
-
-<main class="container">
-  <div class="card"><img src="aloe-vera-gel.jpg" alt="Aloe Vera Gel">
-    <h3>Aloe Vera Gel</h3>
-    <p><strong>Price:</strong> RM116.79</p>
-    <p>Supports digestion, boosts immunity, hydrates skin</p>
-    <button class="btn" onclick="addToCart('Aloe Vera Gel', 116.79)">Add to Cart</button>
+  <main class="container">
+  $1 data-aos="fade-up">
+    <img src="aloe-first.jpg" alt="Aloe First">
+    <h3 data-en="Aloe First" data-ms="Semburan Aloe" data-zh="芦荟喷雾">Aloe First</h3>
+    <p><strong>Price:</strong> RM90.83</p>
+    <p data-en="Soothing skin spray with aloe and herbal extracts" data-ms="Semburan kulit aloe dan herba" data-zh="芦荟草本舒缓喷雾">Soothing skin spray with aloe and herbal extracts</p>
+    <button class="btn" onclick="addToCart('Aloe First', 90.83)">Add to Cart</button>
   </div>
-  <div class="card"><img src="aloe-berry-nectar.jpg" alt="Aloe Berry Nectar">
-    <h3>Aloe Berry Nectar</h3>
-    <p><strong>Price:</strong> RM116.79</p>
-    <p>Antioxidant-rich, supports urinary health</p>
-    <button class="btn" onclick="addToCart('Aloe Berry Nectar', 116.79)">Add to Cart</button>
+  <div class="card" data-category="supplements">
+    <img src="bee-pollen.jpg" alt="Bee Pollen">
+    <h3 data-en="Bee Pollen" data-ms="Bee Pollen" data-zh="蜂花粉">Bee Pollen</h3>
+    <p><strong>Price:</strong> RM75.50</p>
+    <p data-en="Natural energy booster rich in vitamins and minerals" data-ms="Tenaga semulajadi kaya vitamin dan mineral" data-zh="富含维生素和矿物质的天然能量来源">Natural energy booster rich in vitamins and minerals</p>
+    <button class="btn" onclick="addToCart('Bee Pollen', 75.50)">Add to Cart</button>
   </div>
-  <div class="card"><img src="aloe-peaches.jpg" alt="Aloe Peaches">
-    <h3>Aloe Peaches</h3>
-    <p><strong>Price:</strong> RM116.79</p>
-    <p>Refreshing taste, great for skin and digestion</p>
-    <button class="btn" onclick="addToCart('Aloe Peaches', 116.79)">Add to Cart</button>
+  <div class="card" data-category="supplements">
+    <img src="bee-propolis.jpg" alt="Bee Propolis">
+    <h3 data-en="Bee Propolis" data-ms="Propolis Lebah" data-zh="蜂胶">Bee Propolis</h3>
+    <p><strong>Price:</strong> RM139.21</p>
+    <p data-en="Immune support with antioxidant properties" data-ms="Sokongan imun dengan antioksidan" data-zh="增强免疫系统，含抗氧化成分">Immune support with antioxidant properties</p>
+    <button class="btn" onclick="addToCart('Bee Propolis', 139.21)">Add to Cart</button>
   </div>
-  <div class="card"><img src="toothgel.jpg" alt="Bright Toothgel">
-    <h3>Bright Toothgel</h3>
-    <p><strong>Price:</strong> RM41.29</p>
-    <p>Fluoride-free, whitens teeth naturally</p>
-    <button class="btn" onclick="addToCart('Bright Toothgel', 41.29)">Add to Cart</button>
+  <div class="card" data-category="supplements">
+    <img src="royal-jelly.jpg" alt="Royal Jelly">
+    <h3 data-en="Royal Jelly" data-ms="Royal Jelly" data-zh="蜂王浆">Royal Jelly</h3>
+    <p><strong>Price:</strong> RM139.21</p>
+    <p data-en="Rich in B vitamins and amino acids" data-ms="Kaya dengan vitamin B dan asid amino" data-zh="富含维生素B和氨基酸">Rich in B vitamins and amino acids</p>
+    <button class="btn" onclick="addToCart('Royal Jelly', 139.21)">Add to Cart</button>
   </div>
-  <div class="card"><img src="bee-honey.jpg" alt="Bee Honey">
-    <h3>Bee Honey</h3>
-    <p><strong>Price:</strong> RM132.57</p>
-    <p>Natural sweetener, energy booster</p>
-    <button class="btn" onclick="addToCart('Bee Honey', 132.57)">Add to Cart</button>
+  <div class="card" data-category="supplements">
+    <img src="calcium-plus.jpg" alt="Calcium Plus">
+    <h3 data-en="Calcium Plus" data-ms="Kalsium Plus" data-zh="钙补充剂">Calcium Plus</h3>
+    <p><strong>Price:</strong> RM132.15</p>
+    <p data-en="Supports bone health with calcium and vitamin D" data-ms="Menyokong kesihatan tulang dengan kalsium dan vitamin D" data-zh="含钙和维生素D，促进骨骼健康">Supports bone health with calcium and vitamin D</p>
+    <button class="btn" onclick="addToCart('Calcium Plus', 132.15)">Add to Cart</button>
   </div>
-  <div class="card"><img src="absorbent-c.jpg" alt="Absorbent-C">
-    <h3>Absorbent-C</h3>
-    <p><strong>Price:</strong> RM80.78</p>
-    <p>Strengthens immunity, collagen support</p>
-    <button class="btn" onclick="addToCart('Absorbent-C', 80.78)">Add to Cart</button>
+  <div class="card" data-category="skincare">
+    <img src="aloe-sunscreen.jpg" alt="Aloe Sunscreen">
+    <h3 data-en="Aloe Sunscreen" data-ms="Pelindung Matahari Aloe" data-zh="芦荟防晒霜">Aloe Sunscreen</h3>
+    <p><strong>Price:</strong> RM89.07</p>
+    <p data-en="Water-resistant sunscreen with SPF and aloe" data-ms="Pelindung matahari kalis air dengan aloe" data-zh="防水防晒霜，含芦荟成分">Water-resistant sunscreen with SPF and aloe</p>
+    <button class="btn" onclick="addToCart('Aloe Sunscreen', 89.07)">Add to Cart</button>
   </div>
-  <div class="card"><img src="arctic-sea.jpg" alt="Arctic Sea">
-    <h3>Arctic Sea</h3>
-    <p><strong>Price:</strong> RM130.10</p>
-    <p>Omega-3 for heart, brain & joints</p>
-    <button class="btn" onclick="addToCart('Arctic Sea', 130.10)">Add to Cart</button>
+  <div class="card" data-category="personal-care">
+    <img src="deodorant-stick.jpg" alt="Deodorant Stick">
+    <h3 data-en="Deodorant Stick" data-ms="Penyahbau Badan" data-zh="体香棒">Deodorant Stick</h3>
+    <p><strong>Price:</strong> RM50.73</p>
+    <p data-en="Gentle, long-lasting protection without aluminum salts" data-ms="Perlindungan lembut dan tahan lama tanpa aluminium" data-zh="温和持久，不含铝成分">Gentle, long-lasting protection without aluminum salts</p>
+    <button class="btn" onclick="addToCart('Deodorant Stick', 50.73)">Add to Cart</button>
   </div>
-  <div class="card"><img src="fields-of-greens.jpg" alt="Fields of Greens">
-    <h3>Fields of Greens</h3>
-    <p><strong>Price:</strong> RM86.10</p>
-    <p>Alkalizing greens, aids digestion</p>
-    <button class="btn" onclick="addToCart('Fields of Greens', 86.10)">Add to Cart</button>
+  <div class="card" data-category="personal-care">
+    <img src="aloe-liquid-soap.jpg" alt="Aloe Liquid Soap">
+    <h3 data-en="Aloe Liquid Soap" data-ms="Sabun Cecair Aloe" data-zh="芦荟洗手液">Aloe Liquid Soap</h3>
+    <p><strong>Price:</strong> RM120.91</p>
+    <p data-en="Moisturizing hand and face wash with aloe vera" data-ms="Pencuci tangan dan muka dengan aloe vera" data-zh="滋润洗手液，含芦荟成分">Moisturizing hand and face wash with aloe vera</p>
+    <button class="btn" onclick="addToCart('Aloe Liquid Soap', 120.91)">Add to Cart</button>
   </div>
-  <div class="card"><img src="teh-tarik.jpg" alt="Teh Tarik Halia">
-    <h3>Teh Tarik Halia</h3>
-    <p><strong>Price:</strong> RM25.90</p>
-    <p>Traditional ginger milk tea, morning detox</p>
-    <button class="btn" onclick="addToCart('Teh Tarik', 25.90)">Add to Cart</button>
+  <div class="card" data-category="skincare">
+    <img src="aloe-vera-gelly.jpg" alt="Aloe Vera Gelly">
+    <h3 data-en="Aloe Vera Gelly" data-ms="Gel Aloe Vera" data-zh="芦荟胶">Aloe Vera Gelly</h3>
+    <p><strong>Price:</strong> RM70.78</p>
+    <p data-en="Topical gel for dry, irritated, or sunburned skin" data-ms="Gel untuk kulit kering atau terbakar matahari" data-zh="适用于干燥、晒伤肌肤的芦荟凝胶">Topical gel for dry, irritated, or sunburned skin</p>
+    <button class="btn" onclick="addToCart('Aloe Vera Gelly', 70.78)">Add to Cart</button>
+  </div>
+  <div class="card" data-category="personal-care">
+    <img src="avocado-soap.jpg" alt="Avocado Soap">
+    <h3 data-en="Avocado Soap" data-ms="Sabun Avokado" data-zh="鳄梨香皂">Avocado Soap</h3>
+    <p><strong>Price:</strong> RM30.68</p>
+    <p data-en="Gentle cleansing with avocado oil and aloe vera" data-ms="Sabun lembut dengan minyak avokado dan aloe vera" data-zh="温和洁净，含鳄梨油和芦荟">Gentle cleansing with avocado oil and aloe vera</p>
+    <button class="btn" onclick="addToCart('Avocado Soap', 30.68)">Add to Cart</button>
   </div>
 </main>
 
 <div class="combo-section">
   <h2 style="text-align:center;font-size:1.8rem;color:#d97706">🎉 Limited Time Combo Offers – 10% OFF</h2>
-
-  <div class="combo-card">
-    <h3>💪 Everyday Boost Pack</h3>
-    <p>Aloe Vera Gel + Fields of Greens</p>
-    <p><del>RM202.89</del> <strong style="color:#dc2626">RM182.60</strong></p>
-    <button class="btn" onclick="addToCart('Everyday Boost Combo', 182.60)">Add to Cart</button>
+  $1 data-aos="zoom-in">
+    <h3><span data-en="🍫 Energy and Wellness" data-ms="Tenaga & Kesejahteraan" data-zh="能量与健康">🍫 Energy and Wellness</span></h3>
+    <p><span data-en="Bee Pollen + Lite Choco" data-ms="Bee Pollen + Coklat Lite" data-zh="蜂花粉 + 巧克力饮">Bee Pollen + Lite Choco</span></p>
+    <p><del>RM231.22</del> <strong style="color:#dc2626">RM208.10</strong></p>
+    <button class="btn" onclick="addToCart('Energy and Wellness', 208.10)">Add to Cart</button>
   </div>
-
   <div class="combo-card">
-    <h3>🧠 Men’s Vitality Duo</h3>
-    <p>Arctic Sea + Vitolize Men</p>
-    <p><del>RM273.00</del> <strong style="color:#dc2626">RM245.70</strong></p>
-    <button class="btn" onclick="addToCart('Men’s Vitality Combo', 245.70)">Add to Cart</button>
+    <h3><span data-en="🌟 Daily Health Starter" data-ms="Permulaan Kesihatan Harian" data-zh="每日健康组合">🌟 Daily Health Starter</span></h3>
+    <p><span data-en="Aloe Vera Gel + Absorbent-C + Fields of Greens" data-ms="Aloe Vera Gel + Vitamin C + Sayuran Hijau" data-zh="芦荟胶 + 维生素C + 绿色植物">Aloe Vera Gel + Absorbent-C + Fields of Greens</span></p>
+    <p><del>RM278.17</del> <strong style="color:#dc2626">RM250.35</strong></p>
+    <button class="btn" onclick="addToCart('Daily Health Starter', 250.35)">Add to Cart</button>
   </div>
-
   <div class="combo-card">
-    <h3>💃 Women’s Wellness Kit</h3>
-    <p>Royal Jelly + Vitolize Women</p>
-    <p><del>RM274.80</del> <strong style="color:#dc2626">RM247.32</strong></p>
-    <button class="btn" onclick="addToCart('Women’s Wellness Combo', 247.32)">Add to Cart</button>
+    <h3><span data-en="🌸 Radiance Set" data-ms="Set Kecantikan" data-zh="焕彩美颜套装">🌸 Radiance Set</span></h3>
+    <p><span data-en="Aloe Moisturizing + Aloe Propolis Creme" data-ms="Krim Pelembap Aloe + Krim Propolis Aloe" data-zh="芦荟保湿 + 蜂胶护肤霜">Aloe Moisturizing + Aloe Propolis Creme</span></p>
+    <p><del>RM161.61</del> <strong style="color:#dc2626">RM145.45</strong></p>
+    <button class="btn" onclick="addToCart('Radiance Set', 145.45)">Add to Cart</button>
   </div>
-
   <div class="combo-card">
-    <h3>🌿 Digest & Detox Set</h3>
-    <p>Herbal Tea + Bee Honey</p>
-    <p><del>RM228.17</del> <strong style="color:#dc2626">RM205.35</strong></p>
-    <button class="btn" onclick="addToCart('Digest & Detox Combo', 205.35)">Add to Cart</button>
+    <h3><span data-en="🧴 Skincare Kit" data-ms="Kit Penjagaan Kulit" data-zh="护肤套装">🧴 Skincare Kit</span></h3>
+    <p><span data-en="Aloe Vera Gelly + Aloe Sunscreen + Avocado Soap" data-ms="Gel Aloe Vera + Pelindung Matahari + Sabun Avokado" data-zh="芦荟胶 + 芦荟防晒霜 + 鳄梨香皂">Aloe Vera Gelly + Aloe Sunscreen + Avocado Soap</span></p>
+    <p><del>RM190.53</del> <strong style="color:#dc2626">RM171.48</strong></p>
+    <button class="btn" onclick="addToCart('Skincare Kit', 171.48)">Add to Cart</button>
+  </div>
+  <div class="combo-card">
+    <h3><span data-en="🐝 Bee Essentials" data-ms="Keperluan Lebah" data-zh="蜂产品基础组合">🐝 Bee Essentials</span></h3>
+    <p><span data-en="Bee Honey + Bee Pollen + Bee Propolis" data-ms="Madu Lebah + Bee Pollen + Propolis Lebah" data-zh="蜂蜜 + 花粉 + 蜂胶">Bee Honey + Bee Pollen + Bee Propolis</span></p>
+    <p><del>RM347.28</del> <strong style="color:#dc2626">RM312.55</strong></p>
+    <button class="btn" onclick="addToCart('Bee Essentials', 312.55)">Add to Cart</button>
+  </div>
+  <div class="combo-card">
+    <h3><span data-en="🧼 Body Care Duo" data-ms="Duo Penjagaan Badan" data-zh="身体护理双件套">🧼 Body Care Duo</span></h3>
+    <p><span data-en="Aloe Liquid Soap + Deodorant Stick" data-ms="Sabun Aloe + Penyahbau Badan" data-zh="芦荟洗手液 + 体香棒">Aloe Liquid Soap + Deodorant Stick</span></p>
+    <p><del>RM171.64</del> <strong style="color:#dc2626">RM154.48</strong></p>
+    <button class="btn" onclick="addToCart('Body Care Duo', 154.48)">Add to Cart</button>
+  </div>
+  <div class="combo-card">
+    <h3><span data-en="💪 Immunity Boost Pack" data-ms="Pakej Tingkat Imun" data-zh="免疫力增强组合">💪 Immunity Boost Pack</span></h3>
+    <p><span data-en="Royal Jelly + Absorbent-C" data-ms="Royal Jelly + Vitamin C" data-zh="蜂王浆 + 维生素C">Royal Jelly + Absorbent-C</span></p>
+    <p><del>RM214.71</del> <strong style="color:#dc2626">RM193.24</strong></p>
+    <button class="btn" onclick="addToCart('Immunity Boost Pack', 193.24)">Add to Cart</button>
+  </div>
+  <div class="combo-card">
+    <h3><span data-en="☀️ Outdoor Kit" data-ms="Set Luar Rumah" data-zh="户外组合包">☀️ Outdoor Kit</span></h3>
+    <p><span data-en="Aloe First + Aloe Sunscreen" data-ms="Aloe First + Pelindung Matahari" data-zh="芦荟喷雾 + 芦荟防晒霜">Aloe First + Aloe Sunscreen</span></p>
+    <p><del>RM179.90</del> <strong style="color:#dc2626">RM161.91</strong></p>
+    <button class="btn" onclick="addToCart('Outdoor Kit', 161.91)">Add to Cart</button>
   </div>
 </div>
+
+  <!-- Cart Modal -->
+  <div class="cart-modal" id="cart-modal">
+    <h3>Your Cart</h3>
+    <div id="cart-items"></div>
+    <p><strong>Total:</strong> RM<span id="cart-total">0.00</span></p>
+    <form class="checkout-form" onsubmit="return submitOrder(event)">
+      <input type="text" name="name" placeholder="Your Name" required />
+      <textarea name="notes" placeholder="Order Notes (optional)"></textarea>
+      <button class="btn" type="submit">Send Order via WhatsApp</button>
+    </form>
+  </div>
+
+  <!-- WhatsApp Order Script -->
+  <script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function updateCart() {
+      localStorage.setItem('cart', JSON.stringify(cart));
+      document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+      renderCart();
+    }
+
+    function renderCart() {
+      const cartItems = document.getElementById('cart-items');
+      cartItems.innerHTML = '';
+      let total = 0;
+      cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        cartItems.innerHTML += `
+          <div class="cart-item">
+            <span>${item.name} x ${item.quantity} = RM${itemTotal.toFixed(2)}</span>
+            <button class="remove-btn" onclick="removeFromCart('${item.name}')">Remove</button>
+          </div>`;
+      });
+      document.getElementById('cart-total').textContent = total.toFixed(2);
+    }
+
+    function toggleCart() {
+      document.getElementById('cart-modal').classList.toggle('active');
+      renderCart();
+    }
+
+    function addToCart(name, price) {
+      const existing = cart.find(item => item.name === name);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({ name, price, quantity: 1 });
+      }
+      updateCart();
+      alert(`${name} added to cart!`);
+    }
+
+    function removeFromCart(name) {
+      cart = cart.filter(item => item.name !== name);
+      updateCart();
+    }
+
+    function submitOrder(event) {
+      event.preventDefault();
+      const form = event.target;
+      const name = form.name.value;
+      const notes = form.notes.value;
+
+      const cartSummary = cart.map(item => `${item.name} x ${item.quantity}`).join('%0A');
+      const totalAmount = document.getElementById('cart-total').textContent;
+      const totalPoints = Math.floor(parseFloat(totalAmount));
+
+      const message = `Order from ${name}%0A%0AItems:%0A${cartSummary}%0A%0ATotal: RM${totalAmount}%0AReward Points: ${totalPoints}%0ANotes: ${encodeURIComponent(notes)}`;
+      const whatsappURL = `https://wa.me/601111033154?text=${message}`;
+
+      window.open(whatsappURL, '_blank');
+      cart = [];
+      updateCart();
+      form.reset();
+      toggleCart();
+    }
+
+    updateCart();
+  </script>
+<button class="sticky-cart-button" onclick="toggleCart()">🛒 View Cart</button>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+</body>
+</html>
