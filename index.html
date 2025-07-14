@@ -116,6 +116,7 @@
       <li><a href="#" onclick="showTab('products')">Products</a></li>
       <li><a href="#" onclick="showTab('cds')">Cabaran Detox Sihat</a></li>
       <li><a href="#" onclick="showTab('business')">Business Opportunity</a></li>
+      <li><a href="#" onclick="showTab('ai-suggestion')">AI Suggestion</a></li>
     </ul>
   </nav>
 
@@ -154,29 +155,18 @@
         <button onclick="location.href='https://wa.me/601111033154'">Contact Us on WhatsApp</button>
       </section>
     </div>
-    <section class="tab-content" id="ai-suggestion">
-  <h2>AI Product Suggestion</h2>
-  <p>Tell us your symptoms and we’ll suggest the most relevant Forever Living products:</p>
-  <input type="text" id="symptom-ai-input" placeholder="e.g. joint pain, low energy, digestion..." style="width:100%;padding:10px;margin:10px 0;">
-  <button onclick="suggestProduct()" style="padding:10px 20px;background:#2c8a58;color:#fff;border:none;border-radius:4px;cursor:pointer;">Suggest Product</button>
-  <div id="ai-suggestion-result" style="margin-top:20px;"></div>
-  <p style="margin-top:20px;font-size:13px;color:#856404;background:#fff3cd;padding:10px;border:1px solid #ffeeba;border-radius:4px;">
-    <strong>Disclaimer:</strong> Suggestions are AI-generated and do not replace professional medical advice. Please consult a healthcare provider before starting any supplements.
-  </p>
-</section>
-
-$1<section class="tab-content" id="ai-suggestion">
-  <h2>AI Product Suggestion</h2>
-  <p>Tell us your symptoms and we’ll suggest the most relevant Forever Living products:</p>
-  <input type="text" id="symptom-input" placeholder="e.g. joint pain, low energy, digestion..." style="width:100%;padding:10px;margin:10px 0;">
-  <button onclick="suggestProduct()" style="padding:10px 20px;background:#2c8a58;color:#fff;border:none;border-radius:4px;cursor:pointer;">Suggest Product</button>
-  <div id="suggestion-result" style="margin-top:20px;"></div>
-  <p style="margin-top:20px;font-size:13px;color:#856404;background:#fff3cd;padding:10px;border:1px solid #ffeeba;border-radius:4px;">
-    <strong>Disclaimer:</strong> Suggestions are AI-generated and do not replace professional medical advice. Please consult a healthcare provider before starting any supplements.
-  </p>
-</section>
-
-
+    
+    <div id="ai-suggestion" class="tab-content">
+      <h2>AI Product Suggestion</h2>
+      <p>Tell us your symptoms and we'll suggest the most relevant Forever Living products:</p>
+      <input type="text" id="symptom-input" placeholder="e.g. joint pain, low energy, digestion..." style="width:100%;padding:10px;margin:10px 0;">
+      <button onclick="suggestProduct()" style="padding:10px 20px;background:#2c8a58;color:#fff;border:none;border-radius:4px;cursor:pointer;">Suggest Product</button>
+      <div id="suggestion-result" style="margin-top:20px;"></div>
+      <p style="margin-top:20px;font-size:13px;color:#856404;background:#fff3cd;padding:10px;border:1px solid #ffeeba;border-radius:4px;">
+        <strong>Disclaimer:</strong> Suggestions are AI-generated and do not replace professional medical advice. Please consult a healthcare provider before starting any supplements.
+      </p>
+    </div>
+  </main>
 
   <footer>
     <p>&copy; 2025 Forever Living. Powered by Rich Academy Global. All rights reserved.</p>
@@ -210,13 +200,7 @@ $1<section class="tab-content" id="ai-suggestion">
       { name: "Aloe Lips", price: 17.92, image: "images/aloe_lips.jpg" },
       { name: "Forever Aloe Deodorant", price: 34.91, image: "images/deodorant-stick.jpg" },
       { name: "Forever Deodorant Stick", price: 34.91, image: "images/forever-deodorant.jpg" },
-      { name: "Teh Tarik Halia", price: 40.00, image: "images/teh-tarik.jpg" },
-      { name: "Aloe Berry Nectar (Alt)", price: 116.79, image: "images/aloe_berry_nectar.jpg" },
-      { name: "Aloe Sunscreen (New)", price: 84.91, image: "images/aloe sunscreen new.jpg" },
-      { name: "Aloe First (JPEG)", price: 93.40, image: "images/aloe first.jpeg" },
-      { name: "Aloe Soap (Spaced)", price: 54.72, image: "images/aloe soap .jpg" },
-      { name: "Aloe Soap (Dashed)", price: 54.72, image: "images/aloe-soap .jpg" },
-      { name: "Royal Jelly (Duplicate)", price: 157.38, image: "images/royal-jelly.jpg.jpg" }
+      { name: "Teh Tarik Halia", price: 40.00, image: "images/teh-tarik.jpg" }
     ];
 
     function showTab(tabId) {
@@ -228,29 +212,22 @@ $1<section class="tab-content" id="ai-suggestion">
       alert("Cart feature coming soon.");
     }
 
-    $1
+    // Initialize product list
+    function initProductList() {
+      const productList = document.getElementById('product-list');
+      products.forEach(product => {
+        const productEl = document.createElement('div');
+        productEl.className = 'product';
+        productEl.innerHTML = `
+          <img src="${product.image}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <div class="price">RM${product.price.toFixed(2)}</div>
+          <a href="https://wa.me/601111033154?text=I'm%20interested%20in%20${encodeURIComponent(product.name)}" class="whatsapp-btn">Order via WhatsApp</a>
+        `;
+        productList.appendChild(productEl);
+      });
+    }
 
-function suggestProduct() {
-  const input = document.getElementById("symptom-ai-input").value.toLowerCase();
-  const result = document.getElementById("ai-suggestion-result");
-  let suggestions = [];
-
-  if (input.includes("skin")) suggestions.push("Aloe Vera Gel – Drink 30ml daily before meals.");
-  if (input.includes("joint") || input.includes("pain")) suggestions.push("Arctic Sea – 2 softgels twice a day after meals.");
-  if (input.includes("energy") || input.includes("fatigue")) suggestions.push("Royal Jelly – 1 tablet in the morning.");
-  if (input.includes("digest") || input.includes("constipation")) suggestions.push("Fields of Greens – 1 tablet three times daily.");
-  if (input.includes("flu") || input.includes("cold") || input.includes("immunity")) suggestions.push("Bee Propolis – 1 tablet daily.");
-
-  if (suggestions.length === 0) {
-    result.innerHTML = `<p>No specific match found. Please contact us for personalized support.</p>`;
-  } else {
-    result.innerHTML = `<ul>` + suggestions.map(s => `<li>${s}</li>`).join("") + `</ul>`;
-  }
-} else {
-    result.innerHTML = `<ul>` + suggestions.map(s => `<li>${s}</li>`).join("") + `</ul>`;
-  }
-}
-  
     function suggestProduct() {
       const input = document.getElementById("symptom-input").value.toLowerCase();
       const result = document.getElementById("suggestion-result");
@@ -263,10 +240,16 @@ function suggestProduct() {
       if (input.includes("immunity") || input.includes("flu") || input.includes("cold")) suggestions.push("Bee Propolis - 1 tablet daily with meals");
 
       if (suggestions.length === 0) {
-        result.innerHTML = `<p>No specific match found. Please contact us for personalised support.</p>`;
+        result.innerHTML = `<p>No specific match found. Please contact us for personalized support.</p>`;
       } else {
         result.innerHTML = `<ul>` + suggestions.map(s => `<li>${s}</li>`).join("") + `</ul>`;
       }
     }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      initProductList();
+    });
+  </script>
 </body>
 </html>
