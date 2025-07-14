@@ -154,16 +154,16 @@
         <button onclick="location.href='https://wa.me/601111033154'">Contact Us on WhatsApp</button>
       </section>
     </div>
-    <section class="tab-content" id="suggestion">
-    <h2>Get Product Suggestion Based on Your Symptoms</h2>
-    <p>Tell us what health issues you're experiencing and we’ll recommend suitable Forever Living products:</p>
-    <input type="text" id="symptom-input" placeholder="e.g. joint pain, low energy, digestion..." style="width:100%;padding:10px;margin:10px 0;">
-    <button onclick="suggestProduct()" style="padding:10px 20px;background:#2c8a58;color:#fff;border:none;border-radius:4px;cursor:pointer;">Suggest Product</button>
-    <div id="suggestion-result" style="margin-top:20px;"></div>
-    <p style="margin-top:20px;font-size:13px;color:#856404;background:#fff3cd;padding:10px;border:1px solid #ffeeba;border-radius:4px;">
-      <strong>Disclaimer:</strong> This recommendation is based on general input and does not replace medical advice. Please consult your healthcare provider before starting any new supplement.
-    </p>
-  </section>
+    <section class="tab-content" id="ai-suggestion">
+  <h2>AI Product Suggestion</h2>
+  <p>Tell us your symptoms and we’ll suggest the most relevant Forever Living products:</p>
+  <input type="text" id="symptom-ai-input" placeholder="e.g. joint pain, low energy, digestion..." style="width:100%;padding:10px;margin:10px 0;">
+  <button onclick="suggestProduct()" style="padding:10px 20px;background:#2c8a58;color:#fff;border:none;border-radius:4px;cursor:pointer;">Suggest Product</button>
+  <div id="ai-suggestion-result" style="margin-top:20px;"></div>
+  <p style="margin-top:20px;font-size:13px;color:#856404;background:#fff3cd;padding:10px;border:1px solid #ffeeba;border-radius:4px;">
+    <strong>Disclaimer:</strong> Suggestions are AI-generated and do not replace professional medical advice. Please consult a healthcare provider before starting any supplements.
+  </p>
+</section>
 
 $1<section class="tab-content" id="ai-suggestion">
   <h2>AI Product Suggestion</h2>
@@ -231,8 +231,8 @@ $1<section class="tab-content" id="ai-suggestion">
     $1
 
 function suggestProduct() {
-  const input = document.getElementById("symptom-input").value.toLowerCase();
-  const result = document.getElementById("suggestion-result");
+  const input = document.getElementById("symptom-ai-input").value.toLowerCase();
+  const result = document.getElementById("ai-suggestion-result");
   let suggestions = [];
 
   if (input.includes("skin")) suggestions.push("Aloe Vera Gel – Drink 30ml daily before meals.");
@@ -244,6 +244,9 @@ function suggestProduct() {
   if (suggestions.length === 0) {
     result.innerHTML = `<p>No specific match found. Please contact us for personalized support.</p>`;
   } else {
+    result.innerHTML = `<ul>` + suggestions.map(s => `<li>${s}</li>`).join("") + `</ul>`;
+  }
+} else {
     result.innerHTML = `<ul>` + suggestions.map(s => `<li>${s}</li>`).join("") + `</ul>`;
   }
 }
@@ -265,6 +268,5 @@ function suggestProduct() {
         result.innerHTML = `<ul>` + suggestions.map(s => `<li>${s}</li>`).join("") + `</ul>`;
       }
     }
-$1
 </body>
 </html>
