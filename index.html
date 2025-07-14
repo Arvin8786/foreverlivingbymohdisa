@@ -1,188 +1,369 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forever Living by Mohd Arvind Isa</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    header {
+      background-color: #fff;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+    .cart-icon {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    nav {
+      background-color: #2c8a58;
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      padding: 10px;
+      margin: 0;
+      justify-content: center;
+    }
+    nav li {
+      margin: 0 15px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .tab-content {
+      display: none;
+      padding: 20px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .product {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .product img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+    .product h3 {
+      margin: 10px 0 5px;
+      color: #2c8a58;
+    }
+    .product .price {
+      color: #e67e22;
+      font-weight: bold;
+      margin: 8px 0;
+    }
+    .product .benefits {
+      font-size: 13px;
+      color: #555;
+      text-align: left;
+      margin: 8px 0;
+      padding: 0 5px;
+    }
+    .product .consumption {
+      font-size: 13px;
+      color: #2c8a58;
+      font-style: italic;
+      text-align: left;
+      margin: 8px 0 12px;
+      padding: 0 5px;
+    }
+    .product .whatsapp-btn {
+      display: inline-block;
+      margin-top: 10px;
+      background: #25D366;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .ai-suggestion-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    .ai-suggestion-box h2 {
+      color: #2c8a58;
+      margin-top: 0;
+    }
+    #symptom-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+    #suggest-btn {
+      background: #2c8a58;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #suggest-btn:hover {
+      background: #237a48;
+    }
+    #suggestion-result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 4px;
+    }
+    footer {
+      background: #f1f1f1;
+      padding: 20px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .disclaimer {
+      margin-top: 10px;
+      background-color: #fff3cd;
+      color: #856404;
+      padding: 15px;
+      border-top: 1px solid #ffeeba;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 style="font-size: 28px; color: #2c8a58;">
+      FOREVER LIVING by Mohd Arvind Isa
+    </h1>
+    <div class="cart-icon" onclick="toggleCart()">
+      🛒 <span id="cart-count">0</span>
+    </div>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="#" onclick="showTab('products')">Products</a></li>
+      <li><a href="#" onclick="showTab('cds')">Cabaran Detox Sihat</a></li>
+      <li><a href="#" onclick="showTab('business')">Business Opportunity</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div id="products" class="tab-content active">
+      <div class="ai-suggestion-box">
+        <h2>AI Product Suggestion</h2>
+        <p>Tell us your symptoms and we'll recommend the best Forever Living products for you:</p>
+        <input type="text" id="symptom-input" placeholder="e.g. joint pain, low energy, digestion issues...">
+        <button id="suggest-btn" onclick="suggestProduct()">Get Product Suggestions</button>
+        <div id="suggestion-result"></div>
+      </div>
+      
+      <h2>Our Products</h2>
+      <div id="product-list" class="product-list"></div>
+    </div>
+
+    <div id="cds" class="tab-content">
+      <section class="cds-section">
+        <h2>Cabaran Detox Sihat (CDS)</h2>
+        <p>CDS is a health program by Rich Academy Global designed to help you detox and reset your body naturally.</p>
+        <ul>
+          <li>✅ 7-day detox with Forever products</li>
+          <li>📦 Personalized supplement plan</li>
+          <li>📋 Guided meal plan</li>
+          <li>📱 Daily coaching & community support</li>
+          <li>💬 WhatsApp check-ins with a coach</li>
+        </ul>
+        <p><strong>Delivered in 5–10 working days.</strong></p>
+        <button onclick="location.href='https://wa.me/601111033154?text=I%20am%20interested%20in%20CDS%20Program'">Join Now on WhatsApp</button>
+      </section>
+    </div>
+
+    <div id="business" class="tab-content">
+      <section>
+        <h2>Join Our Business</h2>
+        <p>Be part of Rich Academy Global and build your Forever Living career.</p>
+        <ul>
+          <li>💸 30–50% product commission</li>
+          <li>🕐 Flexible hours</li>
+          <li>🌍 Global business potential</li>
+          <li>🎓 Free training and support</li>
+        </ul>
+        <button onclick="location.href='https://wa.me/601111033154'">Contact Us on WhatsApp</button>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Forever Living. Powered by Rich Academy Global. All rights reserved.</p>
+    <section class="disclaimer">
+      <strong>Disclaimer:</strong> This website is operated by an independent Forever Business Owner (FBO) under Rich Academy Global and is not the official site of Forever Living Products. Product names, trademarks, and registered trademarks are property of Forever Living Products International, Inc.
+    </section>
+  </footer>
+
+  <script>
     const products = [
-      { 
-        name: "Aloe Vera Gel", 
-        price: 116.79, 
-        image: "aloe-vera-gel.jpg",
-        benefits: "Supports digestion, boosts immunity, promotes skin health",
-        consumption: "Take 30-60ml daily, preferably on empty stomach"
-      },
-      { 
-        name: "Aloe Berry Nectar", 
-        price: 116.79, 
-        image: "aloe-berry-nectar.jpg",
-        benefits: "Antioxidant support, immune system booster, natural energy",
-        consumption: "30-60ml daily, can be mixed with water or juice"
-      },
-      { 
-        name: "Aloe Peaches", 
-        price: 116.79, 
-        image: "aloe-peaches.jpg",
-        benefits: "Digestive health, vitamin C source, natural detoxification",
-        consumption: "30-60ml daily, refrigerate after opening"
-      },
-      { 
-        name: "Bee Honey", 
-        price: 69.47, 
-        image: "bee-honey.jpg",
-        benefits: "Natural energy, soothes throat, antioxidant properties",
-        consumption: "1-2 teaspoons daily, can be added to drinks"
-      },
-      { 
-        name: "Royal Jelly", 
-        price: 157.38, 
-        image: "royal-jelly.jpg",
-        benefits: "Energy booster, supports immune system, anti-aging",
-        consumption: "1 tablet daily, preferably in the morning"
-      },
-      { 
-        name: "Bee Pollen", 
-        price: 96.23, 
-        image: "bee-pollen.jpg",
-        benefits: "Natural multivitamin, energy enhancement, allergy relief",
-        consumption: "1 tablet 3 times daily with meals"
-      },
-      { 
-        name: "Bee Propolis", 
-        price: 134.34, 
-        image: "bee-propolis.jpg",
-        benefits: "Immune support, natural antibiotic, throat health",
-        consumption: "1 tablet daily or as needed"
-      },
-      { 
-        name: "Arctic Sea", 
-        price: 133.02, 
-        image: "arctic-sea.jpg",
-        benefits: "Heart health, joint support, brain function",
-        consumption: "2 softgels twice daily with meals"
-      },
-      { 
-        name: "Fields of Greens", 
-        price: 115.94, 
-        image: "fields-of-greens.jpg",
-        benefits: "Detoxification, digestion, alkalizing",
-        consumption: "1 tablet 3 times daily with water"
-      },
-      { 
-        name: "Absorbent-C", 
-        price: 95.00, 
-        image: "absorbent_c.jpg",
-        benefits: "Immune support, collagen production, antioxidant",
-        consumption: "1-2 tablets daily with meals"
-      },
-      { 
-        name: "Calcium Plus", 
-        price: 95.85, 
-        image: "calcium-plus.jpg",
-        benefits: "Bone health, muscle function, nerve transmission",
-        consumption: "2 tablets daily with meals"
-      },
-      { 
-        name: "Aloe First", 
-        price: 93.40, 
-        image: "aloe-first.jpeg",
-        benefits: "Skin soothing, first aid, minor burns/cuts",
-        consumption: "Apply topically as needed"
-      },
-      { 
-        name: "Aloe Liquid Soap", 
-        price: 54.72, 
-        image: "aloe-liquid-soap.jpg",
-        benefits: "Gentle cleansing, moisturizing, antibacterial",
-        consumption: "Use as regular hand/body soap"
-      },
-      { 
-        name: "Aloe Propolis Creme", 
-        price: 92.08, 
-        image: "aloe-propolis-creme.jpg",
-        benefits: "Skin repair, moisturizing, soothing",
-        consumption: "Apply to affected area 2-3 times daily"
-      },
-      { 
-        name: "Aloe Jojoba Shampoo", 
-        price: 91.66, 
-        image: "aloe-jojoba-shampoo.jpg",
-        benefits: "Hair strengthening, scalp health, gentle cleansing",
-        consumption: "Use as regular shampoo"
-      },
-      { 
-        name: "Aloe Jojoba Conditioner", 
-        price: 91.66, 
-        image: "aloe-jojoba-conditioner.jpg",
-        benefits: "Hair conditioning, detangling, shine enhancement",
-        consumption: "Use after shampooing"
-      },
-      { 
-        name: "Aloe Sunscreen", 
-        price: 84.91, 
-        image: "aloe-sunscreen.jpg",
-        benefits: "UV protection, moisturizing, water resistant",
-        consumption: "Apply before sun exposure"
-      },
-      { 
-        name: "Aloe MPD 2X Ultra", 
-        price: 114.47, 
-        image: "aloe-mp-lotion.jpg",
-        benefits: "Muscle/joint relief, pain management, anti-inflammatory",
-        consumption: "Massage into affected area as needed"
-      },
-      { 
-        name: "Avocado Face & Body Soap", 
-        price: 23.40, 
-        image: "avocado-soap.jpg",
-        benefits: "Gentle cleansing, moisturizing, natural ingredients",
-        consumption: "Use as regular soap"
-      },
-      { 
-        name: "Forever Bright Toothgel", 
-        price: 31.62, 
-        image: "bright-toothgel.jpg",
-        benefits: "Oral hygiene, whitening, gum health",
-        consumption: "Use like regular toothpaste"
-      },
-      { 
-        name: "Aloe Lips", 
-        price: 17.92, 
-        image: "aloe_lips.jpg",
-        benefits: "Lip moisturizing, sun protection, soothing",
-        consumption: "Apply to lips as needed"
-      },
-      { 
-        name: "Forever Aloe Deodorant", 
-        price: 34.91, 
-        image: "deodorant-stick.jpg",
-        benefits: "Natural odor protection, aluminum-free, soothing",
-        consumption: "Apply to underarms daily"
-      },
-      { 
-        name: "Forever Deodorant Stick", 
-        price: 34.91, 
-        image: "forever-deodorant.jpg",
-        benefits: "24-hour protection, gentle formula, long-lasting",
-        consumption: "Apply to underarms as needed"
-      },
-      { 
-        name: "Teh Tarik Halia", 
-        price: 40.00, 
-        image: "teh-tarik.jpg",
-        benefits: "Energy boost, digestion aid, warming effect",
-        consumption: "Mix 1 sachet with hot water"
-      }
-    ];
+  { name: "Aloe Vera Gel", price: 116.79, image: "aloe-vera-gel.jpg", 
+   benefits: "Supports digestion, boosts immunity, promotes skin health", 
+   consumption: "Take 30-60ml daily, preferably on empty stomach" },
+  { name: "Aloe Berry Nectar", price: 116.79, image: "aloe-berry-nectar.jpg", 
+   benefits: "Antioxidant support, immune system booster, natural energy", 
+   consumption: "30-60ml daily, can be mixed with water or juice" },
+  { name: "Aloe Peaches", price: 116.79, image: "aloe-peaches.jpg", 
+   benefits: "Digestive health, vitamin C source, natural detoxification", 
+   consumption: "30-60ml daily, refrigerate after opening" },
+  { name: "Bee Honey", price: 132.57, image: "bee-honey.jpg", 
+   benefits: "Natural energy, soothes throat, antioxidant properties", 
+   consumption: "1-2 teaspoons daily, can be added to drinks" },
+  { name: "Royal Jelly", price: 139.21, image: "royal-jelly.jpg", 
+   benefits: "Energy booster, supports immune system, anti-aging", 
+   consumption: "1 tablet daily, preferably in the morning" },
+  { name: "Bee Pollen", price: 75.50, image: "bee-pollen.jpg", 
+   benefits: "Natural multivitamin, energy enhancement, allergy relief", 
+   consumption: "1 tablet 3 times daily with meals" },
+  { name: "Bee Propolis", price: 139.21, image: "bee-propolis.jpg", 
+   benefits: "Immune support, natural antibiotic, throat health", 
+   consumption: "1 tablet daily or as needed" },
+  { name: "Arctic Sea", price: 130.10, image: "arctic-sea.jpg", 
+   benefits: "Heart health, joint support, brain function", 
+   consumption: "2 softgels twice daily with meals" },
+  { name: "Fields of Greens", price: 86.10, image: "fields-of-greens.jpg", 
+   benefits: "Detoxification, digestion, alkalizing", 
+   consumption: "1 tablet 3 times daily with water" },
+  { name: "Absorbent-C", price: 75.50, image: "absorbent-c.jpg", 
+   benefits: "Immune support, collagen production, antioxidant", 
+   consumption: "1-2 tablets daily with meals" },
+  { name: "Calcium Plus", price: 132.15, image: "calcium-plus.jpg", 
+   benefits: "Bone support, muscle health, calcium + vitamin D", 
+   consumption: "2 tablets daily with meals" },
+  { name: "Aloe First", price: 93.40, image: "aloe-first.jpg", 
+   benefits: "Skin hydration, cooling relief, wound soothing", 
+   consumption: "Spray directly on skin as needed" },
+  { name: "Aloe Liquid Soap", price: 54.72, image: "aloe-liquid-soap.jpg", 
+   benefits: "Gentle cleansing, moisturizes skin, aloe-based formula", 
+   consumption: "Use daily for face and body cleansing" },
+  { name: "Aloe Propolis Creme", price: 92.08, image: "aloe-propolis-creme.jpg", 
+   benefits: "Skin repair, moisturizing, protective barrier", 
+   consumption: "Apply generously on dry or irritated areas" },
+  { name: "Aloe Jojoba Shampoo", price: 91.66, image: "aloe-jojoba-shampoo.jpg", 
+   benefits: "Hair nourishment, scalp care, sulfate-free", 
+   consumption: "Massage into wet hair, rinse thoroughly" },
+  { name: "Aloe Jojoba Conditioner", price: 91.66, image: "aloe-jojoba-conditioner.jpg", 
+   benefits: "Moisturizing, smooth finish, aloe + jojoba", 
+   consumption: "Apply after shampoo, leave 1-2 minutes, rinse" },
+  { name: "Aloe Sunscreen", price: 84.91, image: "aloe-sunscreen.jpg", 
+   benefits: "UV protection, aloe-based, water-resistant", 
+   consumption: "Apply 15 minutes before sun exposure" },
+  { name: "Aloe MPD 2X Ultra", price: 114.47, image: "aloe-mp-lotion.jpg", 
+   benefits: "Multi-purpose cleaner, concentrated, eco-friendly", 
+   consumption: "Dilute as needed for laundry, dishes or surfaces" },
+  { name: "Avocado Face & Body Soap", price: 23.40, image: "avocado-soap.jpg", 
+   benefits: "Softens skin, gentle cleansing, avocado oil-rich", 
+   consumption: "Use daily for face and body" },
+  { name: "Forever Bright Toothgel", price: 31.62, image: "bright-toothgel.jpg", 
+   benefits: "Fluoride-free, fresh breath, aloe-based care", 
+   consumption: "Brush teeth twice daily" },
+  { name: "Aloe Lips", price: 17.92, image: "aloe-lips.jpg", 
+   benefits: "Lip protection, moisturizes, healing balm", 
+   consumption: "Apply on lips as needed throughout the day" },
+  { name: "Forever Aloe Deodorant", price: 34.91, image: "deodorant-stick.jpg", 
+   benefits: "Long-lasting, gentle on skin, no aluminum salts", 
+   consumption: "Apply on clean underarms daily" },
+  { name: "Forever Deodorant Stick", price: 34.91, image: "forever-deodorant.jpg", 
+   benefits: "Natural fragrance, aloe soothing, easy glide", 
+   consumption: "Use after shower daily" },
+  { name: "Teh Tarik Halia", price: 25.90, image: "teh-tarik.jpg", 
+   benefits: "Warming effect, digestion aid, ginger-infused", 
+   consumption: "Mix sachet with hot water and stir well" },
+  { name: "Aloe Hand Soap", price: 54.72, image: "aloe-soap.jpg", 
+   benefits: "Gentle cleanser for hands, aloe-based", c
+       onsumption: "Use like regular hand wash daily" }
+];
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function toggleCart() {
+      alert("Cart feature coming soon.");
+    }
 
     function renderProducts() {
       const productList = document.getElementById('product-list');
-      productList.innerHTML = products.map(product => `
-        <div class="product">
-          <img src="images/${product.image}" alt="${product.name}">
-          <h3>${product.name}</h3>
-          <div class="price">RM ${product.price.toFixed(2)}</div>
-          <div class="benefits"><strong>Benefits:</strong> ${product.benefits}</div>
-          <div class="consumption"><strong>How to use:</strong> ${product.consumption}</div>
-          <a href="https://wa.me/601111033154?text=I%20want%20to%20buy%20${encodeURIComponent(product.name)}" class="whatsapp-btn">Order via WhatsApp</a>
-        </div>
-      `).join('');
+      if (productList) {
+        productList.innerHTML = products.map(product => `
+          <div class="product">
+            <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/200x200?text=Product+Image'">
+            <h3>${product.name}</h3>
+            <div class="price">RM ${product.price.toFixed(2)}</div>
+            <div class="benefits"><strong>Benefits:</strong> ${product.benefits}</div>
+            <div class="consumption"><strong>How to use:</strong> ${product.consumption}</div>
+            <a href="https://wa.me/601111033154?text=I%20want%20to%20buy%20${encodeURIComponent(product.name)}" class="whatsapp-btn">Order via WhatsApp</a>
+          </div>
+        `).join('');
+      }
     }
 
-    // ... rest of the JavaScript remains unchanged ...
-</script>
+    function suggestProduct() {
+      const input = document.getElementById("symptom-input").value.toLowerCase();
+      const result = document.getElementById("suggestion-result");
+      let suggestions = [];
+
+      if (input.includes("skin")) {
+        suggestions.push("Aloe Vera Gel - Drink 30ml daily before meals for skin hydration and health");
+      }
+      if (input.includes("joint") || input.includes("pain")) {
+        suggestions.push("Arctic Sea - Take 2 softgels twice daily for joint support and inflammation reduction");
+      }
+      if (input.includes("energy") || input.includes("fatigue")) {
+        suggestions.push("Royal Jelly - 1 tablet each morning for natural energy boost and vitality");
+      }
+      if (input.includes("digest") || input.includes("stomach")) {
+        suggestions.push("Fields of Greens - 1 tablet three times daily with meals for digestive support");
+      }
+      if (input.includes("immun") || input.includes("cold")) {
+        suggestions.push("Bee Propolis - 1 tablet daily to support immune system function");
+      }
+
+      if (suggestions.length === 0) {
+        result.innerHTML = `<p>We recommend consulting with our health advisor for personalized recommendations. 
+        <a href="https://wa.me/601111033154" style="color:#2c8a58;font-weight:bold;">Chat with us on WhatsApp</a></p>`;
+      } else {
+        result.innerHTML = `<h3 style="color:#2c8a58;">Recommended Products:</h3><ul style="padding-left:20px;">` + 
+          suggestions.map(s => `<li style="margin-bottom:8px;">${s}</li>`).join("") + `</ul>`;
+      }
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      renderProducts();
+      showTab('products');
+    });
+  </script>
+</body>
+</html>
