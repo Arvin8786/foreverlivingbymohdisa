@@ -165,7 +165,18 @@
     </p>
   </section>
 
-$1
+$1<section class="tab-content" id="ai-suggestion">
+  <h2>AI Product Suggestion</h2>
+  <p>Tell us your symptoms and we’ll suggest the most relevant Forever Living products:</p>
+  <input type="text" id="symptom-input" placeholder="e.g. joint pain, low energy, digestion..." style="width:100%;padding:10px;margin:10px 0;">
+  <button onclick="suggestProduct()" style="padding:10px 20px;background:#2c8a58;color:#fff;border:none;border-radius:4px;cursor:pointer;">Suggest Product</button>
+  <div id="suggestion-result" style="margin-top:20px;"></div>
+  <p style="margin-top:20px;font-size:13px;color:#856404;background:#fff3cd;padding:10px;border:1px solid #ffeeba;border-radius:4px;">
+    <strong>Disclaimer:</strong> Suggestions are AI-generated and do not replace professional medical advice. Please consult a healthcare provider before starting any supplements.
+  </p>
+</section>
+
+
 
   <footer>
     <p>&copy; 2025 Forever Living. Powered by Rich Academy Global. All rights reserved.</p>
@@ -217,22 +228,25 @@ $1
       alert("Cart feature coming soon.");
     }
 
-    function loadProducts() {
-      const container = document.getElementById("product-list");
-      products.forEach(p => {
-        const div = document.createElement("div");
-        div.className = "product";
-        div.innerHTML = `
-          <img src="${p.image}" alt="${p.name}" />
-          <h3>${p.name}</h3>
-          <p class="price">RM ${p.price.toFixed(2)}</p>
-          <a class="whatsapp-btn" href="https://wa.me/601111033154?text=Hi%2C%20I%20want%20to%20order%20${encodeURIComponent(p.name)}" target="_blank">Order Now</a>
-        `;
-        container.appendChild(div);
-      });
-    }
+    $1
 
-    document.addEventListener("DOMContentLoaded", loadProducts);
+function suggestProduct() {
+  const input = document.getElementById("symptom-input").value.toLowerCase();
+  const result = document.getElementById("suggestion-result");
+  let suggestions = [];
+
+  if (input.includes("skin")) suggestions.push("Aloe Vera Gel – Drink 30ml daily before meals.");
+  if (input.includes("joint") || input.includes("pain")) suggestions.push("Arctic Sea – 2 softgels twice a day after meals.");
+  if (input.includes("energy") || input.includes("fatigue")) suggestions.push("Royal Jelly – 1 tablet in the morning.");
+  if (input.includes("digest") || input.includes("constipation")) suggestions.push("Fields of Greens – 1 tablet three times daily.");
+  if (input.includes("flu") || input.includes("cold") || input.includes("immunity")) suggestions.push("Bee Propolis – 1 tablet daily.");
+
+  if (suggestions.length === 0) {
+    result.innerHTML = `<p>No specific match found. Please contact us for personalized support.</p>`;
+  } else {
+    result.innerHTML = `<ul>` + suggestions.map(s => `<li>${s}</li>`).join("") + `</ul>`;
+  }
+}
   
     function suggestProduct() {
       const input = document.getElementById("symptom-input").value.toLowerCase();
