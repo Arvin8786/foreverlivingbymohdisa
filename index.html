@@ -880,7 +880,7 @@
         message += `- ${item.name} (Qty: ${item.quantity}) - RM ${(item.price * item.quantity).toFixed(2)}\n`;
       });
       
-      message += `\nTotal: RM ${cart.reduce((total, item) => total + (item.price * item.quantity), 0).(toFixed(2)}\n\n`;
+      message += `\nTotal: RM ${cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)}\n\n`;
       message += `Please confirm my order. Thank you!`;
       
       // Encode for URL
