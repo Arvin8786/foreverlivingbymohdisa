@@ -34,6 +34,7 @@
       padding: 10px;
       margin: 0;
       justify-content: center;
+      flex-wrap: wrap;
     }
     nav li {
       margin: 0 15px;
@@ -42,6 +43,9 @@
       color: white;
       text-decoration: none;
       font-weight: bold;
+      font-size: 16px;
+      padding: 5px 0;
+      display: inline-block;
     }
     nav a:hover {
       text-decoration: underline;
@@ -245,6 +249,178 @@
       cursor: pointer;
       margin-left: 10px;
     }
+    /* Rewards Animation */
+    .rewards-container {
+      text-align: center;
+      padding: 50px 20px;
+      background: linear-gradient(135deg, #2c8a58, #25D366);
+      color: white;
+      border-radius: 10px;
+      margin: 30px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .rewards-title {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      animation: pulse 2s infinite;
+    }
+    .rewards-subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+    }
+    .reward-icon {
+      font-size: 4rem;
+      margin: 20px;
+      display: inline-block;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #f0f;
+      opacity: 0.7;
+      animation: confettiFall 5s linear infinite;
+    }
+    @keyframes confettiFall {
+      0% { 
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+      }
+      100% { 
+        transform: translateY(1000px) rotate(720deg);
+        opacity: 0;
+      }
+    }
+    /* Enhanced CDS and Business sections */
+    .program-section {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    .program-section h2 {
+      color: #2c8a58;
+      font-size: 2rem;
+      margin-top: 0;
+      text-align: center;
+    }
+    .program-highlights {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      margin: 30px 0;
+    }
+    .highlight-card {
+      width: 30%;
+      min-width: 250px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+    .highlight-card:hover {
+      transform: translateY(-5px);
+    }
+    .highlight-card h3 {
+      color: #2c8a58;
+      border-bottom: 2px solid #2c8a58;
+      padding-bottom: 10px;
+    }
+    .testimonial {
+      background: #f0f8f0;
+      padding: 20px;
+      border-left: 4px solid #2c8a58;
+      margin: 20px 0;
+      font-style: italic;
+    }
+    .testimonial-author {
+      text-align: right;
+      font-weight: bold;
+      color: #2c8a58;
+    }
+    .cta-button {
+      display: block;
+      width: 300px;
+      margin: 30px auto;
+      background: #e67e22;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      border-radius: 50px;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .cta-button:hover {
+      background: #d35400;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+    .program-steps {
+      counter-reset: step;
+      margin: 30px 0;
+    }
+    .step {
+      position: relative;
+      padding-left: 80px;
+      margin-bottom: 30px;
+    }
+    .step:before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 60px;
+      height: 60px;
+      background: #2c8a58;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    /* AI suggestion add to cart buttons */
+    .suggestion-product {
+      background: #e8f5e9;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .suggestion-product button {
+      background: #2c8a58;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .suggestion-product button:hover {
+      background: #237a48;
+    }
   </style>
 </head>
 <body>
@@ -260,8 +436,9 @@
   <nav>
     <ul>
       <li><a href="#" onclick="showTab('products')">Products</a></li>
-      <li><a href="#" onclick="showTab('cds')">Cabaran Detox Sihat @CDS </a></li>
+      <li><a href="#" onclick="showTab('cds')">Cabaran Detox Sihat</a></li>
       <li><a href="#" onclick="showTab('business')">Business Opportunity</a></li>
+      <li><a href="#" onclick="showTab('rewards')">Rewards</a></li>
     </ul>
   </nav>
 
@@ -280,33 +457,181 @@
     </div>
 
     <div id="cds" class="tab-content">
-      <section class="cds-section">
+      <section class="program-section">
         <h2>Cabaran Detox Sihat (CDS)</h2>
-        <p>CDS is a health program by Rich Academy Global designed to help you detox and reset your body naturally.</p>
-        <ul>
-          <li>✅ 7-day detox with Forever products</li>
-          <li>📦 Personalized supplement plan</li>
-          <li>📋 Guided meal plan</li>
-          <li>📱 Daily coaching & community support</li>
-          <li>💬 WhatsApp check-ins with a coach</li>
-        </ul>
-        <p><strong>Delivered in 5–10 working days.</strong></p>
-        <button onclick="location.href='https://wa.me/601111033154?text=I%20am%20interested%20in%20CDS%20Program'">Join Now on WhatsApp</button>
+        <p style="text-align: center; font-size: 1.2rem;">Transform your health in just 7 days with our proven detox program</p>
+        
+        <div class="program-highlights">
+          <div class="highlight-card">
+            <h3>What You Get</h3>
+            <ul>
+              <li>✅ Personalized Forever product package</li>
+              <li>📋 Detailed meal plan & recipes</li>
+              <li>📱 Daily coaching via WhatsApp</li>
+              <li>👥 Private support community</li>
+              <li>📚 Educational materials</li>
+            </ul>
+          </div>
+          
+          <div class="highlight-card">
+            <h3>Benefits</h3>
+            <ul>
+              <li>⚡ Boost energy levels</li>
+              <li>🌿 Natural detoxification</li>
+              <li>⚖️ Healthy weight management</li>
+              <li>🧠 Improved mental clarity</li>
+              <li>😴 Better sleep quality</li>
+            </ul>
+          </div>
+          
+          <div class="highlight-card">
+            <h3>Program Details</h3>
+            <ul>
+              <li>⏳ 7-day intensive program</li>
+              <li>📦 Delivered in 5-10 working days</li>
+              <li>💰 Money-back guarantee</li>
+              <li>👩‍⚕️ Health coach support</li>
+              <li>🔄 Repeatable anytime</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="program-steps">
+          <h3 style="text-align: center;">How It Works</h3>
+          <div class="step">
+            <h4>Registration</h4>
+            <p>Complete your registration and health assessment to receive a personalized program tailored to your needs.</p>
+          </div>
+          <div class="step">
+            <h4>Receive Your Kit</h4>
+            <p>Get your Forever Living product package delivered to your doorstep with detailed instructions.</p>
+          </div>
+          <div class="step">
+            <h4>Daily Guidance</h4>
+            <p>Follow the daily plan with support from your coach and community through WhatsApp.</p>
+          </div>
+          <div class="step">
+            <h4>Transformation</h4>
+            <p>Experience noticeable improvements in your energy, digestion, and overall wellbeing by day 7.</p>
+          </div>
+        </div>
+        
+        <div class="testimonial">
+          <p>"After completing CDS, I lost 3kg and my chronic bloating disappeared. I now have so much more energy throughout the day!"</p>
+          <p class="testimonial-author">- Aina S., 32, Kuala Lumpur</p>
+        </div>
+        
+        <a href="https://wa.me/601111033154?text=I%20want%20to%20join%20CDS%20Program" class="cta-button">Join CDS Now</a>
       </section>
     </div>
 
     <div id="business" class="tab-content">
-      <section>
-        <h2>Join Our Business</h2>
-        <p>Be part of Rich Academy Global and build your Forever Living career.</p>
-        <ul>
-          <li>💸 30–50% product commission</li>
-          <li>🕐 Flexible hours</li>
-          <li>🌍 Global business potential</li>
-          <li>🎓 Free training and support</li>
-        </ul>
-        <button onclick="location.href='https://wa.me/601111033154'">Contact Us on WhatsApp</button>
+      <section class="program-section">
+        <h2>Build Your Forever Business</h2>
+        <p style="text-align: center; font-size: 1.2rem;">Start your journey to financial freedom with our proven system</p>
+        
+        <div class="program-highlights">
+          <div class="highlight-card">
+            <h3>Why Join Us?</h3>
+            <ul>
+              <li>💰 Earn 30-50% commission</li>
+              <li>🌍 Work from anywhere</li>
+              <li>⏱ Flexible hours</li>
+              <li>📈 Unlimited income potential</li>
+              <li>🛍️ Discount on products</li>
+            </ul>
+          </div>
+          
+          <div class="highlight-card">
+            <h3>What We Provide</h3>
+            <ul>
+              <li>🎓 Complete training program</li>
+              <li>📱 Marketing materials</li>
+              <li>🤝 Mentorship</li>
+              <li>👥 Team support</li>
+              <li>🏆 Recognition program</li>
+            </ul>
+          </div>
+          
+          <div class="highlight-card">
+            <h3>Success Path</h3>
+            <ul>
+              <li>1️⃣ Start part-time</li>
+              <li>2️⃣ Build your customer base</li>
+              <li>3️⃣ Recruit your team</li>
+              <li>4️⃣ Earn residual income</li>
+              <li>5️⃣ Achieve financial freedom</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="program-steps">
+          <h3 style="text-align: center;">Your Business Journey</h3>
+          <div class="step">
+            <h4>Step 1: Enroll</h4>
+            <p>Register as a Forever Business Owner (FBO) and receive your starter kit with everything you need to begin.</p>
+          </div>
+          <div class="step">
+            <h4>Step 2: Learn</h4>
+            <p>Complete our comprehensive training program with ongoing support from your upline and team.</p>
+          </div>
+          <div class="step">
+            <h4>Step 3: Implement</h4>
+            <p>Start sharing products and the business opportunity using our proven marketing system.</p>
+          </div>
+          <div class="step">
+            <h4>Step 4: Grow</h4>
+            <p>Build your team and leverage our compensation plan to maximize your earnings.</p>
+          </div>
+        </div>
+        
+        <div class="testimonial">
+          <p>"I joined Forever Living 2 years ago as a side hustle. Today it's my full-time business earning me RM15,000 monthly!"</p>
+          <p class="testimonial-author">- Ahmad F., 28, Penang</p>
+        </div>
+        
+        <div class="testimonial">
+          <p>"The training and support system helped me build confidence. I now have a team of 50 people across Malaysia."</p>
+          <p class="testimonial-author">- Sarah L., 35, Johor Bahru</p>
+        </div>
+        
+        <a href="https://wa.me/601111033154?text=I%20want%20to%20join%20Forever%20Business" class="cta-button">Start Your Business Today</a>
       </section>
+    </div>
+
+    <div id="rewards" class="tab-content">
+      <div class="rewards-container" id="rewards-animation">
+        <h1 class="rewards-title">EXCITING REWARDS COMING SOON!</h1>
+        <p class="rewards-subtitle">Stay tuned for our amazing loyalty program</p>
+        
+        <div>
+          <span class="reward-icon">🏆</span>
+          <span class="reward-icon">💰</span>
+          <span class="reward-icon">✈️</span>
+          <span class="reward-icon">🎁</span>
+        </div>
+        
+        <p style="font-size: 1.2rem; max-width: 800px; margin: 20px auto;">
+          We're preparing something special for our loyal customers! Our rewards program will offer exclusive benefits, 
+          cash bonuses, travel opportunities, and amazing gifts based on your purchases and referrals.
+        </p>
+        
+        <div style="margin-top: 30px;">
+          <button onclick="notifyMe()" style="
+            background: white;
+            color: #2c8a58;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+          ">
+            Notify Me When Launched
+          </button>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -328,7 +653,7 @@
   </div>
 
   <footer>
-    <p>&copy; 2025 Forever Living by Mohd Arvind Isa. Powered by Rich Academy Global. All rights reserved.</p>
+    <p>&copy; 2025 Forever Living. Powered by Rich Academy Global. All rights reserved.</p>
     <section class="disclaimer">
       <strong>Disclaimer:</strong> This website is operated by an independent Forever Business Owner (FBO) under Rich Academy Global and is not the official site of Forever Living Products. Product names, trademarks, and registered trademarks are property of Forever Living Products International, Inc.
     </section>
@@ -410,11 +735,29 @@
        consumption: "Use like regular hand wash daily" }
     ];
 
+    // Product suggestions mapping
+    const productSuggestions = {
+      "skin": { id: 1, name: "Aloe Vera Gel", recommendation: "Drink 30ml daily before meals for skin hydration and health" },
+      "joint": { id: 8, name: "Arctic Sea", recommendation: "Take 2 softgels twice daily for joint support and inflammation reduction" },
+      "pain": { id: 8, name: "Arctic Sea", recommendation: "Take 2 softgels twice daily for joint support and inflammation reduction" },
+      "energy": { id: 5, name: "Royal Jelly", recommendation: "1 tablet each morning for natural energy boost and vitality" },
+      "fatigue": { id: 5, name: "Royal Jelly", recommendation: "1 tablet each morning for natural energy boost and vitality" },
+      "digest": { id: 9, name: "Fields of Greens", recommendation: "1 tablet three times daily with meals for digestive support" },
+      "stomach": { id: 9, name: "Fields of Greens", recommendation: "1 tablet three times daily with meals for digestive support" },
+      "immun": { id: 7, name: "Bee Propolis", recommendation: "1 tablet daily to support immune system function" },
+      "cold": { id: 7, name: "Bee Propolis", recommendation: "1 tablet daily to support immune system function" }
+    };
+
     let cart = [];
 
     function showTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
+      
+      // Add confetti to rewards section
+      if (tabId === 'rewards') {
+        createConfetti();
+      }
     }
 
     function toggleCart() {
@@ -490,7 +833,27 @@
     }
 
     function showAddedToCartMessage(productName) {
-      alert(`${productName} has been added to your cart!`);
+      // Create a temporary notification
+      const notification = document.createElement('div');
+      notification.style.position = 'fixed';
+      notification.style.bottom = '20px';
+      notification.style.right = '20px';
+      notification.style.backgroundColor = '#2c8a58';
+      notification.style.color = 'white';
+      notification.style.padding = '15px';
+      notification.style.borderRadius = '5px';
+      notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+      notification.style.zIndex = '1000';
+      notification.style.animation = 'fadeIn 0.3s';
+      notification.textContent = `✓ ${productName} added to cart!`;
+      
+      document.body.appendChild(notification);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.style.animation = 'fadeOut 0.3s';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
     }
 
     function checkout() {
@@ -517,7 +880,7 @@
         message += `- ${item.name} (Qty: ${item.quantity}) - RM ${(item.price * item.quantity).toFixed(2)}\n`;
       });
       
-      message += `\nTotal: RM ${cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)}\n\n`;
+      message += `\nTotal: RM ${cart.reduce((total, item) => total + (item.price * item.quantity), 0).(toFixed(2)}\n\n`;
       message += `Please confirm my order. Thank you!`;
       
       // Encode for URL
