@@ -1,216 +1,1115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Forever Living by Mohd Arvind Isa</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    :root {
+      --primary: #2c8a58;
+      --secondary: #25D366;
+      --light: #f5f5f5;
+      --dark: #333;
+      --white: #fff;
+      --shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    * {
       margin: 0;
       padding: 0;
-      background-color: #f5f5f5;
+      box-sizing: border-box;
     }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
+    }
+    
     header {
-      background-color: #fff;
+      background-color: var(--white);
       padding: 20px;
       text-align: center;
-      border-bottom: 1px solid #ddd;
+      box-shadow: var(--shadow);
+      position: relative;
     }
+    
+    .logo {
+      font-size: 28px;
+      color: var(--primary);
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
     .cart-icon {
       position: absolute;
-      right: 20px;
-      top: 20px;
-      font-size: 20px;
+      right: 30px;
+      top: 30px;
+      font-size: 24px;
       cursor: pointer;
+      color: var(--primary);
     }
-    nav {
-      background-color: #2c8a58;
-    }
-    nav ul {
-      display: flex;
-      list-style: none;
-      padding: 10px;
-      margin: 0;
-      justify-content: center;
-    }
-    nav li {
-      margin: 0 15px;
-    }
-    nav a {
+    
+    .cart-count {
+      background-color: var(--secondary);
       color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 14px;
+      position: absolute;
+      top: -8px;
+      right: -8px;
+    }
+    
+    nav {
+      background-color: var(--primary);
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      list-style: none;
+    }
+    
+    .nav-links li {
+      margin: 0 20px;
+    }
+    
+    .nav-links a {
+      color: var(--white);
       text-decoration: none;
       font-weight: bold;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      padding: 5px 10px;
+      border-radius: 4px;
     }
-    nav a:hover {
-      text-decoration: underline;
+    
+    .nav-links a:hover {
+      background-color: rgba(255,255,255,0.2);
     }
-    .tab-content {
-      display: none;
-      padding: 20px;
+    
+    .section {
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
-    .tab-content.active {
-      display: block;
-    }
-    .product-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 20px;
-    }
-    .product {
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+    .section-title {
       text-align: center;
+      margin-bottom: 40px;
+      color: var(--primary);
+      font-size: 32px;
+      position: relative;
     }
-    .product img {
+    
+    .section-title:after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 4px;
+      background-color: var(--primary);
+      margin: 15px auto 0;
+    }
+    
+    /* Products Section */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 30px;
+    }
+    
+    .product-card {
+      background: var(--white);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease;
+    }
+    
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .product-image {
       width: 100%;
-      height: 150px;
+      height: 200px;
       object-fit: cover;
     }
-    .product h3 {
-      margin: 10px 0 5px;
+    
+    .product-info {
+      padding: 20px;
     }
-    .product .price {
-      color: #2c8a58;
+    
+    .product-name {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: var(--dark);
+    }
+    
+    .product-price {
+      color: var(--primary);
+      font-weight: bold;
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+    
+    .product-actions {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-whatsapp {
+      background-color: var(--secondary);
+      color: white;
+    }
+    
+    .btn-whatsapp:hover {
+      background-color: #128C7E;
+    }
+    
+    .btn-details {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .btn-details:hover {
+      background-color: #1e6b48;
+    }
+    
+    /* CDS Section */
+    .cds-section {
+      background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), 
+                  url('https://images.unsplash.com/photo-1535914254981-b5012eebbd15') center/cover;
+      padding: 60px 20px;
+      border-radius: 10px;
+      margin-bottom: 40px;
+      box-shadow: var(--shadow);
+    }
+    
+    .cds-content {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: rgba(255,255,255,0.8);
+      padding: 30px;
+      border-radius: 8px;
+    }
+    
+    .cds-benefits {
+      margin: 20px 0;
+    }
+    
+    .cds-benefits li {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .cds-benefits i {
+      margin-right: 10px;
+      color: var(--primary);
+    }
+    
+    /* Business Opportunity Section */
+    .business-section {
+      background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), 
+                  url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40') center/cover;
+      padding: 60px 20px;
+      border-radius: 10px;
+      margin-bottom: 40px;
+      box-shadow: var(--shadow);
+    }
+    
+    .business-content {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: rgba(255,255,255,0.8);
+      padding: 30px;
+      border-radius: 8px;
+    }
+    
+    .business-benefits {
+      margin: 20px 0;
+    }
+    
+    .business-benefits li {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .business-benefits i {
+      margin-right: 10px;
+      color: var(--primary);
+    }
+    
+    /* AI Suggestion Section */
+    .ai-section {
+      background-color: var(--white);
+      padding: 40px;
+      border-radius: 10px;
+      margin-bottom: 40px;
+      box-shadow: var(--shadow);
+    }
+    
+    .ai-input-container {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    
+    #symptom-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px 0 0 4px;
+      font-size: 16px;
+    }
+    
+    .btn-suggest {
+      padding: 12px 20px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
       font-weight: bold;
     }
-    .product .whatsapp-btn {
-      display: inline-block;
-      margin-top: 10px;
-      background: #25D366;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 4px;
-      text-decoration: none;
+    
+    .suggestion-result {
+      margin-top: 30px;
     }
-    footer {
-      background: #f1f1f1;
+    
+    .suggested-product {
+      background-color: #f9f9f9;
+      border-radius: 8px;
       padding: 20px;
-      text-align: center;
-      font-size: 14px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
     }
+    
+    .product-benefits {
+      margin: 15px 0;
+      padding-left: 20px;
+    }
+    
+    .product-usage {
+      font-style: italic;
+      margin-bottom: 15px;
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      z-index: 1000;
+      overflow: auto;
+    }
+    
+    .modal-content {
+      background-color: var(--white);
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 800px;
+      position: relative;
+      animation: modalopen 0.5s;
+    }
+    
+    @keyframes modalopen {
+      from {opacity: 0; transform: translateY(-50px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--dark);
+    }
+    
+    .modal-product-image {
+      width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    
+    .modal-product-name {
+      font-size: 28px;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    
+    .modal-product-price {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+    
+    /* Footer */
+    footer {
+      background-color: var(--dark);
+      color: var(--white);
+      padding: 30px 0;
+      text-align: center;
+    }
+    
     .disclaimer {
-      margin-top: 10px;
       background-color: #fff3cd;
       color: #856404;
       padding: 15px;
-      border-top: 1px solid #ffeeba;
+      margin-top: 20px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .nav-links li {
+        margin: 5px 0;
+      }
+      
+      .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+      
+      .modal-content {
+        width: 90%;
+        margin: 10% auto;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1 style="font-size: 28px; color: #2c8a58;">
-      FOREVER LIVING by Mohd Arvind Isa
-    </h1>
+    <div class="logo">FOREVER LIVING by Mohd Arvind Isa</div>
     <div class="cart-icon" onclick="toggleCart()">
-      🛒 <span id="cart-count">0</span>
+      <i class="fas fa-shopping-cart"></i>
+      <span class="cart-count">0</span>
     </div>
   </header>
-
+  
   <nav>
-    <ul>
-      <li><a href="#" onclick="showTab('products')">Products</a></li>
-      <li><a href="#" onclick="showTab('cds')">Cabaran Detox Sihat</a></li>
-      <li><a href="#" onclick="showTab('business')">Business Opportunity</a></li>
+    <ul class="nav-links">
+      <li><a href="#products">Products</a></li>
+      <li><a href="#cds">Detox Program</a></li>
+      <li><a href="#business">Business Opportunity</a></li>
+      <li><a href="#ai-suggestion">AI Suggestion</a></li>
     </ul>
   </nav>
-
+  
   <main>
-    <div id="products" class="tab-content active">
-      <h2>Our Products</h2>
-      <div id="product-list" class="product-list"></div>
-    </div>
-
-    <div id="cds" class="tab-content">
-      <section class="cds-section">
-        <h2>Cabaran Detox Sihat (CDS)</h2>
-        <p>CDS is a health program by Rich Academy Global designed to help you detox and reset your body naturally.</p>
-        <ul>
-          <li>✅ 7-day detox with Forever products</li>
-          <li>📦 Personalized supplement plan</li>
-          <li>📋 Guided meal plan</li>
-          <li>📱 Daily coaching & community support</li>
-          <li>💬 WhatsApp check-ins with a coach</li>
-        </ul>
-        <p><strong>Delivered in 5–10 working days.</strong></p>
-        <button onclick="location.href='https://wa.me/601111033154?text=I%20am%20interested%20in%20CDS%20Program'">Join Now on WhatsApp</button>
-      </section>
-    </div>
-
-    <div id="business" class="tab-content">
-      <section>
-        <h2>Join Our Business</h2>
-        <p>Be part of Rich Academy Global and build your Forever Living career.</p>
-        <ul>
-          <li>💸 30–50% product commission</li>
-          <li>🕐 Flexible hours</li>
-          <li>🌍 Global business potential</li>
-          <li>🎓 Free training and support</li>
-        </ul>
-        <button onclick="location.href='https://wa.me/601111033154'">Contact Us on WhatsApp</button>
-      </section>
-    </div>
-    <section class="tab-content" id="ai-suggestion">
-  <h2>AI Product Suggestion</h2>
-  <p>Tell us your symptoms and we’ll suggest the most relevant Forever Living products:</p>
-  <input type="text" id="symptom-ai-input" placeholder="e.g. joint pain, low energy, digestion..." style="width:100%;padding:10px;margin:10px 0;">
-  <button onclick="suggestProduct()" style="padding:10px 20px;background:#2c8a58;color:#fff;border:none;border-radius:4px;cursor:pointer;">Suggest Product</button>
-  <div id="ai-suggestion-result" style="margin-top:20px;"></div>
-  <p style="margin-top:20px;font-size:13px;color:#856404;background:#fff3cd;padding:10px;border:1px solid #ffeeba;border-radius:4px;">
-    <strong>Disclaimer:</strong> Suggestions are AI-generated and do not replace professional medical advice. Please consult a healthcare provider before starting any supplements.
-  </p>
-</section>
-
-$1<section class="tab-content" id="ai-suggestion">
-  <h2>AI Product Suggestion</h2>
-  <p>Tell us your symptoms and we’ll suggest the most relevant Forever Living products:</p>
-  <input type="text" id="symptom-input" placeholder="e.g. joint pain, low energy, digestion..." style="width:100%;padding:10px;margin:10px 0;">
-  <button onclick="suggestProduct()" style="padding:10px 20px;background:#2c8a58;color:#fff;border:none;border-radius:4px;cursor:pointer;">Suggest Product</button>
-  <div id="suggestion-result" style="margin-top:20px;"></div>
-  <p style="margin-top:20px;font-size:13px;color:#856404;background:#fff3cd;padding:10px;border:1px solid #ffeeba;border-radius:4px;">
-    <strong>Disclaimer:</strong> Suggestions are AI-generated and do not replace professional medical advice. Please consult a healthcare provider before starting any supplements.
-  </p>
-</section>
-
-
-
-  <footer>
-    <p>&copy; 2025 Forever Living. Powered by Rich Academy Global. All rights reserved.</p>
-    <section class="disclaimer">
-      <strong>Disclaimer:</strong> This website is operated by an independent Forever Business Owner (FBO) under Rich Academy Global and is not the official site of Forever Living Products. Product names, trademarks, and registered trademarks are property of Forever Living Products International, Inc.
+    <!-- Products Section -->
+    <section id="products" class="section">
+      <h2 class="section-title">Our Premium Products</h2>
+      <div class="product-grid" id="product-list"></div>
     </section>
+    
+    <!-- CDS Section -->
+    <section id="cds" class="section">
+      <div class="cds-section">
+        <div class="cds-content">
+          <h2 class="section-title">Cabaran Detox Sihat (CDS)</h2>
+          <p>Transform your health with our 7-day detox program designed to reset your body naturally and boost your energy levels.</p>
+          
+          <ul class="cds-benefits">
+            <li><i class="fas fa-check-circle"></i> Personalized supplement plan with Forever products</li>
+            <li><i class="fas fa-check-circle"></i> Easy-to-follow meal plan with delicious recipes</li>
+            <li><i class="fas fa-check-circle"></i> Daily coaching and community support</li>
+            <li><i class="fas fa-check-circle"></i> WhatsApp check-ins with your personal coach</li>
+            <li><i class="fas fa-check-circle"></i> Lifetime access to health resources</li>
+          </ul>
+          
+          <p><strong>Results you can expect:</strong> Increased energy, better digestion, clearer skin, and weight management.</p>
+          <p><strong>Delivery:</strong> 5-10 working days after registration.</p>
+          
+          <button class="btn btn-whatsapp" onclick="window.location.href='https://wa.me/601111033154?text=I%20am%20interested%20in%20CDS%20Program'">
+            <i class="fab fa-whatsapp"></i> Join Now
+          </button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Business Opportunity Section -->
+    <section id="business" class="section">
+      <div class="business-section">
+        <div class="business-content">
+          <h2 class="section-title">Build Your Forever Business</h2>
+          <p>Join our team and create financial freedom while helping others achieve better health.</p>
+          
+          <ul class="business-benefits">
+            <li><i class="fas fa-money-bill-wave"></i> Earn 30-50% commission on every sale</li>
+            <li><i class="fas fa-clock"></i> Flexible hours - work when you want</li>
+            <li><i class="fas fa-globe"></i> Global business potential</li>
+            <li><i class="fas fa-graduation-cap"></i> Free training and mentorship</li>
+            <li><i class="fas fa-car"></i> Luxury car bonus program</li>
+            <li><i class="fas fa-plane"></i> All-expenses-paid trips</li>
+          </ul>
+          
+          <p><strong>No experience needed</strong> - We provide complete training and support to help you succeed.</p>
+          
+          <button class="btn btn-whatsapp" onclick="window.location.href='https://wa.me/601111033154?text=I%20want%20to%20join%20Forever%20Business'">
+            <i class="fab fa-whatsapp"></i> Contact Us
+          </button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- AI Suggestion Section -->
+    <section id="ai-suggestion" class="section">
+      <div class="ai-section">
+        <h2 class="section-title">AI Product Recommendation</h2>
+        <p>Tell us your health concerns and we'll recommend the perfect Forever products for you:</p>
+        
+        <div class="ai-input-container">
+          <input type="text" id="symptom-input" placeholder="e.g. joint pain, low energy, digestion issues...">
+          <button class="btn-suggest" onclick="suggestProduct()">Get Suggestions</button>
+        </div>
+        
+        <div class="suggestion-result" id="suggestion-result"></div>
+        
+        <div class="disclaimer">
+          <strong>Disclaimer:</strong> These suggestions are based on general product information and do not constitute medical advice. Please consult with a healthcare professional before starting any new supplement regimen.
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Product Modal -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal()">&times;</span>
+      <img id="modal-product-image" class="modal-product-image" src="" alt="Product Image">
+      <h2 id="modal-product-name" class="modal-product-name"></h2>
+      <div id="modal-product-price" class="modal-product-price"></div>
+      
+      <h3>Benefits:</h3>
+      <ul id="modal-product-benefits" class="product-benefits"></ul>
+      
+      <h3>Usage Instructions:</h3>
+      <p id="modal-product-usage" class="product-usage"></p>
+      
+      <button id="modal-add-to-cart" class="btn btn-whatsapp" style="margin-right: 10px;">
+        <i class="fas fa-cart-plus"></i> Add to Cart
+      </button>
+      <button id="modal-whatsapp-order" class="btn btn-whatsapp">
+        <i class="fab fa-whatsapp"></i> Order Now
+      </button>
+    </div>
+  </div>
+  
+  <footer>
+    <p>&copy; 2025 Forever Living. All rights reserved.</p>
+    <p>Independent Distributor | Mohd Arvind Isa | Rich Academy Global</p>
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> This website is operated by an independent Forever Business Owner and is not the official website of Forever Living Products International. All product names, logos, and brands are property of their respective owners.
+    </div>
   </footer>
-
+  
   <script>
+    // Product Data with Correct Retail Prices (April 2025) and image paths
     const products = [
-  { name: "Aloe Vera Gel", price: 116.79, image: "aloe-vera-gel.jpg" },
-  { name: "Aloe Berry Nectar", price: 116.79, image: "aloe-berry-nectar.jpg" },
-  { name: "Aloe Peaches", price: 116.79, image: "aloe-peaches.jpg" },
-  { name: "Bee Honey", price: 69.47, image: "bee-honey.jpg" },
-  { name: "Royal Jelly", price: 157.38, image: "royal-jelly.jpg" },
-  { name: "Bee Pollen", price: 96.23, image: "bee-pollen.jpg" },
-  { name: "Bee Propolis", price: 134.34, image: "bee-propolis.jpg" },
-  { name: "Arctic Sea", price: 133.02, image: "arctic-sea.jpg" },
-  { name: "Fields of Greens", price: 115.94, image: "fields-of-greens.jpg" },
-  { name: "Absorbent-C", price: 95.00, image: "absorbent_c.jpg" },
-  { name: "Calcium Plus", price: 95.85, image: "calcium-plus.jpg" },
-  { name: "Aloe First", price: 93.40, image: "aloe-first.jpeg" },
-  { name: "Aloe Liquid Soap", price: 54.72, image: "aloe-liquid-soap.jpg" },
-  { name: "Aloe Propolis Creme", price: 92.08, image: "aloe-propolis-creme.jpg" },
-  { name: "Aloe Jojoba Shampoo", price: 91.66, image: "aloe-jojoba-shampoo.jpg" },
-  { name: "Aloe Jojoba Conditioner", price: 91.66, image: "aloe-jojoba-conditioner.jpg" },
-  { name: "Aloe Sunscreen", price: 84.91, image: "aloe-sunscreen.jpg" },
-  { name: "Aloe MPD 2X Ultra", price: 114.47, image: "aloe-mp-lotion.jpg" },
-  { name: "Avocado Face & Body Soap", price: 23.40, image: "avocado-soap.jpg" },
-  { name: "Forever Bright Toothgel", price: 31.62, image: "bright-toothgel.jpg" },
-  { name: "Aloe Lips", price: 17.92, image: "aloe_lips.jpg" },
-  { name: "Forever Aloe Deodorant", price: 34.91, image: "deodorant-stick.jpg" },
-  { name: "Forever Deodorant Stick", price: 34.91, image: "forever-deodorant.jpg" },
-  { name: "Teh Tarik Halia", price: 40.00, image: "teh-tarik.jpg" }
+      {
+        name: "Aloe Vera Gel",
+        price: 116.79,
+        image: "aloe-vera-gel.jpg",
+        benefits: [
+          "Supports digestive health",
+          "Boosts immune system",
+          "Promotes skin health",
+          "Natural energy booster",
+          "Rich in vitamins and minerals"
+        ],
+        usage: "Take 30-60ml daily, preferably on an empty stomach. Can be mixed with water or fruit juice."
+      },
+      {
+        name: "Aloe Berry Nectar",
+        price: 116.79,
+        image: "aloe-berry-nectar.jpg",
+        benefits: [
+          "Antioxidant protection",
+          "Supports immune function",
+          "Natural energy source",
+          "Promotes digestive health",
+          "Contains cranberry and apple"
+        ],
+        usage: "Drink 30-60ml daily. Refrigerate after opening and consume within 30 days."
+      },
+      {
+        name: "Aloe Bits N' Peaches",
+        price: 116.79,
+        image: "aloe-bits-peaches.jpg",
+        benefits: [
+          "Delicious peach flavor",
+          "Contains natural aloe vera",
+          "Supports digestion",
+          "Provides antioxidants",
+          "Helps maintain energy levels"
+        ],
+        usage: "Drink 30-60ml daily. Shake well before use. Refrigerate after opening."
+      },
+      {
+        name: "Lite Vanilla",
+        price: 155.72,
+        image: "lite-vanilla.jpg",
+        benefits: [
+          "Meal replacement shake",
+          "Vanilla flavor",
+          "Supports weight management",
+          "Rich in protein",
+          "Contains essential nutrients"
+        ],
+        usage: "Mix 2 scoops with 250ml of water or milk. Can replace 1-2 meals daily."
+      },
+      {
+        name: "Lite Choco",
+        price: 155.72,
+        image: "lite-choco.jpg",
+        benefits: [
+          "Meal replacement shake",
+          "Chocolate flavor",
+          "Supports weight management",
+          "Rich in protein",
+          "Contains essential nutrients"
+        ],
+        usage: "Mix 2 scoops with 250ml of water or milk. Can replace 1-2 meals daily."
+      },
+      {
+        name: "Supergreens",
+        price: 214.71,
+        image: "supergreens.jpg",
+        benefits: [
+          "Alkalizes the body",
+          "Rich in phytonutrients",
+          "Supports detoxification",
+          "Boosts energy naturally",
+          "Contains spirulina and chlorella"
+        ],
+        usage: "Mix 1 scoop with water or juice daily. Best taken in the morning."
+      },
+      {
+        name: "Fiber",
+        price: 124.44,
+        image: "fiber.jpg",
+        benefits: [
+          "Supports digestive health",
+          "Promotes regularity",
+          "Helps maintain cholesterol levels",
+          "Supports weight management",
+          "Contains psyllium husk"
+        ],
+        usage: "Take 1-2 tablets with 8oz of water before meals. Drink plenty of water."
+      },
+      {
+        name: "Tongkat Ali",
+        price: 19.90,
+        image: "tongkat-ali.jpg",
+        benefits: [
+          "Traditional herbal supplement",
+          "Supports energy and vitality",
+          "May help with stress management",
+          "Natural adaptogen",
+          "Supports male health"
+        ],
+        usage: "Take as directed. Consult package for specific dosage instructions."
+      },
+      {
+        name: "White Coffee",
+        price: 15.99,
+        image: "white-coffee.jpg",
+        benefits: [
+          "Smooth coffee flavor",
+          "Lower acidity",
+          "Natural energy boost",
+          "Contains less caffeine than regular coffee",
+          "Creamy texture"
+        ],
+        usage: "Mix 1 sachet with hot water. Adjust to taste preference."
+      },
+      {
+        name: "Chocolate Malt Drink",
+        price: 27.90,
+        image: "chocolate-malt.jpg",
+        benefits: [
+          "Rich chocolate flavor",
+          "Contains malt extract",
+          "Source of energy",
+          "Delicious hot or cold",
+          "Comforting beverage"
+        ],
+        usage: "Mix 3 tablespoons with hot or cold milk/water. Adjust to taste."
+      },
+      {
+        name: "Teh Tarik Halia",
+        price: 25.90,
+        image: "teh-tarik-halia.jpg",
+        benefits: [
+          "Traditional Malaysian flavor",
+          "Contains ginger",
+          "Warming and comforting",
+          "No preservatives",
+          "Instant preparation"
+        ],
+        usage: "Mix 1 sachet with hot water. Stir well and enjoy."
+      },
+      {
+        name: "Bee Honey",
+        price: 132.57,
+        image: "bee-honey.jpg",
+        benefits: [
+          "100% pure natural honey",
+          "Rich in antioxidants",
+          "Natural energy source",
+          "Soothes throat irritation",
+          "Supports immune system"
+        ],
+        usage: "Take 1-2 teaspoons daily. Can be added to drinks or taken directly."
+      },
+      {
+        name: "Bee Pollen",
+        price: 75.50,
+        image: "bee-pollen.jpg",
+        benefits: [
+          "Natural energy booster",
+          "Contains complete proteins",
+          "Rich in vitamins and minerals",
+          "Supports immune function",
+          "May help with allergies"
+        ],
+        usage: "Take 1-2 tablets daily with meals. Start with small amounts if new to bee products."
+      },
+      {
+        name: "Bee Propolis",
+        price: 139.21,
+        image: "bee-propolis.jpg",
+        benefits: [
+          "Natural immune support",
+          "Antioxidant properties",
+          "Soothes throat irritation",
+          "Supports oral health",
+          "May help with allergies"
+        ],
+        usage: "Take 1 tablet daily with meals. Can be increased to 2-3 tablets when needed."
+      },
+      {
+        name: "Royal Jelly",
+        price: 139.21,
+        image: "royal-jelly.jpg",
+        benefits: [
+          "Boosts energy levels",
+          "Supports immune system",
+          "Rich in B vitamins",
+          "Promotes healthy skin",
+          "May help with stress management"
+        ],
+        usage: "Take 1 tablet daily, preferably in the morning. Store in a cool, dry place."
+      },
+      {
+        name: "Omega 3 Plus",
+        price: 130.10,
+        image: "omega-3.jpg",
+        benefits: [
+          "Supports heart health",
+          "Promotes brain function",
+          "Reduces joint inflammation",
+          "Improves skin health",
+          "Supports eye health"
+        ],
+        usage: "Take 2 softgels twice daily with meals. Store in a cool, dry place."
+      },
+      {
+        name: "Absorbent-C",
+        price: 75.50,
+        image: "absorbent-c.jpg",
+        benefits: [
+          "Immune system support",
+          "Powerful antioxidant",
+          "Enhanced with oat bran",
+          "Promotes collagen formation",
+          "Helps with iron absorption"
+        ],
+        usage: "Take 1-3 tablets daily with meals. Increase dosage during illness or stress."
+      },
+      {
+        name: "Fields of Greens",
+        price: 86.10,
+        image: "fields-of-greens.jpg",
+        benefits: [
+          "Alkalizes the body",
+          "Supports detoxification",
+          "Rich in chlorophyll",
+          "Promotes digestive health",
+          "Boosts energy naturally"
+        ],
+        usage: "Take 1 tablet three times daily with meals. Drink plenty of water."
+      },
+      {
+        name: "Calcium Plus Tablet",
+        price: 132.15,
+        image: "calcium-plus.jpg",
+        benefits: [
+          "Supports bone health",
+          "Contains magnesium and zinc",
+          "Promotes muscle function",
+          "Helps with nerve transmission",
+          "Vitamin D for better absorption"
+        ],
+        usage: "Take 3 tablets daily, preferably with meals. May be taken all at once or divided."
+      },
+      {
+        name: "Aloe Lips",
+        price: 20.33,
+        image: "aloe-lips.jpg",
+        benefits: [
+          "Moisturizes dry lips",
+          "Contains aloe vera",
+          "SPF 15 protection",
+          "Soothing formula",
+          "Long-lasting hydration"
+        ],
+        usage: "Apply to lips as needed throughout the day, especially before sun exposure."
+      },
+      {
+        name: "Bright Toothgel",
+        price: 41.29,
+        image: "bright-toothgel.jpg",
+        benefits: [
+          "Whitens teeth naturally",
+          "Contains aloe vera",
+          "Freshens breath",
+          "No harsh abrasives",
+          "Safe for daily use"
+        ],
+        usage: "Use as regular toothpaste. Brush thoroughly twice daily."
+      },
+      {
+        name: "Aloe First",
+        price: 90.83,
+        image: "aloe-first.jpg",
+        benefits: [
+          "Soothes minor burns and cuts",
+          "Relieves insect bites",
+          "Moisturizes dry skin",
+          "Helps with sunburn relief",
+          "Natural first aid solution"
+        ],
+        usage: "Apply to affected area as needed. Can be used several times daily."
+      },
+      {
+        name: "Deodorant Stick",
+        price: 50.73,
+        image: "deodorant-stick.jpg",
+        benefits: [
+          "24-hour protection",
+          "No aluminum chlorohydrate",
+          "Contains aloe vera",
+          "Gentle on skin",
+          "Pleasant fragrance"
+        ],
+        usage: "Apply to clean underarms as needed. Suitable for daily use."
+      },
+      {
+        name: "Avocado Soap",
+        price: 30.68,
+        image: "avocado-soap.jpg",
+        benefits: [
+          "Gentle cleansing",
+          "Contains avocado oil",
+          "Moisturizes skin",
+          "Natural ingredients",
+          "Suitable for all skin types"
+        ],
+        usage: "Use as regular hand or body soap. Lather and rinse thoroughly."
+      },
+      {
+        name: "Aloe Liquid Soap",
+        price: 120.91,
+        image: "aloe-liquid-soap.jpg",
+        benefits: [
+          "Gentle cleansing",
+          "Contains aloe vera",
+          "Moisturizes while cleaning",
+          "pH balanced",
+          "Suitable for all skin types"
+        ],
+        usage: "Use as regular hand or body soap. Lather and rinse thoroughly."
+      },
+      {
+        name: "Jojoba Shampoo",
+        price: 105.93,
+        image: "jojoba-shampoo.jpg",
+        benefits: [
+          "Gentle hair cleansing",
+          "Adds shine and body",
+          "Contains jojoba oil",
+          "pH balanced formula",
+          "Suitable for frequent use"
+        ],
+        usage: "Wet hair, massage shampoo into scalp, rinse thoroughly. Follow with conditioner."
+      },
+      {
+        name: "Jojoba Conditioner",
+        price: 117.70,
+        image: "jojoba-conditioner.jpg",
+        benefits: [
+          "Detangles hair",
+          "Adds moisture and shine",
+          "Reduces static electricity",
+          "Contains jojoba oil",
+          "Leaves hair soft and manageable"
+        ],
+        usage: "After shampooing, apply to hair, leave for 1-2 minutes, then rinse thoroughly."
+      },
+      {
+        name: "Aloe Body Wash",
+        price: 120.91,
+        image: "aloe-body-wash.jpg",
+        benefits: [
+          "Gentle cleansing",
+          "Contains aloe vera",
+          "Moisturizes skin",
+          "Refreshing fragrance",
+          "Suitable for daily use"
+        ],
+        usage: "Use as regular body wash. Lather and rinse thoroughly."
+      },
+      {
+        name: "Aloe Body Lotion",
+        price: 112.35,
+        image: "aloe-body-lotion.jpg",
+        benefits: [
+          "Deep moisturizing",
+          "Contains aloe vera",
+          "Light, non-greasy formula",
+          "Absorbs quickly",
+          "Suitable for all skin types"
+        ],
+        usage: "Apply to clean skin as needed. Can be used daily, morning and night."
+      },
+      {
+        name: "Aloe Propolis Creme",
+        price: 90.83,
+        image: "aloe-propolis-creme.jpg",
+        benefits: [
+          "Soothes irritated skin",
+          "Promotes healing",
+          "Moisturizes deeply",
+          "Contains bee propolis",
+          "Helps with minor skin problems"
+        ],
+        usage: "Apply to clean skin as needed. Can be used 2-3 times daily."
+      },
+      {
+        name: "Aloe Vera Gelly",
+        price: 70.78,
+        image: "aloe-vera-gelly.jpg",
+        benefits: [
+          "Soothes skin irritations",
+          "Promotes healing",
+          "Lightweight gel formula",
+          "Versatile uses",
+          "Great for after sun care"
+        ],
+        usage: "Apply to affected area as needed. Can be used several times daily."
+      },
+      {
+        name: "Aloe Moisturizing",
+        price: 70.78,
+        image: "aloe-moisturizing.jpg",
+        benefits: [
+          "Hydrates skin",
+          "Lightweight formula",
+          "Non-greasy",
+          "Absorbs quickly",
+          "Suitable for face and body"
+        ],
+        usage: "Apply to clean skin as needed. Can be used daily, morning and night."
+      },
+      {
+        name: "Aloe Massage Lotion",
+        price: 70.78,
+        image: "aloe-massage-lotion.jpg",
+        benefits: [
+          "Smooth glide for massage",
+          "Moisturizes skin",
+          "Contains aloe vera",
+          "Light fragrance",
+          "Non-greasy formula"
+        ],
+        usage: "Apply liberally to skin before massage. Can also be used as regular lotion."
+      },
+      {
+        name: "Aloe MSM Gel",
+        price: 86.00,
+        image: "aloe-msm-gel.jpg",
+        benefits: [
+          "Supports joint health",
+          "Contains MSM",
+          "Soothes muscles and joints",
+          "Light gel formula",
+          "Absorbs quickly"
+        ],
+        usage: "Apply to affected area and massage gently. Can be used 2-3 times daily."
+      },
+      {
+        name: "Aloe Sunscreen",
+        price: 89.07,
+        image: "aloe-sunscreen.jpg",
+        benefits: [
+          "SPF 30 protection",
+          "Broad spectrum UVA/UVB",
+          "Water resistant",
+          "Contains aloe vera",
+          "Light, non-greasy formula"
+        ],
+        usage: "Apply liberally 15 minutes before sun exposure. Reapply after swimming or sweating."
+      },
+      {
+        name: "Aloe Scrub",
+        price: 77.86,
+        image: "aloe-scrub.jpg",
+        benefits: [
+          "Gentle exfoliation",
+          "Removes dead skin cells",
+          "Contains aloe vera",
+          "Leaves skin smooth",
+          "Prepares skin for treatments"
+        ],
+        usage: "Apply to damp skin, massage gently, then rinse thoroughly. Use 2-3 times weekly."
+      },
+      {
+        name: "Mask Powder",
+        price: 102.90,
+        image: "mask-powder.jpg",
+        benefits: [
+          "Deep cleansing",
+          "Absorbs excess oil",
+          "Refines pores",
+          "Contains kaolin clay",
+          "Leaves skin refreshed"
+        ],
+        usage: "Mix with water to form paste, apply to face, leave for 10-15 minutes, then rinse."
+      },
+      {
+        name: "R3 Factor-Skin Defense",
+        price: 160.97,
+        image: "r3-factor.jpg",
+        benefits: [
+          "Advanced skin care",
+          "Supports skin's natural defenses",
+          "Contains antioxidants",
+          "Helps combat visible signs of aging",
+          "Lightweight formula"
+        ],
+        usage: "Apply to clean face and neck daily. Follow with moisturizer if needed."
+      },
+      {
+        name: "Forever Alpha-E Factor",
+        price: 144.90,
+        image: "alpha-e-factor.jpg",
+        benefits: [
+          "Powerful antioxidant",
+          "Contains vitamin E",
+          "Helps protect skin",
+          "Supports skin health",
+          "Light, non-greasy formula"
+        ],
+        usage: "Apply to clean skin as needed. Can be used daily, morning and night."
+      },
+      {
+        name: "Infinite Hydrating Cleanser",
+        price: 131.20,
+        image: "hydrating-cleanser.jpg",
+        benefits: [
+          "Gentle cleansing",
+          "Hydrates while cleansing",
+          "Removes impurities",
+          "Maintains skin's moisture",
+          "Suitable for all skin types"
+        ],
+        usage: "Use morning and evening. Apply to damp skin, massage, then rinse thoroughly."
+      },
+      {
+        name: "Infinite Firming Serum",
+        price: 190.47,
+        image: "firming-serum.jpg",
+        benefits: [
+          "Helps firm skin",
+          "Reduces appearance of fine lines",
+          "Lightweight serum",
+          "Fast absorbing",
+          "Contains advanced peptides"
+        ],
+        usage: "Apply to clean face and neck before moisturizer. Use morning and evening."
+      },
+      {
+        name: "Infinite Restoring Creme",
+        price: 221.56,
+        image: "restoring-creme.jpg",
+        benefits: [
+          "Rich moisturizing",
+          "Helps restore skin's elasticity",
+          "Nourishes dry skin",
+          "Contains advanced ingredients",
+          "Luxurious texture"
+        ],
+        usage: "Apply to clean face and neck morning and evening. Can be used with serum."
+      },
+      {
+        name: "Balancing Toner",
+        price: 106.18,
+        image: "balancing-toner.jpg",
+        benefits: [
+          "Balances skin pH",
+          "Refreshes skin",
+          "Prepares skin for treatments",
+          "Gentle formula",
+          "Suitable for all skin types"
+        ],
+        usage: "Apply to clean skin with cotton pad after cleansing and before moisturizing."
+      },
+      {
+        name: "Awakening Eye Cream",
+        price: 89.66,
+        image: "eye-cream.jpg",
+        benefits: [
+          "Reduces puffiness",
+          "Diminishes dark circles",
+          "Hydrates delicate eye area",
+          "Lightweight formula",
+          "Gentle enough for daily use"
+        ],
+        usage: "Apply small amount around eye area using ring finger. Use morning and night."
+      },
 ];
 
     function showTab(tabId) {
