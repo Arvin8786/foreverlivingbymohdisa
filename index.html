@@ -16,6 +16,7 @@
       padding: 20px;
       text-align: center;
       border-bottom: 1px solid #ddd;
+      position: relative;
     }
     .cart-icon {
       position: absolute;
@@ -63,12 +64,15 @@
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       text-align: center;
+      display: flex;
+      flex-direction: column;
     }
     .product img {
       width: 100%;
-      height: 180px;
-      object-fit: cover;
+      height: 200px;
+      object-fit: contain;
       border-radius: 5px;
+      margin-bottom: 10px;
     }
     .product h3 {
       margin: 10px 0 5px;
@@ -85,6 +89,7 @@
       text-align: left;
       margin: 8px 0;
       padding: 0 5px;
+      flex-grow: 1;
     }
     .product .consumption {
       font-size: 13px;
@@ -103,6 +108,18 @@
       border-radius: 4px;
       text-decoration: none;
       font-weight: bold;
+    }
+    .product .add-to-cart {
+      display: inline-block;
+      margin-top: 10px;
+      background: #2c8a58;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
     }
     .ai-suggestion-box {
       background: white;
@@ -152,6 +169,81 @@
       color: #856404;
       padding: 15px;
       border-top: 1px solid #ffeeba;
+    }
+    /* Cart Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 8px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: black;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .cart-item-info {
+      flex-grow: 1;
+    }
+    .cart-item-price {
+      font-weight: bold;
+      color: #e67e22;
+    }
+    .cart-total {
+      font-weight: bold;
+      font-size: 18px;
+      text-align: right;
+      margin-top: 20px;
+    }
+    .customer-info-form {
+      margin-top: 20px;
+    }
+    .customer-info-form input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .checkout-btn {
+      background: #2c8a58;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+      width: 100%;
+    }
+    .remove-item {
+      color: #ff0000;
+      cursor: pointer;
+      margin-left: 10px;
     }
   </style>
 </head>
@@ -218,6 +310,23 @@
     </div>
   </main>
 
+  <!-- Cart Modal -->
+  <div id="cart-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="toggleCart()">&times;</span>
+      <h2>Your Shopping Cart</h2>
+      <div id="cart-items"></div>
+      <div class="cart-total">Total: RM <span id="cart-total">0.00</span></div>
+      
+      <div class="customer-info-form">
+        <h3>Customer Information</h3>
+        <input type="text" id="customer-name" placeholder="Your Full Name" required>
+        <input type="tel" id="customer-phone" placeholder="Your WhatsApp Number" required>
+        <button class="checkout-btn" onclick="checkout()">Complete Order via WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <p>&copy; 2025 Forever Living. Powered by Rich Academy Global. All rights reserved.</p>
     <section class="disclaimer">
@@ -227,82 +336,81 @@
 
   <script>
     const products = [
-      { name: "Aloe Vera Gel", price: 116.79, image: "aloe-vera-gel.jpg", 
+      { id: 1, name: "Aloe Vera Gel", price: 116.79, image: "aloe-vera-gel.jpg", 
        benefits: "Supports digestion, boosts immunity, promotes skin health", 
        consumption: "Take 30-60ml daily, preferably on empty stomach" },
-      { name: "Aloe Berry Nectar", price: 116.79, image: "aloe-berry-nectar.jpg", 
+      { id: 2, name: "Aloe Berry Nectar", price: 116.79, image: "aloe-berry-nectar.jpg", 
        benefits: "Antioxidant support, immune system booster, natural energy", 
        consumption: "30-60ml daily, can be mixed with water or juice" },
-      { name: "Aloe Peaches", price: 116.79, image: "aloe-peaches.jpg", 
+      { id: 3, name: "Aloe Peaches", price: 116.79, image: "aloe-peaches.jpg", 
        benefits: "Digestive health, vitamin C source, natural detoxification", 
        consumption: "30-60ml daily, refrigerate after opening" },
-      { name: "Bee Honey", price: 132.57, image: "bee-honey.jpg", 
+      { id: 4, name: "Bee Honey", price: 132.57, image: "bee-honey.jpg", 
        benefits: "Natural energy, soothes throat, antioxidant properties", 
        consumption: "1-2 teaspoons daily, can be added to drinks" },
-      { name: "Royal Jelly", price: 139.21, image: "royal-jelly.jpg", 
+      { id: 5, name: "Royal Jelly", price: 139.21, image: "royal-jelly.jpg", 
        benefits: "Energy booster, supports immune system, anti-aging", 
        consumption: "1 tablet daily, preferably in the morning" },
-      { name: "Bee Pollen", price: 75.50, image: "bee-pollen.jpg", 
+      { id: 6, name: "Bee Pollen", price: 75.50, image: "bee-pollen.jpg", 
        benefits: "Natural multivitamin, energy enhancement, allergy relief", 
        consumption: "1 tablet 3 times daily with meals" },
-      { name: "Bee Propolis", price: 139.21, image: "bee-propolis.jpg", 
+      { id: 7, name: "Bee Propolis", price: 139.21, image: "bee-propolis.jpg", 
        benefits: "Immune support, natural antibiotic, throat health", 
        consumption: "1 tablet daily or as needed" },
-      { name: "Arctic Sea", price: 130.10, image: "arctic-sea.jpg", 
+      { id: 8, name: "Arctic Sea", price: 130.10, image: "arctic-sea.jpg", 
        benefits: "Heart health, joint support, brain function", 
        consumption: "2 softgels twice daily with meals" },
-      { name: "Fields of Greens", price: 86.10, image: "fields-of-greens.jpg", 
+      { id: 9, name: "Fields of Greens", price: 86.10, image: "fields-of-greens.jpg", 
        benefits: "Detoxification, digestion, alkalizing", 
        consumption: "1 tablet 3 times daily with water" },
-      { name: "Absorbent-C", price: 75.50, image: "absorbent-c.jpg", 
+      { id: 10, name: "Absorbent-C", price: 75.50, image: "absorbent-c.jpg", 
        benefits: "Immune support, collagen production, antioxidant", 
        consumption: "1-2 tablets daily with meals" },
-      { name: "Calcium Plus", price: 132.15, image: "calcium-plus.jpg", 
+      { id: 11, name: "Calcium Plus", price: 132.15, image: "calcium-plus.jpg", 
        benefits: "Bone support, muscle health, calcium + vitamin D", 
        consumption: "2 tablets daily with meals" },
-      { name: "Aloe First", price: 93.40, image: "aloe-first.jpg", 
+      { id: 12, name: "Aloe First", price: 93.40, image: "aloe-first.jpg", 
        benefits: "Skin hydration, cooling relief, wound soothing", 
        consumption: "Spray directly on skin as needed" },
-      { name: "Aloe Liquid Soap", price: 54.72, image: "aloe-liquid-soap.jpg", 
+      { id: 13, name: "Aloe Liquid Soap", price: 54.72, image: "aloe-liquid-soap.jpg", 
        benefits: "Gentle cleansing, moisturizes skin, aloe-based formula", 
        consumption: "Use daily for face and body cleansing" },
-      { name: "Aloe Propolis Creme", price: 92.08, image: "aloe-propolis-creme.jpg", 
+      { id: 14, name: "Aloe Propolis Creme", price: 92.08, image: "aloe-propolis-creme.jpg", 
        benefits: "Skin repair, moisturizing, protective barrier", 
        consumption: "Apply generously on dry or irritated areas" },
-      { name: "Aloe Jojoba Shampoo", price: 91.66, image: "aloe-jojoba-shampoo.jpg", 
+      { id: 15, name: "Aloe Jojoba Shampoo", price: 91.66, image: "aloe-jojoba-shampoo.jpg", 
        benefits: "Hair nourishment, scalp care, sulfate-free", 
        consumption: "Massage into wet hair, rinse thoroughly" },
-      { name: "Aloe Jojoba Conditioner", price: 91.66, image: "aloe-jojoba-conditioner.jpg", 
+      { id: 16, name: "Aloe Jojoba Conditioner", price: 91.66, image: "aloe-jojoba-conditioner.jpg", 
        benefits: "Moisturizing, smooth finish, aloe + jojoba", 
        consumption: "Apply after shampoo, leave 1-2 minutes, rinse" },
-      { name: "Aloe Sunscreen", price: 84.91, image: "aloe-sunscreen.jpg", 
+      { id: 17, name: "Aloe Sunscreen", price: 84.91, image: "aloe-sunscreen.jpg", 
        benefits: "UV protection, aloe-based, water-resistant", 
        consumption: "Apply 15 minutes before sun exposure" },
-      { name: "Aloe MPD 2X Ultra", price: 114.47, image: "aloe-mp-lotion.jpg", 
+      { id: 18, name: "Aloe MPD 2X Ultra", price: 114.47, image: "aloe-mp-lotion.jpg", 
        benefits: "Multi-purpose cleaner, concentrated, eco-friendly", 
        consumption: "Dilute as needed for laundry, dishes or surfaces" },
-      { name: "Avocado Face & Body Soap", price: 23.40, image: "avocado-soap.jpg", 
+      { id: 19, name: "Avocado Face & Body Soap", price: 23.40, image: "avocado-soap.jpg", 
        benefits: "Softens skin, gentle cleansing, avocado oil-rich", 
        consumption: "Use daily for face and body" },
-      { name: "Forever Bright Toothgel", price: 31.62, image: "bright-toothgel.jpg", 
+      { id: 20, name: "Forever Bright Toothgel", price: 31.62, image: "bright-toothgel.jpg", 
        benefits: "Fluoride-free, fresh breath, aloe-based care", 
        consumption: "Brush teeth twice daily" },
-      { name: "Aloe Lips", price: 17.92, image: "aloe-lips.jpg", 
+      { id: 21, name: "Aloe Lips", price: 17.92, image: "aloe-lips.jpg", 
        benefits: "Lip protection, moisturizes, healing balm", 
        consumption: "Apply on lips as needed throughout the day" },
-      { name: "Forever Aloe Deodorant", price: 34.91, image: "deodorant-stick.jpg", 
-       benefits: "Long-lasting, gentle on skin, no aluminum salts", 
-       consumption: "Apply on clean underarms daily" },
-      { name: "Forever Deodorant Stick", price: 34.91, image: "forever-deodorant.jpg", 
+      { id: 22, name: "Forever Deodorant Stick", price: 34.91, image: "forever-deodorant.jpg", 
        benefits: "Natural fragrance, aloe soothing, easy glide", 
        consumption: "Use after shower daily" },
-      { name: "Teh Tarik Halia", price: 25.90, image: "teh-tarik.jpg", 
+      { id: 23, name: "Teh Tarik Halia", price: 25.90, image: "teh-tarik.jpg", 
        benefits: "Warming effect, digestion aid, ginger-infused", 
        consumption: "Mix sachet with hot water and stir well" },
-      { name: "Aloe Hand Soap", price: 54.72, image: "aloe-soap.jpg", 
+      { id: 24, name: "Aloe Hand Soap", price: 54.72, image: "aloe-soap.jpg", 
        benefits: "Gentle cleanser for hands, aloe-based", 
        consumption: "Use like regular hand wash daily" }
     ];
+
+    let cart = [];
 
     function showTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -310,7 +418,111 @@
     }
 
     function toggleCart() {
-      alert("Cart feature coming soon.");
+      const modal = document.getElementById('cart-modal');
+      if (modal.style.display === 'block') {
+        modal.style.display = 'none';
+      } else {
+        modal.style.display = 'block';
+        updateCartDisplay();
+      }
+    }
+
+    function addToCart(productId) {
+      const product = products.find(p => p.id === productId);
+      const existingItem = cart.find(item => item.id === productId);
+      
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          quantity: 1
+        });
+      }
+      
+      updateCartCount();
+      showAddedToCartMessage(product.name);
+    }
+
+    function removeFromCart(productId) {
+      cart = cart.filter(item => item.id !== productId);
+      updateCartDisplay();
+      updateCartCount();
+    }
+
+    function updateCartCount() {
+      const count = cart.reduce((total, item) => total + item.quantity, 0);
+      document.getElementById('cart-count').textContent = count;
+    }
+
+    function updateCartDisplay() {
+      const cartItemsElement = document.getElementById('cart-items');
+      const cartTotalElement = document.getElementById('cart-total');
+      
+      if (cart.length === 0) {
+        cartItemsElement.innerHTML = '<p>Your cart is empty</p>';
+        cartTotalElement.textContent = '0.00';
+        return;
+      }
+      
+      let itemsHTML = '';
+      let total = 0;
+      
+      cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        
+        itemsHTML += `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              ${item.name} (${item.quantity})
+              <span class="remove-item" onclick="removeFromCart(${item.id})">✕</span>
+            </div>
+            <div class="cart-item-price">RM ${itemTotal.toFixed(2)}</div>
+          </div>
+        `;
+      });
+      
+      cartItemsElement.innerHTML = itemsHTML;
+      cartTotalElement.textContent = total.toFixed(2);
+    }
+
+    function showAddedToCartMessage(productName) {
+      alert(`${productName} has been added to your cart!`);
+    }
+
+    function checkout() {
+      const name = document.getElementById('customer-name').value.trim();
+      const phone = document.getElementById('customer-phone').value.trim();
+      
+      if (!name || !phone) {
+        alert('Please enter your name and phone number');
+        return;
+      }
+      
+      if (cart.length === 0) {
+        alert('Your cart is empty');
+        return;
+      }
+      
+      // Format WhatsApp message
+      let message = `Hi, I would like to place an order:\n\n`;
+      message += `Name: ${name}\n`;
+      message += `Phone: ${phone}\n\n`;
+      message += `Order Details:\n`;
+      
+      cart.forEach(item => {
+        message += `- ${item.name} (Qty: ${item.quantity}) - RM ${(item.price * item.quantity).toFixed(2)}\n`;
+      });
+      
+      message += `\nTotal: RM ${cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)}\n\n`;
+      message += `Please confirm my order. Thank you!`;
+      
+      // Encode for URL
+      const encodedMessage = encodeURIComponent(message);
+      window.location.href = `https://wa.me/601111033154?text=${encodedMessage}`;
     }
 
     function renderProducts() {
@@ -323,6 +535,7 @@
             <div class="price">RM ${product.price.toFixed(2)}</div>
             <div class="benefits"><strong>Benefits:</strong> ${product.benefits}</div>
             <div class="consumption"><strong>How to use:</strong> ${product.consumption}</div>
+            <button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>
             <a href="https://wa.me/601111033154?text=I%20want%20to%20buy%20${encodeURIComponent(product.name)}" class="whatsapp-btn">Order via WhatsApp</a>
           </div>
         `).join('');
@@ -363,6 +576,14 @@
     document.addEventListener('DOMContentLoaded', function() {
       renderProducts();
       showTab('products');
+      
+      // Close modal when clicking outside
+      window.onclick = function(event) {
+        const modal = document.getElementById('cart-modal');
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      }
     });
   </script>
 </body>
