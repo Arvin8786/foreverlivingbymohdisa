@@ -68,46 +68,112 @@
       border-radius: 999px;
       font-weight: bold;
       z-index: 1000;
-      display: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     @media (max-width: 768px) {
-      .sticky-cart-button { display: block; }
+      .sticky-cart-button { display: flex; }
     }
     .cart-modal {
       position: fixed;
-      top: 80px;
-      right: 20px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       background: white;
       border: 1px solid #ccc;
       border-radius: 10px;
       padding: 20px;
       z-index: 1001;
       display: none;
-      width: 300px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     }
     .cart-modal.active {
+      display: block;
+    }
+    .cart-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: none;
+    }
+    .cart-overlay.active {
       display: block;
     }
     .cart-item {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .cart-item-info {
+      flex: 1;
+    }
+    .cart-item-name {
+      font-weight: 600;
+    }
+    .cart-item-price {
+      color: #666;
+      font-size: 0.9em;
+    }
+    .cart-item-quantity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .quantity-btn {
+      background: #f0f0f0;
+      border: none;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
     .remove-btn {
       background: #dc2626;
       color: white;
       border: none;
-      padding: 2px 8px;
+      padding: 5px 10px;
       border-radius: 4px;
       cursor: pointer;
+      font-size: 0.8em;
     }
-    .checkout-form input,
-    .checkout-form textarea {
+    .checkout-form {
+      margin-top: 20px;
+    }
+    .checkout-form input {
       width: 100%;
       margin: 10px 0;
-      padding: 8px;
-      border: 1px solid #ccc;
+      padding: 10px;
+      border: 1px solid #ddd;
       border-radius: 6px;
+    }
+    .cart-total {
+      font-weight: bold;
+      font-size: 1.2em;
+      text-align: right;
+      margin: 15px 0;
+    }
+    .close-cart {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.2em;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -123,8 +189,6 @@
 
   <!-- PRODUCT GRID -->
   <main class="container">
-    <!-- ✅ All 20 products inserted here -->
-    <!-- 🔽 Products Begin -->
     <!-- Product 1 -->
     <div class="card" data-category="skincare" data-aos="fade-up">
       <img src="aloe-first.jpg" alt="Aloe First">
@@ -142,157 +206,154 @@
       <button class="btn" onclick="addToCart('Bee Pollen', 75.50)">Add to Cart</button>
     </div>
     <!-- Product 3 -->
-<div class="card" data-category="supplements" data-aos="fade-up">
-  <img src="bee-propolis.jpg" alt="Bee Propolis">
-  <h3>Bee Propolis</h3>
-  <p><strong>Price:</strong> RM139.21</p>
-  <p>Immune support with antioxidant properties</p>
-  <button class="btn" onclick="addToCart('Bee Propolis', 139.21)">Add to Cart</button>
-</div>
-<!-- Product 4 -->
-<div class="card" data-category="supplements" data-aos="fade-up">
-  <img src="royal-jelly.jpg" alt="Royal Jelly">
-  <h3>Royal Jelly</h3>
-  <p><strong>Price:</strong> RM139.21</p>
-  <p>Rich in B vitamins and amino acids</p>
-  <button class="btn" onclick="addToCart('Royal Jelly', 139.21)">Add to Cart</button>
-</div>
-<!-- Product 5 -->
-<div class="card" data-category="supplements" data-aos="fade-up">
-  <img src="calcium-plus.jpg" alt="Calcium Plus">
-  <h3>Calcium Plus</h3>
-  <p><strong>Price:</strong> RM132.15</p>
-  <p>Supports bone health with calcium and vitamin D</p>
-  <button class="btn" onclick="addToCart('Calcium Plus', 132.15)">Add to Cart</button>
-</div>
-<!-- Product 6 -->
-<div class="card" data-category="skincare" data-aos="fade-up">
-  <img src="aloe-sunscreen.jpg" alt="Aloe Sunscreen">
-  <h3>Aloe Sunscreen</h3>
-  <p><strong>Price:</strong> RM89.07</p>
-  <p>Water-resistant sunscreen with aloe</p>
-  <button class="btn" onclick="addToCart('Aloe Sunscreen', 89.07)">Add to Cart</button>
-</div>
-<!-- Product 7 -->
-<div class="card" data-category="personal-care" data-aos="fade-up">
-  <img src="deodorant-stick.jpg" alt="Deodorant Stick">
-  <h3>Deodorant Stick</h3>
-  <p><strong>Price:</strong> RM50.73</p>
-  <p>Gentle, long-lasting protection without aluminum</p>
-  <button class="btn" onclick="addToCart('Deodorant Stick', 50.73)">Add to Cart</button>
-</div>
-<!-- Product 8 -->
-<div class="card" data-category="personal-care" data-aos="fade-up">
-  <img src="aloe-liquid-soap.jpg" alt="Aloe Liquid Soap">
-  <h3>Aloe Liquid Soap</h3>
-  <p><strong>Price:</strong> RM120.91</p>
-  <p>Moisturizing hand and face wash with aloe vera</p>
-  <button class="btn" onclick="addToCart('Aloe Liquid Soap', 120.91)">Add to Cart</button>
-</div>
-<!-- Product 9 -->
-<div class="card" data-category="skincare" data-aos="fade-up">
-  <img src="aloe-vera-gelly.jpg" alt="Aloe Vera Gelly">
-  <h3>Aloe Vera Gelly</h3>
-  <p><strong>Price:</strong> RM70.78</p>
-  <p>Topical gel for dry or sunburned skin</p>
-  <button class="btn" onclick="addToCart('Aloe Vera Gelly', 70.78)">Add to Cart</button>
-</div>
-<!-- Product 10 -->
-<div class="card" data-category="personal-care" data-aos="fade-up">
-  <img src="avocado-soap.jpg" alt="Avocado Soap">
-  <h3>Avocado Soap</h3>
-  <p><strong>Price:</strong> RM30.68</p>
-  <p>Gentle soap with avocado oil and aloe vera</p>
-  <button class="btn" onclick="addToCart('Avocado Soap', 30.68)">Add to Cart</button>
-</div>
-<!-- Product 11 -->
-<div class="card" data-category="drinks" data-aos="fade-up">
-  <img src="aloe-berry-nectar.jpg" alt="Aloe Berry Nectar">
-  <h3>Aloe Berry Nectar</h3>
-  <p><strong>Price:</strong> RM116.79</p>
-  <p>Antioxidant-rich, supports urinary health</p>
-  <button class="btn" onclick="addToCart('Aloe Berry Nectar', 116.79)">Add to Cart</button>
-</div>
-<!-- Product 12 -->
-<div class="card" data-category="drinks" data-aos="fade-up">
-  <img src="aloe-peaches.jpg" alt="Aloe Peaches">
-  <h3>Aloe Peaches</h3>
-  <p><strong>Price:</strong> RM116.79</p>
-  <p>Refreshing taste, great for skin and digestion</p>
-  <button class="btn" onclick="addToCart('Aloe Peaches', 116.79)">Add to Cart</button>
-</div>
-<!-- Product 13 -->
-<div class="card" data-category="personal-care" data-aos="fade-up">
-  <img src="bright-toothgel.jpg" alt="Bright Toothgel">
-  <h3>Bright Toothgel</h3>
-  <p><strong>Price:</strong> RM41.29</p>
-  <p>Fluoride-free, whitens teeth naturally</p>
-  <button class="btn" onclick="addToCart('Bright Toothgel', 41.29)">Add to Cart</button>
-</div>
-<!-- Product 14 -->
-<div class="card" data-category="supplements" data-aos="fade-up">
-  <img src="fields-of-greens.jpg" alt="Fields of Greens">
-  <h3>Fields of Greens</h3>
-  <p><strong>Price:</strong> RM86.10</p>
-  <p>Wheat grass, barley and alfalfa in tablet form</p>
-  <button class="btn" onclick="addToCart('Fields of Greens', 86.10)">Add to Cart</button>
-</div>
-<!-- Product 15 -->
-<div class="card" data-category="supplements" data-aos="fade-up">
-  <img src="absorbent-c.jpg" alt="Absorbent-C">
-  <h3>Absorbent-C</h3>
-  <p><strong>Price:</strong> RM75.50</p>
-  <p>Buffered vitamin C with oat bran</p>
-  <button class="btn" onclick="addToCart('Absorbent-C', 75.50)">Add to Cart</button>
-</div>
-<!-- Product 16 -->
-<div class="card" data-category="personal-care" data-aos="fade-up">
-  <img src="aloe-moisturizing.jpg" alt="Aloe Moisturizing Lotion">
-  <h3>Aloe Moisturizing Lotion</h3>
-  <p><strong>Price:</strong> RM70.78</p>
-  <p>All-purpose lotion for face and hands</p>
-  <button class="btn" onclick="addToCart('Aloe Moisturizing Lotion', 70.78)">Add to Cart</button>
-</div>
-<!-- Product 17 -->
-<div class="card" data-category="skincare" data-aos="fade-up">
-  <img src="aloe-propolis.jpg" alt="Aloe Propolis Creme">
-  <h3>Aloe Propolis Creme</h3>
-  <p><strong>Price:</strong> RM90.83</p>
-  <p>Aloe and bee propolis rich skin cream</p>
-  <button class="btn" onclick="addToCart('Aloe Propolis Creme', 90.83)">Add to Cart</button>
-</div>
-<!-- Product 18 -->
-<div class="card" data-category="personal-care" data-aos="fade-up">
-  <img src="bee-honey.jpg" alt="Bee Honey">
-  <h3>Bee Honey</h3>
-  <p><strong>Price:</strong> RM132.57</p>
-  <p>100% natural honey, great energy source</p>
-  <button class="btn" onclick="addToCart('Bee Honey', 132.57)">Add to Cart</button>
-</div>
-<!-- Product 19 -->
-<div class="card" data-category="skincare" data-aos="fade-up">
-  <img src="aloe-jojoba.jpg" alt="Aloe-Jojoba Shampoo">
-  <h3>Aloe-Jojoba Shampoo</h3>
-  <p><strong>Price:</strong> RM105.93</p>
-  <p>Gentle shampoo with aloe vera and jojoba</p>
-  <button class="btn" onclick="addToCart('Aloe-Jojoba Shampoo', 105.93)">Add to Cart</button>
-</div>
-<!-- Product 20 -->
-<div class="card" data-category="skincare" data-aos="fade-up">
-  <img src="aloe-jojoba-cond.jpg" alt="Aloe-Jojoba Conditioner">
-  <h3>Aloe-Jojoba Conditioner</h3>
-  <p><strong>Price:</strong> RM117.70</p>
-  <p>Smooths and hydrates hair with aloe and jojoba</p>
-  <button class="btn" onclick="addToCart('Aloe-Jojoba Conditioner', 117.70)">Add to Cart</button>
-</div>
-    <!-- 🔼 Products End -->
+    <div class="card" data-category="supplements" data-aos="fade-up">
+      <img src="bee-propolis.jpg" alt="Bee Propolis">
+      <h3>Bee Propolis</h3>
+      <p><strong>Price:</strong> RM139.21</p>
+      <p>Immune support with antioxidant properties</p>
+      <button class="btn" onclick="addToCart('Bee Propolis', 139.21)">Add to Cart</button>
+    </div>
+    <!-- Product 4 -->
+    <div class="card" data-category="supplements" data-aos="fade-up">
+      <img src="royal-jelly.jpg" alt="Royal Jelly">
+      <h3>Royal Jelly</h3>
+      <p><strong>Price:</strong> RM139.21</p>
+      <p>Rich in B vitamins and amino acids</p>
+      <button class="btn" onclick="addToCart('Royal Jelly', 139.21)">Add to Cart</button>
+    </div>
+    <!-- Product 5 -->
+    <div class="card" data-category="supplements" data-aos="fade-up">
+      <img src="calcium-plus.jpg" alt="Calcium Plus">
+      <h3>Calcium Plus</h3>
+      <p><strong>Price:</strong> RM132.15</p>
+      <p>Supports bone health with calcium and vitamin D</p>
+      <button class="btn" onclick="addToCart('Calcium Plus', 132.15)">Add to Cart</button>
+    </div>
+    <!-- Product 6 -->
+    <div class="card" data-category="skincare" data-aos="fade-up">
+      <img src="aloe-sunscreen.jpg" alt="Aloe Sunscreen">
+      <h3>Aloe Sunscreen</h3>
+      <p><strong>Price:</strong> RM89.07</p>
+      <p>Water-resistant sunscreen with aloe</p>
+      <button class="btn" onclick="addToCart('Aloe Sunscreen', 89.07)">Add to Cart</button>
+    </div>
+    <!-- Product 7 -->
+    <div class="card" data-category="personal-care" data-aos="fade-up">
+      <img src="deodorant-stick.jpg" alt="Deodorant Stick">
+      <h3>Deodorant Stick</h3>
+      <p><strong>Price:</strong> RM50.73</p>
+      <p>Gentle, long-lasting protection without aluminum</p>
+      <button class="btn" onclick="addToCart('Deodorant Stick', 50.73)">Add to Cart</button>
+    </div>
+    <!-- Product 8 -->
+    <div class="card" data-category="personal-care" data-aos="fade-up">
+      <img src="aloe-liquid-soap.jpg" alt="Aloe Liquid Soap">
+      <h3>Aloe Liquid Soap</h3>
+      <p><strong>Price:</strong> RM120.91</p>
+      <p>Moisturizing hand and face wash with aloe vera</p>
+      <button class="btn" onclick="addToCart('Aloe Liquid Soap', 120.91)">Add to Cart</button>
+    </div>
+    <!-- Product 9 -->
+    <div class="card" data-category="skincare" data-aos="fade-up">
+      <img src="aloe-vera-gelly.jpg" alt="Aloe Vera Gelly">
+      <h3>Aloe Vera Gelly</h3>
+      <p><strong>Price:</strong> RM70.78</p>
+      <p>Topical gel for dry or sunburned skin</p>
+      <button class="btn" onclick="addToCart('Aloe Vera Gelly', 70.78)">Add to Cart</button>
+    </div>
+    <!-- Product 10 -->
+    <div class="card" data-category="personal-care" data-aos="fade-up">
+      <img src="avocado-soap.jpg" alt="Avocado Soap">
+      <h3>Avocado Soap</h3>
+      <p><strong>Price:</strong> RM30.68</p>
+      <p>Gentle soap with avocado oil and aloe vera</p>
+      <button class="btn" onclick="addToCart('Avocado Soap', 30.68)">Add to Cart</button>
+    </div>
+    <!-- Product 11 -->
+    <div class="card" data-category="drinks" data-aos="fade-up">
+      <img src="aloe-berry-nectar.jpg" alt="Aloe Berry Nectar">
+      <h3>Aloe Berry Nectar</h3>
+      <p><strong>Price:</strong> RM116.79</p>
+      <p>Antioxidant-rich, supports urinary health</p>
+      <button class="btn" onclick="addToCart('Aloe Berry Nectar', 116.79)">Add to Cart</button>
+    </div>
+    <!-- Product 12 -->
+    <div class="card" data-category="drinks" data-aos="fade-up">
+      <img src="aloe-peaches.jpg" alt="Aloe Peaches">
+      <h3>Aloe Peaches</h3>
+      <p><strong>Price:</strong> RM116.79</p>
+      <p>Refreshing taste, great for skin and digestion</p>
+      <button class="btn" onclick="addToCart('Aloe Peaches', 116.79)">Add to Cart</button>
+    </div>
+    <!-- Product 13 -->
+    <div class="card" data-category="personal-care" data-aos="fade-up">
+      <img src="bright-toothgel.jpg" alt="Bright Toothgel">
+      <h3>Bright Toothgel</h3>
+      <p><strong>Price:</strong> RM41.29</p>
+      <p>Fluoride-free, whitens teeth naturally</p>
+      <button class="btn" onclick="addToCart('Bright Toothgel', 41.29)">Add to Cart</button>
+    </div>
+    <!-- Product 14 -->
+    <div class="card" data-category="supplements" data-aos="fade-up">
+      <img src="fields-of-greens.jpg" alt="Fields of Greens">
+      <h3>Fields of Greens</h3>
+      <p><strong>Price:</strong> RM86.10</p>
+      <p>Wheat grass, barley and alfalfa in tablet form</p>
+      <button class="btn" onclick="addToCart('Fields of Greens', 86.10)">Add to Cart</button>
+    </div>
+    <!-- Product 15 -->
+    <div class="card" data-category="supplements" data-aos="fade-up">
+      <img src="absorbent-c.jpg" alt="Absorbent-C">
+      <h3>Absorbent-C</h3>
+      <p><strong>Price:</strong> RM75.50</p>
+      <p>Buffered vitamin C with oat bran</p>
+      <button class="btn" onclick="addToCart('Absorbent-C', 75.50)">Add to Cart</button>
+    </div>
+    <!-- Product 16 -->
+    <div class="card" data-category="personal-care" data-aos="fade-up">
+      <img src="aloe-moisturizing.jpg" alt="Aloe Moisturizing Lotion">
+      <h3>Aloe Moisturizing Lotion</h3>
+      <p><strong>Price:</strong> RM70.78</p>
+      <p>All-purpose lotion for face and hands</p>
+      <button class="btn" onclick="addToCart('Aloe Moisturizing Lotion', 70.78)">Add to Cart</button>
+    </div>
+    <!-- Product 17 -->
+    <div class="card" data-category="skincare" data-aos="fade-up">
+      <img src="aloe-propolis.jpg" alt="Aloe Propolis Creme">
+      <h3>Aloe Propolis Creme</h3>
+      <p><strong>Price:</strong> RM90.83</p>
+      <p>Aloe and bee propolis rich skin cream</p>
+      <button class="btn" onclick="addToCart('Aloe Propolis Creme', 90.83)">Add to Cart</button>
+    </div>
+    <!-- Product 18 -->
+    <div class="card" data-category="personal-care" data-aos="fade-up">
+      <img src="bee-honey.jpg" alt="Bee Honey">
+      <h3>Bee Honey</h3>
+      <p><strong>Price:</strong> RM132.57</p>
+      <p>100% natural honey, great energy source</p>
+      <button class="btn" onclick="addToCart('Bee Honey', 132.57)">Add to Cart</button>
+    </div>
+    <!-- Product 19 -->
+    <div class="card" data-category="skincare" data-aos="fade-up">
+      <img src="aloe-jojoba.jpg" alt="Aloe-Jojoba Shampoo">
+      <h3>Aloe-Jojoba Shampoo</h3>
+      <p><strong>Price:</strong> RM105.93</p>
+      <p>Gentle shampoo with aloe vera and jojoba</p>
+      <button class="btn" onclick="addToCart('Aloe-Jojoba Shampoo', 105.93)">Add to Cart</button>
+    </div>
+    <!-- Product 20 -->
+    <div class="card" data-category="skincare" data-aos="fade-up">
+      <img src="aloe-jojoba-cond.jpg" alt="Aloe-Jojoba Conditioner">
+      <h3>Aloe-Jojoba Conditioner</h3>
+      <p><strong>Price:</strong> RM117.70</p>
+      <p>Smooths and hydrates hair with aloe and jojoba</p>
+      <button class="btn" onclick="addToCart('Aloe-Jojoba Conditioner', 117.70)">Add to Cart</button>
+    </div>
   </main>
 
-  <!-- ✅ COMBO SECTION -->
+  <!-- COMBO SECTION -->
   <div class="combo-section">
     <h2 style="text-align:center;font-size:1.8rem;color:#d97706;width:100%;">🎉 Limited Time Combo Offers – 10% OFF</h2>
-    <!-- ✅ All 8 combo cards inserted here -->
-    <!-- 🔽 Combo Offers Begin -->
     <div class="combo-card" data-aos="zoom-in">
       <h3>🍫 Energy and Wellness</h3>
       <p>Bee Pollen + Lite Choco</p>
@@ -306,78 +367,112 @@
       <button class="btn" onclick="addToCart('Daily Health Starter', 250.35)">Add to Cart</button>
     </div>
     <div class="combo-card" data-aos="zoom-in">
-  <h3>🌸 Radiance Set</h3>
-  <p>Aloe Moisturizing + Aloe Propolis Creme</p>
-  <p><del>RM161.61</del> <strong style="color:#dc2626">RM145.45</strong></p>
-  <button class="btn" onclick="addToCart('Radiance Set', 145.45)">Add to Cart</button>
-</div>
-<div class="combo-card" data-aos="zoom-in">
-  <h3>🧴 Skincare Kit</h3>
-  <p>Aloe Vera Gelly + Aloe Sunscreen + Avocado Soap</p>
-  <p><del>RM190.53</del> <strong style="color:#dc2626">RM171.48</strong></p>
-  <button class="btn" onclick="addToCart('Skincare Kit', 171.48)">Add to Cart</button>
-</div>
-<div class="combo-card" data-aos="zoom-in">
-  <h3>🐝 Bee Essentials</h3>
-  <p>Bee Honey + Bee Pollen + Bee Propolis</p>
-  <p><del>RM347.28</del> <strong style="color:#dc2626">RM312.55</strong></p>
-  <button class="btn" onclick="addToCart('Bee Essentials', 312.55)">Add to Cart</button>
-</div>
-<div class="combo-card" data-aos="zoom-in">
-  <h3>🧼 Body Care Duo</h3>
-  <p>Aloe Liquid Soap + Deodorant Stick</p>
-  <p><del>RM171.64</del> <strong style="color:#dc2626">RM154.48</strong></p>
-  <button class="btn" onclick="addToCart('Body Care Duo', 154.48)">Add to Cart</button>
-</div>
-<div class="combo-card" data-aos="zoom-in">
-  <h3>💪 Immunity Boost Pack</h3>
-  <p>Royal Jelly + Absorbent-C</p>
-  <p><del>RM214.71</del> <strong style="color:#dc2626">RM193.24</strong></p>
-  <button class="btn" onclick="addToCart('Immunity Boost Pack', 193.24)">Add to Cart</button>
-</div>
-<div class="combo-card" data-aos="zoom-in">
-  <h3>☀️ Outdoor Kit</h3>
-  <p>Aloe First + Aloe Sunscreen</p>
-  <p><del>RM179.90</del> <strong style="color:#dc2626">RM161.91</strong></p>
-  <button class="btn" onclick="addToCart('Outdoor Kit', 161.91)">Add to Cart</button>
-</div>
-    <!-- 🔼 Combo Offers End -->
+      <h3>🌸 Radiance Set</h3>
+      <p>Aloe Moisturizing + Aloe Propolis Creme</p>
+      <p><del>RM161.61</del> <strong style="color:#dc2626">RM145.45</strong></p>
+      <button class="btn" onclick="addToCart('Radiance Set', 145.45)">Add to Cart</button>
+    </div>
+    <div class="combo-card" data-aos="zoom-in">
+      <h3>🧴 Skincare Kit</h3>
+      <p>Aloe Vera Gelly + Aloe Sunscreen + Avocado Soap</p>
+      <p><del>RM190.53</del> <strong style="color:#dc2626">RM171.48</strong></p>
+      <button class="btn" onclick="addToCart('Skincare Kit', 171.48)">Add to Cart</button>
+    </div>
+    <div class="combo-card" data-aos="zoom-in">
+      <h3>🐝 Bee Essentials</h3>
+      <p>Bee Honey + Bee Pollen + Bee Propolis</p>
+      <p><del>RM347.28</del> <strong style="color:#dc2626">RM312.55</strong></p>
+      <button class="btn" onclick="addToCart('Bee Essentials', 312.55)">Add to Cart</button>
+    </div>
+    <div class="combo-card" data-aos="zoom-in">
+      <h3>🧼 Body Care Duo</h3>
+      <p>Aloe Liquid Soap + Deodorant Stick</p>
+      <p><del>RM171.64</del> <strong style="color:#dc2626">RM154.48</strong></p>
+      <button class="btn" onclick="addToCart('Body Care Duo', 154.48)">Add to Cart</button>
+    </div>
+    <div class="combo-card" data-aos="zoom-in">
+      <h3>💪 Immunity Boost Pack</h3>
+      <p>Royal Jelly + Absorbent-C</p>
+      <p><del>RM214.71</del> <strong style="color:#dc2626">RM193.24</strong></p>
+      <button class="btn" onclick="addToCart('Immunity Boost Pack', 193.24)">Add to Cart</button>
+    </div>
+    <div class="combo-card" data-aos="zoom-in">
+      <h3>☀️ Outdoor Kit</h3>
+      <p>Aloe First + Aloe Sunscreen</p>
+      <p><del>RM179.90</del> <strong style="color:#dc2626">RM161.91</strong></p>
+      <button class="btn" onclick="addToCart('Outdoor Kit', 161.91)">Add to Cart</button>
+    </div>
   </div>
 
-  <!-- ✅ CART -->
+  <!-- CART MODAL -->
+  <div class="cart-overlay" id="cart-overlay"></div>
   <div class="cart-modal" id="cart-modal">
-    <h3>Your Cart</h3>
+    <button class="close-cart" onclick="toggleCart()">&times;</button>
+    <h3>Your Shopping Cart</h3>
     <div id="cart-items"></div>
-    <p><strong>Total:</strong> RM<span id="cart-total">0.00</span></p>
+    <div class="cart-total">Total: RM<span id="cart-total">0.00</span></div>
     <form class="checkout-form" onsubmit="return submitOrder(event)">
       <input type="text" name="name" placeholder="Your Name" required />
-      <textarea name="notes" placeholder="Order Notes (optional)"></textarea>
+      <input type="tel" name="phone" placeholder="Phone Number" required />
       <button class="btn" type="submit">Send Order via WhatsApp</button>
     </form>
   </div>
-  <button class="sticky-cart-button" onclick="toggleCart()">🛒 View Cart</button>
+  <button class="sticky-cart-button" onclick="toggleCart()">
+    <span id="cart-count">0</span> Items | RM<span id="cart-total-mini">0.00</span>
+  </button>
+
+  <footer style="text-align: center; font-size: 13px; color: #666; padding: 20px; background-color: #f3f4f6;">
+    &copy; 2025 Rezeki Ilahi. All rights reserved.
+  </footer>
+
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
   <script>
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
     function updateCart() {
       localStorage.setItem('cart', JSON.stringify(cart));
-      document.getElementById('cart-items').innerHTML = '';
+      
+      // Update cart items display
+      const cartItemsEl = document.getElementById('cart-items');
+      cartItemsEl.innerHTML = '';
+      
       let total = 0;
-      cart.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-        document.getElementById('cart-items').innerHTML += `
-          <div class="cart-item">
-            <span>${item.name} x ${item.quantity} = RM${itemTotal.toFixed(2)}</span>
-            <button class="remove-btn" onclick="removeFromCart('${item.name}')">Remove</button>
-          </div>`;
-      });
+      let itemCount = 0;
+      
+      if (cart.length === 0) {
+        cartItemsEl.innerHTML = '<p style="text-align:center;color:#666;">Your cart is empty</p>';
+      } else {
+        cart.forEach(item => {
+          const itemTotal = item.price * item.quantity;
+          total += itemTotal;
+          itemCount += item.quantity;
+          
+          cartItemsEl.innerHTML += `
+            <div class="cart-item">
+              <div class="cart-item-info">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-price">RM${item.price.toFixed(2)}</div>
+              </div>
+              <div class="cart-item-quantity">
+                <button class="quantity-btn" onclick="updateQuantity('${item.name}', ${item.quantity - 1})">-</button>
+                <span>${item.quantity}</span>
+                <button class="quantity-btn" onclick="updateQuantity('${item.name}', ${item.quantity + 1})">+</button>
+              </div>
+              <button class="remove-btn" onclick="removeFromCart('${item.name}')">Remove</button>
+            </div>
+          `;
+        });
+      }
+      
+      // Update totals
       document.getElementById('cart-total').textContent = total.toFixed(2);
+      document.getElementById('cart-total-mini').textContent = total.toFixed(2);
+      document.getElementById('cart-count').textContent = itemCount;
     }
 
     function toggleCart() {
       document.getElementById('cart-modal').classList.toggle('active');
+      document.getElementById('cart-overlay').classList.toggle('active');
       updateCart();
     }
 
@@ -389,7 +484,38 @@
         cart.push({ name, price, quantity: 1 });
       }
       updateCart();
-      alert(`${name} added to cart!`);
+      
+      // Show confirmation
+      const confirmation = document.createElement('div');
+      confirmation.textContent = `${name} added to cart!`;
+      confirmation.style.position = 'fixed';
+      confirmation.style.bottom = '80px';
+      confirmation.style.right = '20px';
+      confirmation.style.background = '#0f766e';
+      confirmation.style.color = 'white';
+      confirmation.style.padding = '10px 20px';
+      confirmation.style.borderRadius = '6px';
+      confirmation.style.zIndex = '1000';
+      document.body.appendChild(confirmation);
+      
+      setTimeout(() => {
+        confirmation.style.transition = 'opacity 0.5s';
+        confirmation.style.opacity = '0';
+        setTimeout(() => confirmation.remove(), 500);
+      }, 2000);
+    }
+
+    function updateQuantity(name, newQuantity) {
+      if (newQuantity < 1) {
+        removeFromCart(name);
+        return;
+      }
+      
+      const item = cart.find(item => item.name === name);
+      if (item) {
+        item.quantity = newQuantity;
+        updateCart();
+      }
     }
 
     function removeFromCart(name) {
@@ -401,36 +527,33 @@
       event.preventDefault();
       const form = event.target;
       const name = form.name.value;
-      const notes = form.notes.value;
+      const phone = form.phone.value;
 
-      const cartSummary = cart.map(item => `${item.name} x ${item.quantity}`).join('%0A');
+      // Format cart items for WhatsApp message
+      const cartSummary = cart.map(item => 
+        `${item.name} (${item.quantity} x RM${item.price.toFixed(2)}) = RM${(item.quantity * item.price).toFixed(2)}`
+      ).join('%0A');
+      
       const totalAmount = document.getElementById('cart-total').textContent;
       const totalPoints = Math.floor(parseFloat(totalAmount));
 
-      const message = `Order from ${name}%0A%0AItems:%0A${cartSummary}%0A%0ATotal: RM${totalAmount}%0AReward Points: ${totalPoints}%0ANotes: ${encodeURIComponent(notes)}`;
+      const message = `*NEW ORDER*%0A%0A*Customer Name:* ${encodeURIComponent(name)}%0A*Phone:* ${encodeURIComponent(phone)}%0A%0A*Order Details:*%0A${cartSummary}%0A%0A*Total:* RM${totalAmount}%0A*Reward Points Earned:* ${totalPoints}`;
       const whatsappURL = `https://wa.me/601111033154?text=${message}`;
 
       window.open(whatsappURL, '_blank');
+      
+      // Reset cart after order
       cart = [];
       updateCart();
       form.reset();
       toggleCart();
+      
+      // Show thank you message
+      alert('Thank you for your order! We will contact you shortly.');
     }
 
+    // Initialize cart on page load
     updateCart();
   </script>
-<section style="padding: 40px 20px; background-color: #f9fafb; text-align: center;">
-  <h2 style="color: #0f766e;">📬 Sign Up for Promotions & Updates</h2>
-  <p>Be the first to hear about new products, rewards, and offers!</p>
-  <form onsubmit="alert('Thank you for signing up!'); return false;" style="max-width: 400px; margin: 0 auto;">
-    <input type="text" placeholder="Full Name" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px;">
-    <input type="email" placeholder="Email Address" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px;">
-    <input type="tel" placeholder="Phone Number (Optional)" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px;">
-    <button type="submit" class="btn">Subscribe</button>
-  </form>
-</section>
-<footer style="text-align: center; font-size: 13px; color: #666; padding: 20px; background-color: #f3f4f6;">
-  &copy; 2025 Rezeki Ilahi. All rights reserved.
-</footer>
 </body>
 </html>
