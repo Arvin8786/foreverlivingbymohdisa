@@ -1,818 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Forever Living by Mohd Arvind Isa</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css" />
   <style>
-    :root {
-      --primary: #2c8a58;
-      --secondary: #25D366;
-      --light: #f5f5f5;
-      --dark: #333;
-      --white: #fff;
-      --shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    
-    * {
+    body {
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+      background-color: #f5f5f5;
     }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--light);
-      color: var(--dark);
-      line-height: 1.6;
-    }
-    
     header {
-      background-color: var(--white);
+      background-color: #fff;
       padding: 20px;
       text-align: center;
-      box-shadow: var(--shadow);
-      position: relative;
+      border-bottom: 1px solid #ddd;
     }
-    
-    .logo {
-      font-size: 28px;
-      color: var(--primary);
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    
     .cart-icon {
       position: absolute;
-      right: 30px;
-      top: 30px;
-      font-size: 24px;
+      right: 20px;
+      top: 20px;
+      font-size: 20px;
       cursor: pointer;
-      color: var(--primary);
     }
-    
-    .cart-count {
-      background-color: var(--secondary);
-      color: white;
-      border-radius: 50%;
-      padding: 2px 6px;
-      font-size: 14px;
-      position: absolute;
-      top: -8px;
-      right: -8px;
-    }
-    
     nav {
-      background-color: var(--primary);
-      padding: 15px 0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      background-color: #2c8a58;
     }
-    
-    .nav-links {
+    nav ul {
       display: flex;
-      justify-content: center;
       list-style: none;
+      padding: 10px;
+      margin: 0;
+      justify-content: center;
     }
-    
-    .nav-links li {
-      margin: 0 20px;
+    nav li {
+      margin: 0 15px;
     }
-    
-    .nav-links a {
-      color: var(--white);
+    nav a {
+      color: white;
       text-decoration: none;
       font-weight: bold;
-      font-size: 18px;
-      transition: all 0.3s ease;
-      padding: 5px 10px;
-      border-radius: 4px;
     }
-    
-    .nav-links a:hover {
-      background-color: rgba(255,255,255,0.2);
+    nav a:hover {
+      text-decoration: underline;
     }
-    
-    .section {
-      padding: 40px 20px;
-      max-width: 1200px;
-      margin: 0 auto;
+    .tab-content {
+      display: none;
+      padding: 20px;
     }
-    
-    .section-title {
-      text-align: center;
-      margin-bottom: 40px;
-      color: var(--primary);
-      font-size: 32px;
-      position: relative;
-    }
-    
-    .section-title:after {
-      content: '';
+    .tab-content.active {
       display: block;
-      width: 80px;
-      height: 4px;
-      background-color: var(--primary);
-      margin: 15px auto 0;
     }
-    
-    /* Products Section */
-    .product-grid {
+    .product-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 30px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
     }
-    
-    .product-card {
-      background: var(--white);
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: transform 0.3s ease;
+    .product {
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
     }
-    
-    .product-card:hover {
-      transform: translateY(-5px);
-    }
-    
-    .product-image {
+    .product img {
       width: 100%;
-      height: 200px;
+      height: 150px;
       object-fit: cover;
     }
-    
-    .product-info {
-      padding: 20px;
+    .product h3 {
+      margin: 10px 0 5px;
     }
-    
-    .product-name {
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: var(--dark);
-    }
-    
-    .product-price {
-      color: var(--primary);
+    .product .price {
+      color: #2c8a58;
       font-weight: bold;
-      font-size: 20px;
-      margin-bottom: 15px;
     }
-    
-    .product-actions {
-      display: flex;
-      justify-content: space-between;
-    }
-    
-    .btn {
-      padding: 8px 15px;
-      border: none;
+    .product .whatsapp-btn {
+      display: inline-block;
+      margin-top: 10px;
+      background: #25D366;
+      color: white;
+      padding: 6px 12px;
       border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.3s ease;
+      text-decoration: none;
     }
-    
-    .btn-whatsapp {
-      background-color: var(--secondary);
-      color: white;
-    }
-    
-    .btn-whatsapp:hover {
-      background-color: #128C7E;
-    }
-    
-    .btn-details {
-      background-color: var(--primary);
-      color: white;
-    }
-    
-    .btn-details:hover {
-      background-color: #1e6b48;
-    }
-    
-    /* CDS Section */
-    .cds-section {
-      background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), 
-                  url('https://images.unsplash.com/photo-1535914254981-b5012eebbd15') center/cover;
-      padding: 60px 20px;
-      border-radius: 10px;
-      margin-bottom: 40px;
-      box-shadow: var(--shadow);
-    }
-    
-    .cds-content {
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: rgba(255,255,255,0.8);
-      padding: 30px;
-      border-radius: 8px;
-    }
-    
-    .cds-benefits {
-      margin: 20px 0;
-    }
-    
-    .cds-benefits li {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .cds-benefits i {
-      margin-right: 10px;
-      color: var(--primary);
-    }
-    
-    /* Business Opportunity Section */
-    .business-section {
-      background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), 
-                  url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40') center/cover;
-      padding: 60px 20px;
-      border-radius: 10px;
-      margin-bottom: 40px;
-      box-shadow: var(--shadow);
-    }
-    
-    .business-content {
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: rgba(255,255,255,0.8);
-      padding: 30px;
-      border-radius: 8px;
-    }
-    
-    .business-benefits {
-      margin: 20px 0;
-    }
-    
-    .business-benefits li {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .business-benefits i {
-      margin-right: 10px;
-      color: var(--primary);
-    }
-    
-    /* AI Suggestion Section */
-    .ai-section {
-      background-color: var(--white);
-      padding: 40px;
-      border-radius: 10px;
-      margin-bottom: 40px;
-      box-shadow: var(--shadow);
-    }
-    
-    .ai-input-container {
-      display: flex;
-      margin-bottom: 20px;
-    }
-    
-    #symptom-input {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px 0 0 4px;
-      font-size: 16px;
-    }
-    
-    .btn-suggest {
-      padding: 12px 20px;
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 0 4px 4px 0;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    
-    .suggestion-result {
-      margin-top: 30px;
-    }
-    
-    .suggested-product {
-      background-color: #f9f9f9;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow);
-    }
-    
-    .product-benefits {
-      margin: 15px 0;
-      padding-left: 20px;
-    }
-    
-    .product-usage {
-      font-style: italic;
-      margin-bottom: 15px;
-    }
-    
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.7);
-      z-index: 1000;
-      overflow: auto;
-    }
-    
-    .modal-content {
-      background-color: var(--white);
-      margin: 5% auto;
-      padding: 30px;
-      border-radius: 10px;
-      max-width: 800px;
-      position: relative;
-      animation: modalopen 0.5s;
-    }
-    
-    @keyframes modalopen {
-      from {opacity: 0; transform: translateY(-50px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-    
-    .close-modal {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--dark);
-    }
-    
-    .modal-product-image {
-      width: 100%;
-      max-height: 300px;
-      object-fit: contain;
-      margin-bottom: 20px;
-      border-radius: 8px;
-    }
-    
-    .modal-product-name {
-      font-size: 28px;
-      color: var(--primary);
-      margin-bottom: 10px;
-    }
-    
-    .modal-product-price {
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--primary);
-      margin-bottom: 20px;
-    }
-    
-    /* Footer */
     footer {
-      background-color: var(--dark);
-      color: var(--white);
-      padding: 30px 0;
+      background: #f1f1f1;
+      padding: 20px;
       text-align: center;
+      font-size: 14px;
     }
-    
     .disclaimer {
+      margin-top: 10px;
       background-color: #fff3cd;
       color: #856404;
       padding: 15px;
-      margin-top: 20px;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      .nav-links {
-        flex-direction: column;
-        align-items: center;
-      }
-      
-      .nav-links li {
-        margin: 5px 0;
-      }
-      
-      .product-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      }
-      
-      .modal-content {
-        width: 90%;
-        margin: 10% auto;
-      }
+      border-top: 1px solid #ffeeba;
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="logo">FOREVER LIVING by Mohd Arvind Isa</div>
+    <h1 style="font-size: 28px; color: #2c8a58;">
+      FOREVER LIVING by Mohd Arvind Isa
+    </h1>
     <div class="cart-icon" onclick="toggleCart()">
-      <i class="fas fa-shopping-cart"></i>
-      <span class="cart-count">0</span>
+      🛒 <span id="cart-count">0</span>
     </div>
   </header>
-  
+
   <nav>
-    <ul class="nav-links">
-      <li><a href="#products">Products</a></li>
-      <li><a href="#cds">Detox Program</a></li>
-      <li><a href="#business">Business Opportunity</a></li>
-      <li><a href="#ai-suggestion">AI Suggestion</a></li>
+    <ul>
+      <li><a href="#" onclick="showTab('products')">Products</a></li>
+      <li><a href="#" onclick="showTab('cds')">Cabaran Detox Sihat</a></li>
+      <li><a href="#" onclick="showTab('business')">Business Opportunity</a></li>
     </ul>
   </nav>
-  
-  <main>
-    <!-- Products Section -->
-    <section id="products" class="section">
-      <h2 class="section-title">Our Premium Products</h2>
-      <div class="product-grid" id="product-list"></div>
-    </section>
-    
-    <!-- CDS Section -->
-    <section id="cds" class="section">
-      <div class="cds-section">
-        <div class="cds-content">
-          <h2 class="section-title">Cabaran Detox Sihat (CDS)</h2>
-          <p>Transform your health with our 7-day detox program designed to reset your body naturally and boost your energy levels.</p>
-          
-          <ul class="cds-benefits">
-            <li><i class="fas fa-check-circle"></i> Personalized supplement plan with Forever products</li>
-            <li><i class="fas fa-check-circle"></i> Easy-to-follow meal plan with delicious recipes</li>
-            <li><i class="fas fa-check-circle"></i> Daily coaching and community support</li>
-            <li><i class="fas fa-check-circle"></i> WhatsApp check-ins with your personal coach</li>
-            <li><i class="fas fa-check-circle"></i> Lifetime access to health resources</li>
-          </ul>
-          
-          <p><strong>Results you can expect:</strong> Increased energy, better digestion, clearer skin, and weight management.</p>
-          <p><strong>Delivery:</strong> 5-10 working days after registration.</p>
-          
-          <button class="btn btn-whatsapp" onclick="window.location.href='https://wa.me/601111033154?text=I%20am%20interested%20in%20CDS%20Program'">
-            <i class="fab fa-whatsapp"></i> Join Now
-          </button>
-        </div>
-      </div>
-    </section>
-    
-    <!-- Business Opportunity Section -->
-    <section id="business" class="section">
-      <div class="business-section">
-        <div class="business-content">
-          <h2 class="section-title">Build Your Forever Business</h2>
-          <p>Join our team and create financial freedom while helping others achieve better health.</p>
-          
-          <ul class="business-benefits">
-            <li><i class="fas fa-money-bill-wave"></i> Earn 30-50% commission on every sale</li>
-            <li><i class="fas fa-clock"></i> Flexible hours - work when you want</li>
-            <li><i class="fas fa-globe"></i> Global business potential</li>
-            <li><i class="fas fa-graduation-cap"></i> Free training and mentorship</li>
-            <li><i class="fas fa-car"></i> Luxury car bonus program</li>
-            <li><i class="fas fa-plane"></i> All-expenses-paid trips</li>
-          </ul>
-          
-          <p><strong>No experience needed</strong> - We provide complete training and support to help you succeed.</p>
-          
-          <button class="btn btn-whatsapp" onclick="window.location.href='https://wa.me/601111033154?text=I%20want%20to%20join%20Forever%20Business'">
-            <i class="fab fa-whatsapp"></i> Contact Us
-          </button>
-        </div>
-      </div>
-    </section>
-    
-    <!-- AI Suggestion Section -->
-    <section id="ai-suggestion" class="section">
-      <div class="ai-section">
-        <h2 class="section-title">AI Product Recommendation</h2>
-        <p>Tell us your health concerns and we'll recommend the perfect Forever products for you:</p>
-        
-        <div class="ai-input-container">
-          <input type="text" id="symptom-input" placeholder="e.g. joint pain, low energy, digestion issues...">
-          <button class="btn-suggest" onclick="suggestProduct()">Get Suggestions</button>
-        </div>
-        
-        <div class="suggestion-result" id="suggestion-result"></div>
-        
-        <div class="disclaimer">
-          <strong>Disclaimer:</strong> These suggestions are based on general product information and do not constitute medical advice. Please consult with a healthcare professional before starting any new supplement regimen.
-        </div>
-      </div>
-    </section>
-  </main>
-  
-  <!-- Product Modal -->
-  <div id="productModal" class="modal">
-    <div class="modal-content">
-      <span class="close-modal" onclick="closeModal()">&times;</span>
-      <img id="modal-product-image" class="modal-product-image" src="" alt="Product Image">
-      <h2 id="modal-product-name" class="modal-product-name"></h2>
-      <div id="modal-product-price" class="modal-product-price"></div>
-      
-      <h3>Benefits:</h3>
-      <ul id="modal-product-benefits" class="product-benefits"></ul>
-      
-      <h3>Usage Instructions:</h3>
-      <p id="modal-product-usage" class="product-usage"></p>
-      
-      <button id="modal-add-to-cart" class="btn btn-whatsapp" style="margin-right: 10px;">
-        <i class="fas fa-cart-plus"></i> Add to Cart
-      </button>
-      <button id="modal-whatsapp-order" class="btn btn-whatsapp">
-        <i class="fab fa-whatsapp"></i> Order Now
-      </button>
-    </div>
-  </div>
-  
-  <footer>
-    <p>&copy; 2025 Forever Living. All rights reserved.</p>
-    <p>Independent Distributor | Mohd Arvind Isa | Rich Academy Global</p>
-    <div class="disclaimer">
-      <strong>Disclaimer:</strong> This website is operated by an independent Forever Business Owner and is not the official website of Forever Living Products International. All product names, logos, and brands are property of their respective owners.
-    </div>
-  </footer>
-  
-  <script>
-    // Product Data with Benefits and Usage
-    const products = [
-      {
-        name: "Aloe Vera Gel",
-        price: 116.79,
-        image: "images/aloe-vera-gel.jpg",
-        benefits: [
-          "Supports digestive health",
-          "Boosts immune system",
-          "Promotes skin health",
-          "Natural energy booster",
-          "Rich in vitamins and minerals"
-        ],
-        usage: "Take 30-60ml daily, preferably on an empty stomach. Can be mixed with water or fruit juice."
-      },
-      {
-        name: "Aloe Berry Nectar",
-        price: 116.79,
-        image: "images/aloe-berry-nectar.jpg",
-        benefits: [
-          "Antioxidant protection",
-          "Supports immune function",
-          "Natural energy source",
-          "Promotes digestive health",
-          "Contains cranberry and apple"
-        ],
-        usage: "Drink 30-60ml daily. Refrigerate after opening and consume within 30 days."
-      },
-      {
-        name: "Arctic Sea Omega-3",
-        price: 133.02,
-        image: "images/arctic-sea.jpg",
-        benefits: [
-          "Supports heart health",
-          "Promotes brain function",
-          "Reduces joint inflammation",
-          "Improves skin health",
-          "Supports eye health"
-        ],
-        usage: "Take 2 softgels twice daily with meals. Store in a cool, dry place."
-      },
-      {
-        name: "Royal Jelly",
-        price: 157.38,
-        image: "images/royal-jelly.jpg",
-        benefits: [
-          "Boosts energy levels",
-          "Supports immune system",
-          "Rich in B vitamins",
-          "Promotes healthy skin",
-          "May help with stress management"
-        ],
-        usage: "Take 1 tablet daily, preferably in the morning. Store in a cool, dry place."
-      },
-      {
-        name: "Fields of Greens",
-        price: 115.94,
-        image: "images/fields-of-greens.jpg",
-        benefits: [
-          "Alkalizes the body",
-          "Supports detoxification",
-          "Rich in chlorophyll",
-          "Promotes digestive health",
-          "Boosts energy naturally"
-        ],
-        usage: "Take 1 tablet three times daily with meals. Drink plenty of water."
-      },
-      {
-        name: "Bee Propolis",
-        price: 134.34,
-        image: "images/bee-propolis.jpg",
-        benefits: [
-          "Natural immune support",
-          "Antioxidant properties",
-          "Soothes throat irritation",
-          "Supports oral health",
-          "May help with allergies"
-        ],
-        usage: "Take 1 tablet daily with meals. Can be increased to 2-3 tablets when needed."
-      }
-    ];
 
-    // Shopping Cart
-    let cart = [];
-    
-    // Initialize the page
-    document.addEventListener('DOMContentLoaded', function() {
-      renderProducts();
-      updateCartCount();
-    });
-    
-    // Render all products
-    function renderProducts() {
-      const productList = document.getElementById('product-list');
-      productList.innerHTML = '';
-      
-      products.forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        productCard.innerHTML = `
-          <img src="${product.image}" alt="${product.name}" class="product-image" onclick="openProductModal('${product.name}')">
-          <div class="product-info">
-            <h3 class="product-name">${product.name}</h3>
-            <div class="product-price">RM${product.price.toFixed(2)}</div>
-            <div class="product-actions">
-              <button class="btn btn-details" onclick="openProductModal('${product.name}')">Details</button>
-              <button class="btn btn-whatsapp" onclick="window.location.href='https://wa.me/601111033154?text=I%20want%20to%20order%20${encodeURIComponent(product.name)}'">
-                <i class="fab fa-whatsapp"></i> Order
-              </button>
-            </div>
-          </div>
-        `;
-        productList.appendChild(productCard);
-      });
+  <main>
+    <div id="products" class="tab-content active">
+      <h2>Our Products</h2>
+      <div id="product-list" class="product-list"></div>
+    </div>
+
+    <div id="cds" class="tab-content">
+      <section class="cds-section">
+        <h2>Cabaran Detox Sihat (CDS)</h2>
+        <p>CDS is a health program by Rich Academy Global designed to help you detox and reset your body naturally.</p>
+        <ul>
+          <li>✅ 7-day detox with Forever products</li>
+          <li>📦 Personalized supplement plan</li>
+          <li>📋 Guided meal plan</li>
+          <li>📱 Daily coaching & community support</li>
+          <li>💬 WhatsApp check-ins with a coach</li>
+        </ul>
+        <p><strong>Delivered in 5–10 working days.</strong></p>
+        <button onclick="location.href='https://wa.me/601111033154?text=I%20am%20interested%20in%20CDS%20Program'">Join Now on WhatsApp</button>
+      </section>
+    </div>
+
+    <div id="business" class="tab-content">
+      <section>
+        <h2>Join Our Business</h2>
+        <p>Be part of Rich Academy Global and build your Forever Living career.</p>
+        <ul>
+          <li>💸 30–50% product commission</li>
+          <li>🕐 Flexible hours</li>
+          <li>🌍 Global business potential</li>
+          <li>🎓 Free training and support</li>
+        </ul>
+        <button onclick="location.href='https://wa.me/601111033154'">Contact Us on WhatsApp</button>
+      </section>
+    </div>
+    <section class="tab-content" id="ai-suggestion">
+  <h2>AI Product Suggestion</h2>
+  <p>Tell us your symptoms and we’ll suggest the most relevant Forever Living products:</p>
+  <input type="text" id="symptom-ai-input" placeholder="e.g. joint pain, low energy, digestion..." style="width:100%;padding:10px;margin:10px 0;">
+  <button onclick="suggestProduct()" style="padding:10px 20px;background:#2c8a58;color:#fff;border:none;border-radius:4px;cursor:pointer;">Suggest Product</button>
+  <div id="ai-suggestion-result" style="margin-top:20px;"></div>
+  <p style="margin-top:20px;font-size:13px;color:#856404;background:#fff3cd;padding:10px;border:1px solid #ffeeba;border-radius:4px;">
+    <strong>Disclaimer:</strong> Suggestions are AI-generated and do not replace professional medical advice. Please consult a healthcare provider before starting any supplements.
+  </p>
+</section>
+
+$1<section class="tab-content" id="ai-suggestion">
+  <h2>AI Product Suggestion</h2>
+  <p>Tell us your symptoms and we’ll suggest the most relevant Forever Living products:</p>
+  <input type="text" id="symptom-input" placeholder="e.g. joint pain, low energy, digestion..." style="width:100%;padding:10px;margin:10px 0;">
+  <button onclick="suggestProduct()" style="padding:10px 20px;background:#2c8a58;color:#fff;border:none;border-radius:4px;cursor:pointer;">Suggest Product</button>
+  <div id="suggestion-result" style="margin-top:20px;"></div>
+  <p style="margin-top:20px;font-size:13px;color:#856404;background:#fff3cd;padding:10px;border:1px solid #ffeeba;border-radius:4px;">
+    <strong>Disclaimer:</strong> Suggestions are AI-generated and do not replace professional medical advice. Please consult a healthcare provider before starting any supplements.
+  </p>
+</section>
+
+
+
+  <footer>
+    <p>&copy; 2025 Forever Living. Powered by Rich Academy Global. All rights reserved.</p>
+    <section class="disclaimer">
+      <strong>Disclaimer:</strong> This website is operated by an independent Forever Business Owner (FBO) under Rich Academy Global and is not the official site of Forever Living Products. Product names, trademarks, and registered trademarks are property of Forever Living Products International, Inc.
+    </section>
+  </footer>
+
+  <script>
+    const products = [
+  { name: "Aloe Vera Gel", price: 116.79, image: "aloe-vera-gel.jpg" },
+  { name: "Aloe Berry Nectar", price: 116.79, image: "aloe-berry-nectar.jpg" },
+  { name: "Aloe Peaches", price: 116.79, image: "aloe-peaches.jpg" },
+  { name: "Bee Honey", price: 69.47, image: "bee-honey.jpg" },
+  { name: "Royal Jelly", price: 157.38, image: "royal-jelly.jpg" },
+  { name: "Bee Pollen", price: 96.23, image: "bee-pollen.jpg" },
+  { name: "Bee Propolis", price: 134.34, image: "bee-propolis.jpg" },
+  { name: "Arctic Sea", price: 133.02, image: "arctic-sea.jpg" },
+  { name: "Fields of Greens", price: 115.94, image: "fields-of-greens.jpg" },
+  { name: "Absorbent-C", price: 95.00, image: "absorbent_c.jpg" },
+  { name: "Calcium Plus", price: 95.85, image: "calcium-plus.jpg" },
+  { name: "Aloe First", price: 93.40, image: "aloe-first.jpeg" },
+  { name: "Aloe Liquid Soap", price: 54.72, image: "aloe-liquid-soap.jpg" },
+  { name: "Aloe Propolis Creme", price: 92.08, image: "aloe-propolis-creme.jpg" },
+  { name: "Aloe Jojoba Shampoo", price: 91.66, image: "aloe-jojoba-shampoo.jpg" },
+  { name: "Aloe Jojoba Conditioner", price: 91.66, image: "aloe-jojoba-conditioner.jpg" },
+  { name: "Aloe Sunscreen", price: 84.91, image: "aloe-sunscreen.jpg" },
+  { name: "Aloe MPD 2X Ultra", price: 114.47, image: "aloe-mp-lotion.jpg" },
+  { name: "Avocado Face & Body Soap", price: 23.40, image: "avocado-soap.jpg" },
+  { name: "Forever Bright Toothgel", price: 31.62, image: "bright-toothgel.jpg" },
+  { name: "Aloe Lips", price: 17.92, image: "aloe_lips.jpg" },
+  { name: "Forever Aloe Deodorant", price: 34.91, image: "deodorant-stick.jpg" },
+  { name: "Forever Deodorant Stick", price: 34.91, image: "forever-deodorant.jpg" },
+  { name: "Teh Tarik Halia", price: 40.00, image: "teh-tarik.jpg" }
+];
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
     }
-    
-    // Open product modal
-    function openProductModal(productName) {
-      const product = products.find(p => p.name === productName);
-      if (!product) return;
-      
-      document.getElementById('modal-product-image').src = product.image;
-      document.getElementById('modal-product-name').textContent = product.name;
-      document.getElementById('modal-product-price').textContent = `RM${product.price.toFixed(2)}`;
-      
-      const benefitsList = document.getElementById('modal-product-benefits');
-      benefitsList.innerHTML = '';
-      product.benefits.forEach(benefit => {
-        const li = document.createElement('li');
-        li.textContent = benefit;
-        benefitsList.appendChild(li);
-      });
-      
-      document.getElementById('modal-product-usage').textContent = product.usage;
-      
-      // Set up add to cart button
-      const addToCartBtn = document.getElementById('modal-add-to-cart');
-      addToCartBtn.onclick = function() {
-        addToCart(product);
-        closeModal();
-      };
-      
-      // Set up WhatsApp order button
-      const whatsappBtn = document.getElementById('modal-whatsapp-order');
-      whatsappBtn.onclick = function() {
-        window.location.href = `https://wa.me/601111033154?text=I%20want%20to%20order%20${encodeURIComponent(product.name)}`;
-      };
-      
-      document.getElementById('productModal').style.display = 'block';
-    }
-    
-    // Close modal
-    function closeModal() {
-      document.getElementById('productModal').style.display = 'none';
-    }
-    
-    // Add to cart
-    function addToCart(product) {
-      cart.push(product);
-      updateCartCount();
-      alert(`${product.name} added to cart!`);
-    }
-    
-    // Update cart count
-    function updateCartCount() {
-      document.querySelector('.cart-count').textContent = cart.length;
-    }
-    
-    // Toggle cart (simplified for this demo)
+
     function toggleCart() {
-      if (cart.length === 0) {
-        alert("Your cart is empty. Add some products first!");
-      } else {
-        let cartContent = "Your Cart:\n\n";
-        cart.forEach(item => {
-          cartContent += `${item.name} - RM${item.price.toFixed(2)}\n`;
-        });
-        
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        cartContent += `\nTotal: RM${total.toFixed(2)}`;
-        
-        alert(cartContent);
-      }
+      alert("Cart feature coming soon.");
     }
-    
-    // AI Product Suggestion
+
+    $1
+
+function suggestProduct() {
+  const input = document.getElementById("symptom-ai-input").value.toLowerCase();
+  const result = document.getElementById("ai-suggestion-result");
+  let suggestions = [];
+
+  if (input.includes("skin")) suggestions.push("Aloe Vera Gel – Drink 30ml daily before meals.");
+  if (input.includes("joint") || input.includes("pain")) suggestions.push("Arctic Sea – 2 softgels twice a day after meals.");
+  if (input.includes("energy") || input.includes("fatigue")) suggestions.push("Royal Jelly – 1 tablet in the morning.");
+  if (input.includes("digest") || input.includes("constipation")) suggestions.push("Fields of Greens – 1 tablet three times daily.");
+  if (input.includes("flu") || input.includes("cold") || input.includes("immunity")) suggestions.push("Bee Propolis – 1 tablet daily.");
+
+  if (suggestions.length === 0) {
+    result.innerHTML = `<p>No specific match found. Please contact us for personalized support.</p>`;
+  } else {
+    result.innerHTML = `<ul>` + suggestions.map(s => `<li>${s}</li>`).join("") + `</ul>`;
+  }
+} else {
+    result.innerHTML = `<ul>` + suggestions.map(s => `<li>${s}</li>`).join("") + `</ul>`;
+  }
+}
+  
     function suggestProduct() {
-      const input = document.getElementById('symptom-input').value.toLowerCase();
-      const result = document.getElementById('suggestion-result');
-      
-      if (!input.trim()) {
-        result.innerHTML = '<p>Please describe your symptoms to get product recommendations.</p>';
-        return;
-      }
-      
-      // Clear previous results
-      result.innerHTML = '';
-      
-      // Find matching products based on symptoms
-      const matchedProducts = [];
-      
-      if (input.includes('skin') || input.includes('acne') || input.includes('eczema')) {
-        matchedProducts.push(products.find(p => p.name === "Aloe Vera Gel"));
-      }
-      
-      if (input.includes('joint') || input.includes('pain') || input.includes('arthritis')) {
-        matchedProducts.push(products.find(p => p.name === "Arctic Sea Omega-3"));
-      }
-      
-      if (input.includes('energy') || input.includes('fatigue') || input.includes('tired')) {
-        matchedProducts.push(products.find(p => p.name === "Royal Jelly"));
-      }
-      
-      if (input.includes('digest') || input.includes('bloat') || input.includes('constipat')) {
-        matchedProducts.push(products.find(p => p.name === "Fields of Greens"));
-      }
-      
-      if (input.includes('immune') || input.includes('cold') || input.includes('flu')) {
-        matchedProducts.push(products.find(p => p.name === "Bee Propolis"));
-      }
-      
-      if (input.includes('antioxid') || input.includes('berry') || input.includes('detox')) {
-        matchedProducts.push(products.find(p => p.name === "Aloe Berry Nectar"));
-      }
-      
-      // If no specific matches, show general wellness products
-      if (matchedProducts.length === 0) {
-        matchedProducts.push(
-          products.find(p => p.name === "Aloe Vera Gel"),
-          products.find(p => p.name === "Royal Jelly"),
-          products.find(p => p.name === "Fields of Greens")
-        );
-      }
-      
-      // Display results
-      if (matchedProducts.length === 0) {
-        result.innerHTML = '<p>No specific products match your symptoms. Please contact us for personalized advice.</p>';
+      const input = document.getElementById("symptom-input").value.toLowerCase();
+      const result = document.getElementById("suggestion-result");
+      let suggestions = [];
+
+      if (input.includes("skin")) suggestions.push("Aloe Vera Gel - Drink 30ml daily on empty stomach");
+      if (input.includes("joint") || input.includes("pain")) suggestions.push("Arctic Sea - 2 softgels twice a day after meals");
+      if (input.includes("energy") || input.includes("fatigue")) suggestions.push("Royal Jelly - 1 tablet in the morning");
+      if (input.includes("digest") || input.includes("constipation")) suggestions.push("Fields of Greens - 1 tablet three times a day");
+      if (input.includes("immunity") || input.includes("flu") || input.includes("cold")) suggestions.push("Bee Propolis - 1 tablet daily with meals");
+
+      if (suggestions.length === 0) {
+        result.innerHTML = `<p>No specific match found. Please contact us for personalised support.</p>`;
       } else {
-        // Remove duplicates
-        const uniqueProducts = [...new Set(matchedProducts)];
-        
-        uniqueProducts.forEach(product => {
-          if (!product) return;
-          
-          const productDiv = document.createElement('div');
-          productDiv.className = 'suggested-product';
-          productDiv.innerHTML = `
-            <h3>${product.name}</h3>
-            <p class="product-price">RM${product.price.toFixed(2)}</p>
-            <h4>Benefits for your symptoms:</h4>
-            <ul class="product-benefits">
-              ${product.benefits.slice(0, 3).map(b => `<li>${b}</li>`).join('')}
-            </ul>
-            <p class="product-usage"><strong>Usage:</strong> ${product.usage}</p>
-            <button class="btn btn-details" onclick="openProductModal('${product.name}')" style="margin-right: 10px;">
-              <i class="fas fa-info-circle"></i> More Details
-            </button>
-            <button class="btn btn-whatsapp" onclick="window.location.href='https://wa.me/601111033154?text=I%20want%20to%20order%20${encodeURIComponent(product.name)}'">
-              <i class="fab fa-whatsapp"></i> Order Now
-            </button>
-            <button class="btn" onclick="addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})" 
-              style="background-color: var(--primary); color: white; margin-left: 10px;">
-              <i class="fas fa-cart-plus"></i> Add to Cart
-            </button>
-          `;
-          result.appendChild(productDiv);
-        });
+        result.innerHTML = `<ul>` + suggestions.map(s => `<li>${s}</li>`).join("") + `</ul>`;
       }
     }
-    
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-      const modal = document.getElementById('productModal');
-      if (event.target === modal) {
-        closeModal();
-      }
-    };
-  </script>
+$1
 </body>
 </html>
