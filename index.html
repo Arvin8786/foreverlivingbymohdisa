@@ -800,6 +800,78 @@
       border-radius: 4px;
       font-weight: bold;
     }
+
+    /* Search bar styles */
+    .search-container {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    #product-search {
+      width: 100%;
+      padding: 12px 20px;
+      border: 2px solid var(--primary-color);
+      border-radius: 25px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    
+    #product-search:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+    }
+    
+    .search-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary-color);
+    }
+    
+    /* Quantity controls in cart */
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      margin-left: 10px;
+    }
+    
+    .quantity-btn {
+      width: 25px;
+      height: 25px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .quantity-btn:hover {
+      background: var(--accent-color);
+    }
+    
+    .quantity-input {
+      width: 30px;
+      text-align: center;
+      margin: 0 5px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+    }
+    
+    .cart-item-details {
+      display: flex;
+      align-items: center;
+    }
+    
+    .cart-item-actions {
+      display: flex;
+      align-items: center;
+    }
   </style>
 
   <!-- Grand Opening Decorations -->
@@ -832,11 +904,16 @@
 
   <main>
     <div id="products" class="tab-content active">
-  <div class="special-offer-banner">
-    <h2>🎉 GRAND OPENING SPECIAL 🎉</h2>
-    <p>Enjoy 5% OFF on our top 10 bestselling products!</p>
-    <p style="font-size: 1.1em; margin-top: 5px; font-weight: bold;">Promotion Period: 21/7/2025 - 24/8/2025</p>
-  </div>
+      <div class="special-offer-banner">
+        <h2>🎉 GRAND OPENING SPECIAL 🎉</h2>
+        <p>Enjoy 5% OFF on our top 10 bestselling products!</p>
+        <p style="font-size: 1.1em; margin-top: 5px; font-weight: bold;">Promotion Period: 21/7/2025 - 24/8/2025</p>
+      </div>
+
+      <div class="search-container">
+        <input type="text" id="product-search" placeholder="Search products...">
+        <span class="search-icon">🔍</span>
+      </div>
 
       <div class="ai-suggestion-box">
         <h2>AI Product Suggestion</h2>
@@ -1336,6 +1413,19 @@
       updateCartCount();
     }
 
+    function updateQuantity(productId, newQuantity) {
+      const item = cart.find(item => item.id === productId);
+      if (item) {
+        if (newQuantity < 1) {
+          removeFromCart(productId);
+        } else {
+          item.quantity = newQuantity;
+          updateCartDisplay();
+          updateCartCount();
+        }
+      }
+    }
+
     function updateCartCount() {
       const count = cart.reduce((total, item) => total + item.quantity, 0);
       document.getElementById('cart-count').textContent = count;
@@ -1360,9 +1450,17 @@
         
         itemsHTML += `
           <div class="cart-item">
-            <div class="cart-item-info">
-              ${item.name} (${item.quantity})
-              <span class="remove-item" onclick="removeFromCart(${item.id})">✕</span>
+            <div class="cart-item-details">
+              <div class="cart-item-info">${item.name}</div>
+              <div class="cart-item-actions">
+                <div class="quantity-controls">
+                  <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                  <input type="number" class="quantity-input" value="${item.quantity}" min="1" 
+                    onchange="updateQuantity(${item.id}, parseInt(this.value))">
+                  <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                </div>
+                <span class="remove-item" onclick="removeFromCart(${item.id})">✕</span>
+              </div>
             </div>
             <div class="cart-item-price">RM ${itemTotal.toFixed(2)}</div>
           </div>
@@ -1528,6 +1626,26 @@
       document.getElementById('festival-modal').style.display = 'none';
     }
 
+    // Product search functionality
+    function setupProductSearch() {
+      const searchInput = document.getElementById('product-search');
+      if (!searchInput) return;
+      
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const productElements = document.querySelectorAll('.product');
+        
+        productElements.forEach(product => {
+          const productName = product.querySelector('h3').textContent.toLowerCase();
+          if (productName.includes(searchTerm)) {
+            product.style.display = 'flex';
+          } else {
+            product.style.display = 'none';
+          }
+        });
+      });
+    }
+
     // Initialize the page
     document.addEventListener('DOMContentLoaded', function() {
       // Set current date in footer
@@ -1540,6 +1658,7 @@
       document.documentElement.className = 'grand-opening-theme';
       renderProducts();
       showTab('products');
+      setupProductSearch();
       
       // Only show popup if not already closed
       if (localStorage.getItem('festivalPopupClosed') !== 'true') {
