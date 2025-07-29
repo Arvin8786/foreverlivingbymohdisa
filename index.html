@@ -1,735 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Forever Living by Mohd Arvinsd Isa - Grand Opening Special</title>
-  
-  <!-- Google Fonts & Font Awesome Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <style>
-    :root {
-      --primary-color: #1a5276;
-      --secondary-color: #f39c12;
-      --accent-color: #27ae60;
-      --light-gray: #f4f6f8;
-      --dark-text: #333;
-      --light-text: #fff;
-      --border-radius: 12px;
-      --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      --font-family: 'Poppins', sans-serif;
-    }
-
-    /* --- Keyframes for Animations --- */
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes promoGlow {
-      0% { box-shadow: 0 0 5px rgba(39, 174, 96, 0.5); }
-      50% { box-shadow: 0 0 20px rgba(39, 174, 96, 0.8); }
-      100% { box-shadow: 0 0 5px rgba(39, 174, 96, 0.5); }
-    }
-
-    /* --- Base Styles --- */
-    *, *::before, *::after { box-sizing: border-box; }
-    body {
-      font-family: var(--font-family);
-      margin: 0;
-      padding: 0;
-      background-color: var(--light-gray);
-      color: var(--dark-text);
-      overflow-x: hidden;
-      line-height: 1.6;
-    }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    h1, h2, h3, h4 { color: var(--primary-color); font-weight: 600; }
-
-    /* --- Header & Navigation --- */
-    header {
-      background-color: var(--light-text);
-      padding: 20px 0;
-      text-align: center;
-      border-bottom: 1px solid #e0e0e0;
-      position: relative;
-    }
-    nav {
-      background-color: var(--primary-color);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    nav ul { display: flex; list-style: none; padding: 10px 0; margin: 0; justify-content: center; flex-wrap: wrap; }
-    nav a { color: var(--light-text); text-decoration: none; font-weight: 600; padding: 10px 20px; display: inline-block; position: relative; transition: color 0.3s; }
-    nav a::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 0; height: 2px; background-color: var(--secondary-color); transition: width 0.3s; }
-    nav a:hover { color: #f1c40f; }
-    nav a:hover::after { width: 60%; }
-
-    /* --- Tab Content & Hero --- */
-    .tab-content { display: none; padding: 20px 0; }
-    .tab-content.active { display: block; animation: fadeIn 0.5s; }
-    .hero-section {
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-      color: var(--light-text);
-      padding: 60px 20px;
-      text-align: center;
-      border-radius: var(--border-radius);
-      margin-bottom: 30px;
-    }
-    .hero-section h2 { color: var(--light-text); }
-    .hero-section .promo-period {
-        background-color: rgba(255, 255, 255, 0.15);
-        padding: 10px 20px;
-        border-radius: 50px;
-        display: inline-block;
-        font-weight: 600;
-    }
-
-    /* --- Search & AI Suggestion --- */
-    .search-container { margin-bottom: 30px; position: relative; }
-    #product-search { width: 100%; padding: 15px 50px 15px 25px; border: 2px solid #ddd; border-radius: 50px; font-size: 1rem; outline: none; transition: all 0.3s; }
-    #product-search:focus { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(26, 82, 118, 0.2); }
-    .search-icon { position: absolute; right: 25px; top: 50%; transform: translateY(-50%); color: var(--primary-color); font-size: 1.2rem; }
-    .ai-suggestion-box { background: var(--light-text); padding: 30px; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 30px; text-align: center; }
-    #symptom-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin: 10px 0; }
-    #suggest-btn { background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: var(--light-text); border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: all 0.3s; margin-top: 10px; }
-    #suggest-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-    #suggestion-result { margin-top: 20px; text-align: left; }
-    .suggestion-product { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent-color); }
-
-    /* --- Product List & Cards --- */
-    .product-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
-    .product {
-      background: var(--light-text);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      transition: all 0.3s ease;
-      overflow: hidden;
-    }
-    .product:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.12); }
-    .product.promo-highlight { animation: promoGlow 2.5s infinite ease-in-out; }
-    .product-image-container { height: 220px; padding: 15px; display: flex; align-items: center; justify-content: center; }
-    .product img { max-width: 100%; max-height: 100%; object-fit: contain; }
-    .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; text-align: left; }
-    .product h3 { margin: 0 0 10px; font-size: 1.25rem; height: 3.75rem; overflow: hidden; }
-    .product .benefits { font-size: 0.85rem; color: #555; margin: 10px 0; flex-grow: 1; }
-    .product .consumption { font-size: 0.85rem; color: var(--primary-color); font-style: italic; margin: 10px 0; }
-    .price-section { margin: 15px 0; text-align: center; }
-    .original-price { text-decoration: line-through; color: #999; font-size: 1rem; margin-right: 10px; }
-    .new-price { color: var(--secondary-color); font-weight: bold; font-size: 1.5rem; }
-    .product-points { font-size: 0.9rem; font-weight: 600; color: var(--accent-color); text-align: center; margin-top: 10px; }
-    .product-actions { margin-top: auto; }
-    .btn {
-        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-        width: 100%; padding: 12px 15px; border-radius: 50px; text-decoration: none;
-        font-weight: bold; border: none; cursor: pointer; transition: all 0.3s;
-    }
-    .btn-primary { background: var(--primary-color); color: var(--light-text); }
-    .btn-primary:hover { background: #123e5a; transform: scale(1.05); }
-    .featured-badge {
-      position: absolute; top: 15px; right: -40px; background: var(--secondary-color);
-      color: white; padding: 5px 40px; transform: rotate(45deg);
-      font-weight: bold; font-size: 0.9rem; box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    }
-
-    /* --- CDS & Business Sections --- */
-    .program-section { background: var(--light-text); padding: 40px; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 30px; }
-    .program-section h2 { font-size: 2.5rem; text-align: center; }
-    .program-highlights { display: flex; flex-wrap: wrap; justify-content: space-around; margin: 30px 0; gap: 20px; }
-    .highlight-card { flex: 1; min-width: 280px; background: var(--light-gray); border: 1px solid #e0e0e0; border-radius: var(--border-radius); padding: 20px; transition: transform 0.3s, box-shadow 0.3s; }
-    .highlight-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
-    .highlight-card h3 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; }
-    .highlight-card ul { list-style: none; padding: 0; }
-    .highlight-card li { margin-bottom: 10px; display: flex; align-items: flex-start; }
-    .highlight-card .fa-solid { color: var(--accent-color); margin-right: 10px; margin-top: 5px; }
-    .testimonial { background: #f0f8f0; padding: 20px; border-left: 4px solid var(--accent-color); margin: 20px 0; font-style: italic; border-radius: 0 8px 8px 0; }
-    .testimonial-author { text-align: right; font-weight: bold; color: var(--primary-color); }
-    .cta-button { display: block; width: fit-content; margin: 30px auto; background: linear-gradient(135deg, var(--secondary-color), #e67e22); color: var(--light-text); text-align: center; padding: 15px 40px; border-radius: 50px; font-weight: bold; text-decoration: none; font-size: 1.2rem; transition: all 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-    .cta-button:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
-
-    /* --- Rewards Section --- */
-    .rewards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-    .reward-item { background: var(--light-gray); border: 1px solid #ddd; border-radius: var(--border-radius); padding: 20px; text-align: center; }
-    .reward-item img { max-width: 100%; height: 100px; object-fit: contain; margin-bottom: 15px; border-radius: 8px; }
-    .reward-item h4 { margin: 10px 0 5px; }
-    .reward-item .points-cost { font-weight: bold; color: var(--accent-color); }
-
-    /* --- Footer --- */
-    footer { background: var(--primary-color); color: var(--light-text); padding: 40px 20px; text-align: center; margin-top: 30px; }
-    .disclaimer { margin-top: 20px; background-color: rgba(255,255,255,0.1); color: #ddd; padding: 15px; border-radius: var(--border-radius); max-width: 800px; margin-left: auto; margin-right: auto; }
-
-    /* --- Floating Cart Button --- */
-    .floating-cart-btn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
-        background-color: var(--primary-color);
-        color: var(--light-text);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.8rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-        cursor: pointer;
-        z-index: 1000;
-        transition: transform 0.3s ease;
-    }
-    .floating-cart-btn:hover { transform: scale(1.1); }
-    #cart-count {
-        position: absolute;
-        top: -2px;
-        right: -2px;
-        background-color: var(--secondary-color);
-        color: var(--light-text);
-        border-radius: 50%;
-        padding: 3px 8px;
-        font-size: 0.8rem;
-        font-weight: bold;
-        border: 2px solid var(--light-text);
-    }
-
-    /* --- Modal & Cart Styles --- */
-    .modal {
-      display: none; position: fixed; z-index: 1001; left: 0; top: 0;
-      width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);
-      align-items: center; justify-content: center; animation: fadeIn 0.4s ease;
-    }
-    .modal-content {
-      background-color: #fefefe; padding: 30px; border-radius: var(--border-radius);
-      width: 90%; max-width: 600px; animation: slideIn 0.4s ease;
-    }
-    .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.3s; }
-    .close:hover { color: black; }
-    #cart-items { max-height: 250px; overflow-y: auto; padding-right: 10px; border-bottom: 1px solid #eee; margin-bottom: 15px; }
-    .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
-    .cart-item-details { flex-grow: 1; }
-    .quantity-controls { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
-    .quantity-btn {
-        width: 28px; height: 28px; background: var(--light-gray); border: 1px solid #ccc;
-        border-radius: 50%; cursor: pointer; font-weight: bold;
-    }
-    .quantity-display { font-weight: 600; min-width: 20px; text-align: center; }
-    .remove-item-btn { font-size: 1.2rem; color: #cc0000; cursor: pointer; margin-left: 15px; }
-    .cart-summary { margin-top: 20px; font-size: 1.1rem; }
-    .summary-line { display: flex; justify-content: space-between; padding: 8px 0; }
-    .summary-line.total { font-weight: bold; font-size: 1.3rem; border-top: 2px solid #333; margin-top: 10px; }
-    .points-earned {
-        background-color: #fff3cd; color: #856404; padding: 10px;
-        border-radius: 8px; text-align: center; margin-top: 15px; font-weight: bold;
-    }
-    .free-shipping-promo {
-        background-color: #e0f2f1; color: var(--accent-color); padding: 10px;
-        border-radius: 8px; text-align: center; margin-top: 20px; font-weight: bold;
-    }
-    .checkout-btn { width: 100%; margin-top: 15px; }
-    
-    /* --- Festival Popup --- */
-    #festival-modal .modal-content { border: 4px solid var(--accent-color); text-align: center; }
-    #festival-modal .festival-offer {
-        background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
-        padding: 15px; border-radius: 8px; font-weight: bold;
-        font-size: 1.3rem; margin-bottom: 20px; color: white;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Maintenance - Forever Living by Mohd Arvind Isa</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --primary-color: #1a5276;
+            --secondary-color: #f39c12;
+            --accent-color: #27ae60;
+            --light-gray: #f4f6f8;
+            --dark-text: #333;
+            --light-text: #fff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            background-image: radial-gradient(circle at 10% 20%, rgba(248, 249, 250, 0.9) 0%, rgba(234, 236, 240, 0.9) 90%);
+        }
+        
+        .maintenance-container {
+            max-width: 800px;
+            padding: 40px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .graphics-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 40px 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tool-icon {
+            width: 80px;
+            height: 80px;
+            margin: 15px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .robot-icon {
+            width: 120px;
+            height: 120px;
+            margin: 15px;
+            animation: bounce 2s ease infinite;
+        }
+        
+        .ai-icon {
+            width: 100px;
+            height: 100px;
+            margin: 15px;
+            animation: pulse 2s ease infinite;
+        }
+        
+        .contact-info {
+            margin-top: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .contact-info a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .contact-info a:hover {
+            color: var(--accent-color);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .bubble {
+            position: absolute;
+            background-color: rgba(26, 82, 118, 0.05);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        
+        .bubble-1 {
+            width: 200px;
+            height: 200px;
+            top: -50px;
+            left: -50px;
+        }
+        
+        .bubble-2 {
+            width: 150px;
+            height: 150px;
+            bottom: -30px;
+            right: -30px;
+        }
+        
+        .bubble-3 {
+            width: 100px;
+            height: 100px;
+            top: 30%;
+            right: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            p {
+                font-size: 1rem;
+            }
+            
+            .tool-icon {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .robot-icon {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .ai-icon {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
 </head>
 <body>
-
-  <header>
-    <div class="container">
-        <h1>
-          FOREVER LIVING by Mohd Arvind Isa
-          <span style="font-size: 1rem; color: #555; display: block; font-weight: 400;">Quality Wellness Products</span>
-        </h1>
-    </div>
-  </header>
-
-  <nav>
-    <div class="container">
-        <ul>
-          <li><a href="#" onclick="showTab('products')">Products</a></li>
-          <li><a href="#" onclick="showTab('cds')">Cabaran Detox Sihat</a></li>
-          <li><a href="#" onclick="showTab('business')">Business Opportunity</a></li>
-          <li><a href="#" onclick="showTab('rewards')">Rewards</a></li>
-        </ul>
-    </div>
-  </nav>
-
-  <main class="container">
-    <div id="products" class="tab-content active">
-      <section class="hero-section">
-        <h2><i class="fa-solid fa-gift"></i> GRAND OPENING SPECIAL</h2>
-        <p>Enjoy 5% OFF on our top 10 bestselling products!</p>
-        <div class="promo-period">
-            Promotion Period: 21/7/2025 - 24/8/2025
-        </div>
-      </section>
-
-      <div class="search-container">
-        <input type="text" id="product-search" placeholder="Search for products...">
-        <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
-      </div>
-
-      <div class="ai-suggestion-box">
-        <h2><i class="fa-solid fa-robot"></i> AI Product Suggestion</h2>
-        <p>Tell our AI your symptoms, and we'll recommend the best products for you.</p>
-        <input type="text" id="symptom-input" placeholder="e.g., joint pain, low energy, digestion issues...">
-        <button id="suggest-btn" onclick="suggestProduct()">Get Suggestions</button>
-        <div id="suggestion-result"></div>
-      </div>
-      
-      <h2 style="text-align: center; font-size: 2.2rem; margin: 40px 0 30px;">Our Products</h2>
-      <div id="product-list" class="product-list"></div>
-    </div>
-
-    <div id="cds" class="tab-content">
-      <section class="program-section">
-        <h2>Cabaran Detox Sihat (CDS)</h2>
-        <p style="text-align: center; font-size: 1.2rem;">Transform your health in just 7 days with our proven detox program</p>
-        <div class="program-highlights">
-          <div class="highlight-card">
-            <h3><i class="fa-solid fa-box-open"></i> What You Get</h3>
-            <ul>
-              <li><i class="fa-solid fa-check-circle"></i> Personalized Forever product package</li>
-              <li><i class="fa-solid fa-check-circle"></i> Detailed meal plan & recipes</li>
-              <li><i class="fa-solid fa-check-circle"></i> Daily coaching via WhatsApp</li>
-            </ul>
-          </div>
-          <div class="highlight-card">
-            <h3><i class="fa-solid fa-spa"></i> Benefits</h3>
-            <ul>
-              <li><i class="fa-solid fa-check-circle"></i> Boost energy levels</li>
-              <li><i class="fa-solid fa-check-circle"></i> Healthy weight management</li>
-              <li><i class="fa-solid fa-check-circle"></i> Improved mental clarity</li>
-            </ul>
-          </div>
-        </div>
-        <a href="https://wa.me/601111033154?text=I%20want%20to%20join%20CDS%20Program" class="cta-button">Join CDS Now <i class="fa-solid fa-arrow-right"></i></a>
-      </section>
-    </div>
-
-    <div id="business" class="tab-content">
-      <section class="program-section">
-        <h2>Build Your Forever Business</h2>
-        <p style="text-align: center; font-size: 1.2rem;">Start your journey to financial freedom with our proven system</p>
-        <div class="program-highlights">
-          <div class="highlight-card">
-            <h3><i class="fa-solid fa-briefcase"></i> Why Join Us?</h3>
-            <ul>
-              <li><i class="fa-solid fa-check-circle"></i> Earn 30-50% commission</li>
-              <li><i class="fa-solid fa-check-circle"></i> Work from anywhere</li>
-              <li><i class="fa-solid fa-check-circle"></i> Flexible hours</li>
-            </ul>
-          </div>
-          <div class="highlight-card">
-            <h3><i class="fa-solid fa-handshake-angle"></i> What We Provide</h3>
-            <ul>
-              <li><i class="fa-solid fa-check-circle"></i> Complete training program</li>
-              <li><i class="fa-solid fa-check-circle"></i> Marketing materials & mentorship</li>
-              <li><i class="fa-solid fa-check-circle"></i> Strong team support</li>
-            </ul>
-          </div>
-        </div>
-        <a href="https://wa.me/601111033154?text=I%20want%20to%20join%20Forever%20Business" class="cta-button">Start Your Business Today <i class="fa-solid fa-arrow-right"></i></a>
-      </section>
-    </div>
-
-    <div id="rewards" class="tab-content">
-        <section class="program-section">
-            <h2><i class="fa-solid fa-award"></i> Redeem Your Points</h2>
-            <p style="text-align: center; font-size: 1.2rem;">Use your points to redeem exciting vouchers and products!</p>
-            
-            <h3 style="margin-top: 40px;">Vouchers</h3>
-            <div class="rewards-grid">
-                <div class="reward-item">
-                    <img src="rm5.jpg" alt="RM 5 Voucher">
-                    <h4>RM 5 Voucher</h4>
-                    <p class="points-cost">500 Points</p>
-                </div>
-                <div class="reward-item">
-                    <img src="rm10.jpg" alt="RM 10 Voucher">
-                    <h4>RM 10 Voucher</h4>
-                    <p class="points-cost">1000 Points</p>
-                </div>
-                <div class="reward-item">
-                    <img src="rm20.jpg" alt="RM 20 Voucher">
-                    <h4>RM 20 Voucher</h4>
-                    <p class="points-cost">2000 Points</p>
-                </div>
-            </div>
-
-            <h3 style="margin-top: 40px;">Products</h3>
-            <div class="rewards-grid">
-                <div class="reward-item">
-                    <img src="aloe-vera-gel.jpg" alt="Aloe Vera Gel">
-                    <h4>Aloe Vera Gel</h4>
-                    <p class="points-cost">10000 Points</p>
-                </div>
-                <div class="reward-item">
-                    <img src="aloe-berry-nectar.jpg" alt="Aloe Berry Nectar">
-                    <h4>Aloe Berry Nectar</h4>
-                    <p class="points-cost">10000 Points</p>
-                </div>
-                <div class="reward-item">
-                    <img src="aloe-peaches.jpg" alt="Aloe Peaches">
-                    <h4>Aloe Peaches</h4>
-                    <p class="points-cost">10000 Points</p>
-                </div>
-            </div>
-        </section>
-    </div>
-  </main>
-
-  <!-- Floating Cart Button -->
-  <div class="floating-cart-btn" onclick="toggleCart()">
-    <i class="fa-solid fa-cart-shopping"></i>
-    <span id="cart-count">0</span>
-  </div>
-
-  <!-- Cart Modal -->
-  <div id="cart-modal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="toggleCart()">×</span>
-      <h2>Your Shopping Cart</h2>
-      <div id="cart-items"><p>Your cart is currently empty.</p></div>
-      
-      <div class="cart-summary">
-        <div class="summary-line">
-          <span>Subtotal</span>
-          <span id="cart-subtotal">RM 0.00</span>
-        </div>
-        <div class="summary-line">
-          <span>Shipping</span>
-          <span id="cart-shipping">RM 0.00</span>
-        </div>
-        <div class="summary-line total">
-          <span>Total</span>
-          <span id="cart-total">RM 0.00</span>
-        </div>
-      </div>
-
-      <div class="points-earned">
-        <i class="fa-solid fa-star"></i> Points Earned: <span id="points-earned">0</span>
-      </div>
-      
-      <div class="customer-info-form">
-        <h3 style="margin-top: 20px;">Customer Information</h3>
-        <input type="text" id="customer-name" placeholder="Your Full Name" required style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px;">
-        <input type="tel" id="customer-phone" placeholder="Your WhatsApp Number" required style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px;">
-        <button class="btn btn-primary checkout-btn" onclick="checkout()">Complete Order via WhatsApp</button>
-      </div>
-
-      <div class="free-shipping-promo">
-        🚚 FREE NATIONWIDE DELIVERY for orders RM 250 and above!
-      </div>
-    </div>
-  </div>
-
-  <!-- Festival Popup Modal -->
-  <div id="festival-modal" class="modal" style="display: flex;">
-    <div class="modal-content">
-      <span class="close" onclick="closeFestivalModal()">×</span>
-      <h2 class="festival-title">Online Store Opening Sale!</h2>
-      <img src="https://via.placeholder.com/600x200/1a5276/f39c12?text=Welcome+to+Our+Store" alt="Grand Opening Banner" style="max-width:100%; border-radius: 8px; margin-bottom: 20px;">
-      <p class="festival-message">Welcome to our online store! Enjoy special opening discounts on selected products.</p>
-      <div class="festival-offer">5% OFF on Top Products!</div>
-      <button class="btn btn-primary" onclick="closeFestivalModal()" style="width: auto; margin: 0 auto; padding: 10px 30px;">Start Shopping</button>
-    </div>
-  </div>
-
-  <footer>
-    <div class="container">
-      <p>© 2025 Forever Living by Mohd Arvind Isa. Powered by Rich Academy Global. All rights reserved.</p>
-      <div class="timestamp">Last updated: <span id="current-date"></span></div>
-      <div class="disclaimer">
-        <strong>Disclaimer:</strong> This website is operated by an independent Registered Forever Business Owner (FBO) under Rich Academy Global and is not the official site of Forever Living Products. Product names, trademarks, and registered trademarks are property of Forever Living Products International, Inc.
-      </div>
-    </div>
-  </footer>
-
-  <script>
-    // --- DATA (Restored to full list) ---
-    const products = [
-      { id: 1, name: "Aloe Vera Gel", price: 116.79, image: "aloe-vera-gel.jpg", benefits: "Supports digestion, boosts immunity, promotes skin health, enhances nutrient absorption, helps detoxify the body.", consumption: "Take 30-60ml daily, preferably on empty stomach.", bestSeller: true, grandOpeningSpecial: true },
-      { id: 2, name: "Aloe Berry Nectar", price: 116.79, image: "aloe-berry-nectar.jpg", benefits: "Antioxidant support, immune system booster, natural energy, supports urinary health, rich in vitamin C.", consumption: "30-60ml daily, can be mixed with water or juice.", bestSeller: true, grandOpeningSpecial: true },
-      { id: 3, name: "Bee Honey", price: 132.57, image: "bee-honey.jpg", benefits: "Natural energy, soothes throat, antioxidant properties, supports digestion, promotes wound healing.", consumption: "1-2 teaspoons daily, can be added to drinks.", bestSeller: true, grandOpeningSpecial: true },
-      { id: 4, name: "Royal Jelly", price: 139.21, image: "royal-jelly.jpg", benefits: "Energy booster, supports immune system, anti-aging, hormone balance, supports skin renewal.", consumption: "1 tablet daily, preferably in the morning.", bestSeller: true, grandOpeningSpecial: true },
-      { id: 5, name: "Bee Propolis", price: 139.21, image: "bee-propolis.jpg", benefits: "Immune support, natural antibiotic, throat health, anti-inflammatory, promotes oral health.", consumption: "1 tablet daily or as needed.", bestSeller: true, grandOpeningSpecial: true },
-      { id: 6, name: "Arctic Sea", price: 130.10, image: "arctic-sea.jpg", benefits: "Heart health, joint support, brain function, supports vision, reduces inflammation.", consumption: "2 softgels twice daily with meals.", bestSeller: true, grandOpeningSpecial: true },
-      { id: 7, name: "Fields of Greens", price: 86.10, image: "fields-of-greens.jpg", benefits: "Detoxification, digestion, alkalizing, supports weight management, rich in chlorophyll.", consumption: "1 tablet 3 times daily with water.", bestSeller: true, grandOpeningSpecial: true },
-      { id: 8, name: "Aloe First", price: 93.40, image: "aloe-first.jpg", benefits: "Skin hydration, cooling relief, wound soothing, relieves sunburn, pre-hair treatment spray.", consumption: "Spray directly on skin as needed.", bestSeller: true, grandOpeningSpecial: true },
-      { id: 9, name: "Aloe Propolis Creme", price: 92.08, image: "aloe-propolis-creme.jpg", benefits: "Skin repair, moisturizing, protective barrier, soothes irritated skin, supports healing of minor cuts.", consumption: "Apply generously on dry or irritated areas.", bestSeller: true, grandOpeningSpecial: true },
-      { id: 10, name: "Forever Bright Toothgel", price: 31.62, image: "bright-toothgel.jpg", benefits: "Fluoride-free, fresh breath, aloe-based care, gentle on gums, whitens teeth naturally.", consumption: "Brush teeth twice daily.", bestSeller: true, grandOpeningSpecial: true },
-      { id: 11, name: "Aloe Peaches", price: 116.79, image: "aloe-peaches.jpg", benefits: "Digestive health, vitamin C source, natural detoxification, maintains healthy skin, supports kidney function.", consumption: "30-60ml daily, refrigerate after opening." },
-      { id: 12, name: "Bee Pollen", price: 75.50, image: "bee-pollen.jpg", benefits: "Natural multivitamin, energy enhancement, allergy relief, improves stamina, supports cardiovascular health.", consumption: "1 tablet 3 times daily with meals." },
-      { id: 13, name: "Absorbent-C", price: 75.50, image: "absorbent-c.jpg", benefits: "Immune support, collagen production, antioxidant, helps iron absorption, supports healthy skin.", consumption: "1-2 tablets daily with meals." },
-      { id: 14, name: "Calcium Plus", price: 132.15, image: "calcium-plus.jpg", benefits: "Bone support, muscle health, calcium + vitamin D, supports nerve function, helps prevent osteoporosis.", consumption: "2 tablets daily with meals." },
-      { id: 15, name: "Aloe Liquid Soap", price: 54.72, image: "aloe-liquid-soap.jpg", benefits: "Gentle cleansing, moisturizes skin, aloe-based formula, suitable for sensitive skin, pH-balanced.", consumption: "Use daily for face and body cleansing." },
-      { id: 16, name: "Aloe Jojoba Shampoo", price: 91.66, image: "aloe-jojoba-shampoo.jpg", benefits: "Hair nourishment, scalp care, sulfate-free, promotes hair strength, natural shine.", consumption: "Massage into wet hair, rinse thoroughly." },
-      { id: 17, name: "Aloe Jojoba Conditioner", price: 91.66, image: "aloe-jojoba-conditioner.jpg", benefits: "Moisturizing, smooth finish, aloe + jojoba, strengthens hair strands, prevents breakage.", consumption: "Apply after shampoo, leave 1-2 minutes, rinse." },
-      { id: 18, name: "Aloe Sunscreen", price: 84.91, image: "aloe-sunscreen.jpg", benefits: "UV protection, aloe-based, water-resistant, suitable for sensitive skin, prevents sunburn.", consumption: "Apply 15 minutes before sun exposure." },
-      { id: 19, name: "Aloe MPD 2X Ultra", price: 114.47, image: "aloe-mp-lotion.jpg", benefits: "Multi-purpose cleaner, concentrated, eco-friendly, gentle on skin, biodegradable formula.", consumption: "Dilute as needed for laundry, dishes or surfaces." },
-      { id: 20, name: "Avocado Face & Body Soap", price: 23.40, image: "avocado-soap.jpg", benefits: "Softens skin, gentle cleansing, avocado oil-rich, suitable for all skin types, non-drying.", consumption: "Use daily for face and body." },
-      { id: 21, name: "Aloe Lips", price: 17.92, image: "aloe-lips.jpg", benefits: "Lip protection, moisturizes, healing balm, soothes cracked lips, non-greasy finish.", consumption: "Apply on lips as needed throughout the day." },
-      { id: 22, name: "Forever Deodorant Stick", price: 34.91, image: "forever-deodorant.jpg", benefits: "Natural fragrance, aloe soothing, easy glide, long-lasting protection, non-staining.", consumption: "Use after shower daily." },
-      { id: 23, name: "Teh Tarik Halia", price: 25.90, image: "teh-tarik.jpg", benefits: "Warming effect, digestion aid, ginger-infused, improves circulation, relieves bloating.", consumption: "Mix sachet with hot water and stir well." },
-      { id: 24, name: "Choco Malt Drink", price: 27.90, image: "choco-malt.jpg", benefits: "Rich in B vitamins, iron for red blood cell production, supports metabolism, promotes growth, aids recovery after fatigue.", consumption: "Mix 2-3 tablespoons in 150–200ml hot water or milk." }
-    ];
-    const productSuggestions = { "digestion": { id: 1, name: "Aloe Vera Gel", recommendation: "30-60ml daily on empty stomach for digestive support" }, "bloating": { id: 1, name: "Aloe Vera Gel", recommendation: "30-60ml daily to reduce bloating" }, "low energy": { id: 4, name: "Royal Jelly", recommendation: "1 tablet morning and afternoon" }, "joint pain": { id: 6, name: "Arctic Sea", recommendation: "2 softgels twice daily for joint support" }};
-    let cart = [];
-
-    // --- LOGIC (Updated) ---
-
-    function applyGrandOpeningDiscount(products) {
-      const discountRate = 0.05; // 5% discount
-      return products.map(product => {
-        if (product.grandOpeningSpecial) {
-          return { ...product, originalPrice: product.price, price: product.price * (1 - discountRate) };
-        }
-        return product;
-      });
-    }
-
-    function renderProducts() {
-      const productList = document.getElementById('product-list');
-      if (!productList) return;
-      const discountedProducts = applyGrandOpeningDiscount(products);
-      
-      productList.innerHTML = discountedProducts.map(product => {
-        const isFeatured = product.grandOpeningSpecial;
-        const hasDiscount = product.originalPrice !== undefined;
-        const points = Math.floor(product.price / 10) * 10;
+    <div class="maintenance-container">
+        <div class="bubble bubble-1"></div>
+        <div class="bubble bubble-2"></div>
+        <div class="bubble bubble-3"></div>
         
-        return `
-          <div class="product ${isFeatured ? 'promo-highlight' : ''}" id="product-${product.id}">
-            ${isFeatured ? '<div class="featured-badge">Offer!</div>' : ''}
-            <div class="product-image-container">
-                <img src="${product.image}" alt="${product.name}" onerror="this.onerror=null;this.src='https://via.placeholder.com/200x200?text=Image+Not+Found'">
-            </div>
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <div class="price-section">
-                    ${hasDiscount ? `
-                        <span class="original-price">RM ${product.originalPrice.toFixed(2)}</span>
-                        <span class="new-price">RM ${product.price.toFixed(2)}</span>
-                    ` : `<span class="new-price">RM ${product.price.toFixed(2)}</span>`}
-                </div>
-                <div class="benefits"><strong>Benefits:</strong> ${product.benefits}</div>
-                <div class="consumption"><strong>Usage:</strong> ${product.consumption}</div>
-                <div class="product-points">
-                    <i class="fa-solid fa-star"></i> Earn ${points} Points
-                </div>
-                <div class="product-actions">
-                    <button class="btn btn-primary" onclick="addToCart(${product.id})"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
-                </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function showTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      const activeTab = document.getElementById(tabId);
-      if(activeTab) activeTab.classList.add('active');
-    }
-
-    function toggleCart() {
-      const modal = document.getElementById('cart-modal');
-      const isDisplayed = modal.style.display === 'flex';
-      modal.style.display = isDisplayed ? 'none' : 'flex';
-      if (!isDisplayed) {
-        updateCartDisplay();
-      }
-    }
-
-    function addToCart(productId) {
-      const productData = products.find(p => p.id === productId);
-      const discountedData = applyGrandOpeningDiscount([productData])[0];
-      const existingItem = cart.find(item => item.id === productId);
-      
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        cart.push({ id: discountedData.id, name: discountedData.name, price: discountedData.price, quantity: 1 });
-      }
-      updateCartCount();
-    }
-
-    function increaseQuantity(productId) {
-        const item = cart.find(p => p.id === productId);
-        if (item) {
-            item.quantity++;
-            updateCartDisplay();
-            updateCartCount();
-        }
-    }
-
-    function decreaseQuantity(productId) {
-        const item = cart.find(p => p.id === productId);
-        if (item) {
-            item.quantity--;
-            if (item.quantity <= 0) {
-                cart = cart.filter(p => p.id !== productId);
-            }
-            updateCartDisplay();
-            updateCartCount();
-        }
-    }
-
-    function removeItemFromCart(productId) {
-        cart = cart.filter(p => p.id !== productId);
-        updateCartDisplay();
-        updateCartCount();
-    }
-
-    function calculateShipping(cart, subtotal) {
-        if (subtotal >= 250) {
-            return { fee: 0, message: "FREE" };
-        }
-        if (cart.length === 0) {
-            return { fee: 0, message: "RM 0.00" };
-        }
-
-        const baseShipping = 14.00;
-        const reductionPerItem = 0.30; // 30%
-        const totalReduction = reductionPerItem * (cart.length - 1);
-        const finalFee = baseShipping * (1 - totalReduction);
-
-        const calculatedFee = Math.max(0, finalFee); // Ensure fee is not negative
-        return { fee: calculatedFee, message: `RM ${calculatedFee.toFixed(2)}` };
-    }
-    
-    function updateCartDisplay() {
-      const cartItemsEl = document.getElementById('cart-items');
-      const subtotalEl = document.getElementById('cart-subtotal');
-      const shippingEl = document.getElementById('cart-shipping');
-      const totalEl = document.getElementById('cart-total');
-      const pointsEl = document.getElementById('points-earned');
-      
-      if (cart.length === 0) {
-        cartItemsEl.innerHTML = '<p>Your cart is empty</p>';
-        subtotalEl.textContent = 'RM 0.00';
-        shippingEl.textContent = 'RM 0.00';
-        totalEl.textContent = 'RM 0.00';
-        pointsEl.textContent = '0';
-        return;
-      }
-      
-      let itemsHTML = '';
-      const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-      
-      cart.forEach(item => {
-        itemsHTML += `
-          <div class="cart-item">
-            <div class="cart-item-details">
-                <strong>${item.name}</strong>
-                <div class="quantity-controls">
-                    <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
-                    <span class="quantity-display">${item.quantity}</span>
-                    <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
-                </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span>RM ${(item.price * item.quantity).toFixed(2)}</span>
-                <span class="remove-item-btn" onclick="removeItemFromCart(${item.id})">×</span>
-            </div>
-          </div>`;
-      });
-      
-      const shipping = calculateShipping(cart, subtotal);
-      const total = subtotal + shipping.fee;
-      const points = Math.floor(subtotal / 10) * 10;
-
-      cartItemsEl.innerHTML = itemsHTML;
-      subtotalEl.textContent = `RM ${subtotal.toFixed(2)}`;
-      shippingEl.textContent = shipping.message;
-      totalEl.textContent = `RM ${total.toFixed(2)}`;
-      pointsEl.textContent = points;
-    }
-
-    function updateCartCount() {
-      const count = cart.reduce((total, item) => total + item.quantity, 0);
-      document.getElementById('cart-count').textContent = count;
-    }
-
-    function checkout() {
-      const name = document.getElementById('customer-name').value.trim();
-      const phone = document.getElementById('customer-phone').value.trim();
-      if (!name || !phone) { alert('Please enter your name and phone number'); return; }
-      if (cart.length === 0) { alert('Your cart is empty'); return; }
-      
-      const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-      const shipping = calculateShipping(cart, subtotal);
-      const total = subtotal + shipping.fee;
-      const points = Math.floor(subtotal / 10) * 10;
-      
-      let message = `Hi, I would like to place an order:\n\n`;
-      message += `Name: ${name}\nPhone: ${phone}\n\n`;
-      message += `--- ORDER DETAILS ---\n`;
-      cart.forEach(item => {
-        message += `- ${item.name} (x${item.quantity}) - RM ${(item.price * item.quantity).toFixed(2)}\n`;
-      });
-      message += `\n--- SUMMARY ---\n`;
-      message += `Subtotal: RM ${subtotal.toFixed(2)}\n`;
-      message += `Shipping: ${shipping.message}\n`;
-      message += `TOTAL: RM ${total.toFixed(2)}\n`;
-      message += `Points Earned: ${points}\n\n`;
-      message += `Please confirm my order. Thank you!`;
-      
-      const encodedMessage = encodeURIComponent(message);
-      window.open(`https://wa.me/601111033154?text=${encodedMessage}`, '_blank');
-    }
-
-    function suggestProduct() {
-      const input = document.getElementById("symptom-input").value.toLowerCase();
-      const resultDiv = document.getElementById("suggestion-result");
-      let matchedProducts = [];
-      for (const [symptom, productInfo] of Object.entries(productSuggestions)) {
-        if (input.includes(symptom)) {
-          const existing = matchedProducts.find(p => p.id === productInfo.id);
-          if (!existing) { matchedProducts.push(productInfo); }
-        }
-      }
-      if (matchedProducts.length === 0) {
-        resultDiv.innerHTML = `<p>We recommend consulting with our health advisor for personalized recommendations. <a href="https://wa.me/601111033154" style="color:var(--primary-color);font-weight:bold;">Chat with us on WhatsApp</a></p>`;
-      } else {
-        resultDiv.innerHTML = `<h3 style="color:var(--primary-color);">Recommended Products:</h3>` + 
-          matchedProducts.map(p => `
-            <div class="suggestion-product">
-              <div><strong>${p.name}</strong><br><small>${p.recommendation}</small></div>
-              <button class="btn btn-primary" style="padding: 5px 15px;" onclick="addToCart(${p.id})">Add</button>
-            </div>`).join("");
-      }
-    }
-
-    function closeFestivalModal() {
-      localStorage.setItem('festivalPopupClosed', 'true');
-      const modal = document.getElementById('festival-modal');
-      modal.style.animation = "fadeOut 0.4s";
-      setTimeout(() => { modal.style.display = 'none'; }, 350);
-    }
-
-    // Initialize the page
-    document.addEventListener('DOMContentLoaded', function() {
-      const now = new Date();
-      document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', { 
-        year: 'numeric', month: 'long', day: 'numeric' 
-      });
-      renderProducts();
-      showTab('products');
-      if (localStorage.getItem('festivalPopupClosed') === 'true') {
-        document.getElementById('festival-modal').style.display = 'none';
-      }
-    });
-  </script>
+        <h1>Website Upgrade In Progress</h1>
+        <p>Our team of experts is working hard to bring you new features and enhanced stability to serve our customers better.</p>
+        <p>We appreciate your patience and look forward to welcoming you back to an improved experience soon!</p>
+        
+        <div class="graphics-container">
+            <img src="https://cdn-icons-png.flaticon.com/512/3063/3063172.png" alt="Screwdriver" class="tool-icon" style="animation-delay: 0.2s;">
+            <img src="https://cdn-icons-png.flaticon.com/512/1995/1995450.png" alt="Wrench" class="tool-icon" style="animation-delay: 0.4s;">
+            <img src="https://cdn-icons-png.flaticon.com/512/3344/3344385.png" alt="Robot Working" class="robot-icon" style="animation-delay: 0.1s;">
+            <img src="https://cdn-icons-png.flaticon.com/512/3344/3344372.png" alt="AI Assistant" class="ai-icon" style="animation-delay: 0.3s;">
+            <img src="https://cdn-icons-png.flaticon.com/512/3063/3063185.png" alt="Tools" class="tool-icon" style="animation-delay: 0.5s;">
+        </div>
+        
+        <div class="contact-info">
+            For urgent inquiries, please contact us at <a href="https://wa.me/601111033154">+60 11-1103 3154</a> via WhatsApp.
+        </div>
+    </div>
 </body>
 </html>
