@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Website Maintenance - Forever Living by Mohd Arvind Isa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
         
@@ -11,9 +12,8 @@
             --primary-color: #1a5276;
             --secondary-color: #f39c12;
             --accent-color: #27ae60;
-            --light-gray: #f4f6f8;
-            --dark-text: #333;
-            --light-text: #fff;
+            --light-text: #f8f9fa;
+            --dark-text: #343a40;
         }
         
         * {
@@ -24,180 +24,163 @@
         
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--light-gray);
             color: var(--dark-text);
             height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
             padding: 20px;
-            background-image: radial-gradient(circle at 10% 20%, rgba(248, 249, 250, 0.9) 0%, rgba(234, 236, 240, 0.9) 90%);
+            background: linear-gradient(135deg, #e0c3fc, #8ec5fc, #e0c3fc, #8ec5fc);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
         }
         
         .maintenance-container {
-            max-width: 800px;
-            padding: 40px;
-            background-color: white;
+            max-width: 700px;
+            width: 100%;
+            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .icon-container {
+            margin-bottom: 30px;
+        }
+
+        .main-icon {
+            font-size: 6rem;
+            color: var(--primary-color);
+            animation: spin 10s linear infinite;
         }
         
         h1 {
             color: var(--primary-color);
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 2;
+            font-size: 3.5rem; /* Made bigger */
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            font-size: 1.5rem; /* Added sub-headline */
+            font-weight: 400;
+            color: var(--dark-text);
+            margin-bottom: 25px;
         }
         
         p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            line-height: 1.6;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .graphics-container {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin: 40px 0;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .tool-icon {
-            width: 80px;
-            height: 80px;
-            margin: 15px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        .robot-icon {
-            width: 120px;
-            height: 120px;
-            margin: 15px;
-            animation: bounce 2s ease infinite;
-        }
-        
-        .ai-icon {
-            width: 100px;
-            height: 100px;
-            margin: 15px;
-            animation: pulse 2s ease infinite;
-        }
-        
-        .contact-info {
-            margin-top: 30px;
             font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.7;
+            color: #555;
         }
         
-        .contact-info a {
-            color: var(--primary-color);
+        .progress-bar {
+            width: 80%;
+            height: 15px;
+            background-color: rgba(26, 82, 118, 0.2);
+            border-radius: 10px;
+            margin: 40px auto;
+            overflow: hidden;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            width: 70%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+            animation: fillProgress 2s ease-in-out infinite alternate;
+        }
+
+        .contact-button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 15px 30px;
+            border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
-            transition: color 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(26, 82, 118, 0.3);
         }
         
-        .contact-info a:hover {
-            color: var(--accent-color);
+        .contact-button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
         }
         
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+        /* --- Animations --- */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        .bubble {
-            position: absolute;
-            background-color: rgba(26, 82, 118, 0.05);
-            border-radius: 50%;
-            z-index: 0;
-        }
-        
-        .bubble-1 {
-            width: 200px;
-            height: 200px;
-            top: -50px;
-            left: -50px;
-        }
-        
-        .bubble-2 {
-            width: 150px;
-            height: 150px;
-            bottom: -30px;
-            right: -30px;
-        }
-        
-        .bubble-3 {
-            width: 100px;
-            height: 100px;
-            top: 30%;
-            right: 20px;
+
+        @keyframes fillProgress {
+            from { width: 30%; }
+            to { width: 100%; }
         }
         
         @media (max-width: 600px) {
             h1 {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
-            
+            h2 {
+                font-size: 1.2rem;
+            }
             p {
                 font-size: 1rem;
             }
-            
-            .tool-icon {
-                width: 60px;
-                height: 60px;
+            .main-icon {
+                font-size: 5rem;
             }
-            
-            .robot-icon {
-                width: 90px;
-                height: 90px;
-            }
-            
-            .ai-icon {
-                width: 80px;
-                height: 80px;
+            .maintenance-container {
+                padding: 40px 25px;
             }
         }
     </style>
 </head>
 <body>
     <div class="maintenance-container">
-        <div class="bubble bubble-1"></div>
-        <div class="bubble bubble-2"></div>
-        <div class="bubble bubble-3"></div>
-        
-        <h1>Website Upgrade In Progress</h1>
-        <p>Our team of experts is working hard to bring you new features and enhanced stability to serve our customers better.</p>
-        <p>We appreciate your patience and look forward to welcoming you back to an improved experience soon!</p>
-        
-        <div class="graphics-container">
-            <img src="https://cdn-icons-png.flaticon.com/512/3063/3063172.png" alt="Screwdriver" class="tool-icon" style="animation-delay: 0.2s;">
-            <img src="https://cdn-icons-png.flaticon.com/512/1995/1995450.png" alt="Wrench" class="tool-icon" style="animation-delay: 0.4s;">
-            <img src="https://cdn-icons-png.flaticon.com/512/3344/3344385.png" alt="Robot Working" class="robot-icon" style="animation-delay: 0.1s;">
-            <img src="https://cdn-icons-png.flaticon.com/512/3344/3344372.png" alt="AI Assistant" class="ai-icon" style="animation-delay: 0.3s;">
-            <img src="https://cdn-icons-png.flaticon.com/512/3063/3063185.png" alt="Tools" class="tool-icon" style="animation-delay: 0.5s;">
+        <div class="icon-container">
+            <i class="fas fa-cog main-icon"></i>
         </div>
         
-        <div class="contact-info">
-            For urgent inquiries, please contact us at <a href="https://wa.me/601111033154">+60 11-1103 3154</a> via WhatsApp.
+        <h1>Be Right Back</h1>
+        <h2>We're making things even better.</h2>
+        
+        <p>Our website is currently undergoing scheduled maintenance to improve your experience. We appreciate your patience and look forward to welcoming you back shortly.</p>
+        
+        <div class="progress-bar">
+            <div class="progress-bar-inner"></div>
         </div>
+        
+        <a href="https://wa.me/601111033154" class="contact-button">
+            <i class="fab fa-whatsapp"></i> Contact Us for Urgent Inquiries
+        </a>
     </div>
 </body>
 </html>
