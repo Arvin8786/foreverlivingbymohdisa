@@ -320,48 +320,45 @@
         border-radius: 5px;
     }
     
-    /* --- Rewards Portal Styles --- */
-    .rewards-portal-container {
+    /* --- My Forever Living Section Styles --- */
+    .my-forever-living-container {
         background: white;
-        padding: 30px;
+        padding: 50px; /* Increased padding for more space */
         border-radius: var(--border-radius);
         box-shadow: var(--shadow);
-    }
-    .rewards-portal-container input {
-        width: 100%;
-        padding: 12px;
-        margin-bottom: 10px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-    }
-    .forgot-pac-link {
-        display: block;
-        text-align: right;
-        font-size: 0.9rem;
-        margin-top: -5px;
-        margin-bottom: 15px;
-        cursor: pointer;
-    }
-    .dashboard-header {
+        text-align: center;
+        min-height: 400px; /* Ensure it takes up some space */
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
+    }
+    .my-forever-living-container h2 {
+        font-size: 3rem;
         margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #eee;
+        color: var(--primary-color);
     }
-    .points-display {
-        background: var(--accent-color);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 50px;
+    .my-forever-living-container p {
         font-size: 1.2rem;
-        font-weight: bold;
+        color: #555;
+        max-width: 600px;
+        margin: 0 auto 30px;
     }
-    .history-table-container { overflow-x: auto; }
-    .history-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    .history-table th, .history-table td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-    .history-table th { background-color: var(--primary-color); color: white; }
+    .my-forever-living-container .fa-star,
+    .my-forever-living-container .fa-gears,
+    .my-forever-living-container .fa-heart-pulse {
+        font-size: 4rem; /* Larger icons */
+        color: var(--secondary-color);
+        margin: 15px;
+    }
+    .my-forever-living-container .icon-row {
+        margin-top: 30px;
+        display: flex;
+        gap: 40px;
+        justify-content: center;
+        align-items: center;
+    }
+
 
     /* --- Footer & Disclaimer --- */
     footer { background: var(--primary-color); color: var(--light-text); padding: 40px 20px; text-align: center; margin-top: 30px; }
@@ -395,7 +392,7 @@
           <li><a onclick="showTab('products')">Products</a></li>
           <li><a onclick="showTab('business')">Business Opportunity</a></li>
           <li><a onclick="showTab('rewards')">Rewards</a></li>
-          <li><a onclick="showTab('rewards-portal')">My Rewards</a></li>
+          <li><a onclick="showTab('rewards-portal')">My Forever Living</a></li><!-- Renamed link -->
         </ul>
     </div>
   </nav>
@@ -440,7 +437,7 @@
     <div id="rewards" class="tab-content">
         <section class="program-section">
             <h2><i class="fa-solid fa-award"></i> Redeem Your Points</h2>
-            <p style="text-align: center;">Log in to the "My Rewards" portal to redeem your points.</p>
+            <p style="text-align: center;">Log in to the "My Forever Living" portal to view your points balance and redeem rewards.</p>
             <div class="rewards-grid">
                 <div class="reward-item">
                     <img src="rm5.jpg" alt="RM 5 Voucher" onerror="this.src='https://i.imgur.com/O9yP2aH.png'">
@@ -480,69 +477,22 @@
     </div>
 
     <div id="rewards-portal" class="tab-content">
-        <div class="rewards-portal-container">
-            <!-- Login View -->
-            <div id="login-view">
-                <h2><i class="fa-solid fa-lock"></i> My Rewards Portal</h2>
-                <p>Log in to view your points balance and redeem rewards.</p>
-                <input type="email" id="login-email" placeholder="Enter Your Email Address">
-                <input type="text" id="login-pac" placeholder="Enter Your Personal Access Code (from your receipt)">
-                <a class="forgot-pac-link" onclick="forgotPAC()">Forgot my Personal Access Code?</a>
-                <button class="btn btn-primary" id="login-btn" onclick="login()">Login</button>
-                <p id="login-status" style="margin-top: 15px; font-weight: bold;"></p>
+        <!-- New content for "My Forever Living" -->
+        <div class="my-forever-living-container">
+            <h2><i class="fa-solid fa-star"></i> My Forever Living <i class="fa-solid fa-heart-pulse"></i></h2>
+            <p>
+                Get ready for an enhanced experience! We are working tirelessly to bring you exciting new features
+                to help you manage your wellness journey and Forever Living business.
+            </p>
+            <div class="icon-row">
+                <i class="fa-solid fa-calendar-alt"></i> <!-- Calendar for events/webinars -->
+                <i class="fa-solid fa-chart-line"></i> <!-- Chart for business analytics -->
+                <i class="fa-solid fa-users"></i> <!-- Users for community features -->
+                <i class="fa-solid fa-book-open"></i> <!-- Book for learning resources -->
             </div>
-
-            <!-- Dashboard View (hidden by default) -->
-            <div id="dashboard-view" style="display: none;">
-                <div class="dashboard-header">
-                    <div>
-                        <h2 style="margin: 0;">Welcome Back!</h2>
-                        <span id="customer-email-display"></span>
-                    </div>
-                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
-                </div>
-                
-                <h3>Your Points Balance</h3>
-                <div class="points-display" id="customer-points-display">0 Points</div>
-
-                <h3 style="margin-top: 30px;">Redeemable Rewards</h3>
-                <div class="rewards-grid" id="redeemable-rewards-grid">
-                    <!-- Rewards will be populated by JavaScript -->
-                </div>
-
-                <h3 style="margin-top: 30px;">Your Purchase History</h3>
-                <div class="history-table-container">
-                    <table class="history-table">
-                        <thead>
-                            <tr>
-                                <th>Order Number</th>
-                                <th>Date</th>
-                                <th>Items</th>
-                                <th>Points Earned</th>
-                            </tr>
-                        </thead>
-                        <tbody id="purchase-history-body">
-                            <!-- History will be populated by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3 style="margin-top: 30px;">Your Redemption History</h3>
-                <div class="history-table-container">
-                    <table class="history-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Reward</th>
-                                <th>Points Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody id="redemption-history-body">
-                            <!-- History will be populated by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <p style="margin-top: 30px; font-weight: bold; color: var(--accent-color);">
+                Stay tuned for updates! Exciting features are coming soon.
+            </p>
         </div>
     </div>
   </main>
@@ -665,6 +615,7 @@
         { id: 52, name: "REPLENISHING SKIN OIL", price: 132.00, promoPrice: 97.02, image: "skin-oil.jpg", benefits: "Nourishes with a blend of oils for skin.", consumption: "Apply a few drops to face." },
         { id: 53, name: "PROTECTING DAY LOTION", price: 167.99, promoPrice: 123.47, image: "day-lotion.jpg", benefits: "Moisturizes and protects skin with SPF.", consumption: "Apply in the morning." },
     ];
+    // Rewards data is still used by the 'Rewards' tab
     const rewards = [
         { id: 'RWD01', name: 'RM 5 Voucher', cost: 500, image: 'rm5.jpg', fallbackImage: 'https://i.imgur.com/O9yP2aH.png', available: true },
         { id: 'RWD02', name: 'RM 10 Voucher', cost: 1000, image: 'rm10.jpg', fallbackImage: 'https://i.imgur.com/sY2a2qG.png', available: true },
@@ -1045,9 +996,10 @@
     }
 
     function sendReceiptByEmail(record, orderDetails, newPAC, totalPoints) {
-        const serviceID = 'YOUR_SERVICE_ID';
-        const templateID = 'YOUR_TEMPLATE_ID';
-        const userID = 'YOUR_USER_ID';
+        // NOTE: Replace with your actual EmailJS credentials
+        const serviceID = 'YOUR_SERVICE_ID'; // e.g., 'service_xxxxxx'
+        const templateID = 'YOUR_TEMPLATE_ID'; // e.g., 'template_xxxxxx'
+        const userID = 'YOUR_USER_ID'; // e.g., 'user_xxxxxx'
 
         if (serviceID === 'YOUR_SERVICE_ID' || templateID === 'YOUR_TEMPLATE_ID' || userID === 'YOUR_USER_ID') {
             console.log("EmailJS credentials not set. Skipping email.");
@@ -1064,7 +1016,7 @@
         ).join('');
 
         const templateParams = {
-            to_email: 'arvin8786@gmail.com',
+            to_email: 'arvin8786@gmail.com', // This should likely be the owner's email
             order_number: record.orderNumber,
             customer_name: orderDetails.customerName,
             customer_phone: orderDetails.customerPhone,
@@ -1236,6 +1188,10 @@
           showTab('products');
       }
     });
+
+    // REWARDS PORTAL JS (NO LONGER NEEDED FOR THE NEW "MY FOREVER LIVING" TAB, BUT KEPT FOR REFERENCE)
+    // Removed or commented out login(), forgotPAC(), logout(), renderRedeemableRewards(), etc.
+    // as the tab's content is now a static "Coming Soon" message.
   </script>
 </body>
 </html>
