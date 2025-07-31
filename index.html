@@ -43,6 +43,10 @@
         0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
         100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
     }
+    @keyframes marquee {
+        0%   { transform: translateX(0%); }
+        100% { transform: translateX(-100%); }
+    }
 
     /* --- Base Styles --- */
     *, *::before, *::after { box-sizing: border-box; }
@@ -54,6 +58,8 @@
       color: var(--dark-text);
       overflow-x: hidden;
       line-height: 1.6;
+      /* Adjusted: Add padding-top to account for the fixed running banner */
+      padding-top: 45px; /* Estimated height of the running banner (approx 1.1rem + 20px padding) */
     }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
     h1, h2, h3, h4 { color: var(--primary-color); font-weight: 600; }
@@ -86,29 +92,34 @@
         border: 2px solid #fff;
     }
 
-    /* --- Header & Navigation --- */
-    header {
-      background-color: var(--light-text);
-      padding: 20px 0;
-      text-align: center;
-      border-bottom: 1px solid #e0e0e0;
-      position: relative;
+    /* Updated: Promo Running Banner */
+    #promo-running-banner {
+      background-color: var(--secondary-color); /* Orange/Yellow */
+      color: var(--light-text);
+      padding: 10px 0;
+      text-align: center; /* Center content when not running */
+      font-weight: 700;
+      font-size: 1.1rem;
+      position: fixed; /* Fixed at the top */
+      top: 0;
+      left: 0;
+      width: 100%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 101; /* Ensure it's on top of everything */
+      overflow: hidden; /* Crucial for marquee effect */
+      white-space: nowrap; /* Keep text on one line */
     }
-    .header-content {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 20px;
-    }
-    .header-logo {
-        width: 80px;
-        height: 80px;
+    #promo-running-banner .marquee-content {
+        display: inline-block;
+        padding-left: 100%; /* Start off-screen */
+        animation: marquee 20s linear infinite; /* Re-enabled marquee effect */
     }
 
     nav {
       background-color: var(--primary-color);
       position: sticky;
-      top: 0;
+      /* Adjusted top to be below the fixed banner's height */
+      top: 45px; /* Based on estimated height of #promo-running-banner */
       z-index: 100;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
@@ -160,7 +171,7 @@
       flex-direction: column;
       position: relative;
       transition: all 0.3s ease;
-      overflow: hidden;
+      overflow: hidden; /* Important for containing the image, but badge needs careful positioning */
     }
     .product:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.12); }
     .product.promo-highlight { animation: promoGlow 2.5s infinite ease-in-out; }
@@ -185,10 +196,22 @@
     .btn-primary:hover { background: #123e5a; transform: scale(1.05); }
     .btn-secondary { background: var(--light-gray); color: var(--primary-color); border: 1px solid var(--primary-color); }
     .btn-secondary:hover { background: #e0e0e0; }
+    
+    /* Adjusted Featured Badge CSS for better visibility */
     .featured-badge {
-      position: absolute; top: 15px; right: -40px; background: var(--secondary-color);
-      color: white; padding: 5px 40px; transform: rotate(45deg);
-      font-weight: bold; font-size: 0.9rem; box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      position: absolute; 
+      top: 0; /* Position from top edge */
+      right: 0; /* Position from right edge */
+      background: var(--secondary-color);
+      color: white; 
+      padding: 5px 25px; /* Padding for text inside the badge */
+      transform: rotate(45deg) translate(15%, -65%); /* Rotates 45deg, then moves by percentage of its own size to position outside the corner */
+      transform-origin: 0% 0%; /* Rotate around top-left of the badge's transformed box */
+      font-weight: bold; 
+      font-size: 0.9rem; 
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      z-index: 10; /* Ensure it stays on top of content */
+      white-space: nowrap; /* Prevent text wrapping inside the badge */
     }
 
     /* --- Program & Business Sections --- */
@@ -270,9 +293,15 @@
     }
     .modal-content {
       background-color: #fefefe; padding: 30px; border-radius: var(--border-radius);
-      width: 90%; max-width: 600px; animation: slideIn 0.4s ease;
+      width: 90%; max-width: 600px; /* Default max-width for modals */
+      animation: slideIn 0.4s ease;
       max-height: 90vh; /* Set max height */
       overflow-y: auto; /* Enable scrolling */
+    }
+    /* Specific adjustment for the promo pop-up modal content */
+    #promo-popup-modal .modal-content {
+      max-width: 550px; /* Adjusted to make it smaller */
+      padding: 15px; /* Keep padding light for image */
     }
     .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.3s; }
     .close:hover { color: black; }
@@ -385,6 +414,14 @@
         </div>
     </div>
   </header>
+
+  <!-- Updated: Promo Running Banner -->
+  <div id="promo-running-banner">
+      <div class="marquee-content">
+          ✨ Hot Promo on Aloe Vera Gel, Aloe Berry Nectar, Aloe Bits N' Peaches! Buy Any 2 for RM 200 + FREE Shipping! ✨ 
+          🎉 Plus, enjoy 5% off on ALL other products! 🎉
+      </div>
+  </div>
 
   <nav>
     <div class="container">
@@ -558,62 +595,70 @@
     </div>
   </div>
 
+  <!-- New: Promo Pop-up Modal -->
+  <div id="promo-popup-modal" class="modal">
+    <div class="modal-content" style="max-width: 550px; padding: 15px;">
+      <span class="close" onclick="closePromoPopup()">×</span>
+      <img src="promo.jpg" alt="Special Aloe Trio Offer" style="max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px;">
+    </div>
+  </div>
+
   <script>
     // --- DATA ---
     const products = [
-        { id: 1, name: "ALOE VERA GEL", price: 116.79, promoPrice: 85.84, image: "aloe-vera-gel.jpg", benefits: "Supports digestion, boosts immunity.", consumption: "Take 30-60ml daily." },
-        { id: 2, name: "ALOE BERRY NECTAR", price: 116.79, promoPrice: 85.84, image: "aloe-berry-nectar.jpg", benefits: "Antioxidant support, immune system booster.", consumption: "30-60ml daily." },
-        { id: 3, name: "ALOE BITS N' PEACHES", price: 116.79, promoPrice: 85.84, image: "aloe-peaches.jpg", benefits: "Digestive health, vitamin C source.", consumption: "30-60ml daily." },
-        { id: 4, name: "LITE VANILLA", price: 155.72, promoPrice: 114.45, image: "lite-vanilla.jpg", benefits: "Meal replacement for weight management.", consumption: "Mix with milk or water." },
-        { id: 5, name: "LITE CHOCO", price: 155.72, promoPrice: 114.45, image: "lite-choco.jpg", benefits: "Meal replacement for weight management.", consumption: "Mix with milk or water." },
-        { id: 6, name: "SUPERGREENS", price: 214.71, promoPrice: 157.82, image: "supergreens.jpg", benefits: "Rich in antioxidants and nutrients. Detoxification.", consumption: "Mix with water or juice." },
-        { id: 7, name: "FIBER", price: 124.44, promoPrice: 91.47, image: "fiber.jpg", benefits: "Supports digestive health.", consumption: "Mix with water." },
-        { id: 8, name: "TONGKAT ALI", price: 19.90, promoPrice: 18.80, image: "tongkat-ali.jpg", benefits: "Supports men's health and vitality.", consumption: "As per packaging." },
-        { id: 9, name: "WHITE COFFEE", price: 15.99, promoPrice: 15.11, image: "white-coffee.jpg", benefits: "Rich and aromatic coffee.", consumption: "Mix with hot water." },
-        { id: 10, name: "CHOCOLATE MALT DRINK", price: 27.90, promoPrice: 24.94, image: "choco-malt.jpg", benefits: "Nutritious chocolate malt drink.", consumption: "Mix with hot water or milk." },
-        { id: 11, name: "TEH TARIK HALIA", price: 25.90, promoPrice: 23.15, image: "teh-tarik.jpg", benefits: "Ginger tea for warmth and digestion.", consumption: "Mix with hot water." },
-        { id: 12, name: "BEE HONEY", price: 132.57, promoPrice: 97.44, image: "bee-honey.jpg", benefits: "Natural energy and soothes throat.", consumption: "1-2 teaspoons daily." },
-        { id: 13, name: "BEE POLLEN", price: 75.50, promoPrice: 55.49, image: "bee-pollen.jpg", benefits: "Natural multivitamin and energy booster.", consumption: "1 tablet 3 times daily." },
-        { id: 14, name: "BEE PROPOLIS", price: 139.21, promoPrice: 102.32, image: "bee-propolis.jpg", benefits: "Immune support, natural antibiotic.", consumption: "1 tablet daily." },
-        { id: 15, name: "ROYAL GELLY", price: 139.21, promoPrice: 102.32, image: "royal-jelly.jpg", benefits: "Energy booster, supports immune system.", consumption: "1 tablet daily." },
-        { id: 16, name: "OMEGA 3 PLUS", price: 130.10, promoPrice: 95.62, image: "arctic-sea.jpg", benefits: "Supports heart and brain health.", consumption: "2 softgels twice daily." },
-        { id: 17, name: "ABSORBENT-C", price: 75.50, promoPrice: 55.49, image: "absorbent-c.jpg", benefits: "Immune support, antioxidant.", consumption: "1-2 tablets daily." },
-        { id: 18, name: "FIELDS OF GREENS", price: 86.10, promoPrice: 63.28, image: "fields-of-greens.jpg", benefits: "Detoxification and digestion support.", consumption: "1 tablet 3 times daily." },
-        { id: 19, name: "CALCIUM PLUS TABLET", price: 132.15, promoPrice: 97.14, image: "calcium-plus.jpg", benefits: "Supports bone health.", consumption: "2 tablets daily." },
-        { id: 20, name: "ALOE LIPS", price: 20.33, promoPrice: 14.94, image: "aloe-lips.jpg", benefits: "Moisturizes and protects lips.", consumption: "Apply as needed." },
-        { id: 21, name: "BRIGHT TOOTHGEL", price: 41.29, promoPrice: 30.35, image: "bright-toothgel.jpg", benefits: "Fluoride-free, gentle on gums.", consumption: "Brush teeth twice daily." },
-        { id: 22, name: "ALOE FIRST", price: 90.83, promoPrice: 66.76, image: "aloe-first.jpg", benefits: "Soothes skin irritations.", consumption: "Spray on skin as needed." },
-        { id: 23, name: "DEODORANT STICK", price: 50.73, promoPrice: 37.29, image: "forever-deodorant.jpg", benefits: "Long-lasting protection.", consumption: "Apply daily." },
-        { id: 24, name: "AVOCADO SOAP", price: 30.68, promoPrice: 22.55, image: "avocado-soap.jpg", benefits: "Gentle cleansing for face and body skin.", consumption: "Use daily." },
-        { id: 25, name: "ALOE LIQUID SOAP", price: 120.91, promoPrice: 88.87, image: "aloe-liquid-soap.jpg", benefits: "Moisturizing hand and face skin wash.", consumption: "Use daily." },
-        { id: 26, name: "JOJOBA SHAMPOO", price: 105.93, promoPrice: 77.86, image: "aloe-jojoba-shampoo.jpg", benefits: "Nourishes hair and scalp.", consumption: "Massage into wet hair." },
-        { id: 27, name: "JOJOBA CONDITIONER", price: 117.70, promoPrice: 86.51, image: "aloe-jojoba-conditioner.jpg", benefits: "Moisturizes and strengthens hair.", consumption: "Apply after shampoo." },
-        { id: 28, name: "ALOE BODY WASH", price: 120.91, promoPrice: 88.87, image: "aloe-body-wash.jpg", benefits: "Gentle, moisturizing body skin wash.", consumption: "Use daily in shower." },
-        { id: 29, name: "ALOE BODY LOTION", price: 112.35, promoPrice: 82.58, image: "aloe-body-lotion.jpg", benefits: "Hydrates and softens skin.", consumption: "Apply to body as needed." },
-        { id: 30, name: "ALOE PROPOLIS CREME", price: 90.83, promoPrice: 66.76, image: "aloe-propolis-creme.jpg", benefits: "Soothes and moisturizes dry skin.", consumption: "Apply generously." },
-        { id: 31, name: "ALOE VERA GELLY", price: 70.78, promoPrice: 52.03, image: "aloe-vera-gelly.jpg", benefits: "Soothes minor skin irritations.", consumption: "Apply to affected area." },
-        { id: 32, name: "ALOE MOISTURIZING", price: 70.78, promoPrice: 52.03, image: "aloe-moisturizing.jpg", benefits: "Hydrates face and body skin.", consumption: "Apply as needed." },
-        { id: 33, name: "ALOE MASSAGE LOTION", price: 70.78, promoPrice: 52.03, image: "aloe-massage-lotion.jpg", benefits: "Soothing lotion for massage.", consumption: "Massage into skin." },
-        { id: 34, name: "ALOE MSM GEL", price: 86.00, promoPrice: 63.21, image: "aloe-msm-gel.jpg", benefits: "Soothes joints and muscles.", consumption: "Apply to affected areas." },
-        { id: 35, name: "ALOE SUNSCREEN", price: 89.07, promoPrice: 65.47, image: "aloe-sunscreen.jpg", benefits: "UV protection with aloe for skin.", consumption: "Apply before sun exposure." },
-        { id: 36, name: "ALOE SCRUB", price: 77.86, promoPrice: 57.23, image: "aloe-scrub.jpg", benefits: "Gently exfoliates skin.", consumption: "Use 2-3 times a week." },
-        { id: 37, name: "MASK POWDER", price: 102.90, promoPrice: 75.63, image: "mask-powder.jpg", benefits: "Cleanses and tightens pores.", consumption: "Mix with Aloe Activator." },
-        { id: 38, name: "R3 FACTOR-SKIN DEFENSE", price: 160.97, promoPrice: 118.31, image: "r3-factor.jpg", benefits: "Helps skin retain moisture.", consumption: "Apply to face and neck." },
-        { id: 39, name: "FOREVER ALPHA-E FACTOR", price: 144.90, promoPrice: 106.50, image: "alpha-e-factor.jpg", benefits: "Nourishes and restores skin.", consumption: "Apply a few drops to face." },
-        { id: 40, name: "INFINITE HYDRATING CLEANSER", price: 131.20, promoPrice: 96.43, image: "infinite-cleanser.jpg", benefits: "Gentle, hydrating skin cleanser.", consumption: "Use morning and night." },
-        { id: 41, name: "INFINITE FIRMING SERUM", price: 190.47, promoPrice: 140.00, image: "infinite-serum.jpg", benefits: "Reduces appearance of fine lines.", consumption: "Apply to face." },
-        { id: 42, name: "INFINITE RESTORING CREME", price: 221.56, promoPrice: 162.86, image: "infinite-creme.jpg", benefits: "Deeply moisturizes and restores skin.", consumption: "Apply to face and neck." },
-        { id: 43, name: "BALANCING TONER", price: 106.18, promoPrice: 78.05, image: "balancing-toner.jpg", benefits: "Refreshes and balances skin.", consumption: "Apply after cleansing." },
-        { id: 44, name: "AWAKENING EYE CREAM", price: 89.66, promoPrice: 65.90, image: "eye-cream.jpg", benefits: "Reduces puffiness and dark circles.", consumption: "Pat gently around eyes." },
-        { id: 45, name: "ALOE ACTIVATOR", price: 80.59, promoPrice: 59.23, image: "aloe-activator.jpg", benefits: "Cleanses, soothes and refreshes skin.", consumption: "Use with Mask Powder." },
-        { id: 46, name: "HYDRATING SERUM", price: 156.56, promoPrice: 115.07, image: "hydrating-serum.jpg", benefits: "Boosts skin hydration.", consumption: "Apply to face." },
-        { id: 47, name: "S.REFRESHING G.CLEANSER", price: 115.61, promoPrice: 84.98, image: "refreshing-cleanser.jpg", benefits: "Gentle gel skin cleanser.", consumption: "Use morning and night." },
-        { id: 48, name: "S. IILUMINATING GEL", price: 107.35, promoPrice: 78.91, image: "illuminating-gel.jpg", benefits: "Brightens skin appearance.", consumption: "Apply to face." },
-        { id: 49, name: "S. REFINING GEL MASK", price: 115.61, promoPrice: 84.98, image: "refining-mask.jpg", benefits: "Refines pores and moisturizes skin.", consumption: "Use 2-3 times a week." },
-        { id: 50, name: "S.SMOOTHING GEL MOISTURIZER", price: 115.76, promoPrice: 85.08, image: "smoothing-moisturizer.jpg", benefits: "Lightweight gel moisturizer for skin.", consumption: "Apply to face." },
-        { id: 51, name: "ALOE BIO-CELLULOSE MASK", price: 146.00, promoPrice: 107.31, image: "bio-cellulose-mask.jpg", benefits: "Deeply hydrates and conditions skin.", consumption: "Use once a week." },
-        { id: 52, name: "REPLENISHING SKIN OIL", price: 132.00, promoPrice: 97.02, image: "skin-oil.jpg", benefits: "Nourishes with a blend of oils for skin.", consumption: "Apply a few drops to face." },
-        { id: 53, name: "PROTECTING DAY LOTION", price: 167.99, promoPrice: 123.47, image: "day-lotion.jpg", benefits: "Moisturizes and protects skin with SPF.", consumption: "Apply in the morning." },
+        { id: 1, name: "ALOE VERA GEL", price: 116.79, specialPromo: 'buy2for200', image: "aloe-vera-gel.jpg", benefits: "Supports digestion, boosts immunity.", consumption: "Take 30-60ml daily." },
+        { id: 2, name: "ALOE BERRY NECTAR", price: 116.79, specialPromo: 'buy2for200', image: "aloe-berry-nectar.jpg", benefits: "Antioxidant support, immune system booster.", consumption: "30-60ml daily." },
+        { id: 3, name: "ALOE BITS N' PEACHES", price: 116.79, specialPromo: 'buy2for200', image: "aloe-peaches.jpg", benefits: "Digestive health, vitamin C source.", consumption: "30-60ml daily." },
+        { id: 4, name: "LITE VANILLA", price: 155.72, promoPrice: 147.93, image: "lite-vanilla.jpg", benefits: "Meal replacement for weight management.", consumption: "Mix with milk or water." },
+        { id: 5, name: "LITE CHOCO", price: 155.72, promoPrice: 147.93, image: "lite-choco.jpg", benefits: "Meal replacement for weight management.", consumption: "Mix with milk or water." },
+        { id: 6, name: "SUPERGREENS", price: 214.71, promoPrice: 203.97, image: "supergreens.jpg", benefits: "Rich in antioxidants and nutrients. Detoxification.", consumption: "Mix with water or juice." },
+        { id: 7, name: "FIBER", price: 124.44, promoPrice: 118.22, image: "fiber.jpg", benefits: "Supports digestive health.", consumption: "Mix with water." },
+        { id: 8, name: "TONGKAT ALI", price: 19.90, promoPrice: 19.57, image: "tongkat-ali.jpg", benefits: "Supports men's health and vitality.", consumption: "As per packaging." },
+        { id: 9, name: "WHITE COFFEE", price: 15.99, promoPrice: 15.72, image: "white-coffee.jpg", benefits: "Rich and aromatic coffee.", consumption: "Mix with hot water." },
+        { id: 10, name: "CHOCOLATE MALT DRINK", price: 27.90, promoPrice: 27.20, image: "choco-malt.jpg", benefits: "Nutritious chocolate malt drink.", consumption: "Mix with hot water or milk." },
+        { id: 11, name: "TEH TARIK HALIA", price: 25.90, promoPrice: 25.25, image: "teh-tarik.jpg", benefits: "Ginger tea for warmth and digestion.", consumption: "Mix with hot water." },
+        { id: 12, name: "BEE HONEY", price: 132.57, promoPrice: 125.94, image: "bee-honey.jpg", benefits: "Natural energy and soothes throat.", consumption: "1-2 teaspoons daily." },
+        { id: 13, name: "BEE POLLEN", price: 75.50, promoPrice: 71.73, image: "bee-pollen.jpg", benefits: "Natural multivitamin and energy booster.", consumption: "1 tablet 3 times daily." },
+        { id: 14, name: "BEE PROPOLIS", price: 139.21, promoPrice: 132.25, image: "bee-propolis.jpg", benefits: "Immune support, natural antibiotic.", consumption: "1 tablet daily." },
+        { id: 15, name: "ROYAL GELLY", price: 139.21, promoPrice: 132.25, image: "royal-jelly.jpg", benefits: "Energy booster, supports immune system.", consumption: "1 tablet daily." },
+        { id: 16, name: "OMEGA 3 PLUS", price: 130.10, promoPrice: 123.60, image: "arctic-sea.jpg", benefits: "Supports heart and brain health.", consumption: "2 softgels twice daily." },
+        { id: 17, name: "ABSORBENT-C", price: 75.50, promoPrice: 71.73, image: "absorbent-c.jpg", benefits: "Immune support, antioxidant.", consumption: "1-2 tablets daily." },
+        { id: 18, name: "FIELDS OF GREENS", price: 86.10, promoPrice: 81.80, image: "fields-of-greens.jpg", benefits: "Detoxification and digestion support.", consumption: "1 tablet 3 times daily." },
+        { id: 19, name: "CALCIUM PLUS TABLET", price: 132.15, promoPrice: 125.54, image: "calcium-plus.jpg", benefits: "Supports bone health.", consumption: "2 tablets daily." },
+        { id: 20, name: "ALOE LIPS", price: 20.33, promoPrice: 19.31, image: "aloe-lips.jpg", benefits: "Moisturizes and protects lips.", consumption: "Apply as needed." },
+        { id: 21, name: "BRIGHT TOOTHGEL", price: 41.29, promoPrice: 39.23, image: "bright-toothgel.jpg", benefits: "Fluoride-free, gentle on gums.", consumption: "Brush teeth twice daily." },
+        { id: 22, name: "ALOE FIRST", price: 90.83, promoPrice: 86.29, image: "aloe-first.jpg", benefits: "Soothes skin irritations.", consumption: "Spray on skin as needed." },
+        { id: 23, name: "DEODORANT STICK", price: 50.73, promoPrice: 48.19, image: "forever-deodorant.jpg", benefits: "Long-lasting protection.", consumption: "Apply daily." },
+        { id: 24, name: "AVOCADO SOAP", price: 30.68, promoPrice: 29.15, image: "avocado-soap.jpg", benefits: "Gentle cleansing for face and body skin.", consumption: "Use daily." },
+        { id: 25, name: "ALOE LIQUID SOAP", price: 120.91, promoPrice: 114.86, image: "aloe-liquid-soap.jpg", benefits: "Moisturizing hand and face skin wash.", consumption: "Use daily." },
+        { id: 26, name: "JOJOBA SHAMPOO", price: 105.93, promoPrice: 100.63, image: "aloe-jojoba-shampoo.jpg", benefits: "Nourishes hair and scalp.", consumption: "Massage into wet hair." },
+        { id: 27, name: "JOJOBA CONDITIONER", price: 117.70, promoPrice: 111.82, image: "aloe-jojoba-conditioner.jpg", benefits: "Moisturizes and strengthens hair.", consumption: "Apply after shampoo." },
+        { id: 28, name: "ALOE BODY WASH", price: 120.91, promoPrice: 114.86, image: "aloe-body-wash.jpg", benefits: "Gentle, moisturizing body skin wash.", consumption: "Use daily in shower." },
+        { id: 29, name: "ALOE BODY LOTION", price: 112.35, promoPrice: 106.73, image: "aloe-body-lotion.jpg", benefits: "Hydrates and softens skin.", consumption: "Apply to body as needed." },
+        { id: 30, name: "ALOE PROPOLIS CREME", price: 90.83, promoPrice: 86.29, image: "aloe-propolis-creme.jpg", benefits: "Soothes and moisturizes dry skin.", consumption: "Apply generously." },
+        { id: 31, name: "ALOE VERA GELLY", price: 70.78, promoPrice: 67.24, image: "aloe-vera-gelly.jpg", benefits: "Soothes minor skin irritations.", consumption: "Apply to affected area." },
+        { id: 32, name: "ALOE MOISTURIZING", price: 70.78, promoPrice: 67.24, image: "aloe-moisturizing.jpg", benefits: "Hydrates face and body skin.", consumption: "Apply as needed." },
+        { id: 33, name: "ALOE MASSAGE LOTION", price: 70.78, promoPrice: 67.24, image: "aloe-massage-lotion.jpg", benefits: "Soothing lotion for massage.", consumption: "Massage into skin." },
+        { id: 34, name: "ALOE MSM GEL", price: 86.00, promoPrice: 81.70, image: "aloe-msm-gel.jpg", benefits: "Soothes joints and muscles.", consumption: "Apply to affected areas." },
+        { id: 35, name: "ALOE SUNSCREEN", price: 89.07, promoPrice: 84.62, image: "aloe-sunscreen.jpg", benefits: "UV protection with aloe for skin.", consumption: "Apply before sun exposure." },
+        { id: 36, name: "ALOE SCRUB", price: 77.86, promoPrice: 73.97, image: "aloe-scrub.jpg", benefits: "Gently exfoliates skin.", consumption: "Use 2-3 times a week." },
+        { id: 37, name: "MASK POWDER", price: 102.90, promoPrice: 97.76, image: "mask-powder.jpg", benefits: "Cleanses and tightens pores.", consumption: "Mix with Aloe Activator." },
+        { id: 38, name: "R3 FACTOR-SKIN DEFENSE", price: 160.97, promoPrice: 152.92, image: "r3-factor.jpg", benefits: "Helps skin retain moisture.", consumption: "Apply to face and neck." },
+        { id: 39, name: "FOREVER ALPHA-E FACTOR", price: 144.90, promoPrice: 137.66, image: "alpha-e-factor.jpg", benefits: "Nourishes and restores skin.", consumption: "Apply a few drops to face." },
+        { id: 40, name: "INFINITE HYDRATING CLEANSER", price: 131.20, promoPrice: 124.64, image: "infinite-cleanser.jpg", benefits: "Gentle, hydrating skin cleanser.", consumption: "Use morning and night." },
+        { id: 41, name: "INFINITE FIRMING SERUM", price: 190.47, promoPrice: 180.95, image: "infinite-serum.jpg", benefits: "Reduces appearance of fine lines.", consumption: "Apply to face." },
+        { id: 42, name: "INFINITE RESTORING CREME", price: 221.56, promoPrice: 210.48, image: "infinite-creme.jpg", benefits: "Deeply moisturizes and restores skin.", consumption: "Apply to face and neck." },
+        { id: 43, name: "BALANCING TONER", price: 106.18, promoPrice: 100.87, image: "balancing-toner.jpg", benefits: "Refreshes and balances skin.", consumption: "Apply after cleansing." },
+        { id: 44, name: "AWAKENING EYE CREAM", price: 89.66, promoPrice: 85.18, image: "eye-cream.jpg", benefits: "Reduces puffiness and dark circles.", consumption: "Pat gently around eyes." },
+        { id: 45, name: "ALOE ACTIVATOR", price: 80.59, promoPrice: 76.56, image: "aloe-activator.jpg", benefits: "Cleanses, soothes and refreshes skin.", consumption: "Use with Mask Powder." },
+        { id: 46, name: "HYDRATING SERUM", price: 156.56, promoPrice: 148.73, image: "hydrating-serum.jpg", benefits: "Boosts skin hydration.", consumption: "Apply to face." },
+        { id: 47, name: "S.REFRESHING G.CLEANSER", price: 115.61, promoPrice: 109.83, image: "refreshing-cleanser.jpg", benefits: "Gentle gel skin cleanser.", consumption: "Use morning and night." },
+        { id: 48, name: "S. IILUMINATING GEL", price: 107.35, promoPrice: 102.00, image: "illuminating-gel.jpg", benefits: "Brightens skin appearance.", consumption: "Apply to face." },
+        { id: 49, name: "S. REFINING GEL MASK", price: 115.61, promoPrice: 109.83, image: "refining-mask.jpg", benefits: "Refines pores and moisturizes skin.", consumption: "Use 2-3 times a week." },
+        { id: 50, name: "S.SMOOTHING GEL MOISTURIZER", price: 115.76, promoPrice: 109.97, image: "smoothing-moisturizer.jpg", benefits: "Lightweight gel moisturizer for skin.", consumption: "Apply to face." },
+        { id: 51, name: "ALOE BIO-CELLULOSE MASK", price: 146.00, promoPrice: 138.70, image: "bio-cellulose-mask.jpg", benefits: "Deeply hydrates and conditions skin.", consumption: "Use once a week." },
+        { id: 52, name: "REPLENISHING SKIN OIL", price: 132.00, promoPrice: 125.40, image: "skin-oil.jpg", benefits: "Nourishes with a blend of oils for skin.", consumption: "Apply a few drops to face." },
+        { id: 53, name: "PROTECTING DAY LOTION", price: 167.99, promoPrice: 159.59, image: "day-lotion.jpg", benefits: "Moisturizes and protects skin with SPF.", consumption: "Apply in the morning." },
     ];
     // Rewards data is still used by the 'Rewards' tab
     const rewards = [
@@ -636,25 +681,52 @@
     function renderProducts() {
       const productList = document.getElementById('product-list');
       if (!productList) return;
-      const promoActive = isPromoActive();
+      const promoActive = isPromoActive(); // Check if overall grand opening promo is active
       
       productList.innerHTML = products.map(product => {
-        const finalPrice = promoActive && product.promoPrice ? product.promoPrice : product.price;
-        const hasDiscount = promoActive && product.promoPrice;
-        const points = Math.floor(finalPrice);
+        let priceHTML = '';
+        let badgeHTML = '';
+        let productClasses = 'product';
+        let points = 0; // Initialize points
+
+        if (promoActive && product.specialPromo === 'buy2for200') {
+            // Special promo for Aloe Vera Gel, Aloe Berry Nectar, Aloe Bits N' Peaches
+            badgeHTML = '<div class="featured-badge" style="background-color: #e74c3c;">Hot Promo!</div>'; /* Changed text */
+            priceHTML = `
+                <span class="original-price">RM ${product.price.toFixed(2)}</span>
+                <span class="new-price" style="font-size: 1.2rem; color: var(--primary-color); display: block; margin-top: 5px;">Buy any 2 for RM 200.00</span>
+                <div style="font-size: 0.9rem; color: var(--accent-color); font-weight: bold; margin-top: 5px;"><i class="fa-solid fa-truck-fast"></i> FREE Shipping!</div>
+            `;
+            // Points are based on actual spend, calculated in cart, so display 0 here for these specific products on the product card.
+            points = 0; 
+            productClasses += ' promo-highlight'; // Keep the glowing effect
+        } else if (promoActive && product.promoPrice) {
+            // Standard 5% off promotion
+            badgeHTML = '<div class="featured-badge">Promo!</div>'; /* Re-added for standard promos */
+            priceHTML = `
+                <span class="original-price">RM ${product.price.toFixed(2)}</span>
+                <span class="new-price">RM ${product.promoPrice.toFixed(2)}</span>
+            `;
+            points = Math.floor(product.promoPrice);
+            productClasses += ' promo-highlight'; // Keep the glowing effect
+        } else {
+            // No active promotions, display retail price
+            priceHTML = `<span class="new-price">RM ${product.price.toFixed(2)}</span>`;
+            points = Math.floor(product.price);
+        }
         
         return `
-          <div class="product ${hasDiscount ? 'promo-highlight' : ''}">
-            ${hasDiscount ? '<div class="featured-badge">Promo!</div>' : ''}
+          <div class="${productClasses}">
+            ${badgeHTML}
             <div class="product-image-container"><img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/200x200?text=Image+Not+Found'"></div>
             <div class="product-info">
                 <h3>${product.name}</h3>
                 <div class="price-section">
-                    ${hasDiscount ? `<span class="original-price">RM ${product.price.toFixed(2)}</span><span class="new-price">RM ${finalPrice.toFixed(2)}</span>` : `<span class="new-price">RM ${finalPrice.toFixed(2)}</span>`}
+                    ${priceHTML}
                 </div>
                 <div class="benefits"><strong>Benefits:</strong> ${product.benefits}</div>
                 <div class="consumption"><strong>Usage:</strong> ${product.consumption}</div>
-                <div class="product-points"><i class="fa-solid fa-star"></i> Earn ${points} Points</div>
+                <div class="product-points">${points > 0 ? `<i class="fa-solid fa-star"></i> Earn ${points} Points` : ''}</div>
                 <div class="product-actions">
                     <button class="btn btn-primary" onclick="addToCart(${product.id})"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
                 </div>
@@ -774,8 +846,8 @@
         existingItem.quantity++;
       } else {
         const productData = products.find(p => p.id === productId);
-        const finalPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : productData.price;
-        cart.push({ id: productData.id, name: productData.name, price: finalPrice, quantity: 1 });
+        // Add to cart with its base 'price'. Promo logic applies in updateCartDisplay.
+        cart.push({ id: productData.id, name: productData.name, price: productData.price, quantity: 1 });
       }
       updateCartCount();
     }
@@ -800,13 +872,20 @@
         updateCartCount();
     }
 
-    function calculateShipping(cart, subtotal) {
+    // Function to calculate shipping fee with new logic
+    function calculateShipping(cart, subtotal, hasSpecialAloePromo) {
+        if (hasSpecialAloePromo) { 
+            return { fee: 0, message: "FREE" };
+        }
         if (subtotal >= 250) return { fee: 0, message: "FREE" };
         if (cart.length === 0) return { fee: 0, message: "RM 0.00" };
-        const baseShipping = 14.00, reductionPerItem = 0.30;
-        const finalFee = baseShipping * (1 - (reductionPerItem * (cart.length - 1)));
-        const calculatedFee = Math.max(0, finalFee);
-        return { fee: calculatedFee, message: `RM ${calculatedFee.toFixed(2)}` };
+        const baseShipping = 14.00;
+        // The logic implies a reduction FOR EACH ADDITIONAL item after the first.
+        // So, for 2 items, it's baseShipping * (1 - 0.30)
+        // For 3 items, it's baseShipping * (1 - (0.30 * 2)) = baseShipping * 0.40
+        // etc.
+        const calculatedFee = baseShipping * (1 - (0.30 * (cart.length - 1)));
+        return { fee: Math.max(0, calculatedFee), message: `RM ${Math.max(0, calculatedFee).toFixed(2)}` };
     }
     
     function updateCartDisplay() {
@@ -817,7 +896,7 @@
       const pointsEl = document.getElementById('points-earned-display');
       
       if (cart.length === 0) {
-        cartItemsEl.innerHTML = '<p>Your cart is empty</p>';
+        cartItemsEl.innerHTML = '<p>Your cart is empty.</p>';
         subtotalEl.textContent = 'RM 0.00';
         shippingEl.textContent = 'RM 0.00';
         totalEl.textContent = 'RM 0.00';
@@ -826,9 +905,22 @@
       }
       
       let itemsHTML = '';
-      const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-      
+      let calculatedSubtotal = 0;
+      let totalPoints = 0;
+
+      const aloeDrinkIds = [1, 2, 3];
+      let aloeDrinkCount = 0;
+      let otherItemsCost = 0;
+      let hasSpecialAloePromo = false; 
+
+      const aloeDrinkItemsInCart = cart.filter(item => aloeDrinkIds.includes(item.id));
+      const otherItemsInCart = cart.filter(item => !aloeDrinkIds.includes(item.id));
+
+      // Build HTML for cart items (display individual prices)
       cart.forEach(item => {
+        const productData = products.find(p => p.id === item.id);
+        let displayPrice = productData.price; // Always show original retail price in cart item list
+        
         itemsHTML += `
           <div class="cart-item">
             <div class="cart-item-details">
@@ -840,21 +932,59 @@
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 15px;">
-                <span>RM ${(item.price * item.quantity).toFixed(2)}</span>
+                <span>RM ${displayPrice.toFixed(2)} / pc</span>
                 <span class="remove-item-btn" onclick="removeItemFromCart(${item.id})">×</span>
             </div>
           </div>`;
       });
-      
-      const shipping = calculateShipping(cart, subtotal);
-      const total = subtotal + shipping.fee;
-      const points = Math.floor(subtotal);
 
-      cartItemsEl.innerHTML = itemsHTML;
-      subtotalEl.textContent = `RM ${subtotal.toFixed(2)}`;
+      // Calculate cost for special aloe drinks and add specific promo message
+      aloeDrinkItemsInCart.forEach(item => aloeDrinkCount += item.quantity);
+
+      let aloeDrinksAppliedCost = 0;
+      let aloePromoMessageHtml = '';
+      if (aloeDrinkCount > 0 && isPromoActive()) {
+          const numPairs = Math.floor(aloeDrinkCount / 2);
+          const remainingSingles = aloeDrinkCount % 2;
+          const aloeRetailPrice = products.find(p => p.id === 1).price; // Use any of the 3 aloe drinks' retail price
+          
+          aloeDrinksAppliedCost = (numPairs * 200) + (remainingSingles * aloeRetailPrice);
+          if (numPairs >= 1) { // If at least one pair is bought, trigger free shipping
+              hasSpecialAloePromo = true; 
+              aloePromoMessageHtml = `<div style="background-color: #f0f8ff; padding: 10px; border-radius: 8px; margin-top: 10px; text-align: center; border: 1px dashed var(--primary-color);">
+                <strong>Aloe Trio Special Applied:</strong> Buy any 2 for RM 200.00
+                <br><i class="fa-solid fa-truck-fast"></i> FREE Shipping on this bundle!
+                </div>`;
+          } else if (aloeDrinkCount === 1) {
+              aloeDrinksAppliedCost = aloeRetailPrice;
+              aloePromoMessageHtml = `<div style="background-color: #f0f8ff; padding: 10px; border-radius: 8px; margin-top: 10px; text-align: center; border: 1px dashed var(--primary-color);">
+                Add one more Aloe Trio product to get Buy 2 for RM 200.00 & FREE Shipping!
+                </div>`;
+          }
+      } else if (aloeDrinkCount > 0) {
+          // If promo not active, charge all at retail
+          const aloeRetailPrice = products.find(p => p.id === 1).price;
+          aloeDrinksAppliedCost = aloeDrinkCount * aloeRetailPrice;
+      }
+      
+      // Calculate cost for other products (with 5% discount if applicable)
+      otherItemsInCart.forEach(item => {
+          const productData = products.find(p => p.id === item.id);
+          const itemPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : productData.price;
+          otherItemsCost += itemPrice * item.quantity;
+      });
+
+      calculatedSubtotal = otherItemsCost + aloeDrinksAppliedCost;
+      totalPoints = Math.floor(calculatedSubtotal); // Points based on final subtotal after all promos
+
+      const shipping = calculateShipping(cart, calculatedSubtotal, hasSpecialAloePromo);
+      const total = calculatedSubtotal + shipping.fee;
+
+      cartItemsEl.innerHTML = itemsHTML + aloePromoMessageHtml; /* Append the promo message after individual items. */
+      subtotalEl.textContent = `RM ${calculatedSubtotal.toFixed(2)}`;
       shippingEl.textContent = shipping.message;
       totalEl.textContent = `RM ${total.toFixed(2)}`;
-      pointsEl.innerHTML = `<div class="points-earned"><i class="fa-solid fa-star"></i> Points to be Earned: ${points}</div>`;
+      pointsEl.innerHTML = `<div class="points-earned"><i class="fa-solid fa-star"></i> Points to be Earned: ${totalPoints}</div>`;
     }
 
     function updateCartCount() {
@@ -881,9 +1011,45 @@
             return;
         }
       
-        const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-        const shipping = calculateShipping(cart, subtotal);
-        const total = subtotal + shipping.fee;
+        // Re-calculate based on cart items for WhatsApp message and PDF
+        let calculatedSubtotal = 0;
+        let totalPoints = 0;
+        const aloeDrinkIds = [1, 2, 3];
+        let aloeDrinkCount = 0;
+        let otherItemsCost = 0;
+        let hasSpecialAloePromo = false;
+
+        const aloeDrinkItemsInCart = cart.filter(item => aloeDrinkIds.includes(item.id));
+        const otherItemsInCart = cart.filter(item => !aloeDrinkIds.includes(item.id));
+
+        aloeDrinkItemsInCart.forEach(item => aloeDrinkCount += item.quantity);
+
+        let aloeDrinksAppliedCost = 0;
+        if (aloeDrinkCount > 0 && isPromoActive()) {
+            const numPairs = Math.floor(aloeDrinkCount / 2);
+            const remainingSingles = aloeDrinkCount % 2;
+            const aloeRetailPrice = products.find(p => p.id === 1).price;
+            
+            aloeDrinksAppliedCost = (numPairs * 200) + (remainingSingles * aloeRetailPrice);
+            if (numPairs >= 1) {
+                hasSpecialAloePromo = true;
+            }
+        } else if (aloeDrinkCount > 0) {
+            const aloeRetailPrice = products.find(p => p.id === 1).price;
+            aloeDrinksAppliedCost = aloeDrinkCount * aloeRetailPrice;
+        }
+        
+        otherItemsInCart.forEach(item => {
+            const productData = products.find(p => p.id === item.id);
+            const itemPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : productData.price;
+            otherItemsCost += itemPrice * item.quantity;
+        });
+
+        calculatedSubtotal = otherItemsCost + aloeDrinksAppliedCost;
+        totalPoints = Math.floor(calculatedSubtotal);
+
+        const shipping = calculateShipping(cart, calculatedSubtotal, hasSpecialAloePromo);
+        const total = calculatedSubtotal + shipping.fee;
         const fullAddress = `${address1}, ${address2 ? address2 + ', ' : ''}${city}, ${postcode} ${state}`;
       
         const pendingOrder = {
@@ -891,17 +1057,41 @@
             customerPhone: phone,
             customerEmail: email,
             customerAddress: fullAddress,
-            cart: [...cart],
-            subtotal: subtotal,
+            cart: [...cart], // Store original cart items
+            calculatedSubtotal: calculatedSubtotal, // Store calculated values
             shipping: shipping,
-            totalAmount: total.toFixed(2)
+            totalAmount: total.toFixed(2),
+            totalPoints: totalPoints
         };
 
         sessionStorage.setItem('pendingOrder', JSON.stringify(pendingOrder));
 
         let message = `Hi, I would like to place an order:\n\n*Customer Details:*\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nAddress: ${fullAddress}\n\n--- ORDER DETAILS ---\n`;
-        cart.forEach(item => { message += `- ${item.name} (x${item.quantity}) - RM ${(item.price * item.quantity).toFixed(2)}\n`; });
-        message += `\n--- SUMMARY ---\nSubtotal: RM ${subtotal.toFixed(2)}\nShipping: ${shipping.message}\n*TOTAL: RM ${total.toFixed(2)}*\n`;
+        
+        // This part needs to reconstruct the item details for the WhatsApp message clearly
+        // Show how the promo was applied if applicable
+        aloeDrinkItemsInCart.forEach(item => {
+            message += `- ${item.name} (x${item.quantity}) @ RM ${products.find(p => p.id === item.id).price.toFixed(2)}/pc\n`;
+        });
+        otherItemsInCart.forEach(item => {
+            const productData = products.find(p => p.id === item.id);
+            const itemPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : productData.price;
+            message += `- ${item.name} (x${item.quantity}) @ RM ${itemPrice.toFixed(2)}/pc\n`;
+        });
+        
+        if (aloeDrinkCount > 0 && isPromoActive()) {
+            const numPairs = Math.floor(aloeDrinkCount / 2);
+            const remainingSingles = aloeDrinkCount % 2;
+            const aloeRetailPrice = products.find(p => p.id === 1).price;
+            if (numPairs > 0) {
+                message += `\n*Aloe Drinks Special:* ${numPairs * 2} items for RM ${numPairs * 200}.00\n`;
+            }
+            if (remainingSingles > 0) {
+                message += `*Remaining Aloe Drinks (Retail):* ${remainingSingles} items @ RM ${aloeRetailPrice.toFixed(2)}/pc\n`;
+            }
+        }
+        
+        message += `\n--- SUMMARY ---\nSubtotal: RM ${calculatedSubtotal.toFixed(2)}\nShipping: ${shipping.message}\n*TOTAL: RM ${total.toFixed(2)}*\n`;
         message += `\nPlease confirm my order. Thank you!`;
       
         window.open(`https://wa.me/601111033154?text=${encodeURIComponent(message)}`, '_blank');
@@ -940,8 +1130,43 @@
 
             if (validationResult.status === 'success' && validationResult.isValid) {
                 const orderNumber = `FL-${Date.now().toString().slice(-6)}`;
-                const totalPoints = Math.floor(pendingOrder.subtotal);
-                const itemsString = pendingOrder.cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
+                
+                // Construct items string with actual prices applied for recording
+                const aloeDrinkIds = [1, 2, 3];
+                let aloeDrinkCount = 0;
+                let itemsList = [];
+                const aloeDrinkItemsInCart = pendingOrder.cart.filter(item => aloeDrinkIds.includes(item.id));
+                const otherItemsInCart = pendingOrder.cart.filter(item => !aloeDrinkIds.includes(item.id));
+
+                // Process other items first
+                otherItemsInCart.forEach(item => {
+                    const productData = products.find(p => p.id === item.id);
+                    const itemPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : productData.price;
+                    itemsList.push(`${item.name} (x${item.quantity}) @ RM ${itemPrice.toFixed(2)}`);
+                });
+
+                // Process aloe drinks
+                aloeDrinkItemsInCart.forEach(item => aloeDrinkCount += item.quantity);
+                if (aloeDrinkCount > 0 && isPromoActive()) {
+                    const numPairs = Math.floor(aloeDrinkCount / 2);
+                    const remainingSingles = aloeDrinkCount % 2;
+                    const aloeRetailPrice = products.find(p => p.id === 1).price;
+                    
+                    if (numPairs > 0) {
+                        itemsList.push(`Aloe Drinks Special: ${numPairs * 2} items (any combination of Aloe Vera Gel, Berry Nectar, Peaches) for RM ${numPairs * 200}.00`);
+                    }
+                    if (remainingSingles > 0) {
+                        itemsList.push(`Remaining Aloe Drinks: ${remainingSingles} items @ RM ${aloeRetailPrice.toFixed(2)}/pc`);
+                    }
+                } else {
+                    aloeDrinkItemsInCart.forEach(item => {
+                        const productData = products.find(p => p.id === item.id);
+                        itemsList.push(`${item.name} (x${item.quantity}) @ RM ${productData.price.toFixed(2)}/pc`);
+                    });
+                }
+                
+                const itemsString = itemsList.join('; ');
+
 
                 const orderData = {
                     action: 'addOrder',
@@ -953,7 +1178,7 @@
                     customerAddress: pendingOrder.customerAddress,
                     items: itemsString,
                     totalAmount: pendingOrder.totalAmount,
-                    totalPoints: totalPoints,
+                    totalPoints: pendingOrder.totalPoints,
                     usedCode: codeInput
                 };
 
@@ -1006,14 +1231,38 @@
             return;
         }
 
-        const itemsHtml = orderDetails.cart.map(item => 
-            `<tr>
-                <td>${item.name}</td>
-                <td style="text-align: center;">${item.quantity}</td>
-                <td style="text-align: right;">${item.price.toFixed(2)}</td>
-                <td style="text-align: right;">${(item.price * item.quantity).toFixed(2)}</td>
-            </tr>`
-        ).join('');
+        // Reconstruct items HTML for email, similar to WhatsApp message logic
+        const aloeDrinkIds = [1, 2, 3];
+        let emailItemsHtml = '';
+        let aloeDrinkCount = 0;
+        const aloeDrinkItemsInCart = orderDetails.cart.filter(item => aloeDrinkIds.includes(item.id));
+        const otherItemsInCart = orderDetails.cart.filter(item => !aloeDrinkIds.includes(item.id));
+
+        otherItemsInCart.forEach(item => {
+            const productData = products.find(p => p.id === item.id);
+            const itemPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : productData.price;
+            emailItemsHtml += `<tr><td>${item.name}</td><td style="text-align: center;">${item.quantity}</td><td style="text-align: right;">${itemPrice.toFixed(2)}</td><td style="text-align: right;">${(itemPrice * item.quantity).toFixed(2)}</td></tr>`;
+        });
+
+        aloeDrinkItemsInCart.forEach(item => aloeDrinkCount += item.quantity);
+        if (aloeDrinkCount > 0 && isPromoActive()) {
+            const numPairs = Math.floor(aloeDrinkCount / 2);
+            const remainingSingles = aloeDrinkCount % 2;
+            const aloeRetailPrice = products.find(p => p.id === 1).price;
+
+            if (numPairs > 0) {
+                emailItemsHtml += `<tr><td><em>Aloe Drinks Special (Any 2 for RM 200.00)</em></td><td style="text-align: center;">${numPairs * 2}</td><td style="text-align: right;">100.00 (avg)</td><td style="text-align: right;">${(numPairs * 200).toFixed(2)}</td></tr>`;
+            }
+            if (remainingSingles > 0) {
+                emailItemsHtml += `<tr><td><em>Remaining Aloe Drinks (Retail)</em></td><td style="text-align: center;">${remainingSingles}</td><td style="text-align: right;">${aloeRetailPrice.toFixed(2)}</td><td style="text-align: right;">${(remainingSingles * aloeRetailPrice).toFixed(2)}</td></tr>`;
+            }
+        } else {
+            aloeDrinkItemsInCart.forEach(item => {
+                const productData = products.find(p => p.id === item.id);
+                emailItemsHtml += `<tr><td>${item.name}</td><td style="text-align: center;">${item.quantity}</td><td style="text-align: right;">${productData.price.toFixed(2)}</td><td style="text-align: right;">${(productData.price * item.quantity).toFixed(2)}</td></tr>`;
+            });
+        }
+
 
         const templateParams = {
             to_email: 'arvin8786@gmail.com', // This should likely be the owner's email
@@ -1022,11 +1271,11 @@
             customer_phone: orderDetails.customerPhone,
             customer_email: orderDetails.customerEmail,
             customer_address: orderDetails.customerAddress,
-            items_html: itemsHtml,
-            subtotal: orderDetails.subtotal.toFixed(2),
+            items_html: emailItemsHtml,
+            subtotal: orderDetails.calculatedSubtotal.toFixed(2), // Use calculated subtotal
             shipping: orderDetails.shipping.message,
             total_amount: orderDetails.totalAmount,
-            total_points: totalPoints,
+            total_points: orderDetails.totalPoints,
             personal_access_code: newPAC ? `Your new Personal Access Code is: ${newPAC}` : 'Your Personal Access Code remains the same.'
         };
 
@@ -1076,10 +1325,38 @@
         const tableColumn = ["Item Description", "Quantity", "Unit Price (RM)", "Total (RM)"];
         const tableRows = [];
 
-        orderDetails.cart.forEach(item => {
-            const itemData = [ item.name, item.quantity, item.price.toFixed(2), (item.price * item.quantity).toFixed(2) ];
-            tableRows.push(itemData);
+        // Logic to format table rows based on promo applied
+        const aloeDrinkIds = [1, 2, 3];
+        let aloeDrinkCount = 0;
+        const aloeDrinkItemsInCart = orderDetails.cart.filter(item => aloeDrinkIds.includes(item.id));
+        const otherItemsInCart = orderDetails.cart.filter(item => !aloeDrinkIds.includes(item.id));
+
+        otherItemsInCart.forEach(item => {
+            const productData = products.find(p => p.id === item.id);
+            const itemPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : productData.price;
+            tableRows.push([ item.name, item.quantity, itemPrice.toFixed(2), (itemPrice * item.quantity).toFixed(2) ]);
         });
+
+        aloeDrinkItemsInCart.forEach(item => aloeDrinkCount += item.quantity);
+        if (aloeDrinkCount > 0 && isPromoActive()) {
+            const numPairs = Math.floor(aloeDrinkCount / 2);
+            const remainingSingles = aloeDrinkCount % 2;
+            const aloeRetailPrice = products.find(p => p.id === 1).price;
+
+            if (numPairs > 0) {
+                tableRows.push([`Aloe Drinks Special (Any 2 for RM 200.00)`, numPairs * 2, `100.00 (avg)`, (numPairs * 200).toFixed(2)]);
+            }
+            if (remainingSingles > 0) {
+                // For PDF, it's simpler to just add a generic line for remaining singles
+                tableRows.push([`Remaining Aloe Drinks (Retail)`, remainingSingles, aloeRetailPrice.toFixed(2), (remainingSingles * aloeRetailPrice).toFixed(2)]);
+            }
+        } else {
+            aloeDrinkItemsInCart.forEach(item => {
+                const productData = products.find(p => p.id === item.id);
+                tableRows.push([ item.name, item.quantity, productData.price.toFixed(2), (productData.price * item.quantity).toFixed(2) ]);
+            });
+        }
+
 
         doc.autoTable({
             head: [tableColumn],
@@ -1092,12 +1369,13 @@
         let finalY = doc.lastAutoTable.finalY || 115;
         
         doc.setFontSize(12);
-        doc.text(`Subtotal: RM ${orderDetails.subtotal.toFixed(2)}`, 14, finalY + 10);
+        // Use the calculated values from pendingOrder which already accounted for promos
+        doc.text(`Subtotal: RM ${orderDetails.calculatedSubtotal.toFixed(2)}`, 14, finalY + 10);
         doc.text(`Shipping: ${orderDetails.shipping.message}`, 14, finalY + 17);
         doc.setFontSize(14);
         doc.setFont(undefined, 'bold');
         doc.text(`Total Amount: RM ${orderDetails.totalAmount}`, 14, finalY + 27);
-        doc.text(`Total Accumulated Points: ${totalPoints}`, 14, finalY + 34);
+        doc.text(`Total Accumulated Points: ${orderDetails.totalPoints}`, 14, finalY + 34);
         
         doc.setFont(undefined, 'normal');
         doc.setFontSize(10);
@@ -1168,6 +1446,20 @@
         }
     }
 
+    // New: Functions for the Promo Pop-up
+    function showPromoPopup() {
+        const promoPopupModal = document.getElementById('promo-popup-modal');
+        // Check sessionStorage to only show once per session
+        if (!sessionStorage.getItem('promoPopupShown')) {
+            promoPopupModal.style.display = 'flex';
+            sessionStorage.setItem('promoPopupShown', 'true');
+        }
+    }
+
+    function closePromoPopup() {
+        document.getElementById('promo-popup-modal').style.display = 'none';
+    }
+
     // Initialize the page
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -1176,8 +1468,11 @@
           document.body.classList.add('grand-opening-active');
           startCountdown();
           createConfetti();
+          showPromoPopup(); // Call the function to display the pop-up
       } else {
           document.getElementById('promo-details').innerHTML = '<div class="promo-period">Our Grand Opening promotion has ended.</div>';
+          // Hide banner if promo is not active
+          document.getElementById('promo-running-banner').style.display = 'none';
       }
 
       renderProducts();
@@ -1188,10 +1483,6 @@
           showTab('products');
       }
     });
-
-    // REWARDS PORTAL JS (NO LONGER NEEDED FOR THE NEW "MY FOREVER LIVING" TAB, BUT KEPT FOR REFERENCE)
-    // Removed or commented out login(), forgotPAC(), logout(), renderRedeemableRewards(), etc.
-    // as the tab's content is now a static "Coming Soon" message.
   </script>
 </body>
 </html>
