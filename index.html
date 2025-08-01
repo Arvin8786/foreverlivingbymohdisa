@@ -1,72 +1,1658 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forever Business - Maintenance Notice</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-        .maintenance-container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 90%;
-        }
-        .logo {
-            max-width: 150px;
-            margin-bottom: 20px;
-        }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-        p {
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-        .highlight {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        .contact {
-            margin-top: 30px;
-            font-style: italic;
-            color: #7f8c8d;
-        }
-        a {
-            color: #3498db;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forever Living by Mohd Arvind Isa - Grand Opening Special</title>
+  
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- jsPDF Library for PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- EmailJS Library for Sending Emails -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+  <style>
+    :root {
+      --primary-color: #1a5276;
+      --secondary-color: #f39c12;
+      --accent-color: #27ae60;
+      --light-gray: #f4f6f8;
+      --dark-text: #333;
+      --light-text: #fff;
+      --border-radius: 12px;
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      --font-family: 'Poppins', sans-serif;
+    }
+
+    /* --- Keyframes for Animations --- */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes promoGlow {
+      0% { box-shadow: 0 0 5px rgba(243, 156, 18, 0.6); }
+      50% { box-shadow: 0 0 20px rgba(243, 156, 18, 0.9); }
+      100% { box-shadow: 0 0 5px rgba(243, 156, 18, 0.6); }
+    }
+    @keyframes confetti-fall {
+        0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+    @keyframes marquee {
+        0%   { transform: translateX(0%); }
+        100% { transform: translateX(-100%); }
+    }
+
+    /* --- Base Styles --- */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: var(--font-family);
+      margin: 0;
+      padding: 0;
+      background-color: var(--light-gray);
+      color: var(--dark-text);
+      overflow-x: hidden;
+      line-height: 1.6;
+      padding-top: 45px; /* Estimated height of the running banner */
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    h1, h2, h3, h4 { color: var(--primary-color); font-weight: 600; }
+
+    /* --- Grand Opening Theme --- */
+    body.grand-opening-active {
+        background: linear-gradient(45deg, #fff1e7, #e6f7ff);
+    }
+    .grand-opening-active .hero-section {
+        border: 4px dashed var(--secondary-color);
+    }
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 15px;
+        opacity: 0.8;
+        animation: confetti-fall 5s linear infinite;
+        z-index: 9999;
+        pointer-events: none;
+    }
+    #countdown-timer {
+        background-color: rgba(0,0,0,0.2);
+        padding: 15px 30px;
+        border-radius: 50px;
+        margin-top: 20px;
+        display: inline-block;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #fff;
+        border: 2px solid #fff;
+    }
+
+    /* --- Header & Navigation --- */
+    header {
+      background-color: var(--light-text);
+      padding: 20px 0;
+      text-align: center; /* Ensures the content inside is centered */
+      border-bottom: 1px solid #e0e0e0;
+      position: relative;
+    }
+    .header-content {
+        display: flex; /* Re-added flex for centering children */
+        align-items: center; /* Vertically align items */
+        justify-content: center; /* Horizontally center items */
+        gap: 20px; /* Space between logo and h1 */
+    }
+    .header-logo {
+        width: 80px;
+        height: 80px;
+    }
+    .header-content h1 {
+        margin: 0; /* Remove default margin for better control */
+    }
+    .header-content h1 span {
+        display: block; /* Ensure tagline is on its own line */
+    }
+
+    /* Updated: Promo Running Banner */
+    #promo-running-banner {
+      background-color: var(--secondary-color); /* Orange/Yellow */
+      color: var(--light-text);
+      padding: 10px 0;
+      text-align: center; 
+      font-weight: 700;
+      font-size: 1.1rem;
+      position: fixed; /* Fixed at the top */
+      top: 0;
+      left: 0;
+      width: 100%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 101; /* Ensure it's on top of everything */
+      overflow: hidden; /* Crucial for marquee effect */
+      white-space: nowrap; /* Keep text on one line */
+    }
+    #promo-running-banner .marquee-content {
+        display: inline-block;
+        padding-left: 100%; /* Start off-screen */
+        animation: marquee 20s linear infinite; /* Re-enabled marquee effect */
+    }
+
+    nav {
+      background-color: var(--primary-color);
+      position: sticky;
+      top: 45px; /* Based on estimated height of #promo-running-banner */
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    nav ul { display: flex; list-style: none; padding: 10px 0; margin: 0; justify-content: center; flex-wrap: wrap; }
+    nav a { color: var(--light-text); text-decoration: none; font-weight: 600; padding: 10px 20px; display: inline-block; position: relative; transition: color 0.3s; cursor: pointer; }
+    nav a::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 0; height: 2px; background-color: var(--secondary-color); transition: width 0.3s; }
+    nav a:hover { color: #f1c40f; }
+    nav a:hover::after { width: 60%; }
+
+    /* --- Tab Content & Hero --- */
+    .tab-content { display: none; padding: 20px 0; }
+    .tab-content.active { display: block; animation: fadeIn 0.5s; }
+    .hero-section {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: var(--light-text);
+      padding: 60px 20px;
+      text-align: center;
+      border-radius: var(--border-radius);
+      margin-bottom: 30px;
+    }
+    .hero-section h2 { color: var(--light-text); }
+    .hero-section .promo-period {
+        background-color: rgba(255, 255, 255, 0.15);
+        padding: 10px 20px;
+        border-radius: 50px;
+        display: inline-block;
+        font-weight: 600;
+    }
+
+    /* --- Search & AI Suggestion --- */
+    .search-container { margin-bottom: 30px; position: relative; }
+    #product-search { width: 100%; padding: 15px 50px 15px 25px; border: 2px solid #ddd; border-radius: 50px; font-size: 1rem; outline: none; transition: all 0.3s; }
+    #product-search:focus { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(26, 82, 118, 0.2); }
+    .search-icon { position: absolute; right: 25px; top: 50%; transform: translateY(-50%); color: var(--primary-color); font-size: 1.2rem; }
+    .ai-suggestion-box { background: var(--light-text); padding: 30px; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 30px; text-align: center; }
+    #symptom-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin: 10px 0; }
+    #suggest-btn { background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: var(--light-text); border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: all 0.3s; margin-top: 10px; }
+    #suggest-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    #suggestion-result { margin-top: 20px; text-align: left; }
+    .suggestion-product { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent-color); }
+
+    /* --- Product List & Cards --- */
+    .product-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+    .product {
+      background: var(--light-text);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.3s ease;
+      overflow: hidden; /* Important for containing the image, but badge needs careful positioning */
+    }
+    .product:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.12); }
+    .product.promo-highlight { animation: promoGlow 2.5s infinite ease-in-out; }
+    .product-image-container { height: 220px; padding: 15px; display: flex; align-items: center; justify-content: center; }
+    .product img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; text-align: left; }
+    .product h3 { margin: 0 0 10px; font-size: 1.25rem; height: 3.75rem; overflow: hidden; }
+    .product .benefits { font-size: 0.85rem; color: #555; margin: 10px 0; flex-grow: 1; }
+    .product .consumption { font-size: 0.85rem; color: var(--primary-color); font-style: italic; margin: 10px 0; }
+    .price-section { margin: 15px 0; text-align: center; }
+    .original-price { text-decoration: line-through; color: #999; font-size: 1rem; margin-right: 10px; }
+    .new-price { color: var(--secondary-color); font-weight: bold; font-size: 1.5rem; }
+    .product-points { font-size: 0.9rem; font-weight: 600; color: var(--accent-color); text-align: center; margin-top: 10px; }
+    .product-actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+    .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        width: 100%; padding: 12px 15px; border-radius: 50px; text-decoration: none;
+        font-weight: bold; border: none; cursor: pointer; transition: all 0.3s;
+    }
+    .btn:disabled { background-color: #ccc; cursor: not-allowed; }
+    .btn-primary { background: var(--primary-color); color: var(--light-text); }
+    .btn-primary:hover { background: #123e5a; transform: scale(1.05); }
+    .btn-secondary { background: var(--light-gray); color: var(--primary-color); border: 1px solid var(--primary-color); }
+    .btn-secondary:hover { background: #e0e0e0; }
+    
+    /* Adjusted Featured Badge CSS for better visibility */
+    .featured-badge {
+      position: absolute; 
+      top: 0; /* Position from top edge */
+      right: 0; /* Position from right edge */
+      background: var(--secondary-color);
+      color: white; 
+      padding: 5px 25px; /* Padding for text inside the badge */
+      transform: rotate(45deg) translate(25%, -65%); /* Rotates 45deg, then moves by percentage of its own size to position outside the corner */
+      transform-origin: 0% 0%; /* Rotate around top-left of the badge's transformed box */
+      font-weight: bold; 
+      font-size: 0.9rem; 
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      z-index: 10; /* Ensure it stays on top of content */
+      white-space: nowrap; /* Prevent text wrapping inside the badge */
+    }
+
+    /* --- Program & Business Sections --- */
+    .program-section { background: var(--light-text); padding: 40px; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 30px; }
+    .program-section h2 { font-size: 2.5rem; text-align: center; }
+    .cta-button { display: block; width: fit-content; margin: 30px auto; background: linear-gradient(135deg, var(--secondary-color), #e67e22); color: var(--light-text); text-align: center; padding: 15px 40px; border-radius: 50px; font-weight: bold; text-decoration: none; font-size: 1.2rem; transition: all 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    .cta-button:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+
+    /* --- Rewards Section --- */
+    .rewards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+    .reward-item { 
+        background: var(--light-gray); 
+        border: 1px solid #ddd; 
+        border-radius: var(--border-radius); 
+        padding: 20px; 
+        text-align: center; 
+        display: flex; 
+        flex-direction: column;
+        position: relative; /* Needed for the overlay */
+    }
+    .reward-item img { max-width: 100%; height: 100px; object-fit: contain; margin-bottom: 15px; border-radius: 8px; }
+    .reward-item h4 { margin: 10px 0 5px; }
+    .reward-item .points-cost { font-weight: bold; color: var(--accent-color); margin-bottom: 15px; }
+    .coming-soon-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.8);
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border-radius: var(--border-radius);
+        backdrop-filter: blur(2px);
+    }
+
+    /* --- Floating Cart Button --- */
+    .floating-cart-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: var(--primary-color);
+        color: var(--light-text);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        cursor: pointer;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+    }
+    .floating-cart-btn:hover { transform: scale(1.1); }
+    #cart-count {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        background-color: var(--secondary-color);
+        color: var(--light-text);
+        border-radius: 50%;
+        padding: 3px 8px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        border: 2px solid var(--light-text);
+    }
+
+    /* --- Modal & Cart Styles --- */
+    .modal {
+      display: none; position: fixed; z-index: 1001; left: 0; top: 0;
+      width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);
+      align-items: center; justify-content: center; animation: fadeIn 0.4s ease;
+    }
+    .modal-content {
+      background-color: #fefefe; padding: 30px; border-radius: var(--border-radius);
+      width: 90%; max-width: 600px; /* Default max-width for modals */
+      animation: slideIn 0.4s ease;
+      max-height: 90vh; /* Set max height */
+      overflow-y: auto; /* Enable scrolling */
+    }
+    /* Specific adjustment for the promo pop-up modal content */
+    #promo-popup-modal .modal-content {
+      max-width: 550px; /* Adjusted to make it smaller */
+      padding: 15px; /* Keep padding light for image */
+    }
+    .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.3s; }
+    .close:hover { color: black; }
+    #cart-items { max-height: 250px; overflow-y: auto; padding-right: 10px; border-bottom: 1px solid #eee; margin-bottom: 15px; }
+    .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
+    .cart-item-details { flex-grow: 1; }
+    .quantity-controls { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+    .quantity-btn {
+        width: 28px; height: 28px; background: var(--light-gray); border: 1px solid #ccc;
+        border-radius: 50%; cursor: pointer; font-weight: bold;
+    }
+    .quantity-display { font-weight: 600; min-width: 20px; text-align: center; }
+    .remove-item-btn { font-size: 1.2rem; color: #cc0000; cursor: pointer; margin-left: 15px; }
+    .cart-summary { margin-top: 20px; font-size: 1.1rem; }
+    .summary-line { display: flex; justify-content: space-between; padding: 8px 0; }
+    .summary-line.total { font-weight: bold; font-size: 1.3rem; border-top: 2px solid #333; margin-top: 10px; }
+    .points-earned {
+        background-color: #e0f2f1; color: var(--accent-color); padding: 10px;
+        border-radius: 8px; text-align: center; margin-top: 15px; font-weight: bold;
+    }
+    .free-shipping-promo {
+        background-color: #e0f2f1; color: var(--accent-color); padding: 10px;
+        border-radius: 8px; text-align: center; margin-top: 20px; font-weight: bold;
+    }
+    .checkout-btn { width: 100%; margin-top: 15px; }
+    #verification-section {
+        margin-top: 20px;
+        padding: 20px;
+        background-color: var(--light-gray);
+        border-radius: var(--border-radius);
+        text-align: center;
+    }
+    #verification-section input {
+        width: 100%;
+        padding: 12px;
+        margin: 15px 0;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+    .customer-info-form input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    
+    /* --- My Forever Living Section Styles --- */
+    .my-forever-living-container {
+        background: white;
+        padding: 50px; /* Increased padding for more space */
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        text-align: center;
+        min-height: 400px; /* Ensure it takes up some space */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .my-forever-living-container h2 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+    }
+    .my-forever-living-container p {
+        font-size: 1.2rem;
+        color: #555;
+        max-width: 600px;
+        margin: 0 auto 30px;
+    }
+    .my-forever-living-container .fa-star,
+    .my-forever-living-container .fa-gears,
+    .my-forever-living-container .fa-heart-pulse {
+        font-size: 4rem; /* Larger icons */
+        color: var(--secondary-color);
+        margin: 15px;
+    }
+    .my-forever-living-container .icon-row {
+        margin-top: 30px;
+        display: flex;
+        gap: 40px;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    /* --- Footer & Disclaimer --- */
+    footer { background: var(--primary-color); color: var(--light-text); padding: 40px 20px; text-align: center; margin-top: 30px; }
+    .disclaimer {
+        margin-top: 10px;
+        background-color: #fff3cd;
+        color: #856404;
+        padding: 15px;
+        border-top: 1px solid #ffeeba;
+    }
+  </style>
 </head>
 <body>
-    <div class="maintenance-container">
-        <img src="FL.jpg" alt="Forever Business Logo" class="logo">
-        <h1>Website Maintenance in Progress</h1>
-        <p>We're currently performing scheduled maintenance to improve your experience.</p>
-        <p>Our website will be temporarily unavailable during this time.</p>
-        <p class="highlight">We expect to be back online soon. Thank you for your patience!</p>
-        <div class="contact">
-            <p>For urgent inquiries, please contact us at:<br>
-            <a href="mailto:cs.foreverlivingbymuhdarvindisa@gmail.com">cs.foreverlivingbymuhdarvindisa@gmail.com</a></p>
+
+<div id="store-wrapper">
+  <header>
+    <div class="container">
+        <div class="header-content">
+            <img src="FL.jpg" alt="Business Logo" class="header-logo" onerror="this.style.display='none'">
+            <h1>
+              FOREVER LIVING by Mohd Arvind Isa
+              <span style="font-size: 1rem; color: #555; display: block; font-weight: 400;">Quality Wellness Products</span>
+            </h1>
         </div>
     </div>
+  </header>
+
+  <!-- Updated: Promo Running Banner -->
+  <div id="promo-running-banner">
+      <div class="marquee-content">
+          ✨ Hot Promo on Aloe Vera Gel, Aloe Berry Nectar, Aloe Bits N' Peaches! Buy Any 2 for RM 200 + FREE Shipping! ✨ 
+          🎉 Plus, enjoy 5% off on ALL other products! 🎉
+      </div>
+  </div>
+
+  <nav>
+    <div class="container">
+        <ul id="main-nav">
+          <li><a onclick="showTab('products')">Products</a></li>
+          <li><a onclick="showTab('business')">Business Opportunity</a></li>
+          <li><a onclick="showTab('rewards')">Rewards</a></li>
+          <li><a onclick="showTab('rewards-portal')">My Forever Living</a></li><!-- Renamed link -->
+        </ul>
+    </div>
+  </nav>
+
+  <main id="main-content" class="container">
+    <div id="products" class="tab-content active">
+      <section class="hero-section">
+        <h2><i class="fa-solid fa-gift"></i> GRAND OPENING SPECIAL</h2>
+        <p>Enjoy special promotional prices on all our products!</p>
+        <div id="promo-details">
+            <div class="promo-period">
+                Promotion Ends: 2 August 2025
+            </div>
+            <div id="countdown-timer"></div>
+        </div>
+      </section>
+
+      <section class="ai-suggestion-box">
+        <h3><i class="fa-solid fa-robot"></i> AI Product Suggester</h3>
+        <p>Describe your health concern (e.g., "dry skin", "low energy", "joint pain") and our AI will suggest a product for you.</p>
+        <input type="text" id="symptom-input" placeholder="Enter your symptom or concern...">
+        <button id="suggest-btn" onclick="suggestProduct()">Get Suggestion</button>
+        <div id="suggestion-result"></div>
+      </section>
+
+      <div class="search-container">
+        <input type="text" id="product-search" onkeyup="filterProducts()" placeholder="Search for products by name...">
+        <i class="fa-solid fa-search search-icon"></i>
+      </div>
+
+      <div id="product-list" class="product-list"></div>
+    </div>
+
+    <div id="business" class="tab-content">
+      <section class="program-section">
+        <h2>Build Your Forever Business</h2>
+        <p style="text-align: center; max-width: 700px; margin: 0 auto 30px;">Join a community of entrepreneurs and build a business that offers financial freedom and a healthier lifestyle. With Forever Living, you get a proven business model, world-class products, and unparalleled support.</p>
+        <a href="https://wa.me/601111033154?text=Hi,%20I'm%20interested%20in%20the%20Forever%20Living%20business%20opportunity." class="cta-button" target="_blank">Learn More & Get Started</a>
+      </section>
+    </div>
+
+    <div id="rewards" class="tab-content">
+        <section class="program-section">
+            <h2><i class="fa-solid fa-award"></i> Redeem Your Points</h2>
+            <p style="text-align: center;">Log in to the "My Forever Living" portal to view your points balance and redeem rewards.</p>
+            <div class="rewards-grid">
+                <div class="reward-item">
+                    <img src="rm5.jpg" alt="RM 5 Voucher" onerror="this.src='https://i.imgur.com/O9yP2aH.png'">
+                    <h4>RM 5 Voucher</h4>
+                    <p class="points-cost">500 Points</p>
+                </div>
+                <div class="reward-item">
+                    <img src="rm10.jpg" alt="RM 10 Voucher" onerror="this.src='https://i.imgur.com/sY2a2qG.png'">
+                    <h4>RM 10 Voucher</h4>
+                    <p class="points-cost">1000 Points</p>
+                </div>
+                <div class="reward-item">
+                    <img src="rm20.jpg" alt="RM 20 Voucher" onerror="this.src='https://i.imgur.com/Jz4Y8fW.png'">
+                    <h4>RM 20 Voucher</h4>
+                    <p class="points-cost">2000 Points</p>
+                </div>
+                <div class="reward-item">
+                    <img src="aloe-vera-gel.jpg" alt="Aloe Vera Gel">
+                    <h4>ALOE VERA GEL</h4>
+                    <p class="points-cost"><span style="text-decoration: line-through; color: #999; font-weight: normal;">11700</span> 10000 Points</p>
+                    <div class="coming-soon-overlay"><span>Coming Soon</span></div>
+                </div>
+                <div class="reward-item">
+                    <img src="aloe-berry-nectar.jpg" alt="Aloe Berry Nectar">
+                    <h4>ALOE BERRY NECTAR</h4>
+                    <p class="points-cost"><span style="text-decoration: line-through; color: #999; font-weight: normal;">11700</span> 10000 Points</p>
+                    <div class="coming-soon-overlay"><span>Coming Soon</span></div>
+                </div>
+                <div class="reward-item">
+                    <img src="aloe-peaches.jpg" alt="Aloe Bits N' Peaches">
+                    <h4>ALOE BITS N' PEACHES</h4>
+                    <p class="points-cost"><span style="text-decoration: line-through; color: #999; font-weight: normal;">11700</span> 10000 Points</p>
+                    <div class="coming-soon-overlay"><span>Coming Soon</span></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="rewards-portal" class="tab-content">
+        <!-- New content for "My Forever Living" -->
+        <div class="my-forever-living-container">
+            <h2><i class="fa-solid fa-star"></i> My Forever Living <i class="fa-solid fa-heart-pulse"></i></h2>
+            <p>
+                Get ready for an enhanced experience! We are working tirelessly to bring you exciting new features
+                to help you manage your wellness journey and Forever Living business.
+            </p>
+            <div class="icon-row">
+                <i class="fa-solid fa-calendar-alt"></i> <!-- Calendar for events/webinars -->
+                <i class="fa-solid fa-chart-line"></i> <!-- Chart for business analytics -->
+                <i class="fa-solid fa-users"></i> <!-- Users for community features -->
+                <i class="fa-solid fa-book-open"></i> <!-- Book for learning resources -->
+            </div>
+            <p style="margin-top: 30px; font-weight: bold; color: var(--accent-color);">
+                Stay tuned for updates! Exciting features are coming soon.
+            </p>
+        </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© 2025 Forever Living by Mohd Arvind Isa. All rights reserved.</p>
+      <div class="timestamp">Last updated: <span id="current-date"></span></div>
+      <section class="disclaimer">
+        <strong>Disclaimer:</strong> This website is operated by an independent Forever Business Owner. The products shown are not intended to diagnose, treat, cure, or prevent any specific disease or class of diseases. You should consult your family physician if you are experiencing a medical problem. Statements and information provided on this site are for informational purposes only and are not not intended to substitute for advice from your physician or other health care professional.
+      </section>
+    </div>
+  </footer>
+</div>
+
+  <!-- Floating Cart Button -->
+  <div id="floating-cart" class="floating-cart-btn" onclick="toggleCart()">
+    <i class="fa-solid fa-cart-shopping"></i>
+    <span id="cart-count">0</span>
+  </div>
+
+  <!-- Cart Modal -->
+  <div id="cart-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="toggleCart(true)">×</span>
+      
+      <div id="cart-view">
+        <h2>Your Shopping Cart</h2>
+        <div id="cart-items"><p>Your cart is currently empty.</p></div>
+        <div class="cart-summary">
+          <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+          <div class="summary-line"><span>Shipping</span><span id="cart-shipping">RM 0.00</span></div>
+          <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
+          <div id="points-earned-display"></div>
+        </div>
+        <div class="customer-info-form">
+          <h3 style="margin-top: 20px;">Customer & Shipping Information</h3>
+          <input type="text" id="customer-name" placeholder="Your Full Name" required>
+          <input type="tel" id="customer-phone" placeholder="Your WhatsApp Number" required>
+          <input type="email" id="customer-email" placeholder="Your Email Address (for receipt)" required>
+          <input type="text" id="customer-address1" placeholder="Address Line 1" required>
+          <input type="text" id="customer-address2" placeholder="Address Line 2 (Optional)">
+          <input type="text" id="customer-city" placeholder="City" required>
+          <input type="text" id="customer-state" placeholder="State" required>
+          <input type="text" id="customer-postcode" placeholder="Postcode" required>
+          <button class="btn btn-primary checkout-btn" onclick="initiateCheckout()">Complete Order via WhatsApp</button>
+        </div>
+        <div class="free-shipping-promo">🚚 FREE NATIONWIDE DELIVERY for orders RM 250 and above!</div>
+      </div>
+
+      <div id="verification-view" style="display: none;">
+        <h2>Verify Your Purchase</h2>
+        <p>After completing your payment via WhatsApp, you will receive a verification code from us.</p>
+        <div id="verification-section">
+            <p>Please enter the code below to confirm your order. A PDF receipt will be generated and an email copy sent to the owner.</p>
+            <input type="text" id="verification-code" placeholder="Enter Verification Code">
+            <button class="btn btn-primary" id="verify-btn" onclick="verifyPurchase()">Verify & Generate Receipt</button>
+            <p id="verification-status" style="margin-top: 15px; font-weight: bold;"></p>
+        </div>
+        <button class="btn btn-secondary" style="margin-top: 20px;" onclick="toggleCart(true)">Cancel Verification</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- New: Promo Pop-up Modal -->
+  <div id="promo-popup-modal" class="modal">
+    <div class="modal-content" style="max-width: 550px; padding: 15px;">
+      <span class="close" onclick="closePromoPopup()">×</span>
+      <img src="promo.jpg" alt="Special Aloe Trio Offer" style="max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px;">
+    </div>
+  </div>
+
+  <script>
+    // --- DATA ---
+    const products = [
+        { id: 1, name: "ALOE VERA GEL", price: 116.79, specialPromo: 'buy2for200', image: "aloe-vera-gel.jpg", benefits: "Supports digestion, boosts immunity.", consumption: "Take 30-60ml daily." },
+        { id: 2, name: "ALOE BERRY NECTAR", price: 116.79, specialPromo: 'buy2for200', image: "aloe-berry-nectar.jpg", benefits: "Antioxidant support, immune system booster.", consumption: "30-60ml daily." },
+        { id: 3, name: "ALOE BITS N' PEACHES", price: 116.79, specialPromo: 'buy2for200', image: "aloe-peaches.jpg", benefits: "Digestive health, vitamin C source.", consumption: "30-60ml daily." },
+        { id: 4, name: "LITE VANILLA", price: 155.72, promoPrice: 147.93, image: "lite-vanilla.jpg", benefits: "Meal replacement for weight management.", consumption: "Mix with milk or water." },
+        { id: 5, name: "LITE CHOCO", price: 155.72, promoPrice: 147.93, image: "lite-choco.jpg", benefits: "Meal replacement for weight management.", consumption: "Mix with milk or water." },
+        { id: 6, name: "SUPERGREENS", price: 214.71, promoPrice: 203.97, image: "supergreens.jpg", benefits: "Rich in antioxidants and nutrients. Detoxification.", consumption: "Mix with water or juice." },
+        { id: 7, name: "FIBER", price: 124.44, promoPrice: 118.22, image: "fiber.jpg", benefits: "Supports digestive health.", consumption: "Mix with water." },
+        { id: 8, name: "TONGKAT ALI", price: 19.90, promoPrice: 19.57, image: "tongkat-ali.jpg", benefits: "Supports men's health and vitality.", consumption: "As per packaging." },
+        { id: 9, name: "WHITE COFFEE", price: 15.99, promoPrice: 15.72, image: "white-coffee.jpg", benefits: "Rich and aromatic coffee.", consumption: "Mix with hot water." },
+        { id: 10, name: "CHOCOLATE MALT DRINK", price: 27.90, promoPrice: 27.20, image: "choco-malt.jpg", benefits: "Nutritious chocolate malt drink.", consumption: "Mix with hot water or milk." },
+        { id: 11, name: "TEH TARIK HALIA", price: 25.90, promoPrice: 25.25, image: "teh-tarik.jpg", benefits: "Ginger tea for warmth and digestion.", consumption: "Mix with hot water." },
+        { id: 12, name: "BEE HONEY", price: 132.57, promoPrice: 125.94, image: "bee-honey.jpg", benefits: "Natural energy and soothes throat.", consumption: "1-2 teaspoons daily." },
+        { id: 13, name: "BEE POLLEN", price: 75.50, promoPrice: 71.73, image: "bee-pollen.jpg", benefits: "Natural multivitamin and energy booster.", consumption: "1 tablet 3 times daily." },
+        { id: 14, name: "BEE PROPOLIS", price: 139.21, promoPrice: 132.25, image: "bee-propolis.jpg", benefits: "Immune support, natural antibiotic.", consumption: "1 tablet daily." },
+        { id: 15, name: "ROYAL GELLY", price: 139.21, promoPrice: 132.25, image: "royal-jelly.jpg", benefits: "Energy booster, supports immune system.", consumption: "1 tablet daily." },
+        { id: 16, name: "OMEGA 3 PLUS", price: 130.10, promoPrice: 123.60, image: "arctic-sea.jpg", benefits: "Supports heart and brain health.", consumption: "2 softgels twice daily." },
+        { id: 17, name: "ABSORBENT-C", price: 75.50, promoPrice: 71.73, image: "absorbent-c.jpg", benefits: "Immune support, antioxidant.", consumption: "1-2 tablets daily." },
+        { id: 18, name: "FIELDS OF GREENS", price: 86.10, promoPrice: 81.80, image: "fields-of-greens.jpg", benefits: "Detoxification and digestion support.", consumption: "1 tablet 3 times daily." },
+        { id: 19, name: "CALCIUM PLUS TABLET", price: 132.15, promoPrice: 125.54, image: "calcium-plus.jpg", benefits: "Supports bone health.", consumption: "2 tablets daily." },
+        { id: 20, name: "ALOE LIPS", price: 20.33, promoPrice: 19.31, image: "aloe-lips.jpg", benefits: "Moisturizes and protects lips.", consumption: "Apply as needed." },
+        { id: 21, name: "BRIGHT TOOTHGEL", price: 41.29, promoPrice: 39.23, image: "bright-toothgel.jpg", benefits: "Fluoride-free, gentle on gums.", consumption: "Brush teeth twice daily." },
+        { id: 22, name: "ALOE FIRST", price: 90.83, promoPrice: 86.29, image: "aloe-first.jpg", benefits: "Soothes skin irritations.", consumption: "Spray on skin as needed." },
+        { id: 23, name: "DEODORANT STICK", price: 50.73, promoPrice: 48.19, image: "forever-deodorant.jpg", benefits: "Long-lasting protection.", consumption: "Apply daily." },
+        { id: 24, name: "AVOCADO SOAP", price: 30.68, promoPrice: 29.15, image: "avocado-soap.jpg", benefits: "Gentle cleansing for face and body skin.", consumption: "Use daily." },
+        { id: 25, name: "ALOE LIQUID SOAP", price: 120.91, promoPrice: 114.86, image: "aloe-liquid-soap.jpg", benefits: "Moisturizing hand and face skin wash.", consumption: "Use daily." },
+        { id: 26, name: "JOJOBA SHAMPOO", price: 105.93, promoPrice: 100.63, image: "aloe-jojoba-shampoo.jpg", benefits: "Nourishes hair and scalp.", consumption: "Massage into wet hair." },
+        { id: 27, name: "JOJOBA CONDITIONER", price: 117.70, promoPrice: 111.82, image: "aloe-jojoba-conditioner.jpg", benefits: "Moisturizes and strengthens hair.", consumption: "Apply after shampoo." },
+        { id: 28, name: "ALOE BODY WASH", price: 120.91, promoPrice: 114.86, image: "aloe-body-wash.jpg", benefits: "Gentle, moisturizing body skin wash.", consumption: "Use daily in shower." },
+        { id: 29, name: "ALOE BODY LOTION", price: 112.35, promoPrice: 106.73, image: "aloe-body-lotion.jpg", benefits: "Hydrates and softens skin.", consumption: "Apply to body as needed." },
+        { id: 30, name: "ALOE PROPOLIS CREME", price: 90.83, promoPrice: 86.29, image: "aloe-propolis-creme.jpg", benefits: "Soothes and moisturizes dry skin.", consumption: "Apply generously." },
+        { id: 31, name: "ALOE VERA GELLY", price: 70.78, promoPrice: 67.24, image: "aloe-vera-gelly.jpg", benefits: "Soothes minor skin irritations.", consumption: "Apply to affected area." },
+        { id: 32, name: "ALOE MOISTURIZING", price: 70.78, promoPrice: 67.24, image: "aloe-moisturizing.jpg", benefits: "Hydrates face and body skin.", consumption: "Apply as needed." },
+        { id: 33, name: "ALOE MASSAGE LOTION", price: 70.78, promoPrice: 67.24, image: "aloe-massage-lotion.jpg", benefits: "Soothing lotion for massage.", consumption: "Massage into skin." },
+        { id: 34, name: "ALOE MSM GEL", price: 86.00, promoPrice: 81.70, image: "aloe-msm-gel.jpg", benefits: "Soothes joints and muscles.", consumption: "Apply to affected areas." },
+        { id: 35, name: "ALOE SUNSCREEN", price: 89.07, promoPrice: 84.62, image: "aloe-sunscreen.jpg", benefits: "UV protection with aloe for skin.", consumption: "Apply before sun exposure." },
+        { id: 36, name: "ALOE SCRUB", price: 77.86, promoPrice: 73.97, image: "aloe-scrub.jpg", benefits: "Gently exfoliates skin.", consumption: "Use 2-3 times a week." },
+        { id: 37, name: "MASK POWDER", price: 102.90, promoPrice: 97.76, image: "mask-powder.jpg", benefits: "Cleanses and tightens pores.", consumption: "Mix with Aloe Activator." },
+        { id: 38, name: "R3 FACTOR-SKIN DEFENSE", price: 160.97, promoPrice: 152.92, image: "r3-factor.jpg", benefits: "Helps skin retain moisture.", consumption: "Apply to face and neck." },
+        { id: 39, name: "FOREVER ALPHA-E FACTOR", price: 144.90, promoPrice: 137.66, image: "alpha-e-factor.jpg", benefits: "Nourishes and restores skin.", consumption: "Apply a few drops to face." },
+        { id: 40, name: "INFINITE HYDRATING CLEANSER", price: 131.20, promoPrice: 124.64, image: "infinite-cleanser.jpg", benefits: "Gentle, hydrating skin cleanser.", consumption: "Use morning and night." },
+        { id: 41, name: "INFINITE FIRMING SERUM", price: 190.47, promoPrice: 180.95, image: "infinite-serum.jpg", benefits: "Reduces appearance of fine lines.", consumption: "Apply to face." },
+        { id: 42, name: "INFINITE RESTORING CREME", price: 221.56, promoPrice: 210.48, image: "infinite-creme.jpg", benefits: "Deeply moisturizes and restores skin.", consumption: "Apply to face and neck." },
+        { id: 43, name: "BALANCING TONER", price: 106.18, promoPrice: 100.87, image: "balancing-toner.jpg", benefits: "Refreshes and balances skin.", consumption: "Apply after cleansing." },
+        { id: 44, name: "AWAKENING EYE CREAM", price: 89.66, promoPrice: 85.18, image: "eye-cream.jpg", benefits: "Reduces puffiness and dark circles.", consumption: "Pat gently around eyes." },
+        { id: 45, name: "ALOE ACTIVATOR", price: 80.59, promoPrice: 76.56, image: "aloe-activator.jpg", benefits: "Cleanses, soothes and refreshes skin.", consumption: "Use with Mask Powder." },
+        { id: 46, name: "HYDRATING SERUM", price: 156.56, promoPrice: 148.73, image: "hydrating-serum.jpg", benefits: "Boosts skin hydration.", consumption: "Apply to face." },
+        { id: 47, name: "S.REFRESHING G.CLEANSER", price: 115.61, promoPrice: 109.83, image: "refreshing-cleanser.jpg", benefits: "Gentle gel skin cleanser.", consumption: "Use morning and night." },
+        { id: 48, name: "S. IILUMINATING GEL", price: 107.35, promoPrice: 102.00, image: "illuminating-gel.jpg", benefits: "Brightens skin appearance.", consumption: "Apply to face." },
+        { id: 49, "name": "S. REFINING GEL MASK", price: 115.61, promoPrice: 109.83, image: "refining-mask.jpg", benefits: "Refines pores and moisturizes skin.", consumption: "Use 2-3 times a week." },
+        { id: 50, name: "S.SMOOTHING GEL MOISTURIZER", price: 115.76, promoPrice: 109.97, image: "smoothing-moisturizer.jpg", benefits: "Lightweight gel moisturizer for skin.", consumption: "Apply to face." },
+        { id: 51, name: "ALOE BIO-CELLULOSE MASK", price: 146.00, promoPrice: 138.70, image: "bio-cellulose-mask.jpg", benefits: "Deeply hydrates and conditions skin.", consumption: "Use once a week." },
+        { id: 52, name: "REPLENISHING SKIN OIL", price: 132.00, promoPrice: 125.40, image: "skin-oil.jpg", benefits: "Nourishes with a blend of oils for skin.", consumption: "Apply a few drops to face." },
+        { id: 53, name: "PROTECTING DAY LOTION", price: 167.99, promoPrice: 159.59, image: "day-lotion.jpg", benefits: "Moisturizes and protects skin with SPF.", consumption: "Apply in the morning." },
+    ];
+    const rewards = [
+        { id: 'RWD01', name: 'RM 5 Voucher', cost: 500, image: 'rm5.jpg', fallbackImage: 'https://i.imgur.com/O9yP2aH.png', available: true },
+        { id: 'RWD02', name: 'RM 10 Voucher', cost: 1000, image: 'rm10.jpg', fallbackImage: 'https://i.imgur.com/sY2a2qG.png', available: true },
+        { id: 'RWD03', name: 'RM 20 Voucher', cost: 2000, image: 'rm20.jpg', fallbackImage: 'https://i.imgur.com/Jz4Y8fW.png', available: true },
+        { id: 'RWD04', name: 'ALOE VERA GEL', cost: 10000, image: 'aloe-vera-gel.jpg', fallbackImage: '', available: false },
+        { id: 'RWD05', name: 'ALOE BERRY NECTAR', cost: 10000, image: 'aloe-berry-nectar.jpg', fallbackImage: '', available: false },
+        { id: 'RWD06', name: 'ALOE BITS N\' PEACHES', cost: 10000, image: 'aloe-peaches.jpg', fallbackImage: '', available: false },
+    ];
+    let cart = [];
+    const promoEndDate = new Date("August 2, 2025 23:59:59").getTime();
+
+    // --- LOGIC ---
+
+    function isPromoActive() {
+        return new Date().getTime() < promoEndDate;
+    }
+
+    function renderProducts() {
+      const productList = document.getElementById('product-list');
+      if (!productList) return;
+      const promoActive = isPromoActive(); // Check if overall grand opening promo is active
+      
+      productList.innerHTML = products.map(product => {
+        let priceHTML = '';
+        let badgeHTML = '';
+        let productClasses = 'product';
+        let points = 0; // Initialize points
+
+        if (promoActive && product.specialPromo === 'buy2for200') {
+            // Special promo for Aloe Vera Gel, Aloe Berry Nectar, Aloe Bits N' Peaches
+            badgeHTML = '<div class="featured-badge" style="background-color: #e74c3c;">Hot Promo!</div>'; /* Changed text */
+            priceHTML = `
+                <span class="original-price">RM ${product.price.toFixed(2)}</span>
+                <span class="new-price" style="font-size: 1.2rem; color: var(--primary-color); display: block; margin-top: 5px;">Buy any 2 for RM 200.00</span>
+                <div style="font-size: 0.9rem; color: var(--accent-color); font-weight: bold; margin-top: 5px;"><i class="fa-solid fa-truck-fast"></i> FREE Shipping!</div>
+            `;
+            // Points are based on actual spend, calculated in cart, so display 0 here for these specific products on the product card.
+            points = 0; 
+            productClasses += ' promo-highlight'; // Keep the glowing effect
+        } else if (promoActive && product.promoPrice) {
+            // Standard 5% off promotion
+            badgeHTML = '<div class="featured-badge">Promo!</div>'; /* Re-added for standard promos */
+            priceHTML = `
+                <span class="original-price">RM ${product.price.toFixed(2)}</span>
+                <span class="new-price">RM ${product.promoPrice.toFixed(2)}</span>
+            `;
+            points = Math.floor(product.promoPrice);
+            productClasses += ' promo-highlight'; // Keep the glowing effect
+        } else {
+            // No active promotions, display retail price
+            priceHTML = `<span class="new-price">RM ${product.price.toFixed(2)}</span>`;
+            points = Math.floor(product.price);
+        }
+        
+        return `
+          <div class="${productClasses}">
+            ${badgeHTML}
+            <div class="product-image-container"><img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/200x200?text=Image+Not+Found'"></div>
+            <div class="product-info">
+                <h3>${product.name}</h3>
+                <div class="price-section">
+                    ${priceHTML}
+                </div>
+                <div class="benefits"><strong>Benefits:</strong> ${product.benefits}</div>
+                <div class="consumption"><strong>Usage:</strong> ${product.consumption}</div>
+                <div class="product-points">${points > 0 ? `<i class="fa-solid fa-star"></i> Earn ${points} Points` : ''}</div>
+                <div class="product-actions">
+                    <button class="btn btn-primary" onclick="addToCart(${product.id})"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
+                </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function filterProducts() {
+        const query = document.getElementById('product-search').value.toLowerCase();
+        const productCards = document.querySelectorAll('#product-list .product');
+        productCards.forEach(card => {
+            const productName = card.querySelector('h3').textContent.toLowerCase();
+            if (productName.includes(query)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function suggestProduct() {
+        const symptom = document.getElementById('symptom-input').value.toLowerCase().trim();
+        const resultContainer = document.getElementById('suggestion-result');
+        if (!symptom) {
+            resultContainer.innerHTML = '<p style="color: red;">Please enter a symptom or health concern.</p>';
+            return;
+        }
+
+        const keywords = {
+            'digestion': [1, 2, 3, 7, 11, 18], 'constipation': [1, 7, 18], 'bloated': [1, 7, 11],
+            'immune': [1, 2, 14, 15, 17], 'flu': [14, 17], 'cough': [12, 14], 'cold': [14, 17],
+            'energy': [12, 13, 15, 8], 'fatigue': [13, 15, 8], 'tired': [13, 15, 8],
+            'weight': [4, 5, 6], 'diet': [4, 5, 7],
+            'skin': [22, 24, 25, 28, 29, 30, 31, 32, 35, 36, 38, 39, 40, 42, 51, 52, 45, 46, 47, 48, 49, 50, 53],
+            'dry skin': [30, 32, 29, 39, 52], 'acne': [30, 24, 21], 'eczema': [30, 22, 31], 'sunburn': [35, 22, 31],
+            'joint': [34, 16], 'muscle pain': [33, 34], 'arthritis': [34, 16],
+            'heart': [16], 'cholesterol': [16, 18], 'brain': [16], 'memory': [16],
+            'bone': [19], 'calcium': [19],
+            'lips': [20], 'hair': [26, 27], 'scalp': [26],
+            'detox': [18, 6, 1, 2, 3], 'cleanse': [6, 18, 1],
+            'men': [8], 'vitality': [8, 15],
+            'throat': [12, 14], 'antioxidant': [2, 6, 17, 39],
+            'face': [24, 25, 32, 38, 39, 40, 41, 42, 43, 44, 46, 47, 48, 50, 52, 53],
+            'wrinkles': [38, 39, 41, 42], 'aging': [38, 39, 41, 15]
+        };
+
+        let suggestedIds = new Set();
+        for (const key in keywords) {
+            if (symptom.includes(key)) {
+                keywords[key].forEach(id => suggestedIds.add(id));
+            }
+        }
+        
+        products.forEach(p => {
+            if (p.benefits.toLowerCase().includes(symptom)) {
+                suggestedIds.add(p.id);
+            }
+        });
+
+        const uniqueIds = Array.from(suggestedIds);
+
+        if (uniqueIds.length > 0) {
+            let resultHTML = '<h4>Based on your concern, we suggest:</h4>';
+            uniqueIds.slice(0, 3).forEach(id => {
+                const product = products.find(p => p.id === id);
+                if (product) {
+                    resultHTML += `
+                        <div class="suggestion-product">
+                            <span style="flex-grow: 1;"><strong>${product.name}</strong> - ${product.benefits}</span>
+                            <button class="btn btn-primary" style="width: auto; padding: 8px 15px; flex-shrink: 0;" onclick="addToCart(${product.id}); toggleCart();">Add</button>
+                        </div>`;
+                }
+            });
+            resultContainer.innerHTML = resultHTML;
+        } else {
+            resultContainer.innerHTML = '<p>We could not find a specific match. Try searching for products directly or use broader terms like "skin" or "energy".</p>';
+        }
+    }
+
+    function showTab(tabId) {
+      document.querySelectorAll('#main-content .tab-content').forEach(el => el.classList.remove('active'));
+      const activeTab = document.getElementById(tabId);
+      if(activeTab) {
+          activeTab.classList.add('active');
+      }
+    }
+
+    function toggleCart(forceClose = false) {
+      const modal = document.getElementById('cart-modal');
+      let pendingOrder = JSON.parse(sessionStorage.getItem('pendingOrder'));
+
+      if (forceClose) {
+          modal.style.display = 'none';
+          sessionStorage.removeItem('pendingOrder');
+      } else {
+          modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+      }
+      
+      if (modal.style.display === 'flex') {
+          if (!pendingOrder) {
+              document.getElementById('cart-view').style.display = 'block';
+              document.getElementById('verification-view').style.display = 'none';
+              document.getElementById('verification-status').textContent = '';
+              document.getElementById('verification-code').value = '';
+              updateCartDisplay();
+          } else {
+              document.getElementById('cart-view').style.display = 'none';
+              document.getElementById('verification-view').style.display = 'block';
+          }
+      }
+    }
+
+    function addToCart(productId) {
+      const existingItem = cart.find(item => item.id === productId);
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+        const productData = products.find(p => p.id === productId);
+        // Add to cart with its base 'price'. Promo logic applies in updateCartDisplay.
+        cart.push({ id: productData.id, name: productData.name, price: productData.price, quantity: 1 });
+      }
+      updateCartCount();
+    }
+
+    function increaseQuantity(productId) {
+        const item = cart.find(p => p.id === productId);
+        if (item) { item.quantity++; updateCartDisplay(); updateCartCount(); }
+    }
+
+    function decreaseQuantity(productId) {
+        const item = cart.find(p => p.id === productId);
+        if (item) {
+            item.quantity--;
+            if (item.quantity <= 0) removeItemFromCart(productId);
+            else { updateCartDisplay(); updateCartCount(); }
+        }
+    }
+
+    function removeItemFromCart(productId) {
+        cart = cart.filter(p => p.id !== productId);
+        updateCartDisplay();
+        updateCartCount();
+    }
+
+    // Function to calculate shipping fee with new logic
+    function calculateShipping(cart, subtotal, hasSpecialAloePromo) {
+        if (hasSpecialAloePromo) { 
+            return { fee: 0, message: "FREE" };
+        }
+        if (subtotal >= 250) return { fee: 0, message: "FREE" };
+        if (cart.length === 0) return { fee: 0, message: "RM 0.00" };
+        const baseShipping = 14.00;
+        const calculatedFee = baseShipping * (1 - (0.30 * (cart.length - 1)));
+        return { fee: Math.max(0, calculatedFee), message: `RM ${Math.max(0, calculatedFee).toFixed(2)}` };
+    }
+    
+    function updateCartDisplay() {
+      const cartItemsEl = document.getElementById('cart-items');
+      const subtotalEl = document.getElementById('cart-subtotal');
+      const shippingEl = document.getElementById('cart-shipping');
+      const totalEl = document.getElementById('cart-total');
+      const pointsEl = document.getElementById('points-earned-display');
+      
+      if (cart.length === 0) {
+        cartItemsEl.innerHTML = '<p>Your cart is currently empty.</p>';
+        subtotalEl.textContent = 'RM 0.00';
+        shippingEl.textContent = 'RM 0.00';
+        totalEl.textContent = 'RM 0.00';
+        pointsEl.innerHTML = '';
+        return;
+      }
+      
+      let itemsHTML = '';
+      let calculatedSubtotal = 0;
+
+      const aloeDrinkIds = [1, 2, 3];
+      let aloeDrinkCount = 0;
+      let otherItemsCost = 0;
+      let hasSpecialAloePromo = false; 
+
+      const aloeDrinkItemsInCart = cart.filter(item => aloeDrinkIds.includes(item.id));
+      const otherItemsInCart = cart.filter(item => !aloeDrinkIds.includes(item.id));
+
+      // Build HTML for cart items (display individual retail prices)
+      cart.forEach(item => {
+        const productData = products.find(p => p.id === item.id);
+        let displayPrice = productData.price; // Always show original retail price in cart item list
+        
+        itemsHTML += `
+          <div class="cart-item">
+            <div class="cart-item-details">
+                <strong>${item.name}</strong>
+                <div class="quantity-controls">
+                    <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
+                    <span class="quantity-display">${item.quantity}</span>
+                    <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span>RM ${displayPrice.toFixed(2)} / pc</span>
+                <span class="remove-item-btn" onclick="removeItemFromCart(${item.id})">×</span>
+            </div>
+          </div>`;
+      });
+
+      // Calculate cost for special aloe drinks and add specific promo message
+      aloeDrinkItemsInCart.forEach(item => aloeDrinkCount += item.quantity);
+
+      let aloePromoMessageHtml = '';
+      let aloeDrinksAppliedCost = 0;
+
+      if (aloeDrinkCount > 0 && isPromoActive()) {
+          const numPairs = Math.floor(aloeDrinkCount / 2);
+          const remainingSingles = aloeDrinkCount % 2;
+          const aloeRetailPrice = products.find(p => p.id === 1).price; 
+          
+          aloeDrinksAppliedCost = (numPairs * 200) + (remainingSingles * aloeRetailPrice);
+
+          if (numPairs >= 1) { // If at least one pair is bought, trigger free shipping
+              hasSpecialAloePromo = true; 
+              
+              // List specific items in the bundle message
+              let bundleItemsListNames = [];
+              aloeDrinkItemsInCart.forEach(item => {
+                  bundleItemsListNames.push(`${item.name} x${item.quantity}`);
+              });
+
+              aloePromoMessageHtml = `<div style="background-color: #e0f8f0; padding: 10px; border-radius: 8px; margin-top: 10px; text-align: center; border: 1px dashed var(--accent-color);">
+                <strong>Aloe Trio Combo Offer Applied!</strong>
+                <br><em>(${bundleItemsListNames.join(', ')})</em>
+                <br>Your ${numPairs * 2} items for RM ${numPairs * 200}.00!
+                <br><i class="fa-solid fa-truck-fast"></i> FREE Shipping on this bundle!
+                </div>`;
+          } 
+          if (remainingSingles === 1 && numPairs === 0) { // Only show "add one more" if no pairs were formed
+                 aloePromoMessageHtml = `<div style="background-color: #f8f0e0; padding: 10px; border-radius: 8px; margin-top: 10px; text-align: center; border: 1px dashed var(--secondary-color);">
+                 <i class="fa-solid fa-lightbulb"></i> Add one more Aloe Trio product to get Buy 2 for RM 200.00 & FREE Shipping!
+                 </div>`;
+          } else if (remainingSingles === 1 && numPairs > 0) {
+            aloePromoMessageHtml += `<div style="background-color: #f8f0e0; padding: 10px; border-radius: 8px; margin-top: 10px; text-align: center; border: 1px dashed var(--secondary-color);">
+                 <i class="fa-solid fa-lightbulb"></i> Add one more Aloe Trio product to get another Buy 2 for RM 200.00!
+                 </div>`;
+          }
+      } else if (aloeDrinkCount > 0) {
+          // If promo not active, charge all at retail
+          const aloeRetailPrice = products.find(p => p.id === 1).price;
+          aloeDrinksAppliedCost = aloeDrinkCount * aloeRetailPrice;
+      }
+      
+      // Calculate cost for other products (with 5% discount if applicable)
+      otherItemsInCart.forEach(item => {
+          const productData = products.find(p => p.id === item.id);
+          const itemPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : productData.price;
+          otherItemsCost += itemPrice * item.quantity;
+      });
+
+      calculatedSubtotal = otherItemsCost + aloeDrinksAppliedCost;
+      const totalPoints = Math.floor(calculatedSubtotal); // Points based on final subtotal after all promos
+
+      const shipping = calculateShipping(cart, calculatedSubtotal, hasSpecialAloePromo);
+      const total = calculatedSubtotal + shipping.fee;
+
+      cartItemsEl.innerHTML = itemsHTML + aloePromoMessageHtml; /* Append the promo message after individual items. */
+      subtotalEl.textContent = `RM ${calculatedSubtotal.toFixed(2)}`;
+      shippingEl.textContent = shipping.message;
+      totalEl.textContent = `RM ${total.toFixed(2)}`;
+      pointsEl.innerHTML = `<div class="points-earned"><i class="fa-solid fa-star"></i> Points to be Earned: ${totalPoints}</div>`;
+    }
+
+    function updateCartCount() {
+      const count = cart.reduce((total, item) => total + item.quantity, 0);
+      document.getElementById('cart-count').textContent = count;
+    }
+
+    function initiateCheckout() {
+        const name = document.getElementById('customer-name').value.trim();
+        const phone = document.getElementById('customer-phone').value.trim();
+        const email = document.getElementById('customer-email').value.trim();
+        const address1 = document.getElementById('customer-address1').value.trim();
+        const address2 = document.getElementById('customer-address2').value.trim();
+        const city = document.getElementById('customer-city').value.trim();
+        const state = document.getElementById('customer-state').value.trim();
+        const postcode = document.getElementById('customer-postcode').value.trim();
+
+        if (!name || !phone || !email || !address1 || !city || !state || !postcode) {
+            alert('Please fill in all required customer and shipping information fields.');
+            return;
+        }
+        if (cart.length === 0) {
+            alert('Your cart is empty');
+            return;
+        }
+      
+        // Re-calculate based on cart items for WhatsApp message and PDF
+        let calculatedSubtotal = 0;
+        let totalPointsForThisPurchase = 0; // Points specifically for THIS purchase
+        const aloeDrinkIds = [1, 2, 3];
+        let aloeDrinkCount = 0;
+        let otherItemsCost = 0;
+        let hasSpecialAloePromo = false;
+
+        const aloeDrinkItemsInCart = cart.filter(item => aloeDrinkIds.includes(item.id));
+        const otherItemsInCart = cart.filter(item => !aloeDrinkIds.includes(item.id));
+
+        aloeDrinkItemsInCart.forEach(item => aloeDrinkCount += item.quantity);
+
+        let aloeDrinksAppliedCost = 0;
+        let whatsappAloeSummary = '';
+        if (aloeDrinkCount > 0 && isPromoActive()) {
+            const numPairs = Math.floor(aloeDrinkCount / 2);
+            const remainingSingles = aloeDrinkCount % 2;
+            const aloeRetailPrice = products.find(p => p.id === 1).price;
+            
+            aloeDrinksAppliedCost = (numPairs * 200) + (remainingSingles * aloeRetailPrice);
+            if (numPairs >= 1) {
+                hasSpecialAloePromo = true;
+            }
+            
+            let bundleItemsListNames = [];
+            aloeDrinkItemsInCart.forEach(item => {
+                bundleItemsListNames.push(`${item.name} x${item.quantity}`);
+            });
+
+            const originalBundleValue = (numPairs * 2 * aloeRetailPrice) + (remainingSingles * aloeRetailPrice);
+            const bundleSavings = originalBundleValue - aloeDrinksAppliedCost;
+            
+            if (numPairs > 0) {
+                whatsappAloeSummary += `\n*Aloe Trio Combo Offer:* (${bundleItemsListNames.join(', ')}) - ${numPairs * 2} items for RM ${numPairs * 200}.00 (Save RM ${bundleSavings.toFixed(2)})`;
+            }
+            if (remainingSingles > 0) {
+                whatsappAloeSummary += `\n*Remaining Aloe Drinks (Retail):* ${remainingSingles} items @ RM ${aloeRetailPrice.toFixed(2)}/pc`;
+            }
+            whatsappAloeSummary += `\n(Includes FREE Shipping on this bundle!)`;
+        } else if (aloeDrinkCount > 0) {
+            const aloeRetailPrice = products.find(p => p.id === 1).price;
+            aloeDrinksAppliedCost = aloeDrinkCount * aloeRetailPrice;
+            whatsappAloeSummary += `\n*Aloe Drinks (Retail Price):*`;
+            aloeDrinkItemsInCart.forEach(item => {
+                whatsappAloeSummary += `\n- ${item.name} (x${item.quantity}) @ RM ${item.price.toFixed(2)}/pc`;
+            });
+        }
+        
+        let whatsappOtherItemsDetails = '';
+        otherItemsInCart.forEach(item => {
+            const productData = products.find(p => p.id === item.id);
+            const originalPrice = productData.price;
+            const itemPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : originalPrice;
+            const itemSavings = originalPrice - itemPrice;
+
+            if (itemSavings > 0) {
+                whatsappOtherItemsDetails += `- ${item.name} (x${item.quantity}) @ RM ${itemPrice.toFixed(2)}/pc (Original: RM ${originalPrice.toFixed(2)}, Save RM ${itemSavings.toFixed(2)})\n`;
+            } else {
+                whatsappOtherItemsDetails += `- ${item.name} (x${item.quantity}) @ RM ${itemPrice.toFixed(2)}/pc\n`;
+            }
+        });
+
+        calculatedSubtotal = otherItemsCost + aloeDrinksAppliedCost;
+        totalPointsForThisPurchase = Math.floor(calculatedSubtotal); // This is points from current purchase
+
+        const shipping = calculateShipping(cart, calculatedSubtotal, hasSpecialAloePromo);
+        const total = calculatedSubtotal + shipping.fee;
+        const fullAddress = `${address1}, ${address2 ? address2 + ', ' : ''}${city}, ${postcode} ${state}`;
+      
+        // The pendingOrder will only store the CURRENT purchase points.
+        // Total accumulated points will come from Google Sheet API response.
+        const pendingOrder = {
+            customerName: name,
+            customerPhone: phone,
+            customerEmail: email,
+            customerAddress: fullAddress,
+            cart: [...cart], // Store original cart items
+            calculatedSubtotal: calculatedSubtotal, // Store calculated values
+            shipping: shipping,
+            totalAmount: total.toFixed(2),
+            totalPointsForThisPurchase: totalPointsForThisPurchase // Points for this specific order
+        };
+
+        sessionStorage.setItem('pendingOrder', JSON.stringify(pendingOrder));
+
+        let message = `Hi, I would like to place an order:\n\n*Customer Details:*\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nAddress: ${fullAddress}\n\n--- ORDER DETAILS ---\n`;
+        
+        if (whatsappOtherItemsDetails) {
+            message += `*Other Products:*\n${whatsappOtherItemsDetails}`;
+        }
+        message += whatsappAloeSummary;
+        
+        message += `\n\n--- SUMMARY ---\nSubtotal: RM ${calculatedSubtotal.toFixed(2)}\nShipping: ${shipping.message}\n*TOTAL: RM ${total.toFixed(2)}*\n`;
+        message += `\nPlease confirm my order. Thank you!`;
+      
+        window.open(`https://wa.me/601111033154?text=${encodeURIComponent(message)}`, '_blank');
+      
+        document.getElementById('cart-view').style.display = 'none';
+        document.getElementById('verification-view').style.display = 'block';
+    }
+
+    async function verifyPurchase() {
+        const codeInput = document.getElementById('verification-code').value.trim();
+        const statusEl = document.getElementById('verification-status');
+        const verifyBtn = document.getElementById('verify-btn');
+        let pendingOrder = JSON.parse(sessionStorage.getItem('pendingOrder'));
+
+        if (!pendingOrder) {
+            statusEl.textContent = 'Error: No pending order found. Please try again.';
+            statusEl.style.color = 'red';
+            return;
+        }
+        if (!codeInput) {
+            statusEl.textContent = 'Please enter a code.';
+            statusEl.style.color = 'red';
+            return;
+        }
+
+        verifyBtn.disabled = true;
+        statusEl.textContent = 'Verifying...';
+        statusEl.style.color = 'blue';
+
+        // --- GOOGLE SHEETS API URL ---
+        // *** IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED WEB APP URL ***
+        const googleScriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'; // <<< === EDIT THIS LINE === >>>
+
+        try {
+            console.log('--- Verification Process Start ---');
+            console.log('1. Sending code for validation:', codeInput); // Debugging log
+            const validationResponse = await fetch(`${googleScriptURL}?action=validateCode&code=${codeInput}`);
+            const validationResult = await validationResponse.json();
+            console.log('   Validation API response:', validationResult); // Debugging log
+
+            if (validationResult.status === 'success' && validationResult.isValid) {
+                const orderNumber = `FL-${Date.now().toString().slice(-6)}`;
+                
+                // Construct items string for Google Sheet (includes pricing breakdown)
+                const aloeDrinkIds = [1, 2, 3];
+                let itemsListForSheet = [];
+                let totalOriginalValue = 0;
+                let totalDiscountValue = 0;
+                let totalSavings = 0;
+
+                // Process other items
+                pendingOrder.cart.filter(item => !aloeDrinkIds.includes(item.id)).forEach(item => {
+                    const productData = products.find(p => p.id === item.id);
+                    const originalPrice = productData.price;
+                    const itemPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : originalPrice;
+                    const savings = originalPrice - itemPrice;
+                    
+                    itemsListForSheet.push(`${item.name} (x${item.quantity}) - Orig: RM${originalPrice.toFixed(2)}, Disc: RM${itemPrice.toFixed(2)}, Savings: RM${savings.toFixed(2)}`);
+                    totalOriginalValue += originalPrice * item.quantity;
+                    totalDiscountValue += itemPrice * item.quantity;
+                    totalSavings += savings * item.quantity;
+                });
+
+                // Add Aloe Trio bundle summary for sheet if applicable
+                const aloeDrinkItemsInCart = pendingOrder.cart.filter(item => aloeDrinkIds.includes(item.id));
+                const aloeDrinkCount = aloeDrinkItemsInCart.reduce((sum, item) => sum + item.quantity, 0);
+                if (aloeDrinkCount > 0 && isPromoActive()) {
+                    const numPairs = Math.floor(aloeDrinkCount / 2);
+                    const remainingSingles = aloeDrinkCount % 2;
+                    const aloeRetailPrice = products.find(p => p.id === 1).price;
+                    
+                    let bundleItemsNames = aloeDrinkItemsInCart.map(item => `${item.name} x${item.quantity}`).join(', ');
+                    const originalBundleValue = (numPairs * 2 * aloeRetailPrice) + (remainingSingles * aloeRetailPrice);
+                    const appliedBundleCost = (numPairs * 200) + (remainingSingles * aloeRetailPrice);
+                    const bundleSavings = originalBundleValue - appliedBundleCost;
+                    
+                    if (numPairs > 0) {
+                        itemsListForSheet.push(`Aloe Trio Combo Offer: (${bundleItemsNames}) ${numPairs * 2} items for RM ${numPairs * 200}.00 (Total Savings: RM ${bundleSavings.toFixed(2)})`);
+                    }
+                    if (remainingSingles > 0) {
+                        itemsListForSheet.push(`Remaining Aloe Drinks: ${remainingSingles} items @ RM ${aloeRetailPrice.toFixed(2)}/pc`);
+                    }
+                    totalOriginalValue += originalBundleValue;
+                    totalDiscountValue += appliedBundleCost;
+                    totalSavings += bundleSavings; // Sum up bundle savings as well
+                } else if (aloeDrinkCount > 0) { // If promo not active, list at retail
+                    aloeDrinkItemsInCart.forEach(item => {
+                        const productData = products.find(p => p.id === item.id);
+                        const originalPrice = productData.price;
+                        itemsListForSheet.push(`${item.name} (x${item.quantity}) - Orig: RM${originalPrice.toFixed(2)}, Disc: RM${originalPrice.toFixed(2)}, Savings: RM0.00`);
+                        totalOriginalValue += originalPrice * item.quantity;
+                        totalDiscountValue += originalPrice * item.quantity;
+                    });
+                }
+                
+                const itemsStringForSheet = itemsListForSheet.join('; ');
+
+                const orderData = {
+                    action: 'addOrder',
+                    orderNumber: orderNumber,
+                    date: new Date().toLocaleString('en-GB'),
+                    customerName: pendingOrder.customerName,
+                    customerPhone: pendingOrder.customerPhone,
+                    customerEmail: pendingOrder.customerEmail,
+                    customerAddress: pendingOrder.customerAddress,
+                    items: itemsStringForSheet, // Use the detailed string for the sheet
+                    subtotalOriginal: totalOriginalValue.toFixed(2), // New: Send original subtotal
+                    subtotalDiscounted: totalDiscountValue.toFixed(2), // New: Send discounted subtotal
+                    totalSavings: totalSavings.toFixed(2), // New: Send total savings
+                    totalAmount: pendingOrder.totalAmount, // This includes shipping
+                    totalPointsForThisPurchase: pendingOrder.totalPointsForThisPurchase, // Points for this current purchase
+                    usedCode: codeInput
+                };
+
+                console.log('2. Sending order data to record:', orderData); // Debugging log
+                const recordResponse = await fetch(googleScriptURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json', // Important for doPost(e).postData.contents
+                    },
+                    body: JSON.stringify(orderData)
+                });
+                const recordResult = await recordResponse.json();
+                console.log('   Record API response:', recordResult); // Debugging log
+
+                if (recordResult.status === 'success') {
+                    // Pass current points earned and total accumulated points to PDF/Email generation
+                    generatePDF(orderData, pendingOrder, recordResult.customerPAC, recordResult.totalPoints, pendingOrder.totalPointsForThisPurchase);
+                    sendReceiptByEmail(orderData, pendingOrder, recordResult.customerPAC, recordResult.totalPoints, pendingOrder.totalPointsForThisPurchase);
+
+                    statusEl.textContent = 'Purchase verified! Your receipt is downloading...';
+                    statusEl.style.color = 'green';
+
+                    cart = [];
+                    sessionStorage.removeItem('pendingOrder');
+                    updateCartCount();
+                    
+                    setTimeout(() => {
+                        toggleCart(true);
+                        verifyBtn.disabled = false;
+                    }, 2500);
+                } else {
+                    // This means Apps Script successfully received request but returned a business logic error
+                    console.error('Error from Apps Script during record:', recordResult.message);
+                    statusEl.textContent = recordResult.message || 'Failed to record order on server side.';
+                    statusEl.style.color = 'red';
+                    verifyBtn.disabled = false;
+                }
+
+            } else {
+                // This means validation API returned isValid: false or status: error
+                console.error('Code validation failed:', validationResult.message);
+                statusEl.textContent = validationResult.message || 'Invalid or already used verification code.';
+                statusEl.style.color = 'red';
+                verifyBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error('Verification Process Error:', error); // Log full error object
+            statusEl.textContent = 'An unexpected error occurred: ' + error.message + '. Please check console or contact owner.';
+            statusEl.style.color = 'red';
+            verifyBtn.disabled = false;
+        }
+        console.log('--- Verification Process End ---');
+    }
+
+    // Added two new parameters for point display
+    function sendReceiptByEmail(record, orderDetails, customerPAC, totalAccumulatedPoints, currentPurchasePoints) {
+        // NOTE: Replace with your actual EmailJS credentials
+        const serviceID = 'YOUR_EMAILJS_SERVICE_ID'; // <<< === EDIT THIS LINE === >>>
+        const templateID = 'YOUR_EMAILJS_TEMPLATE_ID'; // <<< === EDIT THIS LINE === >>>
+        const userID = 'YOUR_EMAILJS_USER_ID'; // <<< === EDIT THIS LINE === >>>
+
+        if (serviceID === 'YOUR_EMAILJS_SERVICE_ID' || templateID === 'YOUR_EMAILJS_TEMPLATE_ID' || userID === 'YOUR_EMAILJS_USER_ID') {
+            console.log("EmailJS credentials not set. Skipping email.");
+            return;
+        }
+
+        const aloeDrinkIds = [1, 2, 3];
+        let emailItemsHtml = '';
+
+        // Add table header
+        emailItemsHtml += `
+            <table style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Item Description</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Qty</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Orig. Price (RM)</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Disc. Price (RM)</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Savings (RM)</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Total (RM)</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        // Add regular items first with price breakdown
+        orderDetails.cart.filter(item => !aloeDrinkIds.includes(item.id)).forEach(item => {
+            const productData = products.find(p => p.id === item.id);
+            const originalPrice = productData.price;
+            const itemPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : originalPrice;
+            const savings = originalPrice - itemPrice;
+            emailItemsHtml += `<tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">${item.name}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${item.quantity}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${originalPrice.toFixed(2)}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${itemPrice.toFixed(2)}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${savings.toFixed(2)}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${(itemPrice * item.quantity).toFixed(2)}</td>
+            </tr>`;
+        });
+
+        // Add Aloe Trio bundle summary if applicable
+        const aloeDrinkItemsInCart = orderDetails.cart.filter(item => aloeDrinkIds.includes(item.id));
+        const aloeDrinkCount = aloeDrinkItemsInCart.reduce((sum, item) => sum + item.quantity, 0);
+        if (aloeDrinkCount > 0 && isPromoActive()) {
+            const numPairs = Math.floor(aloeDrinkCount / 2);
+            const remainingSingles = aloeDrinkCount % 2;
+            const aloeRetailPrice = products.find(p => p.id === 1).price;
+
+            let bundleItemsNames = aloeDrinkItemsInCart.map(item => `${item.name} x${item.quantity}`).join(', ');
+            const originalBundleValue = (numPairs * 2 * aloeRetailPrice) + (remainingSingles * aloeRetailPrice);
+            const appliedBundleCost = (numPairs * 200) + (remainingSingles * aloeRetailPrice);
+            const bundleSavings = originalBundleValue - appliedBundleCost;
+
+            if (numPairs > 0) {
+                emailItemsHtml += `<tr>
+                    <td colspan="2" style="padding: 8px; border: 1px solid #ddd;"><em>Aloe Trio Combo Offer (${bundleItemsNames})</em></td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${originalBundleValue.toFixed(2)}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${appliedBundleCost.toFixed(2)}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${bundleSavings.toFixed(2)}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${appliedBundleCost.toFixed(2)}</td>
+                </tr>`;
+            }
+            if (remainingSingles > 0) {
+                emailItemsHtml += `<tr>
+                    <td colspan="2" style="padding: 8px; border: 1px solid #ddd;"><em>Remaining Aloe Drinks (Retail)</em></td>
+                    <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">${aloeRetailPrice.toFixed(2)}</td>
+                    <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">${aloeRetailPrice.toFixed(2)}</td>
+                    <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">0.00</td>
+                    <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">${aloeRetailPrice.toFixed(2)}</td>
+                </tr>`;
+            }
+        } else if (aloeDrinkCount > 0) { // If promo not active, list at retail
+            aloeDrinkItemsInCart.forEach(item => {
+                const productData = products.find(p => p.id === item.id);
+                const originalPrice = productData.price;
+                emailItemsHtml += `<tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${item.name}</td>
+                    <td style="text-align: center; padding: 8px; border: 1px solid #ddd;">${item.quantity}</td>
+                    <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">${originalPrice.toFixed(2)}</td>
+                    <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">${originalPrice.toFixed(2)}</td>
+                    <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">0.00</td>
+                    <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">${(originalPrice * item.quantity).toFixed(2)}</td>
+                </tr>`;
+            });
+        }
+        emailItemsHtml += `</tbody></table>`; // Close table body and table
+
+        const templateParams = {
+            to_email: 'arvin8786@gmail.com', // This should likely be the owner's email
+            order_number: record.orderNumber,
+            customer_name: orderDetails.customerName,
+            customer_phone: orderDetails.customerPhone,
+            customer_email: orderDetails.customerEmail,
+            customer_address: orderDetails.customerAddress,
+            items_html: emailItemsHtml, // Pass the entire table HTML
+            subtotal: orderDetails.calculatedSubtotal.toFixed(2),
+            shipping: orderDetails.shipping.message,
+            total_amount: orderDetails.totalAmount,
+            current_purchase_points: String(currentPurchasePoints), // Convert to string
+            total_accumulated_points: String(totalAccumulatedPoints), // Convert to string
+            personal_access_code: customerPAC ? String(customerPAC) : 'N/A' // Convert to string, handle null/undefined
+        };
+
+        emailjs.send(serviceID, templateID, templateParams, userID)
+            .then(response => console.log('Email successfully sent!', response.status, response.text))
+            .catch(error => console.log('Failed to send email.', error));
+    }
+
+    // Added two new parameters for point display
+    function generatePDF(record, orderDetails, customerPAC, totalAccumulatedPoints, currentPurchasePoints) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const logo = document.querySelector('.header-logo');
+
+        try {
+            doc.setFont('times', 'italic');
+        } catch (e) {
+            doc.setFont(undefined, 'italic');
+        }
+        const customerNameSignature = orderDetails.customerName;
+        doc.setFont('helvetica', 'normal');
+
+        if (logo && logo.complete && logo.naturalHeight !== 0) {
+            try {
+                doc.addImage(logo, 'JPEG', 14, 12, 30, 30);
+            } catch (e) {
+                console.error("Error adding logo to PDF:", e);
+            }
+        }
+
+        doc.setFontSize(20);
+        doc.text("Purchase Receipt", 105, 20, { align: 'center' });
+        
+        doc.setFontSize(11);
+        doc.text("Forever Living by Mohd Arvind Isa", 105, 30, { align: 'center' });
+        doc.text("WhatsApp: 601111033154", 105, 35, { align: 'center' });
+
+        doc.setFontSize(12);
+        doc.text(`Order Number: ${record.orderNumber}`, 14, 50);
+        doc.text(`Date: ${new Date().toLocaleDateString('en-GB')}`, 14, 57);
+
+        doc.text("Bill To:", 14, 67);
+        doc.text(orderDetails.customerName, 14, 74);
+        doc.text(orderDetails.customerPhone, 14, 81);
+        doc.text(orderDetails.customerEmail, 14, 88);
+        doc.text(orderDetails.customerAddress, 14, 95);
+
+        // Updated table headers for detailed pricing
+        const tableColumn = ["Item Description", "Qty", "Orig. Price (RM)", "Disc. Price (RM)", "Savings (RM)", "Total (RM)"];
+        const tableRows = [];
+
+        const aloeDrinkIds = [1, 2, 3];
+
+        // Add regular items first with price breakdown
+        orderDetails.cart.filter(item => !aloeDrinkIds.includes(item.id)).forEach(item => {
+            const productData = products.find(p => p.id === item.id);
+            const originalPrice = productData.price;
+            const itemPrice = isPromoActive() && productData.promoPrice ? productData.promoPrice : originalPrice;
+            const savings = originalPrice - itemPrice;
+            tableRows.push([ 
+                item.name, 
+                item.quantity, 
+                originalPrice.toFixed(2), 
+                itemPrice.toFixed(2), 
+                savings.toFixed(2), 
+                (itemPrice * item.quantity).toFixed(2) 
+            ]);
+        });
+
+        // Add Aloe Trio bundle summary if applicable
+        const aloeDrinkItemsInCart = orderDetails.cart.filter(item => aloeDrinkIds.includes(item.id));
+        const aloeDrinkCount = aloeDrinkItemsInCart.reduce((sum, item) => sum + item.quantity, 0);
+        if (aloeDrinkCount > 0 && isPromoActive()) {
+            const numPairs = Math.floor(aloeDrinkCount / 2);
+            const remainingSingles = aloeDrinkCount % 2;
+            const aloeRetailPrice = products.find(p => p.id === 1).price;
+
+            let bundleItemsNames = aloeDrinkItemsInCart.map(item => `${item.name} x${item.quantity}`).join(', ');
+            const originalBundleValue = (numPairs * 2 * aloeRetailPrice) + (remainingSingles * aloeRetailPrice);
+            const appliedBundleCost = (numPairs * 200) + (remainingSingles * aloeRetailPrice);
+            const bundleSavings = originalBundleValue - appliedBundleCost;
+
+            if (numPairs > 0) {
+                tableRows.push([
+                    `Aloe Trio Combo Offer (${bundleItemsNames})`,
+                    numPairs * 2,
+                    originalBundleValue.toFixed(2),
+                    appliedBundleCost.toFixed(2),
+                    bundleSavings.toFixed(2),
+                    appliedBundleCost.toFixed(2)
+                ]);
+            }
+            if (remainingSingles > 0) {
+                tableRows.push([
+                    `Remaining Aloe Drinks (Retail)`,
+                    remainingSingles,
+                    aloeRetailPrice.toFixed(2),
+                    aloeRetailPrice.toFixed(2),
+                    `0.00`,
+                    aloeRetailPrice.toFixed(2)
+                ]);
+            }
+        } else if (aloeDrinkCount > 0) { // If promo not active, list at retail
+            aloeDrinkItemsInCart.forEach(item => {
+                const productData = products.find(p => p.id === item.id);
+                const originalPrice = productData.price;
+                tableRows.push([ 
+                    item.name, 
+                    item.quantity, 
+                    originalPrice.toFixed(2), 
+                    originalPrice.toFixed(2), 
+                    `0.00`, 
+                    (originalPrice * item.quantity).toFixed(2) 
+                ]);
+            });
+        }
+
+
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 105,
+            theme: 'grid',
+            headStyles: { fillColor: [26, 82, 118] }
+        });
+
+        let finalY = doc.lastAutoTable.finalY || 115;
+        
+        doc.setFontSize(12);
+        // Use the calculated values from pendingOrder which already accounted for promos
+        doc.text(`Subtotal: RM ${orderDetails.calculatedSubtotal.toFixed(2)}`, 14, finalY + 10);
+        doc.text(`Shipping: ${orderDetails.shipping.message}`, 14, finalY + 17);
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text(`Total Amount: RM ${orderDetails.totalAmount}`, 14, finalY + 27);
+        
+        // Display both current and accumulated points
+        doc.text(`Current Purchase Points: ${String(currentPurchasePoints)}`, 14, finalY + 34); // Convert to string
+        doc.text(`Total Accumulated Points: ${String(totalAccumulatedPoints)}`, 14, finalY + 41); // Convert to string
+
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(10);
+        doc.text("Customer Signature:", 14, finalY + 57); /* Adjusted Y-position */
+        
+        try {
+            doc.setFont('times', 'italic');
+            doc.setFontSize(14);
+            doc.text(customerNameSignature, 14, finalY + 67); /* Adjusted Y-position */
+        } catch (e) {
+            doc.setFont(undefined, 'italic');
+            doc.setFontSize(14);
+            doc.text(customerNameSignature, 14, finalY + 67); /* Adjusted Y-position */
+        }
+
+        /* Updated PAC message */
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text("IMPORTANT: Your Personal Access Code for rewards is:", 14, finalY + 82); /* Adjusted Y-position */
+        doc.setFont('courier', 'normal');
+        doc.text(customerPAC ? String(customerPAC) : 'N/A', 14, finalY + 89); /* Convert to string, handle null/undefined */
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.text("Keep this code safe. Use it with your email to log in to the 'My Rewards' portal.", 14, finalY + 94); /* Adjusted Y-position */
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text("This is a computer-generated receipt. No signature is required.", 105, doc.internal.pageSize.height - 10, { align: 'center' });
+
+        doc.save(`Receipt-Order-${record.orderNumber}.pdf`);
+    }
+
+    function startCountdown() {
+        const countdownEl = document.getElementById('countdown-timer');
+        const promoDetailsEl = document.getElementById('promo-details');
+
+        const interval = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = promoEndDate - now;
+
+            if (distance < 0) {
+                clearInterval(interval);
+                promoDetailsEl.innerHTML = '<div class="promo-period">Our Grand Opening promotion has ended.</div>';
+                document.body.classList.remove('grand-opening-active');
+                renderProducts();
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }, 1000);
+    }
+
+    function createConfetti() {
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            confetti.style.animationDelay = Math.random() * 5 + 's';
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            document.body.appendChild(confetti);
+        }
+    }
+
+    // New: Functions for the Promo Pop-up
+    function showPromoPopup() {
+        const promoPopupModal = document.getElementById('promo-popup-modal');
+        // Check sessionStorage to only show once per session
+        if (!sessionStorage.getItem('promoPopupShown')) {
+            promoPopupModal.style.display = 'flex';
+            sessionStorage.setItem('promoPopupShown', 'true');
+        }
+    }
+
+    function closePromoPopup() {
+        document.getElementById('promo-popup-modal').style.display = 'none';
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      
+      if (isPromoActive()) {
+          document.body.classList.add('grand-opening-active');
+          startCountdown();
+          createConfetti();
+          showPromoPopup(); // Call the function to display the pop-up
+      } else {
+          document.getElementById('promo-details').innerHTML = '<div class="promo-period">Our Grand Opening promotion has ended.</div>';
+          // Hide banner if promo is not active
+          document.getElementById('promo-running-banner').style.display = 'none';
+      }
+
+      renderProducts();
+      
+      if (sessionStorage.getItem('pendingOrder')) {
+          toggleCart();
+      } else {
+          showTab('products');
+      }
+    });
+  </script>
 </body>
 </html>
