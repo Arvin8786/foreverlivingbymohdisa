@@ -139,6 +139,22 @@
             100% { left: -10%; top: var(--end-y); opacity: 0; transform: rotate(-360deg); }
         }
 
+        /* Keyframes for products flying top-to-bottom */
+        @keyframes fly-top-to-bottom {
+            0% { top: -10%; left: var(--start-x); opacity: 0; transform: rotate(0deg); }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { top: 110%; left: var(--end-x); opacity: 0; transform: rotate(180deg); }
+        }
+
+        /* Keyframes for products flying bottom-to-top */
+        @keyframes fly-bottom-to-top {
+            0% { top: 110%; left: var(--start-x); opacity: 0; transform: rotate(0deg); }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { top: -10%; left: var(--end-x); opacity: 0; transform: rotate(-180deg); }
+        }
+
         /* Individual product animation settings */
         .product-1 {
             --start-y: 15vh; /* Starts at 15% from top of viewport */
@@ -166,9 +182,42 @@
             animation-delay: 15s;
             transform: scaleY(-1); /* Flip vertically */
         }
-        /* Add more products by copying a .product-X block and incrementing number,
-           then add a corresponding HTML div below. Adjust --start-y, --end-y,
-           animation-duration, and animation-delay for variety. */
+        .product-5 {
+            --start-x: 20vw;
+            --end-x: 80vw;
+            animation: fly-top-to-bottom 22s linear infinite;
+            animation-delay: 3s;
+        }
+        .product-6 {
+            --start-x: 75vw;
+            --end-x: 25vw;
+            animation: fly-bottom-to-top 26s linear infinite;
+            animation-delay: 8s;
+        }
+        .product-7 {
+            --start-y: 10vh;
+            --end-y: 90vh;
+            animation: fly-left-to-right 24s linear infinite;
+            animation-delay: 12s;
+        }
+        .product-8 {
+            --start-x: 30vw;
+            --end-x: 70vw;
+            animation: fly-bottom-to-top 28s linear infinite;
+            animation-delay: 18s;
+        }
+        .product-9 {
+            --start-y: 65vh;
+            --end-y: 35vh;
+            animation: fly-right-to-left 30s linear infinite;
+            animation-delay: 7s;
+        }
+        .product-10 {
+            --start-x: 85vw;
+            --end-x: 15vw;
+            animation: fly-top-to-bottom 25s linear infinite;
+            animation-delay: 14s;
+        }
     </style>
 </head>
 <body>
@@ -177,6 +226,12 @@
     <div class="flying-product-wrapper product-2"><img src="aloe-berry-nectar.jpg" alt="Aloe Berry Nectar" onerror="this.style.display='none'"></div>
     <div class="flying-product-wrapper product-3"><img src="supergreens.jpg" alt="Supergreens" onerror="this.style.display='none'"></div>
     <div class="flying-product-wrapper product-4"><img src="bee-honey.jpg" alt="Bee Honey" onerror="this.style.display='none'"></div>
+    <div class="flying-product-wrapper product-5"><img src="aloe-propolis-creme.jpg" alt="Aloe Propolis Creme" onerror="this.style.display='none'"></div>
+    <div class="flying-product-wrapper product-6"><img src="forever-arctic-sea.jpg" alt="Forever Arctic Sea" onerror="this.style.display='none'"></div>
+    <div class="flying-product-wrapper product-7"><img src="aloe-moisturizing-lotion.jpg" alt="Aloe Moisturizing Lotion" onerror="this.style.display='none'"></div>
+    <div class="flying-product-wrapper product-8"><img src="forever-lycium-plus.jpg" alt="Forever Lycium Plus" onerror="this.style.display='none'"></div>
+    <div class="flying-product-wrapper product-9"><img src="aloe-vera-juice.jpg" alt="Aloe Vera Juice" onerror="this.style.display='none'"></div>
+    <div class="flying-product-wrapper product-10"><img src="forever-bee-pollen.jpg" alt="Forever Bee Pollen" onerror="this.style.display='none'"></div>
     
     <div class="maintenance-container">
         <!-- Make sure FL.jpg is in the same folder as this HTML file -->
@@ -190,16 +245,12 @@
         </p>
 
         <p class="timer">
-            We expect to be back online within <strong>[approximate duration, e.g., the next 2-4 hours]</strong>.
-            Please check back shortly!
+            We are working hard to bring back the best features and exciting promotions!
         </p>
-        <!-- OR, if you have a specific time, use this instead: -->
-        <!-- <p class="timer">Maintenance is estimated to last until <strong>[Date, Time]</strong>.</p> -->
-
 
         <div class="contact-info">
             <p>If you have any urgent inquiries or wish to place an order, please feel free to reach out to us directly:</p>
-            <p>Email: <a href="mailto:YOUR_EMAIL@EXAMPLE.COM">YOUR_EMAIL@EXAMPLE.COM</a></p>
+            <p>Email: <a href="mailto:cs.foreverlivingbymuhdarvindisa@gmail.com">cs.foreverlivingbymuhdarvindisa@gmail.com</a></p>
             <p>Thank you for your patience and understanding!</p>
         </div>
     </div>
