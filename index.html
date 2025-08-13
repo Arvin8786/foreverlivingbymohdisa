@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
@@ -80,6 +81,45 @@
             font-size: 1rem;
             margin-top: 30px;
             color: var(--dark-text);
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        /* NEW STYLE FOR BUSINESS OPPORTUNITY SECTION */
+        .business-opportunity {
+            background-color: #eaf2f8;
+            border: 2px dashed var(--primary-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .business-opportunity h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .whatsapp-button {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--light-text);
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .whatsapp-button:hover {
+            background-color: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .whatsapp-button i {
+            margin-right: 8px;
         }
 
         .contact-info a {
@@ -107,121 +147,34 @@
         /* --- Flying Product Styles --- */
         .flying-product-wrapper {
             position: fixed;
-            width: 70px; /* Size of the flying product image */
+            width: 70px;
             height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: none; /* Crucial: allows clicks/selection through the image */
-            z-index: 5; /* Puts them behind the main maintenance content */
-            opacity: 0; /* Start invisible */
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
         }
-
-        .flying-product-wrapper img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        /* Keyframes for products flying left-to-right */
-        @keyframes fly-left-to-right {
-            0% { left: -10%; top: var(--start-y); opacity: 0; transform: rotate(0deg); }
-            10% { opacity: 0.8; }
-            90% { opacity: 0.8; }
-            100% { left: 110%; top: var(--end-y); opacity: 0; transform: rotate(360deg); }
-        }
-
-        /* Keyframes for products flying right-to-left */
-        @keyframes fly-right-to-left {
-            0% { left: 110%; top: var(--start-y); opacity: 0; transform: rotate(0deg); }
-            10% { opacity: 0.8; }
-            90% { opacity: 0.8; }
-            100% { left: -10%; top: var(--end-y); opacity: 0; transform: rotate(-360deg); }
-        }
-
-        /* Keyframes for products flying top-to-bottom */
-        @keyframes fly-top-to-bottom {
-            0% { top: -10%; left: var(--start-x); opacity: 0; transform: rotate(0deg); }
-            10% { opacity: 0.8; }
-            90% { opacity: 0.8; }
-            100% { top: 110%; left: var(--end-x); opacity: 0; transform: rotate(180deg); }
-        }
-
-        /* Keyframes for products flying bottom-to-top */
-        @keyframes fly-bottom-to-top {
-            0% { top: 110%; left: var(--start-x); opacity: 0; transform: rotate(0deg); }
-            10% { opacity: 0.8; }
-            90% { opacity: 0.8; }
-            100% { top: -10%; left: var(--end-x); opacity: 0; transform: rotate(-180deg); }
-        }
-
-        /* Individual product animation settings */
-        .product-1 {
-            --start-y: 15vh; /* Starts at 15% from top of viewport */
-            --end-y: 70vh;   /* Ends at 70% from top of viewport */
-            animation: fly-left-to-right 28s linear infinite;
-            animation-delay: 0s;
-        }
-        .product-2 {
-            --start-y: 80vh; 
-            --end-y: 20vh; 
-            animation: fly-right-to-left 32s linear infinite;
-            animation-delay: 5s;
-        }
-        .product-3 {
-            --start-y: 45vh; 
-            --end-y: 45vh; /* Stays horizontal */
-            animation: fly-left-to-right 25s linear infinite;
-            animation-delay: 10s;
-            transform: scaleX(-1); /* Flip horizontally to face left initially */
-        }
-        .product-4 {
-            --start-y: 30vh; 
-            --end-y: 85vh; 
-            animation: fly-right-to-left 30s linear infinite;
-            animation-delay: 15s;
-            transform: scaleY(-1); /* Flip vertically */
-        }
-        .product-5 {
-            --start-x: 20vw;
-            --end-x: 80vw;
-            animation: fly-top-to-bottom 22s linear infinite;
-            animation-delay: 3s;
-        }
-        .product-6 {
-            --start-x: 75vw;
-            --end-x: 25vw;
-            animation: fly-bottom-to-top 26s linear infinite;
-            animation-delay: 8s;
-        }
-        .product-7 {
-            --start-y: 10vh;
-            --end-y: 90vh;
-            animation: fly-left-to-right 24s linear infinite;
-            animation-delay: 12s;
-        }
-        .product-8 {
-            --start-x: 30vw;
-            --end-x: 70vw;
-            animation: fly-bottom-to-top 28s linear infinite;
-            animation-delay: 18s;
-        }
-        .product-9 {
-            --start-y: 65vh;
-            --end-y: 35vh;
-            animation: fly-right-to-left 30s linear infinite;
-            animation-delay: 7s;
-        }
-        .product-10 {
-            --start-x: 85vw;
-            --end-x: 15vw;
-            animation: fly-top-to-bottom 25s linear infinite;
-            animation-delay: 14s;
-        }
+        .flying-product-wrapper img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        @keyframes fly-left-to-right { 0% { left: -10%; top: var(--start-y); opacity: 0; transform: rotate(0deg); } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { left: 110%; top: var(--end-y); opacity: 0; transform: rotate(360deg); } }
+        @keyframes fly-right-to-left { 0% { left: 110%; top: var(--start-y); opacity: 0; transform: rotate(0deg); } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { left: -10%; top: var(--end-y); opacity: 0; transform: rotate(-360deg); } }
+        @keyframes fly-top-to-bottom { 0% { top: -10%; left: var(--start-x); opacity: 0; transform: rotate(0deg); } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { top: 110%; left: var(--end-x); opacity: 0; transform: rotate(180deg); } }
+        @keyframes fly-bottom-to-top { 0% { top: 110%; left: var(--start-x); opacity: 0; transform: rotate(0deg); } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { top: -10%; left: var(--end-x); opacity: 0; transform: rotate(-180deg); } }
+        .product-1 { --start-y: 15vh; --end-y: 70vh; animation: fly-left-to-right 28s linear infinite; animation-delay: 0s; }
+        .product-2 { --start-y: 80vh; --end-y: 20vh; animation: fly-right-to-left 32s linear infinite; animation-delay: 5s; }
+        .product-3 { --start-y: 45vh; --end-y: 45vh; animation: fly-left-to-right 25s linear infinite; animation-delay: 10s; transform: scaleX(-1); }
+        .product-4 { --start-y: 30vh; --end-y: 85vh; animation: fly-right-to-left 30s linear infinite; animation-delay: 15s; transform: scaleY(-1); }
+        .product-5 { --start-x: 20vw; --end-x: 80vw; animation: fly-top-to-bottom 22s linear infinite; animation-delay: 3s; }
+        .product-6 { --start-x: 75vw; --end-x: 25vw; animation: fly-bottom-to-top 26s linear infinite; animation-delay: 8s; }
+        .product-7 { --start-y: 10vh; --end-y: 90vh; animation: fly-left-to-right 24s linear infinite; animation-delay: 12s; }
+        .product-8 { --start-x: 30vw; --end-x: 70vw; animation: fly-bottom-to-top 28s linear infinite; animation-delay: 18s; }
+        .product-9 { --start-y: 65vh; --end-y: 35vh; animation: fly-right-to-left 30s linear infinite; animation-delay: 7s; }
+        .product-10 { --start-x: 85vw; --end-x: 15vw; animation: fly-top-to-bottom 25s linear infinite; animation-delay: 14s; }
     </style>
 </head>
 <body>
-    <!-- Flying Product Elements (ensure image files are in the same folder) -->
+    <!-- Flying Product Elements -->
     <div class="flying-product-wrapper product-1"><img src="aloe-vera-gel.jpg" alt="Aloe Vera Gel" onerror="this.style.display='none'"></div>
     <div class="flying-product-wrapper product-2"><img src="aloe-berry-nectar.jpg" alt="Aloe Berry Nectar" onerror="this.style.display='none'"></div>
     <div class="flying-product-wrapper product-3"><img src="supergreens.jpg" alt="Supergreens" onerror="this.style.display='none'"></div>
@@ -234,19 +187,27 @@
     <div class="flying-product-wrapper product-10"><img src="forever-bee-pollen.jpg" alt="Forever Bee Pollen" onerror="this.style.display='none'"></div>
     
     <div class="maintenance-container">
-        <!-- Make sure FL.jpg is in the same folder as this HTML file -->
         <img src="FL.jpg" alt="Forever Living Logo" class="logo" onerror="this.style.display='none'">
 
         <h1>Website Under Maintenance</h1>
         <p>
             We're currently performing scheduled maintenance and exciting upgrades to the
-            <strong>Forever Living by Mohd Arvind Isa</strong> website.
+            <strong>Forever Living by Mohd Arvind Isa</strong> e-shop.
             We apologize for any inconvenience this may cause.
         </p>
 
         <p class="timer">
             We are working hard to bring back the best features and exciting promotions!
         </p>
+
+        <!-- NEW: Business Opportunity Section -->
+        <div class="business-opportunity">
+            <h3>Interested in the Forever Living Business?</h3>
+            <p>While our e-shop is temporarily down, our business opportunity is always open! Learn how you can build a successful business with world-class products.</p>
+            <a href="https://wa.me/601111033154?text=Hi,%20I'm%20interested%20in%20learning%20more%20about%20the%20Forever%20Living%20business%20opportunity." class="whatsapp-button" target="_blank">
+                <i class="fab fa-whatsapp"></i> Click to Learn More on WhatsApp
+            </a>
+        </div>
 
         <div class="contact-info">
             <p>If you have any urgent inquiries or wish to place an order, please feel free to reach out to us directly:</p>
