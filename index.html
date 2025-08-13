@@ -35,7 +35,7 @@
             min-height: 100vh;
             text-align: center;
             line-height: 1.6;
-            overflow: hidden; /* Hide flying products when they go off-screen */
+            /* overflow: hidden;  <-- REMOVED to allow scrolling on small screens */
         }
 
         .maintenance-container {
@@ -43,11 +43,11 @@
             padding: 40px 30px;
             border-radius: 15px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            max-width: 600px;
+            max-width: 750px; /* INCREASED from 600px for a wider, "landscape" feel */
             width: 90%;
             animation: fadeIn 1s ease-out;
-            position: relative; /* For z-index to work against flying products */
-            z-index: 10; /* Ensure maintenance message is above flying products */
+            position: relative;
+            z-index: 10;
         }
 
         @keyframes fadeIn {
@@ -59,7 +59,7 @@
             max-width: 100px;
             height: auto;
             margin-bottom: 25px;
-            display: block; /* Ensure it's treated as a block for margin centering */
+            display: block;
             margin-left: auto;
             margin-right: auto;
         }
@@ -85,7 +85,6 @@
             padding-top: 20px;
         }
 
-        /* NEW STYLE FOR BUSINESS OPPORTUNITY SECTION */
         .business-opportunity {
             background-color: #eaf2f8;
             border: 2px dashed var(--primary-color);
@@ -200,7 +199,6 @@
             We are working hard to bring back the best features and exciting promotions!
         </p>
 
-        <!-- NEW: Business Opportunity Section -->
         <div class="business-opportunity">
             <h3>Interested in the Forever Living Business?</h3>
             <p>While our e-shop is temporarily down, our business opportunity is always open! Learn how you can build a successful business with world-class products.</p>
