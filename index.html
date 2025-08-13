@@ -1,217 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forever Living by Mohd Arvind Isa - Under Maintenance</title>
-    
-    <!-- Google Fonts (Poppins, matching your main site) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        :root {
-            --primary-color: #1a5276; /* Dark Blue */
-            --secondary-color: #f39c12; /* Orange/Yellow */
-            --accent-color: #27ae60; /* Green */
-            --light-gray: #f4f6f8;
-            --dark-text: #333;
-            --light-text: #fff;
-            --font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            font-family: var(--font-family);
-            margin: 0;
-            padding: 20px;
-            background-color: var(--light-gray);
-            color: var(--dark-text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            text-align: center;
-            line-height: 1.6;
-            /* overflow: hidden;  <-- REMOVED to allow scrolling on small screens */
-        }
-
-        .maintenance-container {
-            background-color: var(--light-text);
-            padding: 40px 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            max-width: 750px; /* INCREASED from 600px for a wider, "landscape" feel */
-            width: 90%;
-            animation: fadeIn 1s ease-out;
-            position: relative;
-            z-index: 10;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo {
-            max-width: 100px;
-            height: auto;
-            margin-bottom: 25px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-
-        p {
-            font-size: 1.1rem;
-            color: #555;
-            margin-bottom: 20px;
-        }
-
-        .contact-info {
-            font-size: 1rem;
-            margin-top: 30px;
-            color: var(--dark-text);
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-
-        .business-opportunity {
-            background-color: #eaf2f8;
-            border: 2px dashed var(--primary-color);
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 30px;
-        }
-        
-        .business-opportunity h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-        }
-
-        .whatsapp-button {
-            display: inline-block;
-            background-color: var(--accent-color);
-            color: var(--light-text);
-            padding: 12px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        
-        .whatsapp-button:hover {
-            background-color: #229954;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .whatsapp-button i {
-            margin-right: 8px;
-        }
-
-        .contact-info a {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .contact-info a:hover {
-            color: var(--primary-color);
-        }
-
-        .timer {
-            font-weight: 700;
-            color: var(--secondary-color);
-            font-size: 1.2rem;
-            margin-top: 20px;
-            padding: 10px 20px;
-            border: 2px dashed var(--secondary-color);
-            border-radius: 8px;
-            display: inline-block;
-        }
-
-        /* --- Flying Product Styles --- */
-        .flying-product-wrapper {
-            position: fixed;
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-            z-index: 5;
-            opacity: 0;
-        }
-        .flying-product-wrapper img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        @keyframes fly-left-to-right { 0% { left: -10%; top: var(--start-y); opacity: 0; transform: rotate(0deg); } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { left: 110%; top: var(--end-y); opacity: 0; transform: rotate(360deg); } }
-        @keyframes fly-right-to-left { 0% { left: 110%; top: var(--start-y); opacity: 0; transform: rotate(0deg); } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { left: -10%; top: var(--end-y); opacity: 0; transform: rotate(-360deg); } }
-        @keyframes fly-top-to-bottom { 0% { top: -10%; left: var(--start-x); opacity: 0; transform: rotate(0deg); } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { top: 110%; left: var(--end-x); opacity: 0; transform: rotate(180deg); } }
-        @keyframes fly-bottom-to-top { 0% { top: 110%; left: var(--start-x); opacity: 0; transform: rotate(0deg); } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { top: -10%; left: var(--end-x); opacity: 0; transform: rotate(-180deg); } }
-        .product-1 { --start-y: 15vh; --end-y: 70vh; animation: fly-left-to-right 28s linear infinite; animation-delay: 0s; }
-        .product-2 { --start-y: 80vh; --end-y: 20vh; animation: fly-right-to-left 32s linear infinite; animation-delay: 5s; }
-        .product-3 { --start-y: 45vh; --end-y: 45vh; animation: fly-left-to-right 25s linear infinite; animation-delay: 10s; transform: scaleX(-1); }
-        .product-4 { --start-y: 30vh; --end-y: 85vh; animation: fly-right-to-left 30s linear infinite; animation-delay: 15s; transform: scaleY(-1); }
-        .product-5 { --start-x: 20vw; --end-x: 80vw; animation: fly-top-to-bottom 22s linear infinite; animation-delay: 3s; }
-        .product-6 { --start-x: 75vw; --end-x: 25vw; animation: fly-bottom-to-top 26s linear infinite; animation-delay: 8s; }
-        .product-7 { --start-y: 10vh; --end-y: 90vh; animation: fly-left-to-right 24s linear infinite; animation-delay: 12s; }
-        .product-8 { --start-x: 30vw; --end-x: 70vw; animation: fly-bottom-to-top 28s linear infinite; animation-delay: 18s; }
-        .product-9 { --start-y: 65vh; --end-y: 35vh; animation: fly-right-to-left 30s linear infinite; animation-delay: 7s; }
-        .product-10 { --start-x: 85vw; --end-x: 15vw; animation: fly-top-to-bottom 25s linear infinite; animation-delay: 14s; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forever Living by Muhd Arvind Isa</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root{--primary-color:#1a5276;--secondary-color:#f39c12;--accent-color:#27ae60;--light-gray:#f4f6f8;--dark-text:#333;--light-text:#fff;--border-radius:12px;--shadow:0 4px 15px rgba(0,0,0,.08);--font-family:'Poppins',sans-serif}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideIn{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+    *,::after,::before{box-sizing:border-box}
+    body{font-family:var(--font-family);margin:0;padding:0;background-color:var(--light-gray);color:var(--dark-text);overflow-x:hidden;line-height:1.6}
+    .container{max-width:1200px;margin:0 auto;padding:0 20px}h1,h2,h3,h4{color:var(--primary-color);font-weight:600}
+    header{background-color:var(--light-text);padding:20px 0;text-align:center;border-bottom:1px solid #e0e0e0;position:relative}.header-content{display:flex;align-items:center;justify-content:center;gap:20px}.header-logo{width:80px;height:80px}.header-content h1{margin:0}
+    nav{background-color:var(--primary-color);position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.1)}nav ul{display:flex;list-style:none;padding:10px 0;margin:0;justify-content:center;flex-wrap:wrap}nav a{color:var(--light-text);text-decoration:none;font-weight:600;padding:10px 20px;cursor:pointer}
+    .tab-content{display:none;padding:20px 0}.tab-content.active{display:block;animation:fadeIn .5s}.search-container{margin-bottom:30px;position:relative}
+    #product-search{width:100%;padding:15px 50px 15px 25px;border:2px solid #ddd;border-radius:50px;font-size:1rem;outline:none}#product-search:focus{border-color:var(--primary-color)}.search-icon{position:absolute;right:25px;top:50%;transform:translateY(-50%);color:var(--primary-color)}
+    .product-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:30px}.product{background:var(--light-text);border-radius:var(--border-radius);box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative}.product-info{padding:20px;flex-grow:1}.product h3{margin:0 0 10px;font-size:1.25rem}.product-actions{margin-top:auto}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 15px;border-radius:50px;text-decoration:none;font-weight:700;border:none;cursor:pointer}.btn:disabled{background-color:#ccc;cursor:not-allowed}.btn-primary{background:var(--primary-color);color:var(--light-text)}
+    .floating-cart-btn{position:fixed;bottom:20px;right:20px;width:60px;height:60px;background-color:var(--primary-color);color:var(--light-text);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 4px 12px rgba(0,0,0,.25);cursor:pointer;z-index:1000}#cart-count{position:absolute;top:-2px;right:-2px;background-color:var(--secondary-color);color:var(--light-text);border-radius:50%;padding:3px 8px;font-size:.8rem;border:2px solid var(--light-text)}
+    .modal{display:none;position:fixed;z-index:1001;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,.6);align-items:center;justify-content:center}.modal-content{background-color:#fefefe;padding:30px;border-radius:var(--border-radius);width:90%;max-width:600px;max-height:90vh;overflow-y:auto}.close{color:#aaa;float:right;font-size:28px;font-weight:700;cursor:pointer}
+    #cart-items{border-bottom:1px solid #eee;margin-bottom:15px}.cart-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0}.quantity-controls{display:flex;align-items:center;gap:8px}.remove-item-btn{color:#c00;cursor:pointer;margin-left:15px}
+    .cart-summary{margin-top:20px}.summary-line{display:flex;justify-content:space-between;padding:8px 0}.summary-line.total{font-weight:700;font-size:1.3rem;border-top:2px solid #333;margin-top:10px}
+    .customer-info-form input{width:100%;padding:10px;margin-bottom:10px;border:1px solid #ccc;border-radius:5px}
+    #consent-form{margin-top:20px;padding:15px;background-color:#f8f9fa;border:1px solid #dee2e6;border-radius:8px}.checkout-btn{width:100%;margin-top:15px}
+    /* --- AMENDMENT: Style for the new sections --- */
+    .order-status-checker { text-align: center; padding: 40px; background: #fff; border-radius: 12px; margin: 30px 0; box-shadow: var(--shadow); }
+    .order-status-checker input { width: 100%; padding: 12px; border-radius: 50px; border: 1px solid #ccc; }
+    .order-status-checker button { width: auto; flex-shrink: 0; }
+    .confirmation-view { text-align: center; padding: 20px; }
+    .confirmation-view .order-id-display { background-color: #eaf2f8; border: 2px dashed var(--primary-color); padding: 15px; margin: 20px 0; font-size: 1.2rem; font-weight: bold; }
+  </style>
 </head>
 <body>
-    <!-- Flying Product Elements -->
-    <div class="flying-product-wrapper product-1"><img src="aloe-vera-gel.jpg" alt="Aloe Vera Gel" onerror="this.style.display='none'"></div>
-    <div class="flying-product-wrapper product-2"><img src="aloe-berry-nectar.jpg" alt="Aloe Berry Nectar" onerror="this.style.display='none'"></div>
-    <div class="flying-product-wrapper product-3"><img src="supergreens.jpg" alt="Supergreens" onerror="this.style.display='none'"></div>
-    <div class="flying-product-wrapper product-4"><img src="bee-honey.jpg" alt="Bee Honey" onerror="this.style.display='none'"></div>
-    <div class="flying-product-wrapper product-5"><img src="aloe-propolis-creme.jpg" alt="Aloe Propolis Creme" onerror="this.style.display='none'"></div>
-    <div class="flying-product-wrapper product-6"><img src="forever-arctic-sea.jpg" alt="Forever Arctic Sea" onerror="this.style.display='none'"></div>
-    <div class="flying-product-wrapper product-7"><img src="aloe-moisturizing-lotion.jpg" alt="Aloe Moisturizing Lotion" onerror="this.style.display='none'"></div>
-    <div class="flying-product-wrapper product-8"><img src="forever-lycium-plus.jpg" alt="Forever Lycium Plus" onerror="this.style.display='none'"></div>
-    <div class="flying-product-wrapper product-9"><img src="aloe-vera-juice.jpg" alt="Aloe Vera Juice" onerror="this.style.display='none'"></div>
-    <div class="flying-product-wrapper product-10"><img src="forever-bee-pollen.jpg" alt="Forever Bee Pollen" onerror="this.style.display='none'"></div>
-    
-    <div class="maintenance-container">
-        <img src="FL.jpg" alt="Forever Living Logo" class="logo" onerror="this.style.display='none'">
 
-        <h1>Website Under Maintenance</h1>
-        <p>
-            We're currently performing scheduled maintenance and exciting upgrades to the
-            <strong>Forever Living by Mohd Arvind Isa</strong> e-shop.
-            We apologize for any inconvenience this may cause.
-        </p>
-
-        <p class="timer">
-            We are working hard to bring back the best features and exciting promotions!
-        </p>
-
-        <div class="business-opportunity">
-            <h3>Interested in the Forever Living Business?</h3>
-            <p>While our e-shop is temporarily down, our business opportunity is always open! Learn how you can build a successful business with world-class products.</p>
-            <a href="https://wa.me/601111033154?text=Hi,%20I'm%20interested%20in%20learning%20more%20about%20the%20Forever%20Living%20business%20opportunity." class="whatsapp-button" target="_blank">
-                <i class="fab fa-whatsapp"></i> Click to Learn More on WhatsApp
-            </a>
-        </div>
-
-        <div class="contact-info">
-            <p>If you have any urgent inquiries or wish to place an order, please feel free to reach out to us directly:</p>
-            <p>Email: <a href="mailto:cs.foreverlivingbymuhdarvindisa@gmail.com">cs.foreverlivingbymuhdarvindisa@gmail.com</a></p>
-            <p>Thank you for your patience and understanding!</p>
+<div id="store-wrapper">
+  <header>
+    <div class="container">
+        <div class="header-content">
+            <img src="FL.jpg" alt="Business Logo" class="header-logo" onerror="this.style.display='none'">
+            <h1>FOREVER LIVING by Muhd Arvind Isa</h1>
         </div>
     </div>
+  </header>
+  
+  <nav>
+    <div class="container">
+        <ul>
+          <li><a onclick="showTab('products')">Products</a></li>
+          <li><a onclick="showTab('receipt')">Download Receipt</a></li>
+          <!-- Add other nav links as needed -->
+        </ul>
+    </div>
+  </nav>
+
+  <main id="main-content" class="container">
+    <div id="products" class="tab-content active">
+      <div class="search-container">
+        <input type="text" id="product-search" onkeyup="filterProducts()" placeholder="Search for products...">
+        <i class="fa-solid fa-search search-icon"></i>
+      </div>
+      <div id="product-list" class="product-list">
+          <p>Loading products...</p>
+      </div>
+    </div>
+
+    <!-- --- AMENDMENT: New tab for downloading receipts --- -->
+    <div id="receipt" class="tab-content">
+        <div class="order-status-checker">
+            <h2><i class="fa-solid fa-receipt"></i> Check Order Status & Download Receipt</h2>
+            <p>Enter the Order ID you received after checkout to see your status and download your receipt once approved.</p>
+            <div style="max-width: 500px; margin: 20px auto; display: flex; gap: 10px;">
+                <input type="text" id="order-id-input" placeholder="Enter Your Order ID (e.g., FL-ORD-...)">
+                <button class="btn btn-primary" onclick="checkOrderStatus()">Check Status</button>
+            </div>
+            <div id="status-result" style="margin-top: 20px; font-weight: bold; min-height: 30px;"></div>
+        </div>
+    </div>
+
+  </main>
+</div>
+
+  <div id="floating-cart" class="floating-cart-btn" onclick="toggleCart()">
+    <i class="fa-solid fa-cart-shopping"></i>
+    <span id="cart-count">0</span>
+  </div>
+
+  <div id="cart-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="toggleCart(true)">×</span>
+      <!-- This view will be dynamically replaced by the confirmation view -->
+      <div id="cart-view">
+        <h2>Your Shopping Cart</h2>
+        <div id="cart-items"><p>Your cart is currently empty.</p></div>
+        <div class="cart-summary">
+          <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+          <div class="summary-line" id="discount-line" style="display:none;"><span>Discount</span><span id="cart-discount">RM 0.00</span></div>
+          <div class="summary-line"><span>Shipping</span><span id="cart-shipping">RM 0.00</span></div>
+          <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
+          <div id="points-earned-display"></div>
+        </div>
+        <div class="discount-section">
+            <input type="text" id="discount-code-input" placeholder="Enter Discount Code">
+            <button class="btn" onclick="applyDiscount()">Apply</button>
+        </div>
+        <p id="discount-status"></p>
+        <div class="customer-info-form">
+          <h3>Customer & Shipping Information</h3>
+          <input type="text" id="customer-name" placeholder="Your Full Name" required>
+          <input type="tel" id="customer-phone" placeholder="Your WhatsApp Number (e.g., 60123456789)" required>
+          <input type="email" id="customer-email" placeholder="Your Email Address" required>
+          <input type="text" id="customer-address1" placeholder="Address Line 1" required>
+        </div>
+        <div id="consent-form">
+            <label>
+                <input type="checkbox" id="consent-checkbox" onchange="toggleCheckoutButton()">
+                I consent to the collection of my personal data.
+            </label>
+        </div>
+        <button class="btn btn-primary checkout-btn" id="checkout-btn" onclick="initiateCheckout()" disabled>Send Order via WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    const googleScriptURL = 'YOUR_GOOGLE_SCRIPT_URL_HERE'; // <-- PASTE YOUR DEPLOYED SCRIPT URL
+    let products = [];
+    let cart = [];
+    let activePromotions = [];
+    let shippingRules = {};
+    let availableDiscountCodes = {};
+    let appliedDiscount = null;
+    
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const response = await fetch(googleScriptURL);
+            const data = await response.json();
+            if(data.status === 'success') {
+                // Assuming you have a function to render products from a master sheet in a real scenario
+                // For now, let's use dummy data.
+                products = [{ id: 1, name: "ALOE VERA GEL", price: 116.79 }, { id: 2, name: "ALOE BERRY NECTAR", price: 116.79 }];
+                renderProducts();
+                
+                activePromotions = data.activePromotions;
+                shippingRules = data.shippingRules;
+                availableDiscountCodes = data.discountCodes;
+            } else {
+                document.getElementById('product-list').innerHTML = `<p style="color:red;">Error loading store data: ${data.message}</p>`;
+            }
+        } catch (error) {
+            document.getElementById('product-list').innerHTML = `<p style="color:red;">Could not connect to the store. Please try again later.</p>`;
+        }
+    });
+
+    function renderProducts() {
+        const productListEl = document.getElementById('product-list');
+        productListEl.innerHTML = '';
+        products.forEach(p => {
+            productListEl.innerHTML += `
+                <div class="product">
+                    <div class="product-info">
+                        <h3>${p.name}</h3>
+                        <p>RM ${p.price.toFixed(2)}</p>
+                        <div class="product-actions">
+                            <button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // --- AMENDMENT: NEW CHECKOUT FUNCTION WITH CONFIRMATION STEP ---
+    async function initiateCheckout() {
+        if (!document.getElementById("consent-checkbox").checked) return alert("You must agree to the data consent.");
+        
+        const checkoutBtn = document.getElementById('checkout-btn');
+        checkoutBtn.disabled = true;
+        checkoutBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+
+        const name = document.getElementById("customer-name").value.trim();
+        const phone = document.getElementById("customer-phone").value.trim();
+        const email = document.getElementById("customer-email").value.trim();
+        const address = document.getElementById("customer-address1").value.trim();
+
+        if (!name || !phone || !email || !address || cart.length === 0) {
+            alert("Please fill all fields and ensure your cart is not empty.");
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerHTML = 'Send Order via WhatsApp';
+            return;
+        }
+
+        const { total, discountValue, shipping } = calculateCartTotals(); // Assuming this function exists
+
+        try {
+            const payload = {
+                action: "logPreliminaryOrder",
+                customerName: name, customerPhone: phone, customerEmail: email, customerAddress: address,
+                cart: cart,
+                totalAmount: total.toFixed(2),
+                discountApplied: appliedDiscount ? `${appliedDiscount.code} - RM ${discountValue.toFixed(2)}` : "N/A",
+                shippingFee: shipping.fee.toFixed(2),
+                totalPointsForThisPurchase: Math.floor(total)
+            };
+
+            const response = await fetch(googleScriptURL, { method: "POST", body: JSON.stringify(payload) });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                // Show confirmation view BEFORE opening WhatsApp
+                const cartView = document.getElementById('cart-view');
+                cartView.innerHTML = `
+                    <div class="confirmation-view">
+                        <h3><i class="fa-solid fa-circle-check" style="color: green;"></i> Order Logged!</h3>
+                        <p>Please save your Order ID. You will need it to download your receipt later.</p>
+                        <div class="order-id-display">
+                            Your Order ID is:<br><strong>${result.preliminaryOrderId}</strong>
+                        </div>
+                        <p>A new tab will open for WhatsApp. Please send the pre-filled message to confirm your order with us.</p>
+                        <button class="btn btn-secondary" onclick="toggleCart(true)">Close</button>
+                    </div>
+                `;
+
+                // Now, open WhatsApp
+                let message = `Hi, I would like to place an order:\n\n*Order ID: ${result.preliminaryOrderId}*\n\n--- ORDER SUMMARY ---\n`;
+                cart.forEach(item => { 
+                    const p = products.find(prod => prod.id === item.id);
+                    message += `- ${p.name} (x${item.quantity})\n`;
+                });
+                message += `\n*TOTAL: RM ${total.toFixed(2)}*\n\nPlease provide payment details. Thank you!`;
+                window.open(`https://wa.me/601111033154?text=${encodeURIComponent(message)}`, "_blank");
+
+                // Reset cart state
+                cart = [];
+                appliedDiscount = null;
+                updateCartDisplay(); // This will clear the visual cart details
+
+            } else { throw new Error(result.message); }
+        } catch (error) {
+            alert(`An error occurred: ${error.message}`);
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerHTML = 'Send Order via WhatsApp';
+        }
+    }
+
+    // --- AMENDMENT: NEW FUNCTION TO CHECK ORDER STATUS ---
+    async function checkOrderStatus() {
+        const orderIdInput = document.getElementById('order-id-input');
+        const resultDiv = document.getElementById('status-result');
+        const orderId = orderIdInput.value.trim();
+
+        if (!orderId) {
+            resultDiv.innerHTML = `<p style="color: red;">Please enter an Order ID.</p>`;
+            return;
+        }
+
+        resultDiv.innerHTML = `<p style="color: blue;"><i class="fa-solid fa-spinner fa-spin"></i> Checking...</p>`;
+
+        try {
+            const payload = { action: "checkOrderStatus", orderId: orderId };
+            const response = await fetch(googleScriptURL, { method: "POST", body: JSON.stringify(payload) });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                if (result.orderStatus === 'Approved') {
+                    resultDiv.innerHTML = `
+                        <p style="color: green;">Your order is Approved!</p>
+                        <a href="${result.receiptUrl}" class="btn btn-primary" target="_blank">
+                            <i class="fa-solid fa-download"></i> Download Receipt
+                        </a>`;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: orange;">Your order status is: <strong>${result.orderStatus}</strong>. Please check back later.</p>`;
+                }
+            } else { throw new Error(result.message); }
+        } catch (error) {
+            resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}. Please check your Order ID.</p>`;
+        }
+    }
+
+
+    // --- Your existing utility functions (addToCart, updateCartDisplay, etc.) go here ---
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+    }
+    function toggleCart(forceClose = false) {
+        const modal = document.getElementById('cart-modal');
+        if (forceClose) {
+            modal.style.display = 'none';
+             // AMENDMENT: Reset the cart view when closing after confirmation
+            const cartView = document.getElementById('cart-view');
+            cartView.innerHTML = `
+                <h2>Your Shopping Cart</h2>
+                <div id="cart-items"><p>Your cart is currently empty.</p></div>
+                <div class="cart-summary">
+                  <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+                  <div class="summary-line"><span>Shipping</span><span id="cart-shipping">RM 0.00</span></div>
+                  <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
+                </div>
+                <div class="customer-info-form">...</div>
+                <button class="btn btn-primary checkout-btn" id="checkout-btn" onclick="initiateCheckout()" disabled>Send Order via WhatsApp</button>
+            `;
+            updateCartDisplay();
+            return;
+        }
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        if (modal.style.display === 'flex') { updateCartDisplay(); }
+    }
+    // Dummy functions to make the code runnable. Replace with your actual functions.
+    function addToCart(id) { 
+        const existing = cart.find(i => i.id === id);
+        if (existing) { existing.quantity++; } else { cart.push({id, quantity: 1}); }
+        updateCartDisplay();
+    }
+    function updateCartDisplay() {
+        document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+        // Add logic to update items in the modal cart view
+    }
+    function calculateCartTotals() { return { total: 100, discountValue: 0, shipping: { fee: 14 } }; }
+    function toggleCheckoutButton() { document.getElementById('checkout-btn').disabled = !document.getElementById('consent-checkbox').checked; }
+    function filterProducts() {}
+    function applyDiscount() {}
+
+</script>
 </body>
 </html>
