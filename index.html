@@ -29,9 +29,55 @@
     .product-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:30px}.product{background:var(--light-text);border-radius:var(--border-radius);box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;transition:all .3s ease;overflow:hidden}.product:hover{transform:translateY(-8px);box-shadow:0 10px 25px rgba(0,0,0,.12)}.product.promo-highlight{animation:promoGlow 2.5s infinite ease-in-out}.product-image-container{height:220px;padding:15px;display:flex;align-items:center;justify-content:center}.product img{max-width:100%;max-height:100%;object-fit:contain}.product-info{padding:20px;flex-grow:1;display:flex;flex-direction:column;text-align:left;position:relative}.product h3{margin:0 0 10px;font-size:1.25rem;height:3.75rem;overflow:hidden}.product .benefits{font-size:.85rem;color:#555;margin:10px 0;flex-grow:1}.product .consumption{font-size:.85rem;color:var(--primary-color);font-style:italic;margin:10px 0}.price-section{margin:15px 0;text-align:center}.original-price{text-decoration:line-through;color:#999;font-size:1rem;margin-right:10px}.new-price{color:var(--secondary-color);font-weight:700;font-size:1.5rem}.product-points{font-size:.9rem;font-weight:600;color:var(--accent-color);text-align:center;margin-top:10px}.product-actions{margin-top:auto;display:flex;flex-direction:column;gap:10px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 15px;border-radius:50px;text-decoration:none;font-weight:700;border:none;cursor:pointer;transition:all .3s}.btn:disabled{background-color:#ccc;cursor:not-allowed}.btn-primary{background:var(--primary-color);color:var(--light-text)}.btn-primary:hover{background:#123e5a;transform:scale(1.05)}.btn-secondary{background:var(--light-gray);color:var(--primary-color);border:1px solid var(--primary-color)}.btn-secondary:hover{background:#e0e0e0}.featured-badge{position:absolute;top:0;right:0;background:var(--secondary-color);color:#fff;padding:5px 25px;transform:rotate(45deg) translate(25%,-65%);transform-origin:0 0;font-weight:700;font-size:.9rem;box-shadow:0 3px 10px rgba(0,0,0,.2);z-index:10;white-space:nowrap}.halal-logo-tag{position:absolute;top:10px;left:10px;width:40px;height:40px;z-index:5}.floating-cart-btn{position:fixed;bottom:20px;right:20px;width:60px;height:60px;background-color:var(--primary-color);color:var(--light-text);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 4px 12px rgba(0,0,0,.25);cursor:pointer;z-index:1000;transition:transform .3s ease}.floating-cart-btn:hover{transform:scale(1.1)}#cart-count{position:absolute;top:-2px;right:-2px;background-color:var(--secondary-color);color:var(--light-text);border-radius:50%;padding:3px 8px;font-size:.8rem;font-weight:700;border:2px solid var(--light-text)}.modal{display:none;position:fixed;z-index:1001;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,.6);align-items:center;justify-content:center;animation:fadeIn .4s ease}.modal-content{background-color:#fefefe;padding:30px;border-radius:var(--border-radius);width:90%;max-width:600px;animation:slideIn .4s ease;max-height:90vh;overflow-y:auto}.close{color:#aaa;float:right;font-size:28px;font-weight:700;cursor:pointer;transition:color .3s}.close:hover{color:#000}#cart-items{max-height:250px;overflow-y:auto;padding-right:10px;border-bottom:1px solid #eee;margin-bottom:15px}.cart-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0}.cart-item-details{flex-grow:1}.quantity-controls{display:flex;align-items:center;gap:8px;margin-top:5px}.quantity-btn{width:28px;height:28px;background:var(--light-gray);border:1px solid #ccc;border-radius:50%;cursor:pointer;font-weight:700}.quantity-display{font-weight:600;min-width:20px;text-align:center}.remove-item-btn{font-size:1.2rem;color:#c00;cursor:pointer;margin-left:15px}.cart-summary{margin-top:20px;font-size:1.1rem}.summary-line{display:flex;justify-content:space-between;padding:8px 0}.summary-line.total{font-weight:700;font-size:1.3rem;border-top:2px solid #333;margin-top:10px}.points-earned,.free-shipping-promo{background-color:#e0f2f1;color:var(--accent-color);padding:10px;border-radius:8px;text-align:center;margin-top:20px;font-weight:700}.customer-info-form input{width:100%;padding:10px;margin-bottom:10px;border:1px solid #ccc;border-radius:5px}.discount-section{display:flex;gap:10px;margin-top:15px}.discount-section input{flex-grow:1;padding:10px;border:1px solid #ccc;border-radius:5px}.discount-section button{width:auto;padding:10px 15px;flex-shrink:0}#discount-status{font-size:.9rem;font-weight:600;margin-top:8px;min-height:18px;text-align:center}#consent-form{margin-top:20px;padding:15px;background-color:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;font-size:.9rem}#consent-form label{display:flex;align-items:flex-start;gap:10px}#consent-form input[type=checkbox]{margin-top:3px}#consent-form a{color:var(--primary-color);font-weight:600}.checkout-btn{width:100%;margin-top:15px}.verification-step{margin-top:20px;padding:20px;background-color:var(--light-gray);border-radius:var(--border-radius);text-align:center;border:2px dashed #ddd}.verification-step.active{border-color:var(--primary-color);background-color:#eaf2f8}.verification-step.completed{border-color:var(--accent-color);background-color:#e8f8f5;opacity:.7}.verification-step h4{margin-top:0}.verification-step input[type=file],.verification-step input[type=text]{width:100%;padding:12px;margin:15px 0 10px;border:1px solid #ddd;border-radius:8px}#upload-status,#verification-status{margin-top:10px;font-weight:700;min-height:20px}footer{background:var(--primary-color);color:var(--light-text);padding:40px 20px;text-align:center;margin-top:30px}.disclaimer{margin-top:10px;background-color:#fff3cd;color:#856404;padding:15px;border-top:1px solid #ffeeba}
     .about-us-section{padding:40px;background-color:#fff;border-radius:var(--border-radius);box-shadow:var(--shadow)}.about-us-section .owner-profile{display:flex;align-items:center;gap:30px;flex-wrap:wrap}.about-us-section .owner-image{width:150px;height:150px;border-radius:50%;object-fit:cover;border:5px solid var(--primary-color)}.about-us-section .owner-details{flex:1;min-width:300px}
     .program-section{background:var(--light-text);padding:40px;border-radius:var(--border-radius);box-shadow:var(--shadow);margin-bottom:30px}.program-section h2{font-size:2.5rem;text-align:center}.cta-button{display:block;width:fit-content;margin:30px auto;background:linear-gradient(135deg,var(--secondary-color),#e67e22);color:var(--light-text);text-align:center;padding:15px 40px;border-radius:50px;font-weight:700;text-decoration:none;font-size:1.2rem;transition:all .3s;box-shadow:0 4px 8px rgba(0,0,0,.2)}.cta-button:hover{transform:translateY(-3px);box-shadow:0 6px 12px rgba(0,0,0,.3)}.rewards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}.reward-item{background:var(--light-gray);border:1px solid #ddd;border-radius:var(--border-radius);padding:20px;text-align:center;display:flex;flex-direction:column;position:relative}.reward-item img{max-width:100%;height:100px;object-fit:contain;margin-bottom:15px;border-radius:8px}.reward-item h4{margin:10px 0 5px}.reward-item .points-cost{font-weight:700;color:var(--accent-color);margin-bottom:15px}.coming-soon-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background-color:rgba(255,255,255,.8);color:var(--primary-color);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;border-radius:var(--border-radius);backdrop-filter:blur(2px)}
+    
+    /* Countdown Mask Styles */
+    #countdown-mask {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: white;
+        flex-direction: column;
+    }
+    #countdown-content {
+        background: rgba(26, 82, 118, 0.8);
+        padding: 40px;
+        border-radius: var(--border-radius);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    #countdown-mask h2 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: var(--light-text);
+    }
+    #timer-display {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--secondary-color);
+        margin-top: 10px;
+        letter-spacing: 5px;
+    }
+
   </style>
 </head>
 <body class="default-theme">
+
+<div id="countdown-mask">
+  <div id="countdown-content">
+    <h2>eShop will be launched tomorrow!</h2>
+    <p>Counting down to our grand opening:</p>
+    <div id="timer-display"></div>
+  </div>
+</div>
 
 <div id="store-wrapper">
   <header>
@@ -226,6 +272,39 @@
   </div>
 
 <script>
+    // --- LAUNCH COUNTDOWN SCRIPT ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const countdownMask = document.getElementById('countdown-mask');
+        const timerDisplay = document.getElementById('timer-display');
+
+        // Set the launch date to tomorrow at 9:00 PM (21:00)
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(21, 0, 0, 0);
+        const launchDate = tomorrow.getTime();
+
+        const countdownFunction = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = launchDate - now;
+
+            // Time calculations for days, hours, minutes and seconds
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result in the element with id="timer-display"
+            timerDisplay.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+            // If the countdown is over, remove the mask
+            if (distance < 0) {
+                clearInterval(countdownFunction);
+                countdownMask.style.display = 'none';
+            }
+        }, 1000);
+    });
+
+
     // --- CONFIGURATION ---
     const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwq0xe8DuQuTrWObYrz98IBGrIj_9bJwt03PBwiZqVQeWTQXsj1T8epXV3Fm7RZN3RtQg/exec';
     
