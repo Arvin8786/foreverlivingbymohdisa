@@ -363,33 +363,71 @@
         let potentialShippingRuleIds = new Set();
         const finalPrices = {};
         cart.forEach(item => {
-            finalPrices[item.id] = item.price; 
             originalSubtotal += item.basePrice * item.quantity;
+            finalPrices[item.id] = item.price; 
         });
         
         let tempCart = JSON.parse(JSON.stringify(cart));
         const allApplicablePromos = activePromotions.filter(promo => cart.some(item => promo.productIDs.includes(item.id)));
         const bundlePromos = allApplicablePromos.filter(p => p.type === 'BUNDLE' && p.bundle);
+        const itemPromos = allApplicablePromos.filter(p => p.type === 'PERCENT' || p.type === 'FIXED');
 
+        bundlePromos.forEach(promo => {
+            const eligibleItems = tempCart.filter(item => promo.productIDs.includes(item.id) && item.quantity > 0);
+            const totalEligibleQuantity = eligibleItems.reduce((sum, item) => sum + item.quantity, 0);
+            const numberOfBundles = Math.floor(totalEligibleQuantity / promo.bundle.quantity);
+
+            if (numberOfBundles > 0) {
+                appliedPromoDescriptions.add(promo.description);
+                if (promo.shippingRuleId) potentialShippingRuleIds.add(promo.shippingRuleId);
+                let itemsToProcessForBundle = numberOfBundles * promo.bundle.quantity;
+                const pricePerItemInBundle = promo.bundle.price / promo.bundle.quantity;
+
+                for (const item of eligibleItems) {
+                    if (itemsToProcessForBundle <= 0) break;
+                    const quantityToBundle = Math.min(item.quantity, itemsToProcessForBundle);
+                    
+                    const originalCartItem = cart.find(ci => ci.id === item.id);
+                    originalCartItem.bundledQuantity = quantityToBundle;
+                    originalCartItem.bundlePrice = pricePerItemInBundle;
+
+                    item.quantity -= quantityToBundle;
+                    itemsToProcessForBundle -= quantityToBundle;
+                }
+            }
+        });
+
+        itemPromos.forEach(promo => {
+            const eligibleItems = tempCart.filter(item => promo.productIDs.includes(item.id) && item.quantity > 0);
+            if (eligibleItems.length > 0) {
+                appliedPromoDescriptions.add(promo.description);
+                if (promo.shippingRuleId) potentialShippingRuleIds.add(promo.shippingRuleId);
+                eligibleItems.forEach(item => {
+                    if (promo.type === 'PERCENT') {
+                        finalPrices[item.id] = item.basePrice * (1 - parseFloat(promo.value) / 100);
+                    } else if (promo.type === 'FIXED') {
+                        finalPrices[item.id] = item.basePrice - parseFloat(promo.value);
+                    }
+                });
+            }
+        });
+        
         finalSubtotal = cart.reduce((total, item) => {
             let itemTotal = 0;
-            const itemPromo = bundlePromos.find(p => p.productIDs.includes(item.id));
-            if (itemPromo) {
-                const pricePerItemInBundle = (itemPromo.bundle.price / itemPromo.bundle.quantity);
-                const eligibleItemsForBundle = cart.filter(cartItem => itemPromo.productIDs.includes(cartItem.id));
-                const totalEligibleQuantity = eligibleItemsForBundle.reduce((sum, i) => sum + i.quantity, 0);
-                if (totalEligibleQuantity >= itemPromo.bundle.quantity) {
-                    itemTotal = item.quantity * pricePerItemInBundle;
-                    appliedPromoDescriptions.add(itemPromo.description);
-                } else {
-                    itemTotal = item.quantity * item.basePrice;
+            if (item.bundledQuantity > 0) {
+                const nonBundledQty = item.quantity - item.bundledQuantity;
+                itemTotal += item.bundledQuantity * item.bundlePrice;
+                if (nonBundledQty > 0) {
+                    itemTotal += nonBundledQty * finalPrices[item.id]; 
                 }
             } else {
-                itemTotal = item.quantity * item.price;
+                itemTotal = item.quantity * finalPrices[item.id];
             }
+            delete item.bundledQuantity; 
+            delete item.bundlePrice;
             return total + itemTotal;
         }, 0);
-
+        
         totalDiscount = originalSubtotal - finalSubtotal;
         let discountFromCode = 0;
         if (appliedDiscount) {
@@ -404,7 +442,7 @@
         const totalPoints = Math.floor(finalSubtotal);
         return { originalSubtotal, totalDiscount, finalSubtotal, shipping, finalTotal, totalPoints, appliedPromoDescriptions: Array.from(appliedPromoDescriptions), finalPrices };
     }
-
+    
     function updateCartDisplay() {
         const cartItemsEl = document.getElementById("cart-items");
         const subtotalEl = document.getElementById("cart-subtotal");
@@ -434,7 +472,7 @@
             const displayPrice = finalPrices[item.id] || item.basePrice;
             const lineSubtotal = item.quantity * item.basePrice;
             const lineFinalTotal = item.quantity * displayPrice;
-            const hasLineDiscount = lineSubtotal > lineFinalTotal;
+            const hasLineDiscount = lineSubtotal.toFixed(2) !== lineFinalTotal.toFixed(2);
             itemsHtml += `
             <div class="cart-item">
                 <div class="cart-item-details">
@@ -463,8 +501,9 @@
             discountLineEl.style.display = "none";
             savingsLineEl.style.display = "none";
         }
-        if (appliedPromoDescriptions.length > 0) {
-            let promoListHTML = appliedPromoDescriptions.map(desc => `<li><small>${desc}</small></li>`).join('');
+        if (appliedPromoDescriptions.size > 0 || (appliedDiscount && appliedDiscount.code)) {
+            let promoListHTML = Array.from(appliedPromoDescriptions).map(desc => `<li><small>${desc}</small></li>`).join('');
+            if(appliedDiscount && appliedDiscount.code) promoListHTML += `<li><small>Code: ${appliedDiscount.code}</small></li>`;
             const promoListContainerHTML = `<div class="summary-line" id="applied-promos-list-container" style="font-size: 0.9em; color: #555;"><span>Applied Promotions:</span><ul style="padding-left: 15px; margin: 0; text-align: right; list-style-type: none;">${promoListHTML}</ul></div>`;
             shippingEl.parentElement.insertAdjacentHTML('beforebegin', promoListContainerHTML);
         }
@@ -526,7 +565,7 @@
             discountApplied: `Total Discount - RM ${totals.totalDiscount.toFixed(2)}`,
             discountCodeUsed: appliedDiscount ? appliedDiscount.code : "N/A",
             totalPointsForThisPurchase: totals.totalPoints,
-            appliedPromoDescriptions: totals.appliedPromoDescriptions
+            appliedPromotions: Array.from(totals.appliedPromoDescriptions)
         };
         sessionStorage.setItem("pendingOrder", JSON.stringify(orderData));
         
