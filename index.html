@@ -31,41 +31,25 @@
     .original-cart-price{text-decoration:line-through;color:#999;font-size:.9rem;}.final-cart-price{font-weight:600}.summary-line small{font-size:.8rem;color:var(--accent-color);font-style:italic}
     #maintenance-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 82, 118, 0.95); color: white; z-index: 99999; justify-content: center; align-items: center; text-align: center; padding: 20px; }
     #maintenance-overlay i { font-size: 5rem; margin-bottom: 20px; } #maintenance-overlay h1 { font-size: 2.5rem; color: white; } #maintenance-overlay p { font-size: 1.2rem; max-width: 600px; }
+    .price-section{ height: 50px; } 
+    .price-container { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .original-price { text-decoration: line-through; color: #999; font-size: 1rem; margin-right: 10px; }
+    .new-price { color: var(--secondary-color); font-weight: 700; font-size: 1.5rem; }
+    .promo-price { color: var(--accent-color); }
   </style>
-  <style id="festival-animations-style">
-    :root { --festive-z: -1; }
-    body[data-festival="cny"] { --c1:#c1121f;--c2:#ffd60a;--c3:#850000;--c4:#fff5cc; background:linear-gradient(to bottom,#ffefba,#fff); }
-    body[data-festival="national-day"] { --c1:#cc0000;--c2:#f7c800;--c3:#001b6b;--c4:#fff; background:linear-gradient(to bottom,#001b6b,#cc0000); }
-    body[data-festival="malaysia-day"] { --c1:#002b5c;--c2:#ffcc00;--c3:#cc0000;--c4:#fff; background:linear-gradient(to right,#002b5c,#cc0000); }
-    body[data-festival="mid-autumn"] { --c1:#1d3557;--c2:#f1c40f;--c3:#8ecae6;--c4:#e9f5ff; background:radial-gradient(circle at top,#1d3557,#000); }
-    body[data-festival="thaipusam"] { --c1:#6a0dad;--c2:#ff9f1c;--c3:#ffd166;--c4:#fff2e6; background:radial-gradient(circle at center,#ffecd1,#6a0dad); }
-    body[data-festival="new-year"] { --c1:#111;--c2:#f5f5f5;--c3:#2a9d8f;--c4:#e9c46a; background:radial-gradient(circle at center,#000,#2a2a2a); }
-    body[data-festival="hari-raya"] { --c1:#016a3a;--c2:#ffd700;--c3:#004d26;--c4:#fffbe6; background:linear-gradient(to bottom,#006b3c,#00331d); }
-    body[data-festival="deepavali"] { --c1:#a020f0;--c2:#ff9933;--c3:#ffd700;--c4:#fff8e1; background:radial-gradient(circle,#ffcc80,#4a148c); }
-    body[data-festival="christmas"] { --c1:#006400;--c2:#ff0000;--c3:#fff;--c4:#ffd700; background:linear-gradient(to bottom,#004d00,#001a00); }
-    body[data-festival="grand-opening"] { --c1:#ff0000;--c2:#ffd700;--c3:#000;--c4:#fff; background:linear-gradient(135deg,#ff0000,#ffd700); }
-    .festive-layer { position:fixed; inset:0; pointer-events:none; z-index:var(--festive-z); overflow: hidden; }
-    .decoration { display:none; position: absolute; }
-    body[data-festival="cny"] .decoration.cny {display:block;} body[data-festival="national-day"] .decoration.national-day {display:block;} body[data-festival="malaysia-day"] .decoration.malaysia-day {display:block;} body[data-festival="mid-autumn"] .decoration.mid-autumn {display:block;} body[data-festival="thaipusam"] .decoration.thaipusam {display:block;} body[data-festival="new-year"] .decoration.new-year {display:block;} body[data-festival="hari-raya"] .decoration.hari-raya {display:block;} body[data-festival="deepavali"] .decoration.deepavali {display:block;} body[data-festival="christmas"] .decoration.christmas {display:block;} body[data-festival="grand-opening"] .decoration.grand-opening {display:block;}
-    @keyframes sway{0%,100%{transform:rotate(-3deg);}50%{transform:rotate(3deg);}} @keyframes floatUp{0%{transform:translateY(0) scale(1);}100%{transform:translateY(-120vh) scale(1.2); opacity: 0;}} @keyframes fallDown{0%{transform:translateY(-20vh) rotate(0deg);}100%{transform:translateY(120vh) rotate(360deg);}} @keyframes flicker{0%,100%{opacity:.9;}50%{opacity:.6;}} @keyframes burst{0%{transform:scale(.2);opacity:1;}100%{transform:scale(1.2);opacity:0;}} @keyframes twinkle{50%{opacity:.3;}}
-    .lantern{top:10vh;left:10vw;width:60px;height:80px;background:radial-gradient(circle,var(--c2),var(--c1) 70%);border-radius:50%;animation:sway 3s infinite ease-in-out;} .firecracker{left:20vw;top:-10vh;width:8px;height:50px;background:var(--c1);animation:fallDown 5s linear infinite;} .gold-ingot{bottom:5vh;left:30vw;width:60px;height:30px;background:gold;border-radius:50% 50% 30% 30%;box-shadow:0 0 10px gold;} .dragon{top:40vh;left:-350px;width:300px;height:60px;background:linear-gradient(90deg,var(--c1),var(--c2));border-radius:30px;animation:sway 4s infinite, fallDown 20s linear infinite reverse;} .confetti-cny{inset:0;background-image:radial-gradient(var(--c1) 2px,transparent 2px),radial-gradient(var(--c2) 2px,transparent 2px);background-size:40px 40px;animation:twinkle 2s infinite;} .flag{top:20vh;left:40vw;width:100px;height:60px;background:linear-gradient(var(--c1) 50%,var(--c4) 50%);border:2px solid var(--c3);animation:sway 2s infinite ease-in-out;} .star{top:10vh;right:10vw;width:20px;height:20px;background:var(--c2);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);} .fireworks{inset:0;background:radial-gradient(circle, var(--c2) 5%, transparent 10%);border-radius:50%;animation:burst 2s infinite ease-out;} .bunting{top:0;left:0;right:0;height:50px;background:repeating-linear-gradient(90deg,var(--c1),var(--c1) 20px,var(--c4) 20px,var(--c4) 40px,var(--c3) 40px,var(--c3) 60px);} .malaysia-map{top:30vh;left:30vw;width:200px;height:100px;background:rgba(255,255,255,.2); clip-path: polygon(0% 20%, 60% 20%, 60% 0%, 100% 0%, 100% 80%, 40% 80%, 40% 100%, 0% 100%);} .ribbon{top:10vh;left:0;right:0;height:30px;background:linear-gradient(90deg,var(--c1),var(--c4),var(--c3),var(--c2));} .moon{top:10vh;right:10vw;width:100px;height:100px;background:radial-gradient(circle,var(--c4),var(--c2));border-radius:50%;box-shadow:0 0 30px var(--c2);} .rabbit{bottom:10vh;left:10vw;width:60px;height:40px;background:var(--c4);border-radius:50%;} .sky-lantern{bottom:-10vh;left:30vw;width:30px;height:40px;background:radial-gradient(circle, var(--c2), transparent 70%);border-radius:5px 5px 20px 20px;animation:floatUp 15s linear infinite;} .starry-sky{inset:0;background:radial-gradient(var(--c4) 1px,transparent 1px);background-size:50px 50px;animation:twinkle 2s infinite;} .kolam{bottom:5vh;left:50%;transform:translateX(-50%);width:200px;height:200px;background:conic-gradient(var(--c1) 0 10%,var(--c2) 10% 20%,#0f0 20% 30%,#00f 30% 40%,#f0f 40% 100%);border-radius:50%;} .diya{bottom:5vh;left:20vw;width:40px;height:20px;background:var(--c2);border-radius:50% 50% 0 0;} .diya::after{content:'';position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:10px;height:20px;background:var(--c3);border-radius:50%;animation:flicker 1s infinite;} .peacock{top:30vh;right:10vw;width:100px;height:100px;background:radial-gradient(circle,var(--c3),var(--c1));border-radius:50%;} .fireworks-ny{inset:0;background:radial-gradient(circle, var(--c4) 5%, transparent 10%);border-radius:50%;animation:burst 2s infinite ease-out;} .balloon{bottom:-20vh;left:20vw;width:40px;height:60px;background:radial-gradient(circle,var(--c3),var(--c4));border-radius:50%;animation:floatUp 12s linear infinite;} .champagne{bottom:5vh;right:10vw;width:20px;height:60px;background:var(--c4);border-radius:5px;} .clock{top:10vh;left:50%;transform:translateX(-50%);width:100px;height:100px;border:5px solid var(--c2);border-radius:50%;} .confetti-ny{inset:0;background-image:radial-gradient(var(--c3) 2px,transparent 2px),radial-gradient(var(--c4) 2px,transparent 2px),radial-gradient(var(--c2) 2px,transparent 2px);background-size:30px 30px;animation:twinkle 2s infinite;} .ketupat{top:20vh;left:20vw;width:40px;height:40px;background:linear-gradient(45deg,var(--c1) 50%,lightgreen 50%);transform:rotate(45deg);animation:sway 3s infinite;} .oil-lamp{bottom:10vh;left:30vw;width:20px;height:40px;background:var(--c2);border-radius:5px;} .oil-lamp::after{content:'';position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:10px;height:20px;background:var(--c2);border-radius:50%;animation:flicker 1s infinite;} .mosque{top:10vh;right:20vw;width:80px;height:80px;background:radial-gradient(circle,var(--c4),var(--c3));border-radius:50%;} .moon-star{top:5vh;right:5vw;width:40px;height:40px;background:var(--c2);clip-path:polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);} .torans{top:0;left:0;right:0;height:20px;background:repeating-linear-gradient(90deg,var(--c2),var(--c2) 10px,var(--c1) 10px,var(--c1) 20px);} .firecrackers{left:50%;top:-10vh;width:10px;height:40px;background:var(--c2);animation:fallDown 5s linear infinite;} .diya-big{bottom:5vh;left:40vw;width:60px;height:30px;background:var(--c2);border-radius:50% 50% 0 0;} .diya-big::after{content:'';position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:15px;height:30px;background:var(--c3);border-radius:50%;animation:flicker 1s infinite;} .pattern{bottom:0;left:0;right:0;height:100px;background:conic-gradient(var(--c1),var(--c2),var(--c3));} .tree{bottom:5vh;left:20vw;width:0;height:0;border-left:40px solid transparent;border-right:40px solid transparent;border-bottom:80px solid var(--c1);} .snowflake{top:-10vh;left:10vw;width:20px;height:20px;background:var(--c3);border-radius:50%;animation:fallDown 10s linear infinite;} .gift{bottom:5vh;right:20vw;width:40px;height:40px;background:var(--c2);border:5px solid var(--c4);} .candycane{top:20vh;right:10vw;width:20px;height:60px;background:repeating-linear-gradient(45deg,var(--c2),var(--c2) 10px,var(--c3) 10px,var(--c3) 20px);border-radius:10px;} .star-top{top:0;left:50%;transform:translateX(-50%);width:20px;height:20px;background:var(--c4);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);} .ribbon-go{position:absolute;top:30vh;left:50%;transform:translateX(-50%);width:300px;height:30px;background:linear-gradient(to right,var(--c1),var(--c2));animation:sway 3s infinite;} .balloon-go{position:absolute;bottom:-10vh;left:10vw;width:30px;height:50px;background:radial-gradient(circle,var(--c1),var(--c2));border-radius:50%;animation:floatUp 14s linear infinite;} .sparkles{position:absolute;inset:0;background:radial-gradient(var(--c2) 2px,transparent 2px);background-size:40px 40px;animation:twinkle 2s infinite;} .scissors{position:absolute;bottom:10vh;left:50%;transform:translateX(-50%);width:60px;height:20px;background:silver;border-radius:5px;} .banner{position:absolute;top:0;left:0;right:0;height:60px;background:linear-gradient(90deg,var(--c1),var(--c2),var(--c1));}
-  </style>
+  <style id="festival-animations-style"></style>
 </head>
 <body data-festival="">
 
 <div id="maintenance-overlay">
   <div><i class="fa-solid fa-person-digging"></i><h1>Under Maintenance</h1><p id="maintenance-message">We'll be back shortly!</p></div>
 </div>
-
 <div class="festive-layer"></div>
-
 <div id="store-wrapper">
   <header>
     <div class="container"><div class="header-content"><img src="FL.jpg" alt="Business Logo" class="header-logo" onerror="this.style.display='none'"><h1>FOREVER LIVING by Muhd Arvind Isa<span style="font-size: 1rem; color: #555; display: block; font-weight: 400;">Quality Wellness Products</span></h1></div></div>
   </header>
-  
   <div id="promo-running-banner"><div class="marquee-content" id="promo-banner-text"></div></div>
-
   <nav>
     <div class="container">
         <ul id="main-nav">
@@ -77,7 +61,6 @@
         </ul>
     </div>
   </nav>
-
   <main id="main-content" class="container">
     <div id="products" class="tab-content active">
       <section class="hero-section" id="hero-section">
@@ -96,24 +79,17 @@
       </section>
       <div id="product-list-container"><p style="text-align: center; width: 100%;"><i class="fa-solid fa-spinner fa-spin"></i> Loading products from our catalog...</p></div>
     </div>
-    
     <div id="business" class="tab-content">
       <section class="program-section">
         <h2>Build Your Forever Business</h2>
         <p style="text-align: center; max-width: 800px; margin: 20px auto;">The Forever Living opportunity is more than just selling high-quality products; it's a chance to build a flexible, rewarding business on your own terms. Whether you're looking for extra income or a full-time career, Forever provides a proven path to success.</p>
         <h3 style="margin-top:40px;">How Does It Work?</h3>
-        <ul>
-            <li><strong>Become Your Own Boss:</strong> As a Forever Business Owner (FBO), you have the freedom to work from anywhere, set your own hours, and grow at your own pace. There are no large startup fees or required inventory purchases.</li>
-            <li><strong>A Simple, Proven Model:</strong> The business is built on a simple cycle: Use the products yourself, share your experience and the products with others, and build a team of like-minded individuals to do the same.</li>
-            <li><strong>Earn Generous Rewards:</strong> You earn income from your retail sales and from the sales of your team members. Forever offers one of the most generous compensation plans in the industry, including performance bonuses, the car plan (Earn While you Drive), and global travel incentives.</li>
-            <li><strong>World-Class Support:</strong> You are never alone. You will receive mentorship, training materials, and support from our team at Rich Academy Global and the wider Forever community to help you achieve your goals.</li>
-        </ul>
+        <ul><li><strong>Become Your Own Boss:</strong> As a Forever Business Owner (FBO), you have the freedom to work from anywhere, set your own hours, and grow at your own pace. There are no large startup fees or required inventory purchases.</li><li><strong>A Simple, Proven Model:</strong> The business is built on a simple cycle: Use the products yourself, share your experience and the products with others, and build a team of like-minded individuals to do the same.</li><li><strong>Earn Generous Rewards:</strong> You earn income from your retail sales and from the sales of your team members. Forever offers one of the most generous compensation plans in the industry, including performance bonuses, the car plan (Earn While you Drive), and global travel incentives.</li><li><strong>World-Class Support:</strong> You are never alone. You will receive mentorship, training materials, and support from our team at Rich Academy Global and the wider Forever community to help you achieve your goals.</li></ul>
         <h3 style="margin-top:40px;">Ready to Start Your Journey?</h3>
         <p style="text-align: center;">Take the first step towards a healthier, wealthier life. Contact us today to learn more without any obligation.</p>
         <a href="https://wa.me/601111033154?text=Hi,%20I'm%20interested%20in%20learning%20more%20about%20the%20Forever%20Living%20business%20opportunity." class="cta-button" target="_blank"><i class="fab fa-whatsapp"></i> Click to Learn More on WhatsApp</a>
       </section>
     </div>
-
     <div id="about" class="tab-content">
       <section class="about-us-section">
         <h2>About Us</h2>
@@ -124,20 +100,13 @@
                 <p>Welcome! I am an authorized Independent Forever Business Owner (FBO) dedicated to bringing you the highest quality health and wellness products from Forever Living. My mission is to empower individuals to lead healthier lives and to provide opportunities for financial well-being through the Forever business model.</p>
                 <p><strong>Powered by:</strong> Rich Academy Global</p>
                 <p><strong>Contact Information:</strong></p>
-                <ul>
-                    <li><strong><i class="fab fa-whatsapp"></i> WhatsApp:</strong> <a href="https://wa.me/601111033154">+6011 1103 3154</a></li>
-                    <li><strong><i class="fa fa-envelope"></i> Email:</strong> <a href="mailto:cs.foreverlivingbymuhdarvindisa@gmail.com">cs.foreverlivingbymuhdarvindisa@gmail.com</a></li>
-                </ul>
+                <ul><li><strong><i class="fab fa-whatsapp"></i> WhatsApp:</strong> <a href="https://wa.me/601111033154">+6011 1103 3154</a></li><li><strong><i class="fa fa-envelope"></i> Email:</strong> <a href="mailto:cs.foreverlivingbymuhdarvindisa@gmail.com">cs.foreverlivingbymuhdarvindisa@gmail.com</a></li></ul>
             </div>
         </div>
         <hr style="margin: 30px 0;">
         <h3>The Forever Living Legacy</h3>
         <p>Founded in 1978 by Rex Maughan, Forever Living Products is a multi-billion dollar company that manufactures and sells hundreds of wellness and beauty products all around the world. What makes Forever unique is its commitment to quality through a process called "from seed to product."</p>
-        <ul>
-            <li><strong>The Aloe Vera Company:</strong> Forever owns its own aloe vera plantations in Texas and the Dominican Republic, ensuring the purest and most potent aloe is used in its products. They control the entire process, from planting and harvesting to processing and manufacturing.</li>
-            <li><strong>Global Presence:</strong> For over 40 years, Forever has grown to operate in more than 160 countries, demonstrating the universal appeal and effectiveness of its products and business model.</li>
-            <li><strong>Our Commitment:</strong> We are committed to providing authentic Forever Living products, exceptional customer service, and reliable support for both our customers and business partners. All products are sourced directly from Forever Living Products and are guaranteed to be genuine.</li>
-        </ul>
+        <ul><li><strong>The Aloe Vera Company:</strong> Forever owns its own aloe vera plantations in Texas and the Dominican Republic, ensuring the purest and most potent aloe is used in its products. They control the entire process, from planting and harvesting to processing and manufacturing.</li><li><strong>Global Presence:</strong> For over 40 years, Forever has grown to operate in more than 160 countries, demonstrating the universal appeal and effectiveness of its products and business model.</li><li><strong>Our Commitment:</strong> We are committed to providing authentic Forever Living products, exceptional customer service, and reliable support for both our customers and business partners. All products are sourced directly from Forever Living Products and are guaranteed to be genuine.</li></ul>
         <hr style="margin: 30px 0;">
         <h3>Feedback & Order Requests</h3>
         <form class="feedback-form" onsubmit="sendFeedbackEmail(event)">
@@ -158,7 +127,6 @@
       </section>
     </div>
   </main>
-
   <footer class="footer">
       <div class="container">
         <p>© 2025 Forever Living by Muhd Arvind Isa. All rights reserved.</p>
@@ -167,10 +135,8 @@
       </div>
   </footer>
 </div>
-
-  <div id="floating-cart" class="floating-cart-btn" onclick="toggleCart()"><i class="fa-solid fa-cart-shopping"></i><span id="cart-count">0</span></div>
-
-  <div id="cart-modal" class="modal">
+<div id="floating-cart" class="floating-cart-btn" onclick="toggleCart()"><i class="fa-solid fa-cart-shopping"></i><span id="cart-count">0</span></div>
+<div id="cart-modal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="toggleCart(true)">×</span>
       <div id="cart-view">
@@ -227,7 +193,7 @@
         <button class="btn btn-secondary" style="margin-top: 20px;" onclick="cancelVerification()">Cancel Entire Order</button>
       </div>
     </div>
-  </div>
+</div>
 
 <script>
     const googleScriptURL = 'https://script.google.com/macros/s/AKfycbx_EY22mVSKJrwlaKWyKxlgYPoZ9qhF_d5CuK-l0JUyVPNkvPrxwRa5bX-8_PRfyeXumQ/exec';
@@ -325,38 +291,56 @@
     }
 
     function renderSingleProduct(product) {
-        let priceHTML = `<span class="new-price">RM ${product.price.toFixed(2)}</span>`;
-        let promoDescriptionHTML = '';
-        const itemPromo = activePromotions.find(p => p.productIDs.includes(product.id));
-        if (itemPromo) {
-            if (itemPromo.type === 'PERCENT') {
-                const discountedPrice = product.price * (1 - parseFloat(itemPromo.value) / 100);
-                priceHTML = `<span class="original-price">RM ${product.price.toFixed(2)}</span><span class="new-price promo-price">RM ${discountedPrice.toFixed(2)}</span>`;
-            } else if (itemPromo.type === 'FIXED') {
-                const discountedPrice = product.price - parseFloat(itemPromo.value);
-                priceHTML = `<span class="original-price">RM ${product.price.toFixed(2)}</span><span class="new-price promo-price">RM ${discountedPrice.toFixed(2)}</span>`;
-            } else if (itemPromo.type === 'BUNDLE' && itemPromo.bundle) {
-                const pricePerItemInBundle = (itemPromo.bundle.price / itemPromo.bundle.quantity);
-                priceHTML = `<span class="original-price">RM ${product.price.toFixed(2)}</span><span class="new-price promo-price">RM ${pricePerItemInBundle.toFixed(2)}</span>`;
-                promoDescriptionHTML = `<p class="promo-description">${itemPromo.description}</p>`;
-            }
+        let priceHTML = '';
+        if (product.originalPrice && product.originalPrice > product.price) {
+            priceHTML = `<span class="original-price">RM ${product.originalPrice.toFixed(2)}</span><span class="new-price promo-price">RM ${product.price.toFixed(2)}</span>`;
+        } else {
+            priceHTML = `<span class="new-price">RM ${product.price.toFixed(2)}</span>`;
         }
-        return `<div class="product ${itemPromo ? 'promo-highlight' : ''}"><div class="halal-badge">HALAL</div>${itemPromo ? '<div class="featured-badge">On Offer!</div>' : ''}<div class="product-image-container"><img src="${product.image || 'https://via.placeholder.com/200'}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/200x200?text=Image+Not+Found'"></div><div class="product-info"><h3>${product.name}</h3><div class="price-section">${priceHTML}</div>${promoDescriptionHTML}<div class="benefits"><strong>Benefits:</strong> ${product.benefits || ''}</div><div class="consumption"><strong>Usage:</strong> ${product.consumption || ''}</div><div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${product.id})"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button></div></div></div>`;
+        const itemPromo = activePromotions.find(p => p.productIDs.includes(product.id));
+        let promoDescriptionHTML = '';
+        if (itemPromo && itemPromo.type === 'BUNDLE') {
+            promoDescriptionHTML = `<p class="promo-description">${itemPromo.description}</p>`;
+        }
+        return `
+            <div class="product ${itemPromo ? 'promo-highlight' : ''}">
+                <div class="halal-badge">HALAL</div>
+                ${itemPromo ? '<div class="featured-badge">On Offer!</div>' : ''}
+                <div class="product-image-container">
+                    <img src="${product.image || 'https://via.placeholder.com/200'}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/200x200?text=Image+Not+Found'">
+                </div>
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <div class="price-section">${priceHTML}</div>
+                    ${promoDescriptionHTML}
+                    <div class="benefits"><strong>Benefits:</strong> ${product.benefits || ''}</div>
+                    <div class="consumption"><strong>Usage:</strong> ${product.consumption || ''}</div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary" onclick="addToCart(${product.id})"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     function addToCart(productId) {
-        const existingItem = cart.find(item => item.id === productId);
-        if (existingItem) {
-            existingItem.quantity++;
+        const productToAdd = products.find(p => p.id === productId);
+        if (!productToAdd) return;
+        const existingItemInCart = cart.find(item => item.id === productId);
+        if (existingItemInCart) {
+            existingItemInCart.quantity++;
         } else {
-            const productToAdd = products.find(p => p.id === productId);
-            if (productToAdd) {
-                cart.push({ ...productToAdd, quantity: 1, basePrice: productToAdd.price });
-            }
+            cart.push({
+                id: productToAdd.id,
+                name: productToAdd.name,
+                basePrice: productToAdd.originalPrice || productToAdd.price,
+                price: productToAdd.price,
+                quantity: 1
+            });
         }
         updateCartDisplay();
     }
-
+    
     function increaseQuantity(productId) { const item = cart.find(i => i.id === productId); if (item) { item.quantity++; } updateCartDisplay(); }
     function decreaseQuantity(productId) { const item = cart.find(i => i.id === productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } } }
     function removeItemFromCart(productId) { cart = cart.filter(item => item.id !== productId); updateCartDisplay(); }
@@ -372,73 +356,123 @@
     }
 
     function calculateCartTotals() {
-        let originalSubtotal = 0; let totalDiscount = 0; let finalSubtotal = 0;
-        let appliedPromoDescriptions = new Set(); let potentialShippingRuleIds = new Set();
+        let originalSubtotal = 0;
+        let finalSubtotal = 0;
+        let totalDiscount = 0;
+        let appliedPromoDescriptions = new Set();
+        let potentialShippingRuleIds = new Set();
+        const finalPrices = {};
+        cart.forEach(item => {
+            finalPrices[item.id] = item.price; 
+            originalSubtotal += item.basePrice * item.quantity;
+        });
+        
         let tempCart = JSON.parse(JSON.stringify(cart));
-        const finalPrices = {}; 
-        cart.forEach(item => finalPrices[item.id] = item.basePrice);
-        tempCart.forEach(item => { originalSubtotal += item.basePrice * item.quantity; });
         const allApplicablePromos = activePromotions.filter(promo => cart.some(item => promo.productIDs.includes(item.id)));
         const bundlePromos = allApplicablePromos.filter(p => p.type === 'BUNDLE' && p.bundle);
-        const itemPromos = allApplicablePromos.filter(p => p.type === 'PERCENT' || p.type === 'FIXED');
-        bundlePromos.forEach(promo => {
-            const eligibleItems = tempCart.filter(item => promo.productIDs.includes(item.id) && item.quantity > 0);
-            const totalEligibleQuantity = eligibleItems.reduce((sum, item) => sum + item.quantity, 0);
-            const numberOfBundles = Math.floor(totalEligibleQuantity / promo.bundle.quantity);
-            if (numberOfBundles > 0) {
-                appliedPromoDescriptions.add(promo.description);
-                if (promo.shippingRuleId) potentialShippingRuleIds.add(promo.shippingRuleId);
-                let itemsToProcessForBundle = numberOfBundles * promo.bundle.quantity;
-                for (const item of eligibleItems) {
-                    if (itemsToProcessForBundle <= 0) break;
-                    finalPrices[item.id] = (promo.bundle.price / promo.bundle.quantity);
-                    const quantityToBundle = Math.min(item.quantity, itemsToProcessForBundle);
-                    const originalCostOfPortion = item.basePrice * quantityToBundle;
-                    const bundledCostPortion = finalPrices[item.id] * quantityToBundle;
-                    totalDiscount += originalCostOfPortion - bundledCostPortion;
-                    item.quantity -= quantityToBundle;
-                    itemsToProcessForBundle -= quantityToBundle;
+
+        finalSubtotal = cart.reduce((total, item) => {
+            let itemTotal = 0;
+            const itemPromo = bundlePromos.find(p => p.productIDs.includes(item.id));
+            if (itemPromo) {
+                const pricePerItemInBundle = (itemPromo.bundle.price / itemPromo.bundle.quantity);
+                const eligibleItemsForBundle = cart.filter(cartItem => itemPromo.productIDs.includes(cartItem.id));
+                const totalEligibleQuantity = eligibleItemsForBundle.reduce((sum, i) => sum + i.quantity, 0);
+                if (totalEligibleQuantity >= itemPromo.bundle.quantity) {
+                    itemTotal = item.quantity * pricePerItemInBundle;
+                    appliedPromoDescriptions.add(itemPromo.description);
+                } else {
+                    itemTotal = item.quantity * item.basePrice;
                 }
+            } else {
+                itemTotal = item.quantity * item.price;
             }
-        });
-        itemPromos.forEach(promo => {
-            const eligibleItems = tempCart.filter(item => promo.productIDs.includes(item.id) && item.quantity > 0);
-            if (eligibleItems.length > 0) {
-                appliedPromoDescriptions.add(promo.description);
-                if (promo.shippingRuleId) potentialShippingRuleIds.add(promo.shippingRuleId);
-                eligibleItems.forEach(item => {
-                    let itemDiscount = 0;
-                    if (promo.type === 'PERCENT') {
-                        finalPrices[item.id] = item.basePrice * (1 - parseFloat(promo.value) / 100);
-                        itemDiscount = (item.basePrice - finalPrices[item.id]) * item.quantity;
-                    } else if (promo.type === 'FIXED') {
-                        finalPrices[item.id] = item.basePrice - parseFloat(promo.value);
-                        itemDiscount = parseFloat(promo.value) * item.quantity;
-                    }
-                    totalDiscount += itemDiscount;
-                    item.quantity = 0;
-                });
-            }
-        });
-        finalSubtotal = originalSubtotal - totalDiscount;
+            return total + itemTotal;
+        }, 0);
+
+        totalDiscount = originalSubtotal - finalSubtotal;
         let discountFromCode = 0;
         if (appliedDiscount) {
-            if (appliedDiscount.type === 'Fixed') discountFromCode = Math.min(finalSubtotal, parseFloat(appliedDiscount.value));
-            else if (appliedDiscount.type === 'Percentage') discountFromCode = finalSubtotal * (parseFloat(appliedDiscount.value) / 100);
+            if (appliedDiscount.type === 'Fixed') { discountFromCode = Math.min(finalSubtotal, parseFloat(appliedDiscount.value)); }
+            else if (appliedDiscount.type === 'Percentage') { discountFromCode = finalSubtotal * (parseFloat(appliedDiscount.value) / 100); }
             finalSubtotal -= discountFromCode;
             totalDiscount += discountFromCode;
         }
-        let bestPromoShippingRuleId = null;
-        if (potentialShippingRuleIds.size > 0) {
-            const hasFreeShipping = Array.from(potentialShippingRuleIds).find(id => shippingRules[id] && shippingRules[id].type === 'Free');
-            bestPromoShippingRuleId = hasFreeShipping || potentialShippingRuleIds.values().next().value;
-        }
-        const shipping = calculateShipping(cart, finalSubtotal, bestPromoShippingRuleId);
+        
+        const shipping = calculateShipping(cart, finalSubtotal, Array.from(potentialShippingRuleIds)[0]);
         const finalTotal = finalSubtotal + shipping.fee;
         const totalPoints = Math.floor(finalSubtotal);
         return { originalSubtotal, totalDiscount, finalSubtotal, shipping, finalTotal, totalPoints, appliedPromoDescriptions: Array.from(appliedPromoDescriptions), finalPrices };
     }
-    
+
+    function updateCartDisplay() {
+        const cartItemsEl = document.getElementById("cart-items");
+        const subtotalEl = document.getElementById("cart-subtotal");
+        const discountLineEl = document.getElementById("discount-line");
+        const discountEl = document.getElementById("cart-discount");
+        const shippingEl = document.getElementById("cart-shipping");
+        const totalEl = document.getElementById("cart-total");
+        const pointsEl = document.getElementById("points-earned-display");
+        const savingsLineEl = document.getElementById("savings-line");
+        const savingsEl = document.getElementById("cart-savings");
+        updateCartCount();
+        const oldPromoList = document.getElementById('applied-promos-list-container');
+        if (oldPromoList) oldPromoList.remove();
+        if (cart.length === 0) {
+            cartItemsEl.innerHTML = "<p>Your cart is currently empty.</p>";
+            subtotalEl.textContent = "RM 0.00";
+            shippingEl.textContent = "RM 0.00";
+            totalEl.textContent = "RM 0.00";
+            pointsEl.innerHTML = "";
+            discountLineEl.style.display = "none";
+            savingsLineEl.style.display = "none";
+            return;
+        }
+        const { originalSubtotal, totalDiscount, finalSubtotal, shipping, finalTotal, totalPoints, appliedPromoDescriptions, finalPrices } = calculateCartTotals();
+        let itemsHtml = "";
+        cart.forEach(item => {
+            const displayPrice = finalPrices[item.id] || item.basePrice;
+            const lineSubtotal = item.quantity * item.basePrice;
+            const lineFinalTotal = item.quantity * displayPrice;
+            const hasLineDiscount = lineSubtotal > lineFinalTotal;
+            itemsHtml += `
+            <div class="cart-item">
+                <div class="cart-item-details">
+                    <strong>${item.name}</strong>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
+                        <span class="quantity-display">${item.quantity}</span>
+                        <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    ${hasLineDiscount ? `<div class="original-cart-price">RM ${lineSubtotal.toFixed(2)}</div>` : ''}
+                    <div class="final-cart-price">RM ${lineFinalTotal.toFixed(2)}</div>
+                </div>
+                <button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button>
+            </div>`;
+        });
+        cartItemsEl.innerHTML = itemsHtml;
+        subtotalEl.textContent = `RM ${originalSubtotal.toFixed(2)}`;
+        if (totalDiscount > 0) {
+            discountEl.textContent = `- RM ${totalDiscount.toFixed(2)}`;
+            discountLineEl.style.display = "flex";
+            savingsEl.textContent = `RM ${totalDiscount.toFixed(2)}`;
+            savingsLineEl.style.display = "flex";
+        } else {
+            discountLineEl.style.display = "none";
+            savingsLineEl.style.display = "none";
+        }
+        if (appliedPromoDescriptions.length > 0) {
+            let promoListHTML = appliedPromoDescriptions.map(desc => `<li><small>${desc}</small></li>`).join('');
+            const promoListContainerHTML = `<div class="summary-line" id="applied-promos-list-container" style="font-size: 0.9em; color: #555;"><span>Applied Promotions:</span><ul style="padding-left: 15px; margin: 0; text-align: right; list-style-type: none;">${promoListHTML}</ul></div>`;
+            shippingEl.parentElement.insertAdjacentHTML('beforebegin', promoListContainerHTML);
+        }
+        shippingEl.innerHTML = shipping.message === "FREE" ? `<span style="color:var(--accent-color);font-weight:700"><i class="fa-solid fa-truck-fast"></i> FREE! <small>(${shipping.reason || ''})</small></span>` : `RM ${shipping.fee.toFixed(2)}`;
+        totalEl.textContent = `RM ${finalTotal.toFixed(2)}`;
+        pointsEl.innerHTML = `<div class="points-earned"><i class="fa-solid fa-star"></i> Points to be Earned: ${totalPoints}</div>`;
+    }
+
     function calculateShipping(currentCart, totalAfterDiscounts, promoShippingRuleId) {
         if (currentCart.length === 0) return { fee: 0, message: "RM 0.00" };
         let applicableRule = null;
@@ -467,48 +501,7 @@
         return { fee: charge, message: message, reason: applicableRule.reason };
     }
 
-    function updateCartDisplay() {
-        const cartItemsEl = document.getElementById("cart-items"); const subtotalEl = document.getElementById("cart-subtotal");
-        const discountLineEl = document.getElementById("discount-line"); const discountEl = document.getElementById("cart-discount");
-        const shippingEl = document.getElementById("cart-shipping"); const totalEl = document.getElementById("cart-total");
-        const pointsEl = document.getElementById("points-earned-display"); const savingsLineEl = document.getElementById("savings-line");
-        const savingsEl = document.getElementById("cart-savings");
-        updateCartCount();
-        const oldPromoList = document.getElementById('applied-promos-list-container');
-        if (oldPromoList) oldPromoList.remove();
-        if (cart.length === 0) {
-            cartItemsEl.innerHTML = "<p>Your cart is currently empty.</p>"; subtotalEl.textContent = "RM 0.00";
-            shippingEl.textContent = "RM 0.00"; totalEl.textContent = "RM 0.00"; pointsEl.innerHTML = "";
-            discountLineEl.style.display = "none"; savingsLineEl.style.display = "none"; return;
-        }
-        const { originalSubtotal, totalDiscount, shipping, finalTotal, totalPoints, appliedPromoDescriptions } = calculateCartTotals();
-        let itemsHtml = "";
-        cart.forEach(item => {
-            itemsHtml += `<div class="cart-item"><div class="cart-item-details"><strong>${item.name}</strong><div class="quantity-controls"><button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button><span class="quantity-display">${item.quantity}</span><button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button></div></div><div style="text-align:right"><div class="final-cart-price">RM ${(item.basePrice * item.quantity).toFixed(2)}</div></div><button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button></div>`;
-        });
-        cartItemsEl.innerHTML = itemsHtml;
-        subtotalEl.textContent = `RM ${originalSubtotal.toFixed(2)}`;
-        if (totalDiscount > 0) {
-            discountEl.textContent = `- RM ${totalDiscount.toFixed(2)}`; discountLineEl.style.display = "flex";
-            savingsEl.textContent = `RM ${totalDiscount.toFixed(2)}`; savingsLineEl.style.display = "flex";
-        } else {
-            discountLineEl.style.display = "none"; savingsLineEl.style.display = "none";
-        }
-        if (appliedPromoDescriptions.length > 0) {
-            let promoListHTML = appliedPromoDescriptions.map(desc => `<li><small>${desc}</small></li>`).join('');
-            const promoListContainerHTML = `<div class="summary-line" id="applied-promos-list-container" style="font-size: 0.9em; color: #555;"><span>Promotions:</span><ul style="padding-left: 15px; margin: 0; text-align: right; list-style-type: none;">${promoListHTML}</ul></div>`;
-            shippingEl.parentElement.insertAdjacentHTML('beforebegin', promoListContainerHTML);
-        }
-        if (shipping.message === "FREE") {
-            shippingEl.innerHTML = `<span style="color:var(--accent-color);font-weight:700"><i class="fa-solid fa-truck-fast"></i> FREE! <small>(${shipping.reason || ''})</small></span>`;
-        } else {
-            shippingEl.textContent = `RM ${shipping.fee.toFixed(2)}`;
-        }
-        totalEl.textContent = `RM ${finalTotal.toFixed(2)}`;
-        pointsEl.innerHTML = `<div class="points-earned"><i class="fa-solid fa-star"></i> Points to be Earned: ${totalPoints}</div>`;
-    }
-
-    async function initiateCheckout() {
+    function initiateCheckout() {
         if (!document.getElementById('consent-checkbox').checked) { alert("You must agree to the data collection consent before proceeding."); return; }
         const customerName = document.getElementById('customer-name').value.trim();
         const customerPhone = document.getElementById('customer-phone').value.trim();
@@ -533,7 +526,7 @@
             discountApplied: `Total Discount - RM ${totals.totalDiscount.toFixed(2)}`,
             discountCodeUsed: appliedDiscount ? appliedDiscount.code : "N/A",
             totalPointsForThisPurchase: totals.totalPoints,
-            appliedPromotions: totals.appliedPromoDescriptions
+            appliedPromoDescriptions: totals.appliedPromoDescriptions
         };
         sessionStorage.setItem("pendingOrder", JSON.stringify(orderData));
         
@@ -551,14 +544,11 @@
         const uploadBtn = document.getElementById('upload-proof-btn');
         const file = fileInput.files[0];
         let pendingOrder = JSON.parse(sessionStorage.getItem("pendingOrder"));
-
         if (!file) { statusEl.textContent = "Please select a file to upload."; statusEl.style.color = "red"; return; }
         if (!pendingOrder) { statusEl.textContent = "Error: No pending order found. Please refresh."; statusEl.style.color = "red"; return; }
-
         uploadBtn.disabled = true;
         statusEl.textContent = "Uploading...";
         statusEl.style.color = "blue";
-
         try {
             const base64File = await getBase64(file);
             const payload = {
@@ -588,14 +578,11 @@
         const finalizeBtn = document.getElementById("finalize-order-btn");
         const statusEl = document.getElementById("verification-status");
         let pendingOrder = JSON.parse(sessionStorage.getItem("pendingOrder"));
-
         if (!codeInput) { statusEl.textContent = "Please enter the verification code."; statusEl.style.color = "red"; return; }
         if (!pendingOrder) { statusEl.textContent = "Error: No pending order found."; statusEl.style.color = "red"; return; }
-
         finalizeBtn.disabled = true;
         statusEl.textContent = "Verifying...";
         statusEl.style.color = "blue";
-
         try {
             const payload = { action: "finalizeOrder", usedCode: codeInput, ...pendingOrder };
             const response = await fetch(googleScriptURL, { method: "POST", body: JSON.stringify(payload) });
@@ -613,11 +600,9 @@
         const statusEl = document.getElementById("verification-status");
         statusEl.innerHTML = `Order Verified!<br><br><a href="${receiptUrl}" class="btn btn-primary" style="text-decoration:none;" target="_blank">Click Here to Download Receipt</a>`;
         statusEl.style.color = "green";
-        
         cart = []; sessionStorage.removeItem("pendingOrder"); updateCartDisplay(); appliedDiscount = null;
         document.getElementById("discount-code-input").value = "";
         document.getElementById("discount-status").textContent = "";
-
         setTimeout(() => {
             toggleCart(true);
             updateVerificationUI(true);
