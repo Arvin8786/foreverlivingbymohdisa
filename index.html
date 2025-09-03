@@ -152,7 +152,7 @@
         </div>
         <div id="code-verification-step" class="verification-step">
             <h4><i class="fa-solid fa-key"></i> Step 2: Finalize with Code (Manual Backup)</h4>
-            <p style="font-size: 0.9rem; color: #555;">If the live chat fails, you can enter a verification code provided by the owner here.</p>
+            <p style="font-size: 0.9rem; color: #555;">If the live chat fails, you can enter a verification code provided by the Admin here.</p>
             <input type="text" id="verification-code" placeholder="Enter Verification Code">
             <button class="btn btn-primary" id="finalize-order-btn" onclick="finalizeOrder()">Finalize Order & Get Receipt</button>
             <p id="verification-status"></p>
@@ -618,7 +618,7 @@
     function toggleCart(t=!1){const e=document.getElementById("cart-modal");if(t)return void(e.style.display="none");"flex"===e.style.display?e.style.display="none":(e.style.display="flex",JSON.parse(sessionStorage.getItem("pendingOrder"))?(document.getElementById("cart-view").style.display="none",document.getElementById("verification-view").style.display="block",updateVerificationUI()):(document.getElementById("cart-view").style.display="block",document.getElementById("verification-view").style.display="none",updateCartDisplay(),updateVerificationUI(!0)))}
     function getBase64(t){return new Promise((e,o)=>{const n=new FileReader;n.readAsDataURL(t),n.onload=()=>e(n.result),n.onerror=t=>o(t)})}
     function filterProducts(){const t=document.getElementById("product-search").value.toLowerCase();document.querySelectorAll(".product-list").forEach(e=>{let o=!1;e.querySelectorAll(".product").forEach(e=>{e.querySelector("h3").textContent.toLowerCase().includes(t)?(e.style.display="flex",o=!0):e.style.display="none"});const n=e.closest(".promo-section");n&&(n.style.display=o?"block":"none")})}
-    function sendFeedbackEmail(t){t.preventDefault();const e=document.getElementById("feedback-submit-btn"),o=document.getElementById("feedback-status");if("YOUR_SERVICE_ID"==='YOUR_SERVICE_ID'||"YOUR_TEMPLATE_ID"==='YOUR_TEMPLATE_ID')return o.textContent="Feedback form is not configured. Please contact the owner directly.",void(o.style.color="orange");e.disabled=!0,o.textContent="Sending...",o.style.color="blue"}
+    function sendFeedbackEmail(t){t.preventDefault();const e=document.getElementById("feedback-submit-btn"),o=document.getElementById("feedback-status");if("YOUR_SERVICE_ID"==='YOUR_SERVICE_ID'||"YOUR_TEMPLATE_ID"==='YOUR_TEMPLATE_ID')return o.textContent="Feedback form is not configured. Please contact the Admin directly.",void(o.style.color="orange");e.disabled=!0,o.textContent="Sending...",o.style.color="blue"}
     function toggleCheckoutButton() { document.getElementById('checkout-btn').disabled = !document.getElementById('consent-checkbox').checked; }
     function showTab(tabId) { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); const tab = document.getElementById(tabId); if (tab) tab.classList.add('active'); }
 
@@ -675,7 +675,7 @@
         const buttons = document.querySelector('.chat-buttons');
         if (buttons) buttons.remove();
         addChatMessage('user', "Verify Now");
-        addChatMessage('bot', "Great! I have sent a request to the owner for real-time approval. This may take a few moments. Please keep this page open. I will check for an update every 10 seconds.");
+        addChatMessage('bot', "Great! I have sent a request to the Admin for real-time approval. This may take a few moments. Please keep this page open. I will check for an update every 10 seconds.");
         
         try {
             const response = await fetch(botServerURL, {
