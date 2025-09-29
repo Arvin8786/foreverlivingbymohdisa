@@ -2,7 +2,7 @@
 // E-Shop Frontend Script - v16.0 (Definitive Final & Complete)
 // =================================================================
 
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzp948qz81kzc_PzXv9RwszvXIixrHop_PoiA1LpOJmfychm4lMKSWQagSfceGXc4j2qw/exec'; // <-- IMPORTANT: PASTE YOUR DEPLOYED WEB APP URL HERE
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbw9Z4FICzQDvy8ijD_7KVUISiLpgiQ5-dmvc_VbWmswgCDzgl08iVNGTC-kDSRSwJaKSQ/exec'; // <-- IMPORTANT: PASTE YOUR DEPLOYED WEB APP URL HERE
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat'; // <-- IMPORTANT: PASTE YOUR RENDER SERVER URL HERE
 
 let products = [];
