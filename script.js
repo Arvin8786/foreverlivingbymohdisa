@@ -1,10 +1,10 @@
 // =================================================================
-// E-Shop Frontend Script - v17.6 (Definitive Final with Chatbot Logic)
+// E-Shop Frontend Script - v17.7 (Definitive Final & Corrected)
 // =================================================================
 
 const googleScriptURL = 'https://script.google.com/macros/s/AKfycbw9Z4FICzQDvy8ijD_7KVUISiLpgiQ5-dmvc_VbWmswgCDzgl08iVNGTC-kDSRSwJaKSQ/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
-const apiKey = '9582967'; // The secret API key for chatbot communication
+const apiKey = '9582967'; 
 
 let products = [];
 let cart = [];
@@ -19,14 +19,8 @@ async function fetchData() {
         const data = await response.json();
         if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
 
-        const marketing = data.marketing || {};
-        if (marketing.MaintenanceMode === true) {
-            document.getElementById('maintenance-message').textContent = marketing.MaintenanceMessage || "We'll be back shortly!";
-            document.getElementById('maintenance-overlay').style.display = 'flex';
-            return;
-        }
-
         products = data.products || [];
+        renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, data.jobsListings, data.testimonies);
         renderProducts(products);
         renderAboutUs(data.aboutUsContent);
@@ -35,7 +29,7 @@ async function fetchData() {
         buildCartModal();
         buildJobApplicationModal();
         
-        document.getElementById('update-timestamp').textContent = `v17.6`;
+        document.getElementById('update-timestamp').textContent = new Date().toLocaleDateString('en-GB');
         
         const chatInput = document.getElementById('chat-input');
         const chatSendBtn = document.getElementById('chat-send-btn');
@@ -52,19 +46,22 @@ async function fetchData() {
     }
 }
 
-function renderHomepageContent(about, jobs, testimonies) {
-    if (!about) return;
-    document.getElementById('company-name-header').innerHTML = `${about.CompanyName || ''} <span class="by-line">${about.Owner} - ${about.Role}</span> <span class="slogan">${about.Slogan}</span>`;
-    document.getElementById('footer-text').textContent = about.Footer || `© ${new Date().getFullYear()} ${about.CompanyName}`;
+function renderStaticContent(content) {
+    if (!content) return;
+    document.getElementById('company-name-header').innerHTML = `${content.CompanyName || ''} <span class="by-line">${content.Owner} - ${content.Role}</span> <span class="slogan">${content.Slogan}</span>`;
+    document.getElementById('footer-text').textContent = content.Footer || `© ${new Date().getFullYear()} ${content.CompanyName}`;
     const bannerTextEl = document.getElementById('promo-banner-text');
     const banner = document.getElementById('promo-running-banner');
-    if (about.RunningBanner) {
-        bannerTextEl.textContent = about.RunningBanner;
+    if (content.RunningBanner) {
+        bannerTextEl.textContent = content.RunningBanner;
         banner.style.display = 'block';
     } else {
         banner.style.display = 'none';
     }
+}
 
+function renderHomepageContent(about, jobs, testimonies) {
+    if (!about) return;
     const heroContainer = document.getElementById('homepage-hero');
     if (heroContainer) heroContainer.innerHTML = `<h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p>`;
     
@@ -126,7 +123,24 @@ function renderJobs(jobs) {
         container.innerHTML = '<p>There are currently no open positions.</p>';
         return;
     }
-    container.innerHTML = jobs.map(job => `<div class="job-listing"><h3>${job.position}</h3><ul><li><strong>Location:</strong> ${job.location}</li><li><strong>Type:</strong> ${job.type}</li><li><strong>Citizenship:</strong> ${job.citizenship}</li><li><strong>Gender:</strong> ${job.gender}</li><li><strong>Age Range:</strong> ${job.ageRange}</li><li><strong>Salary:</strong> ${job.salary} SGD</li><li><strong>Accommodation:</strong> ${job.accommodation}</li><li><strong>Work Pattern:</strong> ${job.workDayPattern}</li><li><strong>Availability:</strong> ${job.availability}</li></ul><div class="job-description">${job.description}</div><button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button></div>`).join('');
+    container.innerHTML = jobs.map(job => `
+        <div class="job-listing">
+            <h3>${job.position}</h3>
+            <ul>
+                <li><strong>Location:</strong> ${job.location}</li>
+                <li><strong>Type:</strong> ${job.type}</li>
+                <li><strong>Citizenship:</strong> ${job.citizenship}</li>
+                <li><strong>Gender:</strong> ${job.gender}</li>
+                <li><strong>Age Range:</strong> ${job.ageRange}</li>
+                <li><strong>Salary:</strong> ${job.salary} SGD</li>
+                <li><strong>Accommodation:</strong> ${job.accommodation}</li>
+                <li><strong>Work Pattern:</strong> ${job.workDayPattern}</li>
+                <li><strong>Availability:</strong> ${job.availability}</li>
+            </ul>
+            <div class="job-description">${job.description}</div>
+            <button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button>
+        </div>
+    `).join('');
 }
 
 function buildEnquiryForm() {
@@ -158,7 +172,6 @@ function updateCartDisplay() {
     document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
     const subtotalEl = document.getElementById('cart-subtotal');
     const totalEl = document.getElementById('cart-total');
-
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
         subtotalEl.textContent = 'RM 0.00';
