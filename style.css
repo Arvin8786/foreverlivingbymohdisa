@@ -1,5 +1,5 @@
 /* ================================================================ */
-/* E-Shop Stylesheet - v16.1 (Definitive Final with 4 Products/Row) */
+/* E-Shop Stylesheet - v17.2 (Definitive Final with Homepage)       */
 /* ================================================================ */
 
 :root {
@@ -31,12 +31,11 @@ nav ul { display: flex; list-style: none; padding: 10px 0; margin: 0; justify-co
 nav a { color: var(--light-text); text-decoration: none; font-weight: 600; padding: 10px 20px; cursor: pointer; }
 main { padding: 2rem 0; }
 .tab-content { display: none; } .tab-content.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .hero-section { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: var(--light-text); padding: 80px 20px; text-align: center; border-radius: var(--border-radius); margin-bottom: 30px; }
 .hero-section h2 { color: var(--light-text); }
 .product-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
 .product { background: var(--light-text); border-radius: var(--border-radius); box-shadow: var(--shadow); display: flex; flex-direction: column; }
-.product-image-container { height: 280px; padding: 15px; display: flex; align-items: center; justify-content: center; }
+.product-image-container { height: 220px; padding: 15px; display: flex; align-items: center; justify-content: center; }
 .product img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
 .product h3 { margin: 0 0 10px; font-size: 1.25rem; }
@@ -57,9 +56,22 @@ main { padding: 2rem 0; }
 .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,.6); justify-content: center; align-items: center; }
 .modal-content { background-color: #fefefe; padding: 30px; border-radius: var(--border-radius); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
 .close { color: #aaa; float: right; font-size: 28px; font-weight: 700; cursor: pointer; }
-.dynamic-content-wrapper { background: var(--light-text); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); }
+.dynamic-content-wrapper { background: var(--light-text); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; }
 .job-listing { border: 1px solid var(--light-gray); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: var(--border-radius); }
 .enquiry-form input, .enquiry-form textarea, .enquiry-form select { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; }
 footer { background: var(--primary-color); color: var(--light-text); padding: 40px 20px; text-align: center; margin-top: 30px; }
 #maintenance-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; }
 .loader { text-align: center; padding: 3rem; font-size: 1.2rem; color: var(--primary-color); }
+
+/* NEW STYLES for HOMEPAGE SECTIONS */
+.why-choose-us-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; }
+.why-choose-us-grid i { font-size: 2.5rem; color: var(--accent-color); margin-bottom: 1rem; }
+#youtube-videos-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
+.video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius); box-shadow: var(--shadow); }
+.video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+#testimonies-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+.testimony-card { background: var(--light-gray); padding: 1.5rem; border-radius: var(--border-radius); }
+.testimony-header { display: flex; align-items: center; gap: 15px; margin-bottom: 1rem; }
+.testimony-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
+.testimony-rating { color: var(--secondary-color); }
+.testimony-rating .fa-solid { margin-right: 2px; }
