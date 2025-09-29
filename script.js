@@ -1,9 +1,10 @@
 // =================================================================
-// E-Shop Frontend Script - v17.4 (Definitive Final with Chatbot Logic)
+// E-Shop Frontend Script - v17.6 (Definitive Final with Chatbot Logic)
 // =================================================================
 
 const googleScriptURL = 'https://script.google.com/macros/s/AKfycbw9Z4FICzQDvy8ijD_7KVUISiLpgiQ5-dmvc_VbWmswgCDzgl08iVNGTC-kDSRSwJaKSQ/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
+const apiKey = '9582967'; // The secret API key for chatbot communication
 
 let products = [];
 let cart = [];
@@ -18,16 +19,23 @@ async function fetchData() {
         const data = await response.json();
         if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
 
+        const marketing = data.marketing || {};
+        if (marketing.MaintenanceMode === true) {
+            document.getElementById('maintenance-message').textContent = marketing.MaintenanceMessage || "We'll be back shortly!";
+            document.getElementById('maintenance-overlay').style.display = 'flex';
+            return;
+        }
+
         products = data.products || [];
+        renderHomepageContent(data.aboutUsContent, data.jobsListings, data.testimonies);
         renderProducts(products);
         renderAboutUs(data.aboutUsContent);
         renderJobs(data.jobsListings);
-        renderHomepageContent(data.aboutUsContent, data.jobsListings, data.testimonies);
         buildEnquiryForm();
         buildCartModal();
         buildJobApplicationModal();
         
-        document.getElementById('update-timestamp').textContent = `v17.4`;
+        document.getElementById('update-timestamp').textContent = `v17.6`;
         
         const chatInput = document.getElementById('chat-input');
         const chatSendBtn = document.getElementById('chat-send-btn');
@@ -40,20 +48,29 @@ async function fetchData() {
     } catch (error) {
         console.error("Fatal Error fetching store data:", error);
         const productContainer = document.getElementById('product-list-container');
-        if(productContainer) productContainer.innerHTML = `<p style="text-align: center; color: red; font-weight: bold;">Error loading store. Please try again later.</p>`;
+        if(productContainer) productContainer.innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
     }
 }
 
 function renderHomepageContent(about, jobs, testimonies) {
     if (!about) return;
+    document.getElementById('company-name-header').innerHTML = `${about.CompanyName || ''} <span class="by-line">${about.Owner} - ${about.Role}</span> <span class="slogan">${about.Slogan}</span>`;
+    document.getElementById('footer-text').textContent = about.Footer || `© ${new Date().getFullYear()} ${about.CompanyName}`;
+    const bannerTextEl = document.getElementById('promo-banner-text');
+    const banner = document.getElementById('promo-running-banner');
+    if (about.RunningBanner) {
+        bannerTextEl.textContent = about.RunningBanner;
+        banner.style.display = 'block';
+    } else {
+        banner.style.display = 'none';
+    }
+
     const heroContainer = document.getElementById('homepage-hero');
-    if (heroContainer) {
-        heroContainer.innerHTML = `<h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p>`;
-    }
+    if (heroContainer) heroContainer.innerHTML = `<h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p>`;
+    
     const whyChooseUsContainer = document.getElementById('why-choose-us');
-    if (whyChooseUsContainer) {
-        whyChooseUsContainer.innerHTML = `<h2>${about.WhyChooseUs_Title}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div>`;
-    }
+    if (whyChooseUsContainer) whyChooseUsContainer.innerHTML = `<h2>${about.WhyChooseUs_Title}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div>`;
+        
     const videosContainer = document.getElementById('youtube-videos-container');
     const videoUrls = about.YoutubeURL ? about.YoutubeURL.split(',').map(url => url.trim()) : [];
     if (videoUrls.length > 0) {
@@ -67,6 +84,7 @@ function renderHomepageContent(about, jobs, testimonies) {
     } else {
         document.getElementById('youtube-videos').style.display = 'none';
     }
+
     const testimoniesContainer = document.getElementById('testimonies-container');
     if (testimonies && testimonies.length > 0) {
         testimoniesContainer.innerHTML = testimonies.map(t => {
@@ -77,6 +95,7 @@ function renderHomepageContent(about, jobs, testimonies) {
     } else {
         document.getElementById('homepage-testimonies').style.display = 'none';
     }
+
     const featuredJobsContainer = document.getElementById('featured-jobs-container');
     const featuredJobs = jobs ? jobs.filter(j => j.isFeatured) : [];
     if (featuredJobs.length > 0) {
@@ -107,7 +126,7 @@ function renderJobs(jobs) {
         container.innerHTML = '<p>There are currently no open positions.</p>';
         return;
     }
-    container.innerHTML = jobs.map(job => `<div class="job-listing"><h3>${job.position}</h3><p><strong>Location:</strong> ${job.location} | <strong>Type:</strong> ${job.type}</p><div>${job.description}</div><button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button></div>`).join('');
+    container.innerHTML = jobs.map(job => `<div class="job-listing"><h3>${job.position}</h3><ul><li><strong>Location:</strong> ${job.location}</li><li><strong>Type:</strong> ${job.type}</li><li><strong>Citizenship:</strong> ${job.citizenship}</li><li><strong>Gender:</strong> ${job.gender}</li><li><strong>Age Range:</strong> ${job.ageRange}</li><li><strong>Salary:</strong> ${job.salary} SGD</li><li><strong>Accommodation:</strong> ${job.accommodation}</li><li><strong>Work Pattern:</strong> ${job.workDayPattern}</li><li><strong>Availability:</strong> ${job.availability}</li></ul><div class="job-description">${job.description}</div><button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button></div>`).join('');
 }
 
 function buildEnquiryForm() {
@@ -137,11 +156,19 @@ function addToCart(productId) {
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
     document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const subtotalEl = document.getElementById('cart-subtotal');
+    const totalEl = document.getElementById('cart-total');
+
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+        subtotalEl.textContent = 'RM 0.00';
+        totalEl.textContent = 'RM 0.00';
         return;
     }
     cartItemsContainer.innerHTML = cart.map(item => `<div class="cart-item"><span>${item.name} (x${item.quantity})</span><span>RM ${(item.price * item.quantity).toFixed(2)}</span></div>`).join('');
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    subtotalEl.textContent = `RM ${subtotal.toFixed(2)}`;
+    totalEl.textContent = `RM ${subtotal.toFixed(2)}`;
 }
 
 function toggleCart(hide = false) {
@@ -228,10 +255,6 @@ function getBase64(file) {
     });
 }
 
-// =================================================================
-// CHATBOT LOGIC - FULLY RESTORED
-// =================================================================
-
 function toggleChatWidget(show) {
     const chatWidget = document.getElementById('eshop-chat-widget');
     const fabContainer = document.getElementById('fab-container');
@@ -249,129 +272,120 @@ function toggleChatWidget(show) {
 
 function addChatMessage(sender, text, type = 'text') {
     const chatBody = document.getElementById('chat-body');
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('chat-message', sender === 'bot' ? 'bot-message' : 'user-message');
-    if (type === 'html') {
-        messageDiv.innerHTML = text;
-    } else {
-        messageDiv.textContent = text;
-    }
-    chatBody.appendChild(messageDiv);
+    const msg = document.createElement('div');
+    msg.classList.add('chat-message', sender === 'bot' ? 'bot-message' : 'user-message');
+    if (type === 'html') { msg.innerHTML = text; } else { msg.textContent = text; }
+    chatBody.appendChild(msg);
     chatBody.scrollTop = chatBody.scrollHeight;
-    return messageDiv;
+    return msg;
 }
 
 function displayMainMenu() {
     chatSession.state = 'main_menu';
-    const menuText = `<strong>Welcome! How can I help?</strong><br><br>1. My Account (Orders & Points)<br>2. Talk to a Human<br><br>Or, ask me a question about our products!`;
-    addChatMessage('bot', menuText, 'html');
+    const menu = `<strong>Welcome!</strong><br>1. My Account<br>2. Talk to a Human<br>Or ask a question.`;
+    addChatMessage('bot', menu, 'html');
 }
 
 async function handleChatSubmit() {
-    const chatInput = document.getElementById('chat-input');
-    const userInput = chatInput.value.trim();
-    if (!userInput) return;
-    addChatMessage('user', userInput);
-    chatInput.value = '';
-    chatInput.disabled = true;
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+    addChatMessage('user', text);
+    input.value = '';
     const thinkingMsg = addChatMessage('bot', '<i>Thinking...</i>', 'html');
 
-    try {
-        if (chatSession.state === 'awaiting_identifier') { await startVerification(userInput); }
-        else if (chatSession.state === 'awaiting_code') { await submitVerificationCode(userInput); }
-        else if (chatSession.state === 'my_account_menu') { await handleMyAccountMenu(userInput); }
-        else { await handleMainMenu(userInput); }
-    } finally {
-        thinkingMsg.remove();
-        chatInput.disabled = false;
-        chatInput.focus();
-    }
+    if (chatSession.state === 'awaiting_identifier') { await startVerification(text); }
+    else if (chatSession.state === 'awaiting_code') { await submitVerificationCode(text); }
+    else if (chatSession.state === 'my_account_menu') { await handleMyAccountMenu(text); }
+    else { await handleMainMenu(text); }
+
+    thinkingMsg.remove();
 }
 
-async function handleMainMenu(userInput) {
-    if (userInput === '1') {
+async function handleMainMenu(text) {
+    if (text === '1') {
         if (sessionStorage.getItem('eshop_session_token')) {
             displayMyAccountMenu();
         } else {
             chatSession.state = 'awaiting_identifier';
-            addChatMessage('bot', 'To access your account, please enter your PAC or registered Email address.');
+            addChatMessage('bot', 'Enter your PAC or Email to verify.');
         }
-    } else if (userInput === '2') {
-        addChatMessage('bot', 'To speak with our admin, please click the link below to contact them directly on WhatsApp:');
-        addChatMessage('bot', '<a href="https://wa.me/601111033154" target="_blank">Contact Admin on WhatsApp</a>', 'html');
-        setTimeout(displayMainMenu, 2000);
+    } else if (text === '2') {
+        addChatMessage('bot', '<a href="https://wa.me/601111033154" target="_blank">Contact Admin</a>', 'html');
     } else {
-        try {
-            const response = await fetch(botServerURL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'handleUserQuery', data: { query: userInput }}) });
-            const result = await response.json();
-            if (!result.success) throw new Error(result.message);
-            addChatMessage('bot', result.answer, 'html');
-        } catch (error) {
-            addChatMessage('bot', `Sorry, an error occurred: ${error.message}`);
-        }
+        const response = await fetch(botServerURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'getSmartAnswer', apiKey: apiKey, data: { question: text } })
+        });
+        const result = await response.json();
+        addChatMessage('bot', result.answer || 'Sorry, I had trouble finding an answer.');
     }
 }
 
 async function startVerification(identifier) {
-    try {
-        const response = await fetch(botServerURL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'startChatVerification', data: { identifier }}) });
-        const result = await response.json();
-        if (!result.success) throw new Error(result.message);
+    const response = await fetch(botServerURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'issueChatVerificationCode', apiKey: apiKey, data: { identifier: identifier } })
+    });
+    const result = await response.json();
+    if (result.success) {
         chatSession.state = 'awaiting_code';
         chatSession.pac = result.pac;
-        addChatMessage('bot', `A verification code has been sent to your registered WhatsApp. Please enter it here.`);
-    } catch (error) {
-        addChatMessage('bot', `Verification failed: ${error.message}.`);
-        setTimeout(displayMainMenu, 2000);
+        addChatMessage('bot', 'A code has been sent to your WhatsApp. Please enter it here.');
+    } else {
+        addChatMessage('bot', `Verification failed: ${result.message}`);
+        chatSession.state = 'main_menu';
     }
 }
 
 async function submitVerificationCode(code) {
-    try {
-        const response = await fetch(botServerURL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'verifyChatCode', data: { pac: chatSession.pac, code }}) });
-        const result = await response.json();
-        if (!result.success) throw new Error(result.message);
+    const response = await fetch(botServerURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'verifyChatCode', apiKey: apiKey, data: { pac: chatSession.pac, code: code } })
+    });
+    const result = await response.json();
+    if (result.success) {
         sessionStorage.setItem('eshop_session_token', result.token);
-        delete chatSession.pac;
-        addChatMessage('bot', '✅ Verification Successful!');
+        addChatMessage('bot', 'Verified!');
         displayMyAccountMenu();
-    } catch (error) {
-        addChatMessage('bot', `Verification failed: ${error.message}.`);
-        setTimeout(displayMainMenu, 2000);
+    } else {
+        addChatMessage('bot', `Verification failed: ${result.message}`);
+        chatSession.state = 'main_menu';
     }
 }
 
 function displayMyAccountMenu() {
     chatSession.state = 'my_account_menu';
-    const menuText = `<strong>My Account</strong><br><br>1. View My Last 5 Orders<br>2. Check My Total Points<br>3. Back to Main Menu`;
-    addChatMessage('bot', menuText, 'html');
+    addChatMessage('bot', '<strong>My Account</strong><br>1. View My Last 5 Orders<br>2. Check My Total Points<br>3. Back to Main Menu', 'html');
 }
 
-async function handleMyAccountMenu(userInput) {
+async function handleMyAccountMenu(text) {
     let action = '';
-    switch(userInput) {
-        case '1': action = 'getPurchaseHistory'; break;
-        case '2': action = 'getPointsHistory'; break;
-        case '3': displayMainMenu(); return;
-        default: addChatMessage('bot', "Invalid option."); return;
-    }
-    try {
-        const token = sessionStorage.getItem('eshop_session_token');
-        const response = await fetch(botServerURL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: action, data: { token: token }}) });
-        const result = await response.json();
-        if (!result.success) throw new Error(result.message);
+    if (text === '1') action = 'getPurchaseHistory';
+    else if (text === '2') action = 'getPointsHistory';
+    else if (text === '3') { displayMainMenu(); return; }
+    else { addChatMessage('bot', 'Invalid option.'); return; }
 
-        if (action === 'getPurchaseHistory') {
+    const token = sessionStorage.getItem('eshop_session_token');
+    const response = await fetch(botServerURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: action, apiKey: apiKey, data: { token: token } })
+    });
+    const result = await response.json();
+    if(result.success) {
+        if(action === 'getPurchaseHistory') {
             let historyText = "<strong>Your Last 5 Orders:</strong><br>";
-            if (result.history.length === 0) { historyText = 'You have no purchase history on record.'; }
+            if (result.history.length === 0) { historyText = 'You have no purchase history.'; }
             else { result.history.forEach(order => { historyText += `<br><strong>ID:</strong> ${order.invoiceId}<br><strong>Date:</strong> ${order.date}<br><strong>Total:</strong> RM ${order.totalAmount}<br><strong>Status:</strong> ${order.status}`; }); }
             addChatMessage('bot', historyText, 'html');
-        } else if (action === 'getPointsHistory') {
-            addChatMessage('bot', `Your total accumulated points balance is: <strong>${result.currentBalance}</strong>`, 'html');
+        } else {
+            addChatMessage('bot', `Your total points: <strong>${result.currentBalance}</strong>`, 'html');
         }
-    } catch (error) {
-        addChatMessage('bot', `Error: ${error.message}. Your session may have expired.`);
-        sessionStorage.removeItem('eshop_session_token');
-        setTimeout(displayMainMenu, 2000);
+    } else {
+        addChatMessage('bot', `Error: ${result.message}`);
     }
 }
