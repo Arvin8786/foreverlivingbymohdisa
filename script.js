@@ -1,9 +1,9 @@
 // =================================================================
-// E-Shop Frontend Script - v16.0 (Definitive Final & Complete)
+// E-Shop Frontend Script - v17.2 (Definitive Final & Complete)
 // =================================================================
 
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbw9Z4FICzQDvy8ijD_7KVUISiLpgiQ5-dmvc_VbWmswgCDzgl08iVNGTC-kDSRSwJaKSQ/exec'; // <-- IMPORTANT: PASTE YOUR DEPLOYED WEB APP URL HERE
-const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat'; // <-- IMPORTANT: PASTE YOUR RENDER SERVER URL HERE
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbw9Z4FICzQDvy8ijD_7KVUISiLpgiQ5-dmvc_VbWmswgCDzgl08iVNGTC-kDSRSwJaKSQ/exec';
+const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 
 let products = [];
 let cart = [];
@@ -11,17 +11,17 @@ let chatSession = { state: 'main_menu' };
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchData();
-    // Event listeners for forms and chatbot are added after content is built
 });
 
 async function fetchData() {
-    const productContainer = document.getElementById('product-list-container');
     try {
+        const productContainer = document.getElementById('product-list-container');
         productContainer.innerHTML = `<p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading products...</p>`;
+        
         const response = await fetch(googleScriptURL);
-        if (!response.ok) throw new Error('Network response was not ok.');
+        if (!response.ok) throw new Error('Network response failed');
         const data = await response.json();
-        if (data.status !== 'success') throw new Error(data.message || 'An unknown error occurred.');
+        if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
 
         const marketing = data.marketing || {};
         if (marketing.MaintenanceMode === true) {
@@ -31,19 +31,27 @@ async function fetchData() {
         }
 
         products = data.products || [];
+        renderHomepageContent(data.aboutUsContent, data.jobsListings, data.testimonies);
         renderProducts(products);
         renderAboutUs(data.aboutUsContent);
         renderJobs(data.jobsListings);
-        renderStaticContent(data.aboutUsContent);
         buildEnquiryForm();
-        buildCart();
+        buildCartModal();
         buildJobApplicationModal();
         
-        document.getElementById('update-timestamp').textContent = `v16.0`;
+        document.getElementById('update-timestamp').textContent = `v17.2`;
+        
+        const chatInput = document.getElementById('chat-input');
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        if (chatSendBtn) {
+            chatSendBtn.addEventListener('click', handleChatSubmit);
+            chatInput.addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
+        }
+        showTab('homepage');
 
     } catch (error) {
         console.error("Fatal Error fetching store data:", error);
-        productContainer.innerHTML = `<p style="text-align: center; color: red; font-weight: bold;">Error loading store. Could not retrieve catalog. Please try again later.</p>`;
+        document.getElementById('product-list-container').innerHTML = `<p style="color: red;">Error: Could not load store data. Please try again later.</p>`;
     }
 }
 
@@ -60,10 +68,72 @@ function renderStaticContent(content) {
     }
 }
 
+function renderHomepageContent(about, jobs, testimonies) {
+    if (!about) return;
+    const heroContainer = document.getElementById('homepage-hero');
+    heroContainer.innerHTML = `<h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p>`;
+
+    const whyChooseUsContainer = document.getElementById('why-choose-us');
+    whyChooseUsContainer.innerHTML = `
+        <h2>${about.WhyChooseUs_Title}</h2>
+        <div class="why-choose-us-grid">
+            <div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div>
+            <div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div>
+            <div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div>
+        </div>`;
+        
+    const videosContainer = document.getElementById('youtube-videos-container');
+    const videoUrls = about.YoutubeURL ? about.YoutubeURL.split(',').map(url => url.trim()) : [];
+    if (videoUrls.length > 0) {
+        videosContainer.innerHTML = videoUrls.map(url => {
+            try {
+                const videoId = new URL(url).searchParams.get('v');
+                if (videoId) {
+                    return `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
+                }
+            } catch(e) { /* ignore invalid urls */ }
+            return '';
+        }).join('');
+    } else {
+        document.getElementById('youtube-videos').style.display = 'none';
+    }
+
+    const testimoniesContainer = document.getElementById('testimonies-container');
+    if (testimonies && testimonies.length > 0) {
+        testimoniesContainer.innerHTML = testimonies.map(t => {
+            let stars = '';
+            for (let i = 0; i < 5; i++) {
+                stars += `<i class="fa-solid fa-star" style="color: ${i < t.Rating ? 'var(--secondary-color)' : '#ccc'}"></i>`;
+            }
+            return `
+                <div class="testimony-card">
+                    <div class="testimony-header">
+                        <img src="${t.Customer_Image_URL}" alt="${t.Customer_Name}" class="testimony-img">
+                        <div>
+                            <h4>${t.Customer_Name}</h4>
+                            <div class="testimony-rating">${stars}</div>
+                        </div>
+                    </div>
+                    <p>"${t.Testimony_Text}"</p>
+                </div>`;
+        }).join('');
+    } else {
+        document.getElementById('homepage-testimonies').style.display = 'none';
+    }
+
+    const featuredJobsContainer = document.getElementById('featured-jobs-container');
+    const featuredJobs = jobs ? jobs.filter(j => j.isFeatured) : [];
+    if (featuredJobs.length > 0) {
+        featuredJobsContainer.innerHTML = featuredJobs.map(job => `<div class="job-listing-summary"><h4>${job.position}</h4><p>${job.location} | ${job.type}</p></div>`).join('');
+    } else {
+        document.getElementById('homepage-featured-jobs').style.display = 'none';
+    }
+}
+
 function renderProducts(productsToRender) {
     const container = document.getElementById('product-list-container');
     if (!productsToRender || productsToRender.length === 0) {
-        container.innerHTML = `<p>No products available at the moment.</p>`;
+        container.innerHTML = `<p>No products available.</p>`;
         return;
     }
     container.innerHTML = productsToRender.map(p => `
@@ -72,29 +142,25 @@ function renderProducts(productsToRender) {
             <div class="product-info">
                 <h3>${p.name}</h3>
                 <div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div>
-                <div class="product-actions">
-                  <button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button>
-                </div>
+                <div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div>
             </div>
         </div>`).join('');
 }
 
 function renderAboutUs(content) {
     const container = document.getElementById('about-us-content');
-    if (!content) { container.innerHTML = '<p>About us information is currently unavailable.</p>'; return; }
+    if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
     container.innerHTML = `
-        <h2>${content.WhyChooseUs_Title || 'About Us'}</h2>
+        <h2>About ${content.CompanyName}</h2>
         <div class="owner-profile">
             <div class="owner-details">
                 <h3>${content.Owner} - ${content.Role}</h3>
                 <div>${content.MoreDetails}</div>
-                <p><strong>Our Mission:</strong> ${content.OurMission}</p>
-                <p><strong>Our Vision:</strong> ${content.OurVision}</p>
-                <ul>
-                    <li><i class="${content.Point1_Icon}"></i> ${content.Point1_Text}</li>
-                    <li><i class="${content.Point2_Icon}"></i> ${content.Point2_Text}</li>
-                    <li><i class="${content.Point3_Icon}"></i> ${content.Point3_Text}</li>
-                </ul>
+                <hr>
+                <h4>Our Mission</h4>
+                <p>${content.OurMission}</p>
+                <h4>Our Vision</h4>
+                <p>${content.OurVision}</p>
             </div>
         </div>`;
 }
@@ -102,17 +168,19 @@ function renderAboutUs(content) {
 function renderJobs(jobs) {
     const container = document.getElementById('job-listings-container');
     if (!jobs || jobs.length === 0) {
-        container.innerHTML = '<p>There are currently no open positions. Please check back later.</p>';
+        container.innerHTML = '<p>There are currently no open positions.</p>';
         return;
     }
     container.innerHTML = jobs.map(job => `
         <div class="job-listing">
             <h3>${job.position}</h3>
             <p><strong>Location:</strong> ${job.location} | <strong>Type:</strong> ${job.type}</p>
-            <div>${job.description}</div>
+            <p><strong>Citizenship:</strong> ${job.citizenship} | <strong>Gender:</strong> ${job.gender} | <strong>Age:</strong> ${job.ageRange}</p>
+            <p><strong>Salary:</strong> ${job.salary} SGD | <strong>Accommodation:</strong> ${job.accommodation}</p>
+            <p><strong>Work Pattern:</strong> ${job.workDayPattern}</p>
+            <div class="job-description">${job.description}</div>
             <button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button>
-        </div>
-    `).join('');
+        </div>`).join('');
 }
 
 function buildEnquiryForm() {
@@ -135,7 +203,7 @@ function buildEnquiryForm() {
     document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
 }
 
-function buildCart() {
+function buildCartModal() {
     const container = document.getElementById('cart-modal');
     container.innerHTML = `
         <div class="modal-content">
@@ -146,7 +214,6 @@ function buildCart() {
               <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
               <div class="summary-line"><span>Shipping</span><span id="cart-shipping">RM 0.00</span></div>
               <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
-              <div id="points-earned-display"></div>
             </div>
             <div class="customer-info-form">
               <h3>Customer & Shipping Information</h3>
@@ -209,7 +276,7 @@ function updateCartDisplay() {
     `).join('');
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     subtotalEl.textContent = `RM ${subtotal.toFixed(2)}`;
-    totalEl.textContent = `RM ${subtotal.toFixed(2)}`; // Add shipping logic here if needed
+    totalEl.textContent = `RM ${subtotal.toFixed(2)}`;
 }
 
 function toggleCart(hide = false) {
@@ -237,7 +304,7 @@ async function handleEnquirySubmit(event) {
     statusEl.textContent = 'Sending...';
     try {
         const payload = { action: 'logEnquiry', data: { name: document.getElementById('enquiry-name').value, email: document.getElementById('enquiry-email').value, phone: document.getElementById('enquiry-phone').value, type: document.getElementById('enquiry-type').value, message: document.getElementById('enquiry-message').value } };
-        const response = await fetch(googleScriptURL, { method: 'POST', body: JSON.stringify(payload), mode: 'no-cors' });
+        await fetch(googleScriptURL, { method: 'POST', body: JSON.stringify(payload), mode: 'no-cors' });
         statusEl.textContent = 'Your enquiry has been sent successfully!';
         event.target.reset();
     } catch (error) {
@@ -274,10 +341,10 @@ async function handleJobApplicationSubmit(event) {
         }
     };
     try {
-        const response = await fetch(googleScriptURL, { method: 'POST', body: JSON.stringify(payload), mode: 'no-cors' });
+        await fetch(googleScriptURL, { method: 'POST', body: JSON.stringify(payload), mode: 'no-cors' });
         statusEl.textContent = 'Application submitted successfully!';
         statusEl.style.color = 'green';
-        setTimeout(() => { toggleJobModal(false); statusEl.textContent = ''; }, 3000);
+        setTimeout(() => { toggleJobModal(false); }, 3000);
     } catch (error) {
         statusEl.textContent = 'An error occurred. Please try again.';
         statusEl.style.color = 'red';
@@ -291,8 +358,7 @@ function showTab(tabId) {
 }
 
 function initiateCheckout() {
-    // This is a placeholder for your full checkout logic
-    alert('Checkout process initiated!');
+    alert('This feature is under development.');
 }
 
 function getBase64(file) {
@@ -302,4 +368,9 @@ function getBase64(file) {
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
     });
+}
+
+function toggleChatWidget(show) {
+    const chatWidget = document.getElementById('eshop-chat-widget');
+    chatWidget.classList.toggle('active', show);
 }
