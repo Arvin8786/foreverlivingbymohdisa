@@ -1,5 +1,5 @@
 /* ================================================================ */
-/* E-Shop Stylesheet - v17.7 (Definitive Layout Fix)                */
+/* E-Shop Stylesheet - v15.2 (Definitive Layout Fix)                */
 /* ================================================================ */
 
 :root {
@@ -34,14 +34,14 @@ main { padding: 2rem 0; }
 .hero-section { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: var(--light-text); padding: 80px 20px; text-align: center; border-radius: var(--border-radius); margin-bottom: 30px; }
 .hero-section h2 { color: var(--light-text); }
 
-/* [CRITICAL FIX] Corrected the product grid to display 4 items per row */
+/* [CRITICAL FIX] Corrected the product grid to display 3 items per row */
 .product-list { 
     display: grid; 
-    grid-template-columns: repeat(4, 1fr); 
+    grid-template-columns: repeat(3, 1fr); 
     gap: 30px; 
 }
 .product { background: var(--light-text); border-radius: var(--border-radius); box-shadow: var(--shadow); display: flex; flex-direction: column; }
-.product-image-container { height: 220px; padding: 15px; display: flex; align-items: center; justify-content: center; }
+.product-image-container { height: 280px; padding: 15px; display: flex; align-items: center; justify-content: center; }
 .product img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
 .product h3 { margin: 0 0 10px; font-size: 1.25rem; }
