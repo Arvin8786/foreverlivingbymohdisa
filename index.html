@@ -4,168 +4,67 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Forever Living by Muhd Arvind Isa</title>
-  
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="theme.css">
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body data-festival="">
+<body>
 
-<div id="maintenance-overlay">
-  <div><i class="fa-solid fa-person-digging"></i><h1>Under Maintenance</h1><p id="maintenance-message">We'll be back shortly!</p></div>
-</div>
-<div class="festive-layer"></div>
+<div id="maintenance-overlay"></div>
+
 <div id="store-wrapper">
   <header>
-    <div class="container"><div class="header-content"><img src="FL.jpg" alt="Business Logo" class="header-logo" onerror="this.style.display='none'"><h1>FOREVER LIVING by Muhd Arvind Isa<span class="header-subtitle">Quality Wellness Products</span></h1></div></div>
+    <div class="container">
+      <div class="header-content">
+        <img src="FL.jpg" alt="Business Logo" class="header-logo" onerror="this.style.display='none'">
+        <h1 id="company-name-header"></h1>
+      </div>
+    </div>
   </header>
   <div id="promo-running-banner"><div class="marquee-content" id="promo-banner-text"></div></div>
   <nav>
     <div class="container">
-        <ul id="main-nav">
-          <li><a onclick="showTab('products')">Products</a></li>
-          <li><a onclick="showTab('business')">Business Opportunity</a></li>
-          <li><a onclick="showTab('about')">About Us</a></li>
-          <li><a class="nav-disabled">Rewards</a></li>
-          <li><a class="nav-disabled">My Forever Living</a></li>
-        </ul>
+      <ul id="main-nav">
+        <li><a onclick="showTab('products')">Products</a></li>
+        <li><a onclick="showTab('about')">About Us</a></li>
+        <li><a onclick="showTab('jobs')">Careers</a></li>
+        <li><a onclick="showTab('enquiries')">Contact Us</a></li>
+      </ul>
     </div>
   </nav>
   <main id="main-content" class="container">
     <div id="products" class="tab-content active">
-      <section class="hero-section" id="hero-section">
-        <h2 id="hero-title"><i class="fa-solid fa-store"></i> Welcome to Our Store</h2>
-        <p id="hero-subtitle">Enjoy high-quality wellness products for a healthier lifestyle.</p>
-      </section>
-      <div class="search-container">
-        <input type="text" id="product-search" onkeyup="filterProducts()" placeholder="Search for products by name..."><i class="fa-solid fa-search search-icon"></i>
-      </div>
-      <div id="product-list-container"><p style="text-align: center; width: 100%;"><i class="fa-solid fa-spinner fa-spin"></i> Loading products from our catalog...</p></div>
-    </div>
-    
-    <div id="business" class="tab-content">
-      <section class="program-section">
-        <h2>Build Your Forever Business</h2>
-        <p style="text-align: center; max-width: 800px; margin: 20px auto;">The Forever Living opportunity is more than just selling high-quality products; it's a chance to build a flexible, rewarding business on your own terms.</p>
-        <h3 style="margin-top:40px;">How Does It Work?</h3>
-        <ul><li><strong>Become Your Own Boss:</strong> As a Forever Business Owner (FBO), you have the freedom to work from anywhere, set your own hours, and grow at your own pace.</li><li><strong>A Simple, Proven Model:</strong> The business is built on a simple cycle: Use the products yourself, share your experience with others, and build a team to do the same.</li><li><strong>Earn Generous Rewards:</strong> You earn income from your retail sales and from the sales of your team members. Forever offers a generous compensation plan, including bonuses and travel incentives.</li><li><strong>World-Class Support:</strong> You are never alone. You will receive mentorship, training, and support from our team and the wider Forever community.</li></ul>
-        <h3 style="margin-top:40px;">Ready to Start Your Journey?</h3>
-        <p style="text-align: center;">Take the first step towards a healthier, wealthier life. Contact us today to learn more.</p>
-        <a href="https://wa.me/601111033154?text=Hi,%20I'm%20interested%20in%20learning%20more%20about%20the%20Forever%20Living%20business%20opportunity." class="cta-button" target="_blank"><i class="fab fa-whatsapp"></i> Click to Learn More on WhatsApp</a>
-      </section>
+      <div id="product-list-container"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading products...</p></div>
     </div>
     <div id="about" class="tab-content">
-      <section class="about-us-section">
-        <h2>About Us</h2>
-        <div class="owner-profile">
-            <img src="owner.jpg" alt="Muhd Arvind Isa" class="owner-image" onerror="this.src='https://via.placeholder.com/150'">
-            <div class="owner-details">
-                <h3>Muhd Arvind Isa - Independent FBO</h3>
-                <p>Welcome! I am an authorized Independent Forever Business Owner (FBO) dedicated to bringing you the highest quality health and wellness products from Forever Living.</p>
-                <p><strong>Powered by:</strong> Rich Academy Global</p>
-                <p><strong>Contact Information:</strong></p>
-                <ul><li><strong><i class="fab fa-whatsapp"></i> WhatsApp:</strong> <a href="https://wa.me/601111033154">+6011 1103 3154</a></li><li><strong><i class="fa fa-envelope"></i> Email:</strong> <a href="mailto:cs.foreverlivingbymuhdarvindisa@gmail.com">cs.foreverlivingbymuhdarvindisa@gmail.com</a></li></ul>
-            </div>
-        </div>
+      <div id="about-us-content" class="dynamic-content-wrapper"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading content...</p></div>
+    </div>
+    <div id="jobs" class="tab-content">
+      <div id="jobs-content" class="dynamic-content-wrapper">
+        <h2>Join Our Team</h2>
+        <div id="job-listings-container"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading job opportunities...</p></div>
+      </section>
+    </div>
+    <div id="enquiries" class="tab-content">
+      <section id="enquiries-form-content" class="dynamic-content-wrapper">
+        <h2>Send us an Enquiry</h2>
+        <form id="enquiry-form" class="enquiry-form"></form>
       </section>
     </div>
   </main>
   <footer class="footer">
       <div class="container">
-        <p>© 2024 Forever Living by Muhd Arvind Isa. All rights reserved.</p>
+        <p id="footer-text"></p>
         <div class="timestamp">Last updated: <span id="update-timestamp"></span></div>
-        <section class="disclaimer"><strong>Disclaimer:</strong> This website is operated by an independent FBO and is not the official site of Forever Living Products.</section>
       </div>
   </footer>
 </div>
 
-<!-- CART MODAL (Full, Correct Structure) -->
-<div id="cart-modal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="toggleCart(true)">×</span>
-      
-      <div id="cart-view">
-        <h2>Your Shopping Cart</h2>
-        <div id="cart-items"><p>Your cart is currently empty.</p></div>
-        <div class="cart-summary">
-          <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
-          <div class="summary-line" id="discount-line" style="display:none;"><span>Discount</span><span id="cart-discount">RM 0.00</span></div>
-          <div class="summary-line"><span>Shipping</span><span id="cart-shipping">RM 0.00</span></div>
-          <div class="summary-line" id="savings-line" style="display:none; color: var(--accent-color); font-weight: bold;"><span>You Saved</span><span id="cart-savings">RM 0.00</span></div>
-          <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
-          <div id="points-earned-display"></div>
-        </div>
-        <div class="discount-section">
-            <input type="text" id="discount-code-input" placeholder="Enter Discount Code"><button class="btn btn-secondary" onclick="applyDiscount()">Apply</button>
-        </div>
-        <p id="discount-status"></p>
-        <div class="customer-info-form">
-          <h3>Customer & Shipping Information</h3>
-          <input type="text" id="customer-name" placeholder="Your Full Name" required>
-          <input type="tel" id="customer-phone" placeholder="Your WhatsApp Number (e.g., +60123456789)" required>
-          <input type="email" id="customer-email" placeholder="Your Email Address (for receipt)" required>
-          <input type="text" id="customer-address1" placeholder="Address Line 1" required>
-          <input type="text" id="customer-address2" placeholder="Address Line 2 (Optional)">
-          <input type="text" id="customer-city" placeholder="City" required>
-          <input type="text" id="customer-state" placeholder="State" required>
-          <input type="text" id="customer-postcode" placeholder="Postcode" required>
-        </div>
-        <div id="consent-form">
-            <label for="consent-checkbox">
-                <input type="checkbox" id="consent-checkbox" onchange="toggleCheckoutButton()">
-                <span>I consent to the collection of my personal data for transaction purposes. You can request data deletion at any time.</span>
-            </label>
-        </div>
-        <button class="btn btn-primary checkout-btn" id="checkout-btn" onclick="initiateCheckout()" disabled>Proceed to Payment</button>
-      </div>
-      
-      <div id="payment-options-view" style="display: none;">
-        <h2>Payment</h2>
-        <div class="payment-options">
-            <div class="payment-option">
-                <h4>Option 1: Online Banking / Bank Transfer</h4>
-                <p>Bank: <strong>Maybank</strong></p>
-                <p>Account Name: <strong>Arvinderan A/L M Ganeson</strong></p>
-                <p>Account Number: <strong>102037147223</strong></p>
-            </div>
-            <div class="payment-option">
-                <h4>Option 2: Touch 'n Go eWallet</h4>
-                <p>Please scan the QR code below with your TNG app.</p>
-                <img src="https://i.imgur.com/46ddVhc.png" alt="TNG QR Code" style="max-width: 200px;">
-            </div>
-        </div>
-        <div id="payment-choice-buttons" style="margin-top: 20px;">
-            <button class="btn btn-primary" onclick="proceedToUpload()">I Have Made My Payment</button>
-        </div>
-      </div>
+<div id="cart-modal" class="modal"></div>
+<div id="job-application-modal" class="modal"></div>
 
-      <div id="verification-view" style="display: none;">
-        <h2>Order Submission</h2>
-        <div id="proof-upload-step" class="verification-step active">
-            <h4><i class="fa-solid fa-arrow-up-from-bracket"></i> Upload Payment Proof</h4>
-            <div class="payment-method-selection" style="margin: 15px 0;">
-                <label for="payment-method">Payment Method Used:</label>
-                <select id="payment-method" style="padding: 8px; border-radius: 5px;">
-                    <option value="" disabled selected>Please select...</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                    <option value="TNG eWallet">TNG eWallet</option>
-                </select>
-            </div>
-            <input type="file" id="payment-proof-upload" accept="image/*">
-            <button class="btn btn-primary" id="upload-proof-btn" onclick="uploadProof()">Submit Order & Get Proforma Invoice</button>
-            <p id="upload-status"></p>
-        </div>
-        <button class="btn btn-secondary" style="margin-top: 20px;" onclick="cancelVerification()">Cancel Order</button>
-      </div>
-
-    </div>
-</div>
-
-<!-- FLOATING ACTION BUTTONS CONTAINER (Full, Correct Structure) -->
 <div class="fab-container" id="fab-container">
     <div id="floating-cart" class="fab floating-cart-btn" onclick="toggleCart()">
         <i class="fa-solid fa-cart-shopping"></i>
@@ -176,22 +75,18 @@
     </div>
 </div>
 
-<!-- E-SHOP ON-SCREEN CHATBOT WIDGET (Full, Correct Structure) -->
 <div id="eshop-chat-widget">
     <div id="chat-header">
-        FL e-Shop Assistant
+        <span>FL e-Shop Assistant</span>
         <button id="close-chat-btn" onclick="toggleChatWidget(false)">&times;</button>
     </div>
-    <div id="chat-body">
-        <!-- Chat messages will be added here -->
-    </div>
+    <div id="chat-body"></div>
     <div id="chat-input-container">
-        <input type="text" id="chat-input" placeholder="Type a number or your message...">
+        <input type="text" id="chat-input" placeholder="Type your message...">
         <button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
