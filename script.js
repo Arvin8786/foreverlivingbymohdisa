@@ -1,4 +1,4 @@
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbx_EY22mVSKJrwlaKWyKxlgYPoZ9qhF_d5CuK-l0JUyVPNkvPrxwRa5bX-8_PRfyeXumQ/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbysamg2i7-1PKBgXqk_CWECNpCwfO-ImjcmWbPcvyvGSxm1NTOX7l1gAJoIf82iexBS/exec';
 let products = []; let cart = []; let activeFestival = null; let activePromotions = [];
 let shippingRules = {}; let availableDiscountCodes = {}; let appliedDiscount = null;
 
