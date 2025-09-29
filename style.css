@@ -1,5 +1,5 @@
 /* ================================================================ */
-/* E-Shop Stylesheet - v17.2 (Definitive Final with Homepage)       */
+/* E-Shop Stylesheet - v17.5 (Definitive Layout & Style Fix)        */
 /* ================================================================ */
 
 :root {
@@ -58,14 +58,13 @@ main { padding: 2rem 0; }
 .close { color: #aaa; float: right; font-size: 28px; font-weight: 700; cursor: pointer; }
 .dynamic-content-wrapper { background: var(--light-text); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; }
 .job-listing { border: 1px solid var(--light-gray); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: var(--border-radius); }
+.job-listing ul { list-style: none; padding-left: 0; margin-top: 1rem; }
+.job-listing li { display: inline-block; background-color: var(--light-gray); padding: 5px 10px; border-radius: 15px; margin: 5px 5px 5px 0; font-size: 0.9rem; }
 .enquiry-form input, .enquiry-form textarea, .enquiry-form select { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; }
 footer { background: var(--primary-color); color: var(--light-text); padding: 40px 20px; text-align: center; margin-top: 30px; }
 #maintenance-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; }
 .loader { text-align: center; padding: 3rem; font-size: 1.2rem; color: var(--primary-color); }
-
-/* NEW STYLES for HOMEPAGE SECTIONS */
 .why-choose-us-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; }
-.why-choose-us-grid i { font-size: 2.5rem; color: var(--accent-color); margin-bottom: 1rem; }
 #youtube-videos-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
 .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius); box-shadow: var(--shadow); }
 .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
@@ -74,4 +73,3 @@ footer { background: var(--primary-color); color: var(--light-text); padding: 40
 .testimony-header { display: flex; align-items: center; gap: 15px; margin-bottom: 1rem; }
 .testimony-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
 .testimony-rating { color: var(--secondary-color); }
-.testimony-rating .fa-solid { margin-right: 2px; }
