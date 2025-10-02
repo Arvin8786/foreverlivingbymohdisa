@@ -1,10 +1,10 @@
 // =================================================================
-// E-Shop Frontend Script - v17.9 (Definitive Final & Complete)
+// E-Shop Frontend Script - v17.8 (Definitive Final & Corrected)
 // =================================================================
 
 const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzYV-A8wFhM1s9kFWIshAW3H0vuFaRsKnl4ueDwU_4wVGmp2pRb74Q75eAnmcKIXsE-YA/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
-const apiKey = '9582967'; // The secret API key for chatbot communication
+const apiKey = '9582967'; 
 
 let products = [];
 let cart = [];
@@ -18,13 +18,6 @@ async function fetchData() {
         if (!response.ok) throw new Error('Network response failed');
         const data = await response.json();
         if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
-
-        const marketing = data.marketing || {};
-        if (marketing.MaintenanceMode === true) {
-            document.getElementById('maintenance-message').textContent = marketing.MaintenanceMessage || "We'll be back shortly!";
-            document.getElementById('maintenance-overlay').style.display = 'flex';
-            return;
-        }
 
         products = data.products || [];
         renderStaticContent(data.aboutUsContent);
@@ -48,8 +41,7 @@ async function fetchData() {
 
     } catch (error) {
         console.error("Fatal Error fetching store data:", error);
-        const productContainer = document.getElementById('product-list-container');
-        if(productContainer) productContainer.innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
+        document.getElementById('product-list-container').innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
     }
 }
 
@@ -183,9 +175,8 @@ function updateCartDisplay() {
     document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
     const subtotalEl = document.getElementById('cart-subtotal');
     const totalEl = document.getElementById('cart-total');
-
     if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p>Your cart is currently empty.</p>';
+        cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
         subtotalEl.textContent = 'RM 0.00';
         totalEl.textContent = 'RM 0.00';
         return;
