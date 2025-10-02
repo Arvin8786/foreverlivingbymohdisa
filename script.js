@@ -1,10 +1,10 @@
 // =================================================================
-// E-Shop Frontend Script - v17.7 (Definitive Final & Corrected)
+// E-Shop Frontend Script - v17.9 (Definitive Final & Complete)
 // =================================================================
 
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbw9Z4FICzQDvy8ijD_7KVUISiLpgiQ5-dmvc_VbWmswgCDzgl08iVNGTC-kDSRSwJaKSQ/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzYV-A8wFhM1s9kFWIshAW3H0vuFaRsKnl4ueDwU_4wVGmp2pRb74Q75eAnmcKIXsE-YA/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
-const apiKey = '9582967'; 
+const apiKey = '9582967'; // The secret API key for chatbot communication
 
 let products = [];
 let cart = [];
@@ -18,6 +18,13 @@ async function fetchData() {
         if (!response.ok) throw new Error('Network response failed');
         const data = await response.json();
         if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
+
+        const marketing = data.marketing || {};
+        if (marketing.MaintenanceMode === true) {
+            document.getElementById('maintenance-message').textContent = marketing.MaintenanceMessage || "We'll be back shortly!";
+            document.getElementById('maintenance-overlay').style.display = 'flex';
+            return;
+        }
 
         products = data.products || [];
         renderStaticContent(data.aboutUsContent);
@@ -167,18 +174,36 @@ function addToCart(productId) {
     updateCartDisplay();
 }
 
+function increaseQuantity(productId) { const item = cart.find(i => i.id === productId); if (item) { item.quantity++; } updateCartDisplay(); }
+function decreaseQuantity(productId) { const item = cart.find(i => i.id === productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } } }
+function removeItemFromCart(productId) { cart = cart.filter(item => item.id !== productId); updateCartDisplay(); }
+
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
     document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
     const subtotalEl = document.getElementById('cart-subtotal');
     const totalEl = document.getElementById('cart-total');
+
     if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+        cartItemsContainer.innerHTML = '<p>Your cart is currently empty.</p>';
         subtotalEl.textContent = 'RM 0.00';
         totalEl.textContent = 'RM 0.00';
         return;
     }
-    cartItemsContainer.innerHTML = cart.map(item => `<div class="cart-item"><span>${item.name} (x${item.quantity})</span><span>RM ${(item.price * item.quantity).toFixed(2)}</span></div>`).join('');
+    cartItemsContainer.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <div class="cart-item-details">
+                <strong>${item.name}</strong>
+                <div class="quantity-controls">
+                    <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
+                    <span class="quantity-display">${item.quantity}</span>
+                    <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
+                </div>
+            </div>
+            <div style="text-align:right">RM ${(item.price * item.quantity).toFixed(2)}</div>
+            <button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+    `).join('');
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     subtotalEl.textContent = `RM ${subtotal.toFixed(2)}`;
     totalEl.textContent = `RM ${subtotal.toFixed(2)}`;
@@ -195,9 +220,11 @@ function toggleJobModal(show = false, jobId = '', jobTitle = '') {
     if (show) {
         document.getElementById('job-modal-title').textContent = jobTitle;
         document.getElementById('job-id-input').value = jobId;
+        document.getElementById('job-position-input').value = jobTitle;
         modal.style.display = 'flex';
     } else {
         modal.style.display = 'none';
+        document.getElementById('job-application-form').reset();
     }
 }
 
