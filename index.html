@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Forever Living by Muhd Arvind Isa</title>
+  <title>Muhd Isa Solutions</title>
   
-  <link rel="stylesheet" href="style.css">
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/theme.css">
   
+  <!-- Fonts and Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,102 +17,59 @@
 </head>
 <body>
 
-<div id="maintenance-overlay">
-  <div><i class="fa-solid fa-person-digging"></i><h1>Under Maintenance</h1><p id="maintenance-message"></p></div>
+<div id="maintenance-overlay"></div>
+
+<div id="portal-shell">
+    <header id="main-header"></header>
+    <div id="sidebar"></div>
+    <div id="main-content-area"></div>
 </div>
 
-<div id="store-wrapper">
-  <header>
-    <div class="container">
-      <div class="header-content">
-        <img src="FL.jpg" alt="Business Logo" class="header-logo" onerror="this.style.display='none'">
-        <h1 id="company-name-header"></h1>
-      </div>
-    </div>
-  </header>
-  <div id="promo-running-banner"><div class="marquee-content" id="promo-banner-text"></div></div>
-  <nav>
-    <div class="container">
-      <ul id="main-nav">
-        <li><a onclick="showTab('homepage')">Homepage</a></li>
-        <li><a onclick="showTab('products')">Products</a></li>
-        <li><a onclick="showTab('about')">About Us</a></li>
-        <li><a onclick="showTab('jobs')">Careers</a></li>
-        <li><a onclick="showTab('enquiries')">Contact Us</a></li>
-      </ul>
-    </div>
-  </nav>
-  <main id="main-content" class="container">
-    <div id="homepage" class="tab-content active">
-        <section id="homepage-hero" class="hero-section"></section>
-        
-        <section id="why-choose-us" class="dynamic-content-wrapper"></section>
-        
-        <section id="youtube-videos" class="dynamic-content-wrapper">
-            <h2>Learn More</h2>
-            <div id="youtube-videos-container"></div>
-        </section>
-        
-        <section id="homepage-testimonies" class="dynamic-content-wrapper">
-            <h2>What Our Customers Say</h2>
-            <div id="testimonies-container"></div>
-        </section>
+<!-- JavaScript modules are loaded at the end of the body -->
+<script src="js/api.js" defer></script>
+<script src="js/forever-living/fl_ui.js" defer></script>
+<script src="js/forever-living/fl_cart.js" defer></script>
+<script src="js/forever-living/fl_chatbot.js" defer></script>
+<script src="js/forever-living/fl_forms.js" defer></script>
+<script src="js/main.js" defer></script>
 
-        <section id="homepage-featured-jobs" class="dynamic-content-wrapper">
-            <h2>Join Our Team</h2>
-            <div id="featured-jobs-container"></div>
-            <a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0;">View All Career Opportunities</a>
-        </section>
-    </div>
-    <div id="products" class="tab-content">
-      <div id="product-list-container"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading products...</p></div>
-    </div>
-    <div id="about" class="tab-content">
-      <section id="about-us-content" class="dynamic-content-wrapper"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading content...</p></section>
-    </div>
-    <div id="jobs" class="tab-content">
-      <section id="jobs-content" class="dynamic-content-wrapper">
-        <h2>All Career Opportunities</h2>
-        <div id="job-listings-container"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading job opportunities...</p></div>
-      </section>
-    </div>
-    <div id="enquiries" class="tab-content">
-      <section id="enquiries-form-content" class="dynamic-content-wrapper"></section>
-    </div>
-  </main>
-  <footer class="footer">
-      <div class="container">
-        <p id="footer-text"></p>
-        <div class="timestamp">Last updated: <span id="update-timestamp"></span></div>
-      </div>
-  </footer>
-</div>
-
-<div id="cart-modal" class="modal"></div>
-<div id="job-application-modal" class="modal"></div>
-
-<div class="fab-container" id="fab-container">
-    <div id="floating-cart" class="fab floating-cart-btn" onclick="toggleCart()">
-        <i class="fa-solid fa-cart-shopping"></i>
-        <span id="cart-count">0</span>
-    </div>
-    <div class="fab chatbot-fab" onclick="toggleChatWidget(true)">
-        <i class="fa-solid fa-robot"></i>
-    </div>
-</div>
-
-<div id="eshop-chat-widget">
-    <div id="chat-header">
-        <span>FL e-Shop Assistant</span>
-        <button id="close-chat-btn" onclick="toggleChatWidget(false)">&times;</button>
-    </div>
-    <div id="chat-body"></div>
-    <div id="chat-input-container">
-        <input type="text" id="chat-input" placeholder="Type your message...">
-        <button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
-    </div>
-</div>
-
-<script src="script.js"></script>
 </body>
 </html>
+```
+
+---
+
+#### **Step 2 of 8: The Definitive `/css/main.css` File**
+
+This is the corrected global stylesheet for the portal shell.
+
+**Action:** Delete everything in your `css/main.css` file and replace it with this block.
+
+```css
+:root {
+    --primary-color: #1a5276;
+    --secondary-color: #f39c12;
+    --accent-color: #27ae60;
+    --light-gray: #f4f6f8;
+    --dark-text: #333;
+    --light-text: #fff;
+    --border-radius: 12px;
+    --shadow: 0 4px 15px rgba(0,0,0,.08);
+    --font-family: 'Poppins',sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-family); background-color: var(--light-gray); color: var(--dark-text); }
+#maintenance-overlay { 
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    background-color: rgba(26, 82, 118, 0.95); 
+    color: white; 
+    z-index: 99999; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    text-align: center;
+}
+.loader { text-align: center; padding: 3rem; font-size: 1.2rem; color: var(--primary-color); }
