@@ -3,7 +3,7 @@
 // Handles all communication with backend services.
 // =================================================================
 
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzYV-A8wFhM1s9kFWIshAW3H0vuFaRsKnl4ueDwU_4wVGmp2pRb74Q75eAnmcKIXsE-YA/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwLxHRP04GEhpwiu7d4ILce7i3IsieeBs1Egfv32P3AGL2M0NjdeezyN7NEISACZjef3w/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967'; // The secret API key
 
