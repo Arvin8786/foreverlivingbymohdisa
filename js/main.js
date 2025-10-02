@@ -1,24 +1,53 @@
 // =================================================================
-// Main Controller - v19.4 (Definitive Final)
-// Initializes the application and orchestrates all other modules.
+// Main Portal Controller - v19.6 (Definitive Final & Complete)
 // =================================================================
 
+// Global state variables
 let products = [];
 let allJobs = [];
 let allTestimonies = [];
 let aboutContent = {};
 
+// This is the main entry point of the application
 document.addEventListener('DOMContentLoaded', main);
 
+/**
+ * The main function that initializes the entire portal.
+ */
 async function main() {
     try {
-        const productContainer = document.getElementById('product-list-container');
-        if (productContainer) {
-            productContainer.innerHTML = `<p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading store data...</p>`;
+        // --- In the future, this section will have logic to decide which business to load ---
+        // For now, we will directly load the "Forever Living" module as the default.
+        await loadBusinessModule('forever-living');
+
+    } catch (error) {
+        console.error("Fatal Error initializing the application:", error);
+        const mainContent = document.getElementById('main-content');
+        if(mainContent) {
+            mainContent.innerHTML = `<p style="text-align: center; color: red; font-weight: bold;">Error: Could not load the application. The server may be offline. Please try again later.</p>`;
         }
+    }
+}
 
-        const data = await fetchInitialData();
+/**
+ * Dynamically loads the CSS and JS for a specific business module.
+ * This is the core of the multi-business portal.
+ * @param {string} businessName - The name of the business folder (e.g., 'forever-living').
+ */
+async function loadBusinessModule(businessName) {
+    if (businessName === 'forever-living') {
+        
+        // Step 1: Dynamically load all the necessary CSS files for this module
+        loadCss('css/forever-living/fl_homepage.css');
+        loadCss('css/forever-living/fl_products.css');
+        loadCss('css/forever-living/fl_cart.css');
+        loadCss('css/forever-living/fl_chatbot.css');
+        loadCss('css/forever-living/fl_pages.css');
 
+        // Step 2: Fetch the initial data required for this module
+        const data = await fetchInitialFLData();
+
+        // Step 3: Check for maintenance mode before proceeding
         const marketing = data.marketing || {};
         if (marketing.MaintenanceMode === true) {
             const maintenanceOverlay = document.getElementById('maintenance-overlay');
@@ -26,62 +55,56 @@ async function main() {
                 maintenanceOverlay.innerHTML = `<div><h1>Under Maintenance</h1><p>${marketing.MaintenanceMessage || "We'll be back shortly."}</p></div>`;
                 maintenanceOverlay.style.display = 'flex';
             }
-            return;
+            return; // Stop execution if in maintenance mode
         }
 
-        // Store data globally
+        // Step 4: Store fetched data in global variables for other FL modules to access
         products = data.products || [];
         allJobs = data.jobsListings || [];
         allTestimonies = data.testimonies || [];
         aboutContent = data.aboutUsContent || {};
         
-        // Initial Page Render
-        renderStaticContent(aboutContent);
+        // Step 5: Render all UI components for the FL module by calling functions in fl_ui.js
+        renderStaticFLContent(aboutContent);
         renderFLHomepage(aboutContent, allJobs, allTestimonies);
-        renderFLProducts(products);
-        renderFLAboutUs(aboutContent);
-        renderFLJobs(allJobs);
-        buildFLEnquiryForm();
+        
+        // Build the modals (cart, job application) so they are ready to be opened
         buildFLCartModal();
         buildFLJobApplicationModal();
         
+        // Step 6: Update the timestamp in the footer
         const timestampEl = document.getElementById('update-timestamp');
         if (timestampEl) {
             timestampEl.textContent = new Date().toLocaleDateString('en-GB');
         }
 
-        // Activate the homepage tab
+        // Step 7: Activate the homepage tab by default
         showTab('homepage');
-
-    } catch (error) {
-        console.error("Fatal Error fetching store data:", error);
-        const productContainer = document.getElementById('product-list-container');
-        if(productContainer) {
-            productContainer.innerHTML = `<p style="text-align: center; color: red;">Error: Could not load store data. Please try again later.</p>`;
-        }
     }
+    // In the future, you can add other businesses here:
+    // else if (businessName === 'khind-rto') { /* load Khind module */ }
 }
 
-function renderStaticContent(content) {
-    const headerEl = document.getElementById('company-name-header');
-    const footerEl = document.getElementById('footer-text');
-    const bannerTextEl = document.getElementById('promo-banner-text');
-    const banner = document.getElementById('promo-running-banner');
-
-    if (headerEl) {
-        headerEl.innerHTML = `${content.CompanyName || ''} <span class="by-line">${content.Owner} - ${content.Role}</span> <span class="slogan">${content.Slogan}</span>`;
+/**
+ * A helper function to dynamically create and append a <link> tag for a CSS file.
+ * This ensures that CSS files are only loaded when they are needed.
+ * @param {string} href - The path to the CSS file.
+ */
+function loadCss(href) {
+    // Check if the stylesheet is already loaded to avoid duplicates
+    if (document.querySelector(`link[href="${href}"]`)) {
+        return;
     }
-    if (footerEl) {
-        footerEl.textContent = content.Footer || `© ${new Date().getFullYear()} ${content.CompanyName}`;
-    }
-    if (banner && bannerTextEl && content.RunningBanner) {
-        bannerTextEl.textContent = content.RunningBanner;
-        banner.style.display = 'block';
-    } else if (banner) {
-        banner.style.display = 'none';
-    }
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
 }
 
+/**
+ * Shows a specific content tab within the main content area and hides the others.
+ * @param {string} tabId - The ID of the tab to show (e.g., 'homepage', 'products').
+ */
 function showTab(tabId) {
     const allTabs = document.querySelectorAll('.tab-content');
     allTabs.forEach(tab => {
@@ -93,7 +116,12 @@ function showTab(tabId) {
     }
 }
 
-// Global helper to make it easier for other modules to access products
+/**
+ * A global helper function to allow other modules to easily find product data by its ID.
+ * @param {number} id - The product ID.
+ * @returns {object|undefined} The product object or undefined if not found.
+ */
 function getProductById(id) {
+    if (!products) return undefined;
     return products.find(p => p.id === id);
 }
