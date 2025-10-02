@@ -41,23 +41,27 @@
   </nav>
   <main id="main-content" class="container">
     <div id="homepage" class="tab-content active">
-        <section id="homepage-hero" class="hero-section"></section>
+        <section id="homepage-hero" class="hero-section">
+            <!-- Content injected by script.js -->
+        </section>
         
-        <section id="why-choose-us" class="dynamic-content-wrapper"></section>
+        <section id="why-choose-us" class="dynamic-content-wrapper">
+            <!-- Content injected by script.js -->
+        </section>
         
         <section id="youtube-videos" class="dynamic-content-wrapper">
             <h2>Learn More</h2>
-            <div id="youtube-videos-container"></div>
+            <div id="youtube-videos-container"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading videos...</p></div>
         </section>
         
         <section id="homepage-testimonies" class="dynamic-content-wrapper">
             <h2>What Our Customers Say</h2>
-            <div id="testimonies-container"></div>
+            <div id="testimonies-container"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading testimonies...</p></div>
         </section>
 
         <section id="homepage-featured-jobs" class="dynamic-content-wrapper">
             <h2>Join Our Team</h2>
-            <div id="featured-jobs-container"></div>
+            <div id="featured-jobs-container"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading opportunities...</p></div>
             <a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0;">View All Career Opportunities</a>
         </section>
     </div>
