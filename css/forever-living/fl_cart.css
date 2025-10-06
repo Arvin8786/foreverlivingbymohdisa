@@ -8,4 +8,4 @@
 .cart-item-details { flex-grow:1; }
 .quantity-controls { display:flex; align-items:center; gap:8px; margin-top:5px; }
 .quantity-btn { width:28px; height:28px; background:var(--light-gray); border:1px solid #ccc; border-radius:50%; cursor:pointer; font-weight:700; }
-.remove-item-btn { background:none; border:none; color:var(--danger-color); font-size:1.2rem; cursor:pointer; margin-left:15px; }
+.remove-item-btn { background:none; border:none; color:#e74c3c; font-size:1.2rem; cursor:pointer; margin-left:15px; }
