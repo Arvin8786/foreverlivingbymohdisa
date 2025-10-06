@@ -1,7 +1,7 @@
 // =================================================================
 // API Module - v17.9 (Definitive Final)
 // =================================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxfq6chO5mbStUNO4gI8pUwZCtbJwIGaZfwQB_a8UYrXVUotq3qPDsajGCw2lk35kjO8w/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbw5mXYARDrICLO6GehJt7PfVpeW6FyISZWSBpk38S3ifUy4FVkQC4AfGyCULuJ8fWxnww/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
