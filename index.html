@@ -7,7 +7,14 @@
   
   <!-- Global CSS -->
   <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/theme.css">
+  
+  <!-- Forever Living Module CSS -->
+  <link rel="stylesheet" href="css/forever-living/fl_main.css">
+  <link rel="stylesheet" href="css/forever-living/fl_homepage.css">
+  <link rel="stylesheet" href="css/forever-living/fl_products.css">
+  <link rel="stylesheet" href="css/forever-living/fl_cart.css">
+  <link rel="stylesheet" href="css/forever-living/fl_chatbot.css">
+  <link rel="stylesheet" href="css/forever-living/fl_pages.css">
   
   <!-- Fonts and Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,12 +27,31 @@
 <div id="maintenance-overlay"></div>
 
 <div id="portal-shell">
-    <header id="main-header"></header>
-    <div id="sidebar"></div>
-    <div id="main-content-area"></div>
+    <header id="main-header">
+        <!-- The main parent company header will be built here by main.js -->
+    </header>
+
+    <div class="portal-body">
+        <aside id="sidebar">
+            <nav id="sidebar-nav">
+                <!-- The business toggles/buttons will be built here by main.js -->
+            </nav>
+        </aside>
+
+        <main id="main-content-area">
+            <!-- The content for the selected business will be loaded here -->
+            <p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Initializing Portal...</p>
+        </main>
+    </div>
 </div>
 
-<!-- JavaScript modules are loaded at the end of the body -->
+<!-- All modals and floating widgets are at the end -->
+<div id="cart-modal" class="modal"></div>
+<div id="job-application-modal" class="modal"></div>
+<div class="fab-container" id="fab-container"></div>
+<div id="eshop-chat-widget"></div>
+
+<!-- JavaScript modules are loaded at the end of the body in order -->
 <script src="js/api.js" defer></script>
 <script src="js/forever-living/fl_ui.js" defer></script>
 <script src="js/forever-living/fl_cart.js" defer></script>
