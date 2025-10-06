@@ -1,96 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Forever Living by Muhd Arvind Isa</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <style>
-    /* ================================================================ */
-    /* CSS - v18.0 (Definitive Final & Complete)                        */
-    /* ================================================================ */
-    :root {
-        --primary-color: #1a5276;
-        --secondary-color: #f39c12;
-        --accent-color: #27ae60;
-        --light-gray: #f4f6f8;
-        --dark-text: #333;
-        --light-text: #fff;
-        --border-radius: 12px;
-        --shadow: 0 4px 15px rgba(0,0,0,.08);
-        --font-family: 'Poppins',sans-serif;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-family); background-color: var(--light-gray); color: var(--dark-text); line-height: 1.6; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    h1, h2, h3, h4 { color: var(--primary-color); font-weight: 600; }
-    header { background-color: var(--light-text); padding: 20px 0; text-align: center; border-bottom: 1px solid #e0e0e0; }
-    .header-content { display: flex; align-items: center; justify-content: center; gap: 20px; }
-    .header-logo { width: 80px; height: 80px; }
-    #company-name-header { margin: 0; font-size: 1.8rem; line-height: 1.2; font-weight: 600; }
-    #company-name-header .by-line { font-size: 1.1rem; font-weight: 500; display: block; }
-    #company-name-header .slogan { font-size: 0.9rem; color: #555; font-weight: 400; display: block; margin-top: 4px; }
-    #promo-running-banner { color: var(--light-text); padding: 10px 0; font-weight: 700; background-color: var(--accent-color); overflow: hidden; white-space: nowrap; display: none; }
-    #promo-running-banner .marquee-content { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; }
-    @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
-    nav { background-color: var(--primary-color); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,.1); }
-    nav ul { display: flex; list-style: none; padding: 10px 0; margin: 0; justify-content: center; }
-    nav a { color: var(--light-text); text-decoration: none; font-weight: 600; padding: 10px 20px; cursor: pointer; }
-    main { padding: 2rem 0; }
-    .tab-content { display: none; } .tab-content.active { display: block; }
-    .hero-section { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: var(--light-text); padding: 80px 20px; text-align: center; border-radius: var(--border-radius); margin-bottom: 30px; }
-    .hero-section h2 { color: var(--light-text); }
-    .product-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
-    .product { background: var(--light-text); border-radius: var(--border-radius); box-shadow: var(--shadow); display: flex; flex-direction: column; }
-    .product-image-container { height: 280px; padding: 15px; display: flex; align-items: center; justify-content: center; }
-    .product img { max-width: 100%; max-height: 100%; object-fit: contain; }
-    .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-    .product h3 { margin: 0 0 10px; font-size: 1.25rem; }
-    .product-actions { margin-top: auto; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 12px 15px; border-radius: 50px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; }
-    .btn-primary { background: var(--primary-color); color: var(--light-text); }
-    .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; gap: 15px; }
-    .fab { width: 60px; height: 60px; background-color: var(--primary-color); color: var(--light-text); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 4px 12px rgba(0,0,0,.25); cursor: pointer; position: relative; }
-    #cart-count { position: absolute; top: -2px; right: -2px; background-color: var(--secondary-color); color: var(--light-text); border-radius: 50%; padding: 3px 8px; font-size: .8rem; font-weight: 700; }
-    #eshop-chat-widget { position: fixed; bottom: 95px; right: 20px; width: 350px; height: 500px; background: #fff; border-radius: var(--border-radius); box-shadow: 0 5px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; visibility: hidden; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-in-out; z-index: 998; }
-    #eshop-chat-widget.active { visibility: visible; opacity: 1; transform: translateY(0); }
-    #chat-header { background: var(--primary-color); color: var(--light-text); padding: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-    #close-chat-btn { background: none; border: none; color: var(--light-text); font-size: 24px; cursor: pointer; }
-    #chat-body { flex-grow: 1; padding: 15px; overflow-y: auto; }
-    #chat-input-container { display: flex; padding: 10px; border-top: 1px solid #eee; }
-    #chat-input { flex-grow: 1; border: 1px solid #ccc; border-radius: 20px; padding: 10px 15px; }
-    #chat-send-btn { background: none; border: none; font-size: 20px; color: var(--primary-color); cursor: pointer; padding: 0 10px; }
-    .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,.6); justify-content: center; align-items: center; }
-    .modal-content { background-color: #fefefe; padding: 30px; border-radius: var(--border-radius); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
-    .close { color: #aaa; float: right; font-size: 28px; font-weight: 700; cursor: pointer; }
-    .dynamic-content-wrapper { background: var(--light-text); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; }
-    .job-listing { border: 1px solid var(--light-gray); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: var(--border-radius); }
-    .job-listing ul { list-style: none; padding-left: 0; margin-top: 1rem; }
-    .job-listing li { display: inline-block; background-color: var(--light-gray); padding: 5px 10px; border-radius: 15px; margin: 5px 5px 5px 0; font-size: 0.9rem; }
-    .enquiry-form input, .enquiry-form textarea, .enquiry-form select { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; }
-    footer { background: var(--primary-color); color: var(--light-text); padding: 40px 20px; text-align: center; margin-top: 30px; }
-    #maintenance-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; }
-    .loader { text-align: center; padding: 3rem; font-size: 1.2rem; color: var(--primary-color); }
-    .why-choose-us-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; }
-    #youtube-videos-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
-    .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius); box-shadow: var(--shadow); }
-    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-    #testimonies-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-    .testimony-card { background: var(--light-gray); padding: 1.5rem; border-radius: var(--border-radius); }
-    .testimony-header { display: flex; align-items: center; gap: 15px; margin-bottom: 1rem; }
-    .testimony-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
-    .testimony-rating { color: var(--secondary-color); }
-    .cart-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; }
-    .cart-item-details { flex-grow:1; }
-    .quantity-controls { display:flex; align-items:center; gap:8px; margin-top:5px; }
-    .quantity-btn { width:28px; height:28px; background:var(--light-gray); border:1px solid #ccc; border-radius:50%; cursor:pointer; font-weight:700; }
-    .remove-item-btn { background:none; border:none; color:var(--danger-color); font-size:1.2rem; cursor:pointer; margin-left:15px; }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forever Living by Muhd Arvind Isa</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #1a5276;
+            --secondary-color: #f39c12;
+            --accent-color: #27ae60;
+            --light-gray: #f4f6f8;
+            --dark-text: #333;
+            --light-text: #fff;
+            --border-radius: 12px;
+            --shadow: 0 4px 15px rgba(0,0,0,.08);
+            --font-family: 'Poppins',sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-family); background-color: var(--light-gray); color: var(--dark-text); line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        h1, h2, h3, h4 { color: var(--primary-color); font-weight: 600; }
+        header { background-color: var(--light-text); padding: 20px 0; text-align: center; border-bottom: 1px solid #e0e0e0; }
+        .header-content { display: flex; align-items: center; justify-content: center; gap: 20px; }
+        .header-logo { width: 80px; height: 80px; }
+        #company-name-header { margin: 0; font-size: 1.8rem; line-height: 1.2; font-weight: 600; }
+        #company-name-header .by-line { font-size: 1.1rem; font-weight: 500; display: block; }
+        #company-name-header .slogan { font-size: 0.9rem; color: #555; font-weight: 400; display: block; margin-top: 4px; }
+        #promo-running-banner { color: var(--light-text); padding: 10px 0; font-weight: 700; background-color: var(--accent-color); overflow: hidden; white-space: nowrap; display: none; }
+        #promo-running-banner .marquee-content { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+        nav { background-color: var(--primary-color); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,.1); }
+        nav ul { display: flex; list-style: none; padding: 10px 0; margin: 0; justify-content: center; }
+        nav a { color: var(--light-text); text-decoration: none; font-weight: 600; padding: 10px 20px; cursor: pointer; }
+        main { padding: 2rem 0; }
+        .tab-content { display: none; } .tab-content.active { display: block; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 12px 15px; border-radius: 50px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; }
+        .btn-primary { background: var(--primary-color); color: var(--light-text); }
+        footer { background: var(--primary-color); color: var(--light-text); padding: 40px 20px; text-align: center; margin-top: 30px; }
+        #maintenance-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; }
+        .loader { text-align: center; padding: 3rem; font-size: 1.2rem; color: var(--primary-color); }
+        .hero-section { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: var(--light-text); padding: 80px 20px; text-align: center; border-radius: var(--border-radius); margin-bottom: 30px; }
+        .hero-section h2 { color: var(--light-text); }
+        .dynamic-content-wrapper { background: var(--light-text); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; }
+        .why-choose-us-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; }
+        #youtube-videos-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius); box-shadow: var(--shadow); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        #testimonies-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .testimony-card { background: var(--light-gray); padding: 1.5rem; border-radius: var(--border-radius); }
+        .testimony-header { display: flex; align-items: center; gap: 15px; margin-bottom: 1rem; }
+        .testimony-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
+        .testimony-rating { color: var(--secondary-color); }
+        .product-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+        .product { background: var(--light-text); border-radius: var(--border-radius); box-shadow: var(--shadow); display: flex; flex-direction: column; }
+        .product-image-container { height: 280px; padding: 15px; display: flex; align-items: center; justify-content: center; }
+        .product img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .product h3 { margin: 0 0 10px; font-size: 1.25rem; }
+        .product-actions { margin-top: auto; }
+        .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; gap: 15px; }
+        .fab { width: 60px; height: 60px; background-color: var(--primary-color); color: var(--light-text); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 4px 12px rgba(0,0,0,.25); cursor: pointer; position: relative; }
+        #cart-count { position: absolute; top: -2px; right: -2px; background-color: var(--secondary-color); color: var(--light-text); border-radius: 50%; padding: 3px 8px; font-size: .8rem; font-weight: 700; }
+        #eshop-chat-widget { position: fixed; bottom: 95px; right: 20px; width: 350px; height: 500px; background: #fff; border-radius: var(--border-radius); box-shadow: 0 5px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; visibility: hidden; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-in-out; z-index: 998; }
+        #eshop-chat-widget.active { visibility: visible; opacity: 1; transform: translateY(0); }
+        #chat-header { background: var(--primary-color); color: var(--light-text); padding: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        #close-chat-btn { background: none; border: none; color: var(--light-text); font-size: 24px; cursor: pointer; }
+        #chat-body { flex-grow: 1; padding: 15px; overflow-y: auto; }
+        #chat-input-container { display: flex; padding: 10px; border-top: 1px solid #eee; }
+        #chat-input { flex-grow: 1; border: 1px solid #ccc; border-radius: 20px; padding: 10px 15px; }
+        #chat-send-btn { background: none; border: none; font-size: 20px; color: var(--primary-color); cursor: pointer; padding: 0 10px; }
+        .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,.6); justify-content: center; align-items: center; }
+        .modal-content { background-color: #fefefe; padding: 30px; border-radius: var(--border-radius); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: 700; cursor: pointer; }
+        .cart-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; }
+        .cart-item-details { flex-grow:1; }
+        .quantity-controls { display:flex; align-items:center; gap:8px; margin-top:5px; }
+        .quantity-btn { width:28px; height:28px; background:var(--light-gray); border:1px solid #ccc; border-radius:50%; cursor:pointer; font-weight:700; }
+        .remove-item-btn { background:none; border:none; color:var(--danger-color); font-size:1.2rem; cursor:pointer; margin-left:15px; }
+        .job-listing { border: 1px solid var(--light-gray); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: var(--border-radius); }
+        .job-listing ul { list-style: none; padding-left: 0; margin-top: 1rem; }
+        .job-listing li { display: inline-block; background-color: var(--light-gray); padding: 5px 10px; border-radius: 15px; margin: 5px 5px 5px 0; font-size: 0.9rem; }
+        .enquiry-form input, .enquiry-form textarea, .enquiry-form select { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; }
+    </style>
 </head>
 <body>
 
@@ -116,40 +113,7 @@
       </ul>
     </div>
   </nav>
-  <main id="main-content" class="container">
-    <div id="homepage" class="tab-content active">
-        <section id="homepage-hero" class="hero-section"></section>
-        <section id="why-choose-us" class="dynamic-content-wrapper"></section>
-        <section id="youtube-videos" class="dynamic-content-wrapper">
-            <h2>Learn More</h2>
-            <div id="youtube-videos-container"></div>
-        </section>
-        <section id="homepage-testimonies" class="dynamic-content-wrapper">
-            <h2>What Our Customers Say</h2>
-            <div id="testimonies-container"></div>
-        </section>
-        <section id="homepage-featured-jobs" class="dynamic-content-wrapper">
-            <h2>Join Our Team</h2>
-            <div id="featured-jobs-container"></div>
-            <a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0;">View All Career Opportunities</a>
-        </section>
-    </div>
-    <div id="products" class="tab-content">
-      <div id="product-list-container"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading products...</p></div>
-    </div>
-    <div id="about" class="tab-content">
-      <section id="about-us-content" class="dynamic-content-wrapper"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading content...</p></section>
-    </div>
-    <div id="jobs" class="tab-content">
-      <section id="jobs-content" class="dynamic-content-wrapper">
-        <h2>All Career Opportunities</h2>
-        <div id="job-listings-container"><p class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Loading job opportunities...</p></div>
-      </section>
-    </div>
-    <div id="enquiries" class="tab-content">
-      <section id="enquiries-form-content" class="dynamic-content-wrapper"></section>
-    </div>
-  </main>
+  <main id="main-content" class="container"></main>
   <footer class="footer">
       <div class="container">
         <p id="footer-text"></p>
@@ -160,28 +124,8 @@
 
 <div id="cart-modal" class="modal"></div>
 <div id="job-application-modal" class="modal"></div>
-
-<div class="fab-container" id="fab-container">
-    <div id="floating-cart" class="fab floating-cart-btn" onclick="toggleCart()">
-        <i class="fa-solid fa-cart-shopping"></i>
-        <span id="cart-count">0</span>
-    </div>
-    <div class="fab chatbot-fab" onclick="toggleChatWidget(true)">
-        <i class="fa-solid fa-robot"></i>
-    </div>
-</div>
-
-<div id="eshop-chat-widget">
-    <div id="chat-header">
-        <span>FL e-Shop Assistant</span>
-        <button id="close-chat-btn" onclick="toggleChatWidget(false)">&times;</button>
-    </div>
-    <div id="chat-body"></div>
-    <div id="chat-input-container">
-        <input type="text" id="chat-input" placeholder="Type your message...">
-        <button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
-    </div>
-</div>
+<div class="fab-container" id="fab-container"></div>
+<div id="eshop-chat-widget"></div>
 
 <script>
 // =================================================================
@@ -209,27 +153,30 @@ async function fetchData() {
         allJobs = data.jobsListings || [];
         
         renderStaticContent(data.aboutUsContent);
+        renderMainContentShell();
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
         renderProducts(products);
         renderAboutUs(data.aboutUsContent);
         renderJobs(allJobs);
         buildEnquiryForm();
+        
         buildCartModal();
         buildJobApplicationModal();
+        buildFabButtons();
+        buildChatbotWidget();
         
         document.getElementById('update-timestamp').textContent = new Date().toLocaleDateString('en-GB');
         
-        const chatInput = document.getElementById('chat-input');
-        const chatSendBtn = document.getElementById('chat-send-btn');
-        if (chatSendBtn) {
-            chatSendBtn.addEventListener('click', handleChatSubmit);
-            chatInput.addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
-        }
+        document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
+        document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
+        document.getElementById('chat-send-btn').addEventListener('click', handleChatSubmit);
+        document.getElementById('chat-input').addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
+
         showTab('homepage');
 
     } catch (error) {
         console.error("Fatal Error fetching store data:", error);
-        document.getElementById('product-list-container').innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
+        document.getElementById('main-content').innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
     }
 }
 
@@ -244,6 +191,23 @@ function renderStaticContent(content) {
     } else {
         banner.style.display = 'none';
     }
+}
+
+function renderMainContentShell() {
+    const main = document.getElementById('main-content');
+    main.innerHTML = `
+        <div id="homepage" class="tab-content">
+            <section id="homepage-hero" class="hero-section"></section>
+            <section id="why-choose-us" class="dynamic-content-wrapper"></section>
+            <section id="youtube-videos" class="dynamic-content-wrapper"><h2>Learn More</h2><div id="youtube-videos-container"></div></section>
+            <section id="homepage-testimonies" class="dynamic-content-wrapper"><h2>What Our Customers Say</h2><div id="testimonies-container"></div></section>
+            <section id="homepage-featured-jobs" class="dynamic-content-wrapper"><h2>Join Our Team</h2><div id="featured-jobs-container"></div><a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0;">View All Career Opportunities</a></section>
+        </div>
+        <div id="products" class="tab-content"><div id="product-list-container"></div></div>
+        <div id="about" class="tab-content"><section id="about-us-content" class="dynamic-content-wrapper"></section></div>
+        <div id="jobs" class="tab-content"><section id="jobs-content" class="dynamic-content-wrapper"><h2>All Career Opportunities</h2><div id="job-listings-container"></div></section></div>
+        <div id="enquiries" class="tab-content"><section id="enquiries-form-content" class="dynamic-content-wrapper"></section></div>
+    `;
 }
 
 function renderHomepageContent(about, jobs, testimonies) {
@@ -309,7 +273,6 @@ function renderJobs(jobs) {
 function buildEnquiryForm() {
     const container = document.getElementById('enquiries-form-content');
     container.innerHTML = `<form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary">Submit</button><p id="enquiry-status"></p></form>`;
-    document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
 }
 
 function buildCartModal() {
@@ -320,7 +283,16 @@ function buildCartModal() {
 function buildJobApplicationModal() {
     const container = document.getElementById('job-application-modal');
     container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleJobModal(false)">&times;</span><h2>Apply for <span id="job-modal-title"></span></h2><form id="job-application-form" class="enquiry-form"><input type="hidden" id="job-id-input"><input type="hidden" id="job-position-input"><input type="text" id="applicant-name" placeholder="Full Name" required><input type="email" id="applicant-email" placeholder="Email" required><input type="tel" id="applicant-phone" placeholder="Phone" required><input type="text" id="applicant-citizenship" placeholder="Citizenship" required><textarea id="applicant-message" placeholder="Tell us about yourself" rows="4"></textarea><label for="applicant-resume">Upload Resume (Mandatory)</label><input type="file" id="applicant-resume" required><button type="submit" class="btn btn-primary">Submit</button><p id="job-application-status"></p></form></div>`;
-    document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
+}
+
+function buildFabButtons() {
+    const container = document.getElementById('fab-container');
+    container.innerHTML = `<div id="floating-cart" class="fab floating-cart-btn" onclick="toggleCart()"><i class="fa-solid fa-cart-shopping"></i><span id="cart-count">0</span></div><div class="fab chatbot-fab" onclick="toggleChatWidget(true)"><i class="fa-solid fa-robot"></i></div>`;
+}
+
+function buildChatbotWidget() {
+    const container = document.getElementById('eshop-chat-widget');
+    container.innerHTML = `<div id="chat-header"><span>FL e-Shop Assistant</span><button id="close-chat-btn" onclick="toggleChatWidget(false)">&times;</button></div><div id="chat-body"></div><div id="chat-input-container"><input type="text" id="chat-input" placeholder="Type your message..."><button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button></div>`;
 }
 
 function addToCart(productId) {
