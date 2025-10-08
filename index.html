@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- =========================================================== -->
+    <!-- [ 1.0 ] Global Head Content                                 -->
+    <!-- =========================================================== -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Forever Living by Muhd Arvind Isa</title>
@@ -13,9 +16,10 @@
 <body>
 
 <!-- =========================================================== -->
-<!-- [ 1.0 ] GLOBAL STYLES & CORE HTML SHELL                       -->
+<!-- [ 2.0 ] GLOBAL STYLES & CORE HTML SHELL                       -->
 <!-- =========================================================== -->
 <style>
+    /* [ 2.1 ] Core Styles */
     :root {
         --primary-color: #1a5276;
         --secondary-color: #f39c12;
@@ -32,6 +36,14 @@
     body { font-family: var(--font-family); background-color: var(--light-gray); color: var(--dark-text); line-height: 1.6; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
     h1, h2, h3, h4 { color: var(--primary-color); font-weight: 600; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 12px 15px; border-radius: 50px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s ease; }
+    .btn:disabled { background-color: #ccc; cursor: not-allowed; }
+    .btn-primary { background: var(--primary-color); color: var(--light-text); }
+    .btn-primary:hover:not(:disabled) { background: #123e5a; }
+    .btn-secondary { background-color: var(--light-gray); color: var(--dark-text); border: 1px solid #ccc; }
+    .loader { text-align: center; padding: 3rem; font-size: 1.2rem; color: var(--primary-color); }
+
+    /* [ 2.2 ] Header, Nav, Footer Styles */
     header { background-color: var(--light-text); padding: 20px 0; text-align: center; border-bottom: 1px solid #e0e0e0; }
     .header-content { display: flex; align-items: center; justify-content: center; gap: 20px; }
     .header-logo { width: 80px; height: 80px; }
@@ -45,13 +57,10 @@
     nav ul { display: flex; list-style: none; padding: 10px 0; margin: 0; justify-content: center; }
     nav a { color: var(--light-text); text-decoration: none; font-weight: 600; padding: 10px 20px; cursor: pointer; }
     main { padding: 2rem 0; }
-    .tab-content { display: none; } .tab-content.active { display: block; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 12px 15px; border-radius: 50px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; }
-    .btn-primary { background: var(--primary-color); color: var(--light-text); }
-    .btn-secondary { background-color: var(--light-gray); color: var(--dark-text); }
+    .tab-content { display: none; } .tab-content.active { display: block; animation: fadeIn 0.5s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     footer { background: var(--primary-color); color: var(--light-text); padding: 40px 20px; text-align: center; margin-top: 30px; }
     #maintenance-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; background: rgba(26,82,118,0.95); color: white; justify-content: center; align-items: center; text-align: center; }
-    .loader { text-align: center; padding: 3rem; font-size: 1.2rem; color: var(--primary-color); }
 </style>
 
 <div id="maintenance-overlay"></div>
@@ -87,28 +96,29 @@
 </div>
 
 <!-- =========================================================== -->
-<!-- [ 2.0 ] DYNAMIC CONTENT PAGES MODULE                      -->
+<!-- [ 3.0 ] DYNAMIC CONTENT & PAGES MODULE                      -->
 <!-- =========================================================== -->
 <style>
     .hero-section { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: var(--light-text); padding: 80px 20px; text-align: center; border-radius: var(--border-radius); margin-bottom: 30px; }
     .hero-section h2 { color: var(--light-text); }
     .dynamic-content-wrapper { background: var(--light-text); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; }
-    .why-choose-us-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; }
+    .why-choose-us-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; margin-top: 2rem; }
     .why-choose-us-grid i { font-size: 2.5rem; color: var(--accent-color); margin-bottom: 1rem; }
     #youtube-videos-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
     .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius); box-shadow: var(--shadow); }
     .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     #testimonies-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-    .testimony-card { background: var(--light-gray); padding: 1.5rem; border-radius: var(--border-radius); }
-    .testimony-header { text-align: center; margin-bottom: 1rem; }
+    .testimony-card { background: var(--light-gray); padding: 1.5rem; border-radius: var(--border-radius); text-align: center; }
+    .testimony-header { margin-bottom: 1rem; }
     .testimony-rating { color: var(--secondary-color); font-size: 1.2rem; }
     .job-listing { border: 1px solid var(--light-gray); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: var(--border-radius); }
     .job-listing ul { list-style: none; padding-left: 0; margin-top: 1rem; }
     .job-listing li { display: inline-block; background-color: var(--light-gray); padding: 5px 10px; border-radius: 15px; margin: 5px 5px 5px 0; font-size: 0.9rem; }
+    .job-description { white-space: pre-wrap; margin-top: 1rem; }
 </style>
 
 <!-- =========================================================== -->
-<!-- [ 3.0 ] PRODUCTS MODULE                                     -->
+<!-- [ 4.0 ] PRODUCTS MODULE                                     -->
 <!-- =========================================================== -->
 <style>
     .product-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
@@ -124,7 +134,7 @@
 </style>
 
 <!-- =========================================================== -->
-<!-- [ 4.0 ] SHOPPING CART MODULE                                -->
+<!-- [ 5.0 ] SHOPPING CART MODULE                                -->
 <!-- =========================================================== -->
 <style>
     .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; gap: 15px; }
@@ -144,7 +154,7 @@
 <div class="fab-container" id="fab-container"></div>
 
 <!-- =========================================================== -->
-<!-- [ 5.0 ] CHATBOT MODULE                                      -->
+<!-- [ 6.0 ] CHATBOT MODULE                                      -->
 <!-- =========================================================== -->
 <style>
     #eshop-chat-widget { position: fixed; bottom: 95px; right: 20px; width: 350px; height: 500px; background: #fff; border-radius: var(--border-radius); box-shadow: 0 5px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; visibility: hidden; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-in-out; z-index: 998; }
@@ -163,7 +173,7 @@
 <div id="eshop-chat-widget"></div>
 
 <!-- =========================================================== -->
-<!-- [ 6.0 ] FORMS MODULE (Jobs & Enquiries)                     -->
+<!-- [ 7.0 ] FORMS MODULE (Jobs & Enquiries)                     -->
 <!-- =========================================================== -->
 <style>
     .enquiry-form input, .enquiry-form textarea, .enquiry-form select { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
@@ -173,11 +183,11 @@
 <div id="job-application-modal" class="modal"></div>
 
 <!-- =========================================================== -->
-<!-- [ 7.0 ] MAIN CONTROLLER SCRIPT                              -->
+<!-- [ 8.0 ] MAIN CONTROLLER SCRIPT                              -->
 <!-- =========================================================== -->
 <script>
 // =================================================================
-// E-Shop Frontend Script - v18.1 (Definitive Final & Corrected)
+// E-Shop Frontend Script - v18.1 (Definitive Final & Complete)
 // =================================================================
 const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzWZVO-g0pMiHDrRHHzACOrxQIzgSG3oWInzhiEpKfM0HpccER25cCjuuvY0RHWfS4quA/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
@@ -201,8 +211,8 @@ async function fetchData() {
         products = data.products || [];
         allJobs = data.jobsListings || [];
         
-        renderStaticContent(data.aboutUsContent);
         renderMainContentShell();
+        renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
         renderProducts(products);
         renderAboutUs(data.aboutUsContent);
@@ -288,7 +298,7 @@ function renderHomepageContent(about, jobs, testimonies) {
         testimoniesContainer.innerHTML = testimonies.map(t => {
             let stars = '';
             for (let i = 0; i < 5; i++) { stars += `<i class="fa-solid fa-star" style="color: ${i < t.Rating ? 'var(--secondary-color)' : '#ccc'}"></i>`; }
-            return `<div class="testimony-card"><div class="testimony-header"><div><h4>${t.ClientName}</h4><div class="testimony-rating">${stars}</div></div></div><p>"${t.Quote}"</p></div>`;
+            return `<div class="testimony-card"><div class="testimony-header"><h4>${t.ClientName}</h4><div class="testimony-rating">${stars}</div></div><p>"${t.Quote}"</p></div>`;
         }).join('');
     } else {
         document.getElementById('homepage-testimonies').style.display = 'none';
@@ -305,39 +315,8 @@ function renderHomepageContent(about, jobs, testimonies) {
 
 function renderProducts(productsToRender) {
     const container = document.getElementById('product-list-container');
-function renderProducts(productsToRender) {
-    const container = document.getElementById('product-list-container');
-    if (!container) {
-        console.error("Product container not found.");
-        return;
-    }
-
-    if (!productsToRender || productsToRender.length === 0) {
-        container.innerHTML = `<p>No products are available at the moment. Please check back later.</p>`;
-        return;
-    }
-
-    // This correctly creates the product list container and then maps over the products.
-    container.innerHTML = `<div class="product-list">
-        ${productsToRender.map(p => `
-            <div class="product">
-                <div class="product-image-container">
-                    <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/280x280?text=Image+Not+Found'">
-                </div>
-                <div class="product-info">
-                    <h3>${p.name}</h3>
-                    <div class="price-section">
-                        <span class="new-price">RM ${p.price.toFixed(2)}</span>
-                    </div>
-                    <div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div>
-                    <div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div>
-                    <div class="product-actions">
-                        <button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button>
-                    </div>
-                </div>
-            </div>
-        `).join('')}
-    </div>`;
+    if (!productsToRender || productsToRender.length === 0) { container.innerHTML = `<p>No products available.</p>`; return; }
+    container.innerHTML = `<div class="product-list">${productsToRender.map(p => `<div class="product"><div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div><div class="product-info"><h3>${p.name}</h3><div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div><div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div><div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div><div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div></div></div>`).join('')}</div>`;
 }
 
 function renderAboutUs(content) {
@@ -354,7 +333,7 @@ function renderJobs(jobs) {
 
 function buildEnquiryForm() {
     const container = document.getElementById('enquiries-form-content');
-    container.innerHTML = `<form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary">Submit</button><p id="enquiry-status"></p></form>`;
+    container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary">Submit</button><p id="enquiry-status"></p></form>`;
 }
 
 function buildCartModal() {
@@ -514,4 +493,3 @@ async function handleChatSubmit() {
 
 </body>
 </html>
-```
