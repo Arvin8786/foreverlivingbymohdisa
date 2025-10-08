@@ -48,7 +48,7 @@
     .tab-content { display: none; } .tab-content.active { display: block; }
     .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 12px 15px; border-radius: 50px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; }
     .btn-primary { background: var(--primary-color); color: var(--light-text); }
-    .btn-secondary { background: var(--light-gray); color: var(--dark-text); }
+    .btn-secondary { background-color: var(--light-gray); color: var(--dark-text); }
     footer { background: var(--primary-color); color: var(--light-text); padding: 40px 20px; text-align: center; margin-top: 30px; }
     #maintenance-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; background: rgba(26,82,118,0.95); color: white; justify-content: center; align-items: center; text-align: center; }
     .loader { text-align: center; padding: 3rem; font-size: 1.2rem; color: var(--primary-color); }
@@ -73,12 +73,11 @@
         <li><a onclick="showTab('about')">About Us</a></li>
         <li><a onclick="showTab('jobs')">Careers</a></li>
         <li><a onclick="showTab('enquiries')">Contact Us</a></li>
+        <li><a onclick="showTab('rewards')">Rewards</a></li>
       </ul>
     </div>
   </nav>
-  <main id="main-content" class="container">
-    <!-- Tab content will be injected by JavaScript -->
-  </main>
+  <main id="main-content" class="container"></main>
   <footer class="footer">
       <div class="container">
         <p id="footer-text"></p>
@@ -88,21 +87,21 @@
 </div>
 
 <!-- =========================================================== -->
-<!-- [ 2.0 ] DYNAMIC CONTENT PAGES MODULE                          -->
+<!-- [ 2.0 ] DYNAMIC CONTENT PAGES MODULE                      -->
 <!-- =========================================================== -->
 <style>
     .hero-section { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: var(--light-text); padding: 80px 20px; text-align: center; border-radius: var(--border-radius); margin-bottom: 30px; }
     .hero-section h2 { color: var(--light-text); }
     .dynamic-content-wrapper { background: var(--light-text); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; }
     .why-choose-us-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; }
+    .why-choose-us-grid i { font-size: 2.5rem; color: var(--accent-color); margin-bottom: 1rem; }
     #youtube-videos-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
     .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius); box-shadow: var(--shadow); }
     .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     #testimonies-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
     .testimony-card { background: var(--light-gray); padding: 1.5rem; border-radius: var(--border-radius); }
-    .testimony-header { display: flex; align-items: center; gap: 15px; margin-bottom: 1rem; }
-    .testimony-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
-    .testimony-rating { color: var(--secondary-color); }
+    .testimony-header { text-align: center; margin-bottom: 1rem; }
+    .testimony-rating { color: var(--secondary-color); font-size: 1.2rem; }
     .job-listing { border: 1px solid var(--light-gray); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: var(--border-radius); }
     .job-listing ul { list-style: none; padding-left: 0; margin-top: 1rem; }
     .job-listing li { display: inline-block; background-color: var(--light-gray); padding: 5px 10px; border-radius: 15px; margin: 5px 5px 5px 0; font-size: 0.9rem; }
@@ -119,6 +118,9 @@
     .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
     .product h3 { margin: 0 0 10px; font-size: 1.25rem; }
     .product-actions { margin-top: auto; }
+    .price-section { margin-bottom: 10px; }
+    .new-price { font-weight: 700; font-size: 1.4rem; color: var(--primary-color); }
+    .product .benefits, .product .consumption { font-size: .85rem; color: #555; margin: 10px 0; }
 </style>
 
 <!-- =========================================================== -->
@@ -161,7 +163,7 @@
 <div id="eshop-chat-widget"></div>
 
 <!-- =========================================================== -->
-<!-- [ 6.0 ] FORMS MODULE                                        -->
+<!-- [ 6.0 ] FORMS MODULE (Jobs & Enquiries)                     -->
 <!-- =========================================================== -->
 <style>
     .enquiry-form input, .enquiry-form textarea, .enquiry-form select { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
@@ -175,9 +177,9 @@
 <!-- =========================================================== -->
 <script>
 // =================================================================
-// E-Shop Frontend Script - v18.0 (Definitive Final & Complete)
+// E-Shop Frontend Script - v18.1 (Definitive Final & Corrected)
 // =================================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbyuw0q0KT2lXsaXiMSn8thZdRByUZ_bw9_g8MJCx3z_W3WOiUD7NegZNkDBsHIrPfvp/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzWZVO-g0pMiHDrRHHzACOrxQIzgSG3oWInzhiEpKfM0HpccER25cCjuuvY0RHWfS4quA/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
@@ -199,8 +201,8 @@ async function fetchData() {
         products = data.products || [];
         allJobs = data.jobsListings || [];
         
-        buildMainContentShell();
         renderStaticContent(data.aboutUsContent);
+        renderMainContentShell();
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
         renderProducts(products);
         renderAboutUs(data.aboutUsContent);
@@ -212,7 +214,7 @@ async function fetchData() {
         buildFabButtons();
         buildChatbotWidget();
         
-        document.getElementById('update-timestamp').textContent = new Date().toLocaleDateString('en-GB');
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v18.1)`;
         
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
         document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
@@ -255,6 +257,7 @@ function renderMainContentShell() {
         <div id="about" class="tab-content"><section id="about-us-content" class="dynamic-content-wrapper"></section></div>
         <div id="jobs" class="tab-content"><section id="jobs-content" class="dynamic-content-wrapper"><h2>All Career Opportunities</h2><div id="job-listings-container"></div></section></div>
         <div id="enquiries" class="tab-content"><section id="enquiries-form-content" class="dynamic-content-wrapper"></section></div>
+        <div id="rewards" class="tab-content"><section class="dynamic-content-wrapper"><h2>Rewards Program</h2><p>Our exciting new rewards program is coming soon! Stay tuned for more details.</p></section></div>
     `;
 }
 
@@ -285,7 +288,7 @@ function renderHomepageContent(about, jobs, testimonies) {
         testimoniesContainer.innerHTML = testimonies.map(t => {
             let stars = '';
             for (let i = 0; i < 5; i++) { stars += `<i class="fa-solid fa-star" style="color: ${i < t.Rating ? 'var(--secondary-color)' : '#ccc'}"></i>`; }
-            return `<div class="testimony-card"><div class="testimony-header"><img src="${t.Customer_Image_URL || 'https://via.placeholder.com/60'}" alt="${t.Customer_Name}" class="testimony-img"><div><h4>${t.Customer_Name}</h4><div class="testimony-rating">${stars}</div></div></div><p>"${t.Testimony_Text}"</p></div>`;
+            return `<div class="testimony-card"><div class="testimony-header"><div><h4>${t.ClientName}</h4><div class="testimony-rating">${stars}</div></div></div><p>"${t.Quote}"</p></div>`;
         }).join('');
     } else {
         document.getElementById('homepage-testimonies').style.display = 'none';
@@ -303,7 +306,7 @@ function renderHomepageContent(about, jobs, testimonies) {
 function renderProducts(productsToRender) {
     const container = document.getElementById('product-list-container');
     if (!productsToRender || productsToRender.length === 0) { container.innerHTML = `<p>No products available.</p>`; return; }
-    container.innerHTML = `<div class="product-list">${productsToRender.map(p => `<div class="product"><div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div><div class="product-info"><h3>${p.name}</h3><div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div><div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div></div></div>`).join('')}</div>`;
+    container.innerHTML = `<div class="product-list">${productsToRender.map(p => `<div class="product"><div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div><div class="product-info"><h3>${p.name}</h3><div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div><div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div><div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div><div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div></div></div>`).join('')}</div>`;
 }
 
 function renderAboutUs(content) {
@@ -315,7 +318,7 @@ function renderAboutUs(content) {
 function renderJobs(jobs) {
     const container = document.getElementById('job-listings-container');
     if (!jobs || jobs.length === 0) { container.innerHTML = '<p>There are currently no open positions.</p>'; return; }
-    container.innerHTML = jobs.map(job => `<div class="job-listing"><h3>${job.position}</h3><ul><li><strong>Location:</strong> ${job.location}</li><li><strong>Type:</strong> ${job.type}</li><li><strong>Citizenship:</strong> ${job.citizenship}</li><li><strong>Gender:</strong> ${job.gender}</li><li><strong>Age Range:</strong> ${job.ageRange}</li><li><strong>Salary:</strong> ${job.salary} SGD</li><li><strong>Accommodation:</strong> ${job.accommodation}</li><li><strong>Work Pattern:</strong> ${job.workDayPattern}</li><li><strong>Availability:</strong> ${job.availability}</li></ul><div class="job-description">${job.description}</div><button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button></div>`).join('');
+    container.innerHTML = jobs.map(job => `<div class="job-listing"><h3>${job.position}</h3><ul><li><strong>Location:</strong> ${job.location}</li><li><strong>Type:</strong> ${job.type}</li><li><strong>Citizenship:</strong> ${job.citizenship}</li><li><strong>Gender:</strong> ${job.gender}</li><li><strong>Age Range:</strong> ${job.ageRange}</li><li><strong>Salary:</strong> ${job.salary} RM</li><li><strong>Accommodation:</strong> ${job.accommodation}</li><li><strong>Work Pattern:</strong> ${job.workDayPattern}</li><li><strong>Availability:</strong> ${job.availability}</li></ul><div class="job-description">${job.description}</div><button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button></div>`).join('');
 }
 
 function buildEnquiryForm() {
@@ -344,15 +347,15 @@ function buildChatbotWidget() {
 }
 
 function addToCart(productId) {
-    const product = products.find(p => p.id === productId);
-    const existingItem = cart.find(item => item.id === productId);
+    const product = products.find(p => p.id == productId);
+    const existingItem = cart.find(item => item.id == productId);
     if (existingItem) { existingItem.quantity++; } else { cart.push({ ...product, quantity: 1 }); }
     updateCartDisplay();
 }
 
-function increaseQuantity(productId) { const item = cart.find(i => i.id === productId); if (item) { item.quantity++; } updateCartDisplay(); }
-function decreaseQuantity(productId) { const item = cart.find(i => i.id === productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } } }
-function removeItemFromCart(productId) { cart = cart.filter(item => item.id !== productId); updateCartDisplay(); }
+function increaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity++; } updateCartDisplay(); }
+function decreaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } } }
+function removeItemFromCart(productId) { cart = cart.filter(item => item.id != productId); updateCartDisplay(); }
 
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
@@ -382,9 +385,11 @@ function toggleJobModal(show = false, jobId = '', jobTitle = '') {
     if (show) {
         document.getElementById('job-modal-title').textContent = jobTitle;
         document.getElementById('job-id-input').value = jobId;
+        document.getElementById('job-position-input').value = jobTitle;
         modal.style.display = 'flex';
     } else {
         modal.style.display = 'none';
+        document.getElementById('job-application-form').reset();
     }
 }
 
@@ -468,6 +473,7 @@ async function handleChatSubmit() {
     input.value = '';
     const thinkingMsg = addChatMessage('bot', '<i>Thinking...</i>', 'html');
     
+    // This is a simplified chatbot for now.
     setTimeout(() => {
         thinkingMsg.remove();
         addChatMessage('bot', 'Hello! This chatbot is currently under maintenance. Please contact the owner directly for support.');
@@ -477,3 +483,4 @@ async function handleChatSubmit() {
 
 </body>
 </html>
+```
