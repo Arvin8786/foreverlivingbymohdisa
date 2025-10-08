@@ -305,8 +305,39 @@ function renderHomepageContent(about, jobs, testimonies) {
 
 function renderProducts(productsToRender) {
     const container = document.getElementById('product-list-container');
-    if (!productsToRender || productsToRender.length === 0) { container.innerHTML = `<p>No products available.</p>`; return; }
-    container.innerHTML = `<div class="product-list">${productsToRender.map(p => `<div class="product"><div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div><div class="product-info"><h3>${p.name}</h3><div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div><div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div><div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div><div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div></div></div>`).join('')}</div>`;
+function renderProducts(productsToRender) {
+    const container = document.getElementById('product-list-container');
+    if (!container) {
+        console.error("Product container not found.");
+        return;
+    }
+
+    if (!productsToRender || productsToRender.length === 0) {
+        container.innerHTML = `<p>No products are available at the moment. Please check back later.</p>`;
+        return;
+    }
+
+    // This correctly creates the product list container and then maps over the products.
+    container.innerHTML = `<div class="product-list">
+        ${productsToRender.map(p => `
+            <div class="product">
+                <div class="product-image-container">
+                    <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/280x280?text=Image+Not+Found'">
+                </div>
+                <div class="product-info">
+                    <h3>${p.name}</h3>
+                    <div class="price-section">
+                        <span class="new-price">RM ${p.price.toFixed(2)}</span>
+                    </div>
+                    <div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div>
+                    <div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        `).join('')}
+    </div>`;
 }
 
 function renderAboutUs(content) {
