@@ -5,14 +5,14 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL ='https://script.google.com/macros/s/AKfycbwtZlTSni5TORQSd5c0PxNpGQaXtVVYNlNdORROGSwvf4AgUlrCcOFm2ptMXlVmSmCibw/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwtZlTSni5TORQSd5c0PxNpGQaXtVVYNlNdORROGSwvf4AgUlrCcOFm2ptMXlVmSmCibw/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
 let products = [];
 let allJobs = [];
-let cart = []; // <--- ADD THIS LINE
-let chatSession = {}; // <--- AND ADD THIS LINE
+let cart = [];
+let chatSession = {};
 
 // ===========================================================
 // [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
@@ -442,7 +442,3 @@ async function postToRender(action, data) {
         throw error;
     }
 }
-</script>
-
-</body>
-</html>
