@@ -141,8 +141,45 @@ function renderProducts(productsToRender) {
 
 function renderAboutUs(content) {
     const container = document.getElementById('about-us-content');
-    if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
-    container.innerHTML = `<h2>About ${content.CompanyName}</h2><div class="owner-profile"><div class="owner-details"><h3>${content.Owner} - ${content.Role}</h3><div>${content.MoreDetails}</div><hr><h4>Our Mission</h4><p>${content.OurMission}</p><h4>Our Vision</h4><p>${content.OurVision}</p></div></div>`;
+    if (!content) { 
+        container.innerHTML = '<p>About information is unavailable.</p>'; 
+        return; 
+    }
+
+    const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
+
+    // Corrected to use the exact field names from your sheet
+    const emailLink = content.EmailAddress ? `<a href="mailto:${content.EmailAddress}"><i class="fa-solid fa-envelope"></i> ${content.EmailAddress}</a>` : '';
+    const whatsappLink = content.Whatsapp ? `<a href="https://wa.me/${content.Whatsapp.replace(/\D/g,'')}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${content.Whatsapp}</a>` : '';
+    
+    // New: Added the store Address with a link to Google Maps
+    const addressLink = content.Address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content.Address)}" target="_blank" class="address-link"><i class="fa-solid fa-location-dot"></i> ${content.Address}</a>` : '';
+
+    // Builds the contact links container only if any of the fields have data
+    const contactLinksHtml = (emailLink || whatsappLink || addressLink) 
+        ? `<div class="contact-links">${emailLink}${whatsappLink}${addressLink}</div>`
+        : '';
+
+    container.innerHTML = `
+        <h2>About ${content.CompanyName}</h2>
+        <div class="owner-profile">
+            <img src="arvind.jpg" alt="${content.Owner}" class="owner-image" onerror="this.style.display='none'">
+            <div class="owner-details">
+                <h3>${content.Owner} - ${content.Role}</h3>
+                ${contactLinksHtml}
+                <div>${content.MoreDetails}</div>
+            </div>
+        </div>
+        <div class="about-section">
+            <h4>Our Mission</h4>
+            <p>${content.OurMission}</p>
+        </div>
+        <div class="about-section">
+            <h4>Our Vision</h4>
+            <p>${content.OurVision}</p>
+        </div>
+        ${historySection}
+    `;
 }
 
 function renderJobs(jobs) {
