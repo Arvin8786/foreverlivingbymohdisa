@@ -11,6 +11,8 @@ const apiKey = '9582967';
 
 let products = [];
 let allJobs = [];
+let cart = []; // <--- ADD THIS LINE
+let chatSession = {}; // <--- AND ADD THIS LINE
 
 // ===========================================================
 // [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
