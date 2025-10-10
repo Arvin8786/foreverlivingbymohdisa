@@ -1,11 +1,11 @@
 // =================================================================
-// E-Shop Frontend Script - v18.3 (Definitive Final & Complete)
+// E-Shop Frontend Script - v18.4 (Upgraded & Consolidated)
 // =================================================================
 
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwtZlTSni5TORQSd5c0PxNpGQaXtVVYNlNdORROGSwvf4AgUlrCcOFm2ptMXlVmSmCibw/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwIU5yn5VC4d4ZZtEnodlNixeZqoup0MFVct1wsBoG8Tr5jZy3PLEPZjuITVFBPou2r1Q/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
@@ -42,7 +42,7 @@ async function fetchData() {
         buildFabButtons();
         buildChatbotWidget();
         
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v18.3)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v18.4)`;
         
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
         document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
@@ -100,13 +100,13 @@ function renderHomepageContent(about, jobs, testimonies) {
     if (whyChooseUsContainer) whyChooseUsContainer.innerHTML = `<h2>${about.WhyChooseUs_Title}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div>`;
         
     const videosContainer = document.getElementById('youtube-videos-container');
-    const videoUrls = about.YoutubeURL ? about.YoutubeURL.split(',').map(url => url.trim()) : [];
-    if (videosContainer && videoUrls.length > 0) {
+    const videoUrls = about.YoutubeURL ? String(about.YoutubeURL).split(',').map(url => url.trim()) : [];
+    if (videosContainer && videoUrls.length > 0 && videoUrls[0]) {
         videosContainer.innerHTML = videoUrls.map(url => {
             try {
                 const videoId = new URL(url).searchParams.get('v');
                 if (videoId) return `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
-            } catch(e) {}
+            } catch(e) { console.error("Invalid YouTube URL:", url); }
             return '';
         }).join('');
     } else if(videosContainer) {
@@ -147,18 +147,10 @@ function renderAboutUs(content) {
     }
 
     const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
-
-    // Corrected to use the exact field names from your sheet
     const emailLink = content.EmailAddress ? `<a href="mailto:${content.EmailAddress}"><i class="fa-solid fa-envelope"></i> ${content.EmailAddress}</a>` : '';
-    const whatsappLink = content.Whatsapp ? `<a href="https://wa.me/${content.Whatsapp.replace(/\D/g,'')}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${content.Whatsapp}</a>` : '';
-    
-    // New: Added the store Address with a link to Google Maps
+    const whatsappLink = content.Whatsapp ? `<a href="https://wa.me/${String(content.Whatsapp).replace(/\D/g,'')}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${content.Whatsapp}</a>` : '';
     const addressLink = content.Address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content.Address)}" target="_blank" class="address-link"><i class="fa-solid fa-location-dot"></i> ${content.Address}</a>` : '';
-
-    // Builds the contact links container only if any of the fields have data
-    const contactLinksHtml = (emailLink || whatsappLink || addressLink) 
-        ? `<div class="contact-links">${emailLink}${whatsappLink}${addressLink}</div>`
-        : '';
+    const contactLinksHtml = (emailLink || whatsappLink || addressLink) ? `<div class="contact-links">${emailLink}${whatsappLink}${addressLink}</div>` : '';
 
     container.innerHTML = `
         <h2>About ${content.CompanyName}</h2>
