@@ -115,13 +115,89 @@
     .job-listing-summary { padding: 1rem; border: 1px solid var(--light-gray); border-radius: 8px; }
 
     /* [ 3.2 ] About Us & Careers Page Styles */
-    .owner-profile { display: flex; flex-wrap: wrap; align-items: center; gap: 2rem; }
-    .owner-details { flex: 1; }
-    .job-listing { border: 1px solid var(--light-gray); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: var(--border-radius); }
-    .job-listing ul { list-style: none; padding-left: 0; margin-top: 1rem; }
-    .job-listing li { display: inline-block; background-color: var(--light-gray); padding: 5px 10px; border-radius: 15px; margin: 5px 5px 5px 0; font-size: 0.9rem; }
-    .job-description { white-space: pre-wrap; margin-top: 1rem; }
-</style>
+.owner-profile { 
+    display: flex; 
+    flex-wrap: wrap; 
+    align-items: center; 
+    gap: 2rem; 
+    margin-bottom: 2rem; /* Added for better spacing */
+}
+.owner-image { 
+    flex-shrink: 0; 
+    width: 200px; 
+    height: 200px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    border: 4px solid var(--primary-color); 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+}
+.owner-details { 
+    flex: 1; 
+}
+.contact-links { 
+    margin: 15px 0; 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 15px 20px; /* Vertical and horizontal gap */
+}
+.contact-links a { 
+    text-decoration: none; 
+    color: var(--dark-text); 
+    font-weight: 500; 
+    align-items: center; 
+    display: inline-flex; 
+    gap: 8px; /* Spacing between icon and text */
+}
+.contact-links a:hover { 
+    color: var(--primary-color); 
+}
+.contact-links i { 
+    margin-right: 0; /* Replaced by gap */
+    color: var(--accent-color); 
+    font-size: 1.2rem; 
+}
+.contact-links .address-link {
+    flex-basis: 100%; /* Allows the address to take its own line */
+}
+.about-section { 
+    background: #fdfefe; 
+    border-left: 5px solid var(--accent-color); 
+    padding: 20px; 
+    margin-top: 25px; 
+    border-radius: 8px; 
+    box-shadow: 0 0 20px rgba(39, 174, 96, 0.2); 
+    transition: all 0.3s ease; 
+}
+.about-section:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 5px 25px rgba(39, 174, 96, 0.3); 
+}
+.about-section h4 { 
+    margin-bottom: 10px; 
+}
+.job-listing { 
+    border: 1px solid var(--light-gray); 
+    padding: 1.5rem; 
+    margin-bottom: 1.5rem; 
+    border-radius: var(--border-radius); 
+}
+.job-listing ul { 
+    list-style: none; 
+    padding-left: 0; 
+    margin-top: 1rem; 
+}
+.job-listing li { 
+    display: inline-block; 
+    background-color: var(--light-gray); 
+    padding: 5px 10px; 
+    border-radius: 15px; 
+    margin: 5px 5px 5px 0; 
+    font-size: 0.9rem; 
+}
+.job-description { 
+    white-space: pre-wrap; 
+    margin-top: 1rem; 
+}
 
 <!-- =========================================================== -->
 <!-- [ 4.0 ] PRODUCTS MODULE                                     -->
