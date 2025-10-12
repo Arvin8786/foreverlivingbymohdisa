@@ -1,5 +1,5 @@
 // =================================================================
-// E-Shop Frontend Script - v20.1 (Final Checkout Upgrade)
+// E-Shop Frontend Script - v18.6 (Final UI & Feature Upgrade)
 // =================================================================
 
 // ===========================================================
@@ -13,7 +13,6 @@ let products = [];
 let allJobs = [];
 let cart = [];
 let chatSession = {};
-let shippingRules = [];
 
 // ===========================================================
 // [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
@@ -29,7 +28,6 @@ async function fetchData() {
 
         products = data.products || [];
         allJobs = data.jobsListings || [];
-        shippingRules = data.shippingRules || [];
         
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
@@ -44,7 +42,7 @@ async function fetchData() {
         buildFabButtons();
         buildChatbotWidget();
         
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v20.1)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v18.6)`;
         
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
         document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
@@ -177,6 +175,7 @@ function renderAboutUs(content) {
         ${historySection}`;
 }
 
+// UPGRADED to render new attractive job cards
 function renderJobs(jobs) {
     const container = document.getElementById('job-listings-container');
     if (!jobs || jobs.length === 0) { container.innerHTML = '<p>There are currently no open positions.</p>'; return; }
@@ -201,6 +200,7 @@ function buildEnquiryForm() {
     container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">Submit</button><p id="enquiry-status"></p></form>`;
 }
 
+// UPGRADED for new attractive cart modal
 function buildCartModal() {
     const container = document.getElementById('cart-modal');
     container.innerHTML = `
@@ -213,7 +213,6 @@ function buildCartModal() {
             <div id="cart-checkout-area">
                 <div class="modal-footer">
                     <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
-                    <div class="summary-line"><span>Shipping</span><span id="cart-shipping">RM 0.00</span></div>
                     <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
                 </div>
                 <div class="customer-info-form">
@@ -222,26 +221,15 @@ function buildCartModal() {
                     <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
                     <input type="email" id="customer-email" placeholder="Email (Optional)">
                     <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
-                    
-                    <h3>Payment</h3>
-                    <p>Please transfer to the details below and upload a receipt.</p>
-                    <div class="payment-details" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #eee;">
-                        <strong>Bank:</strong> MAYBANK<br>
-                        <strong>Account No:</strong> 551169113645<br>
-                        <strong>Name:</strong> RICH ACADEMY GLOBAL<br>
-                        <img src="https://i.ibb.co/L6Wn00G/duitnow.png" alt="DuitNow QR" style="max-width: 200px; margin-top: 10px;">
-                    </div>
-                    <label for="payment-proof" style="display: block; margin-bottom: 5px;">Upload Payment Receipt (Required)</label>
-                    <input type="file" id="payment-proof" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
                 </div>
-                <div style="padding: 0 30px 20px;"><button id="checkout-btn" class="btn btn-primary" style="width: 100%;" onclick="initiateCheckout()">Complete Order</button></div>
+                <div style="padding: 0 30px 20px;"><button class="btn btn-primary" style="width: 100%;" onclick="initiateCheckout()">Complete Order</button></div>
             </div>
         </div>`;
 }
 
 function buildJobApplicationModal() {
     const container = document.getElementById('job-application-modal');
-    container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleJobModal(false)">&times;</span><h2>Apply for <span id="job-modal-title"></span></h2><form id="job-application-form" class="enquiry-form"><input type="hidden" id="job-id-input"><input type="hidden" id="job-position-input"><input type="text" id="applicant-name" placeholder="Full Name" required><input type="email" id="applicant-email" placeholder="Email" required><input type="tel" id="applicant-phone" placeholder="Phone" required><input type="text" id="applicant-citizenship" placeholder="Citizenship" required><textarea id="applicant-message" placeholder="Tell us about yourself" rows="4"></textarea><label for="applicant-resume">Upload Resume (Mandatory)</label><input type="file" id="applicant-resume" required><button type="submit" class="btn btn-primary" style="width:100%;">Submit</button><p id="job-application-status"></p></form></div>`;
+    container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleJobModal(false)">&times;</span><h2>Apply for <span id="job-modal-title"></span></h2><form id="job-application-form" class="enquiry-form"><input type="hidden" id="job-id-input"><input type="hidden" id="job-position-input"><input type="text" id="applicant-name" placeholder="Full Name" required><input type="email" id="applicant-email" placeholder="Email" required><input type="tel" id="applicant-phone" placeholder="Phone" required><input type="text" id="applicant-citizenship" placeholder="Citizenship" required><textarea id="applicant-message" placeholder="Tell us about yourself" rows="4"></textarea><label for="applicant-resume">Upload Resume (Mandatory)</label><input type="file" id="applicant-resume" required><button type="submit" class="btn btn-primary">Submit</button><p id="job-application-status"></p></form></div>`;
 }
 
 function buildFabButtons() {
@@ -259,24 +247,16 @@ function buildChatbotWidget() {
 // ===========================================================
 function addToCart(productId) {
     const product = products.find(p => p.id == productId);
-    if (!product) return;
     const existingItem = cart.find(item => item.id == productId);
     if (existingItem) { existingItem.quantity++; } else { cart.push({ ...product, quantity: 1 }); }
     updateCartDisplay();
 }
 
-function increaseQuantity(productId) {
-    const item = cart.find(i => i.id == productId); if (item) { item.quantity++; } updateCartDisplay();
-}
+function increaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity++; } updateCartDisplay(); }
+function decreaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } } }
+function removeItemFromCart(productId) { cart = cart.filter(item => item.id != productId); updateCartDisplay(); }
 
-function decreaseQuantity(productId) {
-    const item = cart.find(i => i.id == productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } }
-}
-
-function removeItemFromCart(productId) {
-    cart = cart.filter(item => item.id != productId); updateCartDisplay();
-}
-
+// UPGRADED to render new attractive cart items
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
     const checkoutArea = document.getElementById('cart-checkout-area');
@@ -285,11 +265,11 @@ function updateCartDisplay() {
     
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p style="text-align:center; padding: 20px 0;">Your cart is empty.</p>';
-        if (checkoutArea) checkoutArea.style.display = 'none';
+        checkoutArea.style.display = 'none';
         return;
     }
     
-    if (checkoutArea) checkoutArea.style.display = 'block';
+    checkoutArea.style.display = 'block';
     cartItemsContainer.innerHTML = cart.map(item => `
         <div class="cart-item">
             <img src="${item.image}" alt="${item.name}" class="cart-item-image"/>
@@ -306,24 +286,8 @@ function updateCartDisplay() {
         </div>`).join('');
         
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    let shippingFee = 0;
-    if (shippingRules.length > 0) {
-        const promoFree = shippingRules.find(r => r.ruleType === 'Free' && subtotal >= r.minSpend);
-        if (promoFree) {
-            shippingFee = 0;
-        } else {
-            const applicableTier = shippingRules.find(r => r.ruleType === 'Tiered' && subtotal >= r.minSpend && subtotal <= r.maxSpend);
-            if (applicableTier) {
-                shippingFee = applicableTier.charge;
-            }
-        }
-    }
-    const total = subtotal + shippingFee;
-
     document.getElementById('cart-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
-    document.getElementById('cart-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
-    document.getElementById('cart-total').textContent = `RM ${total.toFixed(2)}`;
+    document.getElementById('cart-total').textContent = `RM ${subtotal.toFixed(2)}`;
 }
 
 function toggleCart(hide = false) {
@@ -331,79 +295,69 @@ function toggleCart(hide = false) {
     modal.style.display = hide ? 'none' : 'flex';
     if (!hide) updateCartDisplay();
 }
-
-async function initiateCheckout() {
-    const checkoutBtn = document.getElementById('checkout-btn');
+    async function initiateCheckout() {
+    const checkoutBtn = document.querySelector('#cart-checkout-area button');
     checkoutBtn.disabled = true;
     checkoutBtn.textContent = 'Processing...';
 
+    // 1. Get and validate form fields
     const name = document.getElementById('customer-name').value.trim();
     const phone = document.getElementById('customer-phone').value.trim();
     const address = document.getElementById('customer-address').value.trim();
     const email = document.getElementById('customer-email').value.trim();
-    const proofFile = document.getElementById('payment-proof').files[0];
 
-    if (!name || !phone || !address || !proofFile) {
-        alert('Please fill in all required fields: Name, Phone, Address, and upload a payment receipt.');
+    if (!name || !phone || !address) {
+        alert('Please fill in all required customer details: Name, Phone, and Address.');
         checkoutBtn.disabled = false;
         checkoutBtn.textContent = 'Complete Order';
         return;
     }
 
+    // 2. Prepare the order data payload
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingFee = parseFloat(document.getElementById('cart-shipping').textContent.replace('RM ', ''));
+    const shippingFee = 0.0; // Assuming free shipping for now, can be updated later
     const totalAmount = subtotal + shippingFee;
+
     const itemsPurchased = cart.map(item => `${item.id}x${item.quantity}`).join(', ');
 
-    try {
-        const base64File = await getBase64(proofFile);
-        
-        const payload = {
-            action: 'logInitialOrder',
-            data: {
-                customerName: name,
-                customerPhone: phone,
-                customerEmail: email,
-                customerAddress: address,
-                itemsPurchased: itemsPurchased,
-                cart: cart,
-                totalAmount: totalAmount,
-                shippingFee: shippingFee,
-                paymentProofFile: base64File.split(',')[1],
-                paymentProofMimeType: proofFile.type,
-                totalPointsForThisPurchase: 0
-            }
-        };
+    const payload = {
+        action: 'logInitialOrder',
+        data: {
+            customerName: name,
+            customerPhone: phone,
+            customerEmail: email,
+            customerAddress: address,
+            itemsPurchased: itemsPurchased,
+            cart: cart, // Send full cart data for detailed logging
+            totalAmount: totalAmount,
+            shippingFee: shippingFee,
+            totalPointsForThisPurchase: 0 // Backend can calculate points if needed
+        }
+    };
 
-        const response = await postDataToGScript(payload, true);
+    // 3. Send the order to the Google Apps Script backend
+    try {
+        await postDataToGScript(payload);
+
+        // 4. Handle success: show message, clear cart, and close modal
+        alert('Your order has been placed successfully! We will contact you via WhatsApp shortly to confirm payment and shipping.');
         
-        const invoiceId = response.proformaUrl.split('/').pop().replace('.pdf', '');
-        document.getElementById('main-content').innerHTML = `
-            <div class="dynamic-content-wrapper" style="text-align: center;">
-                <h2>Thank You! Your Order is Pending Verification.</h2>
-                <p>Your order has been placed successfully.</p>
-                <p><strong>Invoice Number:</strong> ${invoiceId}</p>
-                <p>We will contact you via WhatsApp shortly to confirm payment and shipping.</p>
-                <a href="${response.proformaUrl}" target="_blank" class="btn btn-primary" style="max-width: 300px; margin: 20px auto 0;">Download Your Invoice</a>
-            </div>`;
-        
-        cart = [];
-        toggleCart(true);
-        updateCartDisplay();
+        cart = []; // Clear the cart array
+        toggleCart(true); // Close the cart modal
+        updateCartDisplay(); // Update the cart icon to show 0
 
     } catch (error) {
+        // 5. Handle failure
         console.error('Checkout failed:', error);
         alert('There was an error placing your order. Please try again or contact us directly.');
     } finally {
-        if(checkoutBtn) {
-            checkoutBtn.disabled = false;
-            checkoutBtn.textContent = 'Complete Order';
-        }
+        // 6. Re-enable the button regardless of success or failure
+        checkoutBtn.disabled = false;
+        checkoutBtn.textContent = 'Complete Order';
     }
 }
-
 // ===========================================================
-// [ 5.0 ] FORMS & CHATBOT LOGIC
+// [ 5.0 ] FORMS LOGIC
 // ===========================================================
 function toggleJobModal(show = false, jobId = '', jobTitle = '') {
     const modal = document.getElementById('job-application-modal');
@@ -476,6 +430,9 @@ function getBase64(file) {
     });
 }
 
+// ===========================================================
+// [ 6.0 ] CHATBOT LOGIC
+// ===========================================================
 function toggleChatWidget(show) {
     const chatWidget = document.getElementById('eshop-chat-widget');
     const fabContainer = document.getElementById('fab-container');
@@ -599,27 +556,9 @@ function showTab(tabId) {
     document.getElementById(tabId).classList.add('active');
 }
 
-async function postDataToGScript(payload, expectJsonResponse = false) {
-    const options = {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: { 'Content-Type': 'application/json' },
-        redirect: 'follow'
-    };
-
-    if (!expectJsonResponse) {
-        options.mode = 'no-cors';
-    }
-
+async function postDataToGScript(payload) {
     try {
-        const response = await fetch(googleScriptURL, options);
-        if (expectJsonResponse) {
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Network response was not ok: ${errorText}`);
-            }
-            return await response.json();
-        }
+        await fetch(googleScriptURL, { method: 'POST', mode: 'no-cors', cache: 'no-cache', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), redirect: 'follow' });
         return { status: 'success' };
     } catch (error) {
         console.error('Error posting to Google Script:', error);
