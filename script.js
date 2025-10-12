@@ -30,7 +30,7 @@ async function fetchData() {
 
         products = data.products || [];
         allJobs = data.jobsListings || [];
-        shippingRules = data.shippingRules || [];
+        shippingRules = data.shippingRules || []; // This line is new
         
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
@@ -40,12 +40,12 @@ async function fetchData() {
         renderJobs(allJobs);
         buildEnquiryForm();
         
-        buildCartModal(data.aboutUsContent);
+        buildCartModal(data.aboutUsContent); // Pass content for bank details
         buildJobApplicationModal();
         buildFabButtons();
         buildChatbotWidget();
         
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v20.3)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v20.2)`;
         
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
         document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
@@ -84,6 +84,9 @@ function renderMainContentShell() {
 function renderHomepageContent(about, jobs, testimonies) {
     const container = document.getElementById('homepage');
     if (!about) { container.innerHTML = '<p>Welcome</p>'; return; }
+
+    const heroHtml = `<section id="homepage-hero" class="hero-section"><h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p></section>`;
+    const whyChooseUsHtml = `<section id="why-choose-us" class="dynamic-content-wrapper"><h2>${about.WhyChooseUs_Title}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div></section>`;
     
     let youtubeHtml = '';
     const videoUrls = about.YoutubeURL ? String(about.YoutubeURL).split(',').map(url => url.trim()) : [];
@@ -96,13 +99,13 @@ function renderHomepageContent(about, jobs, testimonies) {
             } catch(e) {}
             return '';
         }).join('');
-        youtubeHtml = `<section class="dynamic-content-wrapper"><h2>${youtubeTitle}</h2><div id="youtube-videos-container">${videosHtml}</div></section>`;
+        youtubeHtml = `<section id="youtube-videos" class="dynamic-content-wrapper"><h2>${youtubeTitle}</h2><div id="youtube-videos-container">${videosHtml}</div></section>`;
     }
 
-    container.innerHTML = `
-        <section class="hero-section"><h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p></section>
-        ${youtubeHtml}
-    `;
+    const testimoniesHtml = `<section id="homepage-testimonies" class="dynamic-content-wrapper"><h2>What Our Customers Say</h2><div id="testimonies-container">${(testimonies || []).map(t => `<div class="testimony-card">...</div>`).join('')}</div></section>`;
+    const featuredJobsHtml = `<section id="homepage-featured-jobs" class="dynamic-content-wrapper"><h2>Join Our Team</h2><div id="featured-jobs-container">${(jobs || []).filter(j=>j.isFeatured).map(job => `<div class="job-listing-summary"><h4>${job.position}</h4><p>${job.location} | ${job.type}</p></div>`).join('')}</div><a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0; max-width: 300px;">View All Career Opportunities</a></section>`;
+
+    container.innerHTML = heroHtml + whyChooseUsHtml + youtubeHtml + testimoniesHtml + featuredJobsHtml;
 }
 
 function renderProducts(productsToRender) {
@@ -114,6 +117,8 @@ function renderProducts(productsToRender) {
             <div class="product-info">
                 <h3>${p.name}</h3>
                 <div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div>
+                <div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div>
+                <div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div>
                 <div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div>
             </div>
         </div>`).join('')}</div>`;
@@ -121,7 +126,8 @@ function renderProducts(productsToRender) {
 
 function renderAboutUs(content) {
     const container = document.getElementById('about-us-content');
-    if (!content) return;
+    if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
+    const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
     container.innerHTML = `
         <h2>About ${content.CompanyName}</h2>
         <div class="owner-profile">
@@ -131,13 +137,34 @@ function renderAboutUs(content) {
                 <div>${content.MoreDetails}</div>
             </div>
         </div>
-    `;
+        <div class="about-section">
+            <h4>Our Mission</h4>
+            <p>${content.OurMission}</p>
+        </div>
+        <div class="about-section">
+            <h4>Our Vision</h4>
+            <p>${content.OurVision}</p>
+        </div>
+        ${historySection}`;
 }
 
 function renderJobs(jobs) {
     const container = document.getElementById('job-listings-container');
     if (!jobs || jobs.length === 0) { container.innerHTML = '<p>There are currently no open positions.</p>'; return; }
-    container.innerHTML = jobs.map(job => `<div class="job-listing">${job.position}</div>`).join('');
+    container.innerHTML = jobs.map(job => `
+        <div class="job-card">
+            <div class="job-header"><h3>${job.position}</h3></div>
+            <div class="job-body">
+                <div class="job-details">
+                    <div class="job-detail-item"><i class="fa-solid fa-location-dot"></i> <span>${job.location} | ${job.type}</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-money-bill-wave"></i> <span>${job.salary} RM</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-house-user"></i> <span>${job.accommodation}</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-calendar-days"></i> <span>${job.workDayPattern}</span></div>
+                </div>
+                <div class="job-description">${job.description}</div>
+                <button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')" style="width: auto;">Apply Now</button>
+            </div>
+        </div>`).join('');
 }
 
 function buildEnquiryForm() {
@@ -149,49 +176,36 @@ function buildCartModal(content) {
     const container = document.getElementById('cart-modal');
     const bankDetailsHTML = (content && content.BankAccountNumber) 
         ? `<strong>Bank:</strong> ${content.BankName || 'N/A'}<br>
-           <strong>Account No:</strong> ${content.BankAccountNumber || 'N/A'}<br>
+           <strong>Account No:</strong> ${content.BankAccountNumber}<br>
            <strong>Name:</strong> ${content.BankAccountName || 'N/A'}<br>
            <img src="https://i.ibb.co/L6Wn00G/duitnow.png" alt="DuitNow QR" style="max-width: 200px; margin-top: 10px;">`
         : "Payment details are not available. Please contact us.";
 
     container.innerHTML = `
         <div class="modal-content">
-            <div id="cart-view-1">
-                <span class="close" onclick="toggleCart(true)">&times;</span>
-                <h2>Your Cart</h2>
-                <div id="cart-items" style="padding: 0 30px;"></div>
-                <div class="cart-summary" style="padding: 20px 30px;">
-                    <div class="discount-area" style="margin-bottom: 15px; display: flex; gap: 10px;"><input type="text" id="discount-code" placeholder="Enter discount code" style="width: 100%;"><button class="btn btn-secondary" onclick="applyDiscount()" style="width: auto; padding: 10px 20px;">Apply</button></div>
-                    <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal"></span></div>
-                    <div class="summary-line"><span>Shipping</span><span id="cart-shipping"></span></div>
-                    <div class="summary-line"><span>Discount</span><span id="cart-discount">RM 0.00</span></div>
-                    <div class="summary-line total"><span>Total</span><span id="cart-total"></span></div>
-                </div>
-                <div style="padding: 0 30px 20px;"><button class="btn btn-primary" onclick="showCartView(2)" style="width: 100%;">Checkout</button></div>
+            <span class="close" onclick="toggleCart(true)">&times;</span>
+            <h2>Your Cart</h2>
+            <div id="cart-items"></div>
+            <div class="cart-summary">
+                <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal"></span></div>
+                <div class="summary-line"><span>Shipping</span><span id="cart-shipping"></span></div>
+                <div class="summary-line total"><span>Total</span><span id="cart-total"></span></div>
             </div>
-            <div id="cart-view-2" style="display:none; padding: 30px;">
-                <span class="close" onclick="toggleCart(true)">&times;</span>
-                <h2>Customer Details</h2>
-                <div class="customer-info-form">
-                    <input type="text" id="customer-name" placeholder="Full Name" required>
-                    <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
-                    <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
-                </div>
-                <button class="btn btn-secondary" onclick="showCartView(1)" style="margin-bottom: 10px;">Back to Cart</button>
-                <button class="btn btn-primary" onclick="showCartView(3)">Proceed to Payment</button>
-            </div>
-            <div id="cart-view-3" style="display:none; padding: 30px;">
-                <span class="close" onclick="toggleCart(true)">&times;</span>
-                <h2>Payment</h2>
-                <div class="payment-details">
-                    <p>Please transfer to the details below and upload a receipt.</p>
+            <div class="customer-info-form">
+                <h3>Customer Info</h3>
+                <input type="text" id="customer-name" placeholder="Full Name" required>
+                <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
+                <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
+                
+                <h3>Payment</h3>
+                <p>Please transfer to the details below and upload a receipt.</p>
+                <div class="payment-details" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #eee;">
                     ${bankDetailsHTML}
                 </div>
-                <label for="payment-proof">Upload Payment Receipt (Required)</label>
-                <input type="file" id="payment-proof" required>
-                <button class="btn btn-secondary" onclick="showCartView(2)" style="margin-top: 20px; margin-bottom: 10px;">Back</button>
-                <button id="checkout-btn" class="btn btn-primary" onclick="initiateCheckout()">Complete Order</button>
+                <label for="payment-proof" style="display: block; margin-bottom: 5px;">Upload Payment Receipt (Required)</label>
+                <input type="file" id="payment-proof" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
             </div>
+            <button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="initiateCheckout()">Complete Order</button>
         </div>`;
 }
 
@@ -247,40 +261,41 @@ function updateCartDisplay() {
     
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p style="text-align:center;">Your cart is empty.</p>';
-        document.querySelector('#cart-view-1 .btn-primary').style.display = 'none';
     } else {
         cartItemsContainer.innerHTML = cart.map(item => `
             <div class="cart-item">
                 <img src="${item.image}" class="cart-item-image" />
                 <div class="cart-item-details">
                     <strong>${item.name}</strong>
-                    <div class="quantity-controls"><button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button><span>${item.quantity}</span><button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button></div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
+                    </div>
                 </div>
                 <strong>RM ${(item.price * item.quantity).toFixed(2)}</strong>
+                <button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button>
             </div>`).join('');
-        document.querySelector('#cart-view-1 .btn-primary').style.display = 'block';
     }
-    
+        
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
     let shippingFee = 0;
     if (shippingRules.length > 0) {
-        const applicableTier = shippingRules.find(r => subtotal >= r.minSpend && subtotal <= r.maxSpend);
-        if (applicableTier) shippingFee = applicableTier.charge;
-    }
-
-    let discountAmount = 0;
-    if (discountInfo) {
-        if (discountInfo.type === 'Percentage') {
-            discountAmount = subtotal * (discountInfo.value / 100);
+        const promoFree = shippingRules.find(r => r.ruleType === 'Free' && subtotal >= r.minSpend);
+        if (promoFree) {
+            shippingFee = 0;
         } else {
-            discountAmount = discountInfo.value;
+            const applicableTier = shippingRules.find(r => r.ruleType === 'Tiered' && subtotal >= r.minSpend && subtotal <= r.maxSpend);
+            if (applicableTier) {
+                shippingFee = applicableTier.charge;
+            }
         }
     }
-    const total = subtotal - discountAmount + shippingFee;
+    const total = subtotal + shippingFee;
 
     document.getElementById('cart-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
     document.getElementById('cart-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
-    document.getElementById('cart-discount').textContent = `- RM ${discountAmount.toFixed(2)}`;
     document.getElementById('cart-total').textContent = `RM ${total.toFixed(2)}`;
 }
 
@@ -319,6 +334,7 @@ async function initiateCheckout() {
     const name = document.getElementById('customer-name').value.trim();
     const phone = document.getElementById('customer-phone').value.trim();
     const address = document.getElementById('customer-address').value.trim();
+    const email = document.getElementById('customer-email').value.trim();
     const proofFile = document.getElementById('payment-proof').files[0];
 
     if (!name || !phone || !address || !proofFile) {
@@ -332,40 +348,49 @@ async function initiateCheckout() {
         const base64File = await getBase64(proofFile);
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const shippingFee = parseFloat(document.getElementById('cart-shipping').textContent.replace('RM ', ''));
-        const discountAmount = discountInfo ? (discountInfo.type === 'Percentage' ? subtotal * (discountInfo.value / 100) : discountInfo.value) : 0;
-        const totalAmount = subtotal - discountAmount + shippingFee;
-
+        const totalAmount = subtotal + shippingFee;
+        const itemsPurchased = cart.map(item => `${item.id}x${item.quantity}`).join(', ');
+        
         const payload = {
             action: 'logInitialOrder',
             data: {
                 customerName: name,
                 customerPhone: phone,
+                customerEmail: email,
                 customerAddress: address,
+                itemsPurchased: itemsPurchased,
                 cart: cart,
                 totalAmount: totalAmount,
                 shippingFee: shippingFee,
-                discountCode: discountInfo ? discountInfo.code : null,
-                discountAmount: discountAmount,
                 paymentProofFile: base64File.split(',')[1],
                 paymentProofMimeType: proofFile.type
             }
         };
+
         const response = await postDataToGScript(payload, true);
         
+        const invoiceId = response.proformaUrl.split('/').pop().replace('.pdf', '');
         document.getElementById('main-content').innerHTML = `
             <div class="dynamic-content-wrapper" style="text-align: center;">
-                <h2>Order Logged Successfully!</h2>
-                <p>Once payment is verified, the final receipt will be sent to you by our admin team.</p>
+                <h2>Thank You! Your Order is Pending Verification.</h2>
+                <p>Your order has been placed successfully.</p>
+                <p><strong>Invoice Number:</strong> ${invoiceId}</p>
+                <p>We will contact you via WhatsApp shortly to confirm payment and shipping.</p>
+                <a href="${response.proformaUrl}" target="_blank" class="btn btn-primary" style="max-width: 300px; margin: 20px auto 0;">Download Your Invoice</a>
             </div>`;
         
         cart = [];
-        discountInfo = null;
         toggleCart(true);
+        updateCartDisplay();
+
     } catch (error) {
-        alert('There was an error placing your order.');
+        console.error('Checkout failed:', error);
+        alert('There was an error placing your order. Please try again or contact us directly.');
     } finally {
-        checkoutBtn.disabled = false;
-        checkoutBtn.textContent = 'Complete Order';
+        if(checkoutBtn) {
+            checkoutBtn.disabled = false;
+            checkoutBtn.textContent = 'Complete Order';
+        }
     }
 }
 
@@ -564,13 +589,23 @@ async function postDataToGScript(payload, expectJsonResponse = false) {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: { 'Content-Type': 'application/json' },
+        redirect: 'follow'
     };
-    if (!expectJsonResponse) options.mode = 'no-cors';
+
+    if (!expectJsonResponse) {
+        options.mode = 'no-cors';
+    }
 
     try {
         const response = await fetch(googleScriptURL, options);
-        if (expectJsonResponse && !response.ok) throw new Error('Network error');
-        return expectJsonResponse ? await response.json() : { status: 'success' };
+        if (expectJsonResponse) {
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Network response was not ok: ${errorText}`);
+            }
+            return await response.json();
+        }
+        return { status: 'success' };
     } catch (error) {
         console.error('Error posting to Google Script:', error);
         throw error;
