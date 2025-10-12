@@ -85,8 +85,10 @@ function renderHomepageContent(about, jobs, testimonies) {
     const container = document.getElementById('homepage');
     if (!about) { container.innerHTML = '<p>Welcome</p>'; return; }
 
+    // Rebuild all the sections for the homepage
     const heroHtml = `<section id="homepage-hero" class="hero-section"><h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p></section>`;
-    const whyChooseUsHtml = `<section id="why-choose-us" class="dynamic-content-wrapper"><h2>${about.WhyChooseUs_Title}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div></section>`;
+    
+    const whyChooseUsHtml = `<section id="why-choose-us" class="dynamic-content-wrapper"><h2>${about.WhyChooseUs_Title || 'Why Choose Us?'}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div></section>`;
     
     let youtubeHtml = '';
     const videoUrls = about.YoutubeURL ? String(about.YoutubeURL).split(',').map(url => url.trim()) : [];
@@ -102,8 +104,24 @@ function renderHomepageContent(about, jobs, testimonies) {
         youtubeHtml = `<section id="youtube-videos" class="dynamic-content-wrapper"><h2>${youtubeTitle}</h2><div id="youtube-videos-container">${videosHtml}</div></section>`;
     }
 
-    const testimoniesHtml = `<section id="homepage-testimonies" class="dynamic-content-wrapper"><h2>What Our Customers Say</h2><div id="testimonies-container">${(testimonies || []).map(t => `<div class="testimony-card">...</div>`).join('')}</div></section>`;
-    const featuredJobsHtml = `<section id="homepage-featured-jobs" class="dynamic-content-wrapper"><h2>Join Our Team</h2><div id="featured-jobs-container">${(jobs || []).filter(j=>j.isFeatured).map(job => `<div class="job-listing-summary"><h4>${job.position}</h4><p>${job.location} | ${job.type}</p></div>`).join('')}</div><a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0; max-width: 300px;">View All Career Opportunities</a></section>`;
+    let testimoniesHtml = '';
+    if (testimonies && testimonies.length > 0) {
+        const testimoniesContent = testimonies.map(t => {
+            let stars = '';
+            for (let i = 0; i < 5; i++) {
+                stars += `<i class="fa-solid fa-star" style="color: ${i < t.Rating ? 'var(--secondary-color)' : '#ccc'}"></i>`;
+            }
+            return `<div class="testimony-card"><div class="testimony-header"><h4>${t.ClientName}</h4><div class="testimony-rating">${stars}</div></div><p>"${t.Quote}"</p></div>`;
+        }).join('');
+        testimoniesHtml = `<section id="homepage-testimonies" class="dynamic-content-wrapper"><h2>What Our Customers Say</h2><div id="testimonies-container">${testimoniesContent}</div></section>`;
+    }
+    
+    let featuredJobsHtml = '';
+    const featuredJobs = jobs ? jobs.filter(j => j.isFeatured) : [];
+    if (featuredJobs.length > 0) {
+        const jobsContent = featuredJobs.map(job => `<div class="job-listing-summary"><h4>${job.position}</h4><p>${job.location} | ${job.type}</p></div>`).join('');
+        featuredJobsHtml = `<section id="homepage-featured-jobs" class="dynamic-content-wrapper"><h2>Join Our Team</h2><div id="featured-jobs-container">${jobsContent}</div><a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0; max-width: 300px;">View All Career Opportunities</a></section>`;
+    }
 
     container.innerHTML = heroHtml + whyChooseUsHtml + youtubeHtml + testimoniesHtml + featuredJobsHtml;
 }
