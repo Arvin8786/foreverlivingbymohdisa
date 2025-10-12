@@ -352,10 +352,23 @@ async function applyDiscount() {
     }
 }
 
-function toggleCart(hide = false) {
+unction toggleCart(hide = false) {
     const modal = document.getElementById('cart-modal');
-    if (!hide) { showCartView(1); updateCartDisplay(); }
-    modal.style.display = hide ? 'none' : 'flex';
+    if (!modal) {
+        console.error("Cart modal not found!");
+        return;
+    }
+
+    // Determine the new display state
+    const isCurrentlyVisible = modal.style.display === 'flex';
+    const shouldShow = !isCurrentlyVisible && !hide;
+
+    if (shouldShow) {
+        modal.style.display = 'flex';
+        updateCartDisplay(); // Refresh cart content when showing
+    } else {
+        modal.style.display = 'none';
+    }
 }
 
 async function initiateCheckout() {
