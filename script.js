@@ -314,7 +314,7 @@ function updateCartDisplay() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
     let shippingFee = 0;
-    if (shippingRules.length > 0) {
+    if (shippingRules && shippingRules.length > 0) {
         const promoFree = shippingRules.find(r => r.ruleType === 'Free' && subtotal >= r.minSpend);
         if (promoFree) {
             shippingFee = 0;
@@ -331,7 +331,6 @@ function updateCartDisplay() {
     document.getElementById('cart-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
     document.getElementById('cart-total').textContent = `RM ${total.toFixed(2)}`;
 }
-
 async function applyDiscount() {
     const codeInput = document.getElementById('discount-code');
     const code = codeInput.value.trim();
@@ -507,7 +506,6 @@ function toggleChatWidget(show) {
     if (show) {
         chatWidget.classList.add('active');
         fabContainer.style.right = '370px';
-        // Check if chat is empty, and if so, display the main menu
         if (document.getElementById('chat-body').innerHTML.trim() === '') {
             displayMainMenu();
         }
@@ -521,7 +519,7 @@ function addChatMessage(sender, text, type = 'html') {
     const chatBody = document.getElementById('chat-body');
     const msg = document.createElement('div');
     msg.classList.add('chat-message', sender === 'bot' ? 'bot-message' : 'user-message');
-    msg.innerHTML = text; // Use innerHTML to render HTML like <i> and <a> tags
+    msg.innerHTML = text;
     chatBody.appendChild(msg);
     chatBody.scrollTop = chatBody.scrollHeight;
     return msg;
@@ -549,7 +547,6 @@ async function handleChatSubmit() {
         } else if (chatSession.state === 'my_account_menu') {
             await handleMyAccountMenu(text);
         } else {
-            // This is the main menu logic
             await handleMainMenu(text);
         }
     } catch (error) {
@@ -561,7 +558,7 @@ async function handleMainMenu(text) {
     const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
     if (text === '1') {
         if (sessionStorage.getItem('eshop_session_token')) {
-            lastBotMsg.remove(); // Remove "Thinking..."
+            lastBotMsg.remove();
             displayMyAccountMenu();
         } else {
             chatSession.state = 'awaiting_identifier';
@@ -569,11 +566,9 @@ async function handleMainMenu(text) {
         }
     } else if (text === '2') {
         lastBotMsg.innerHTML = 'Please ask any general question you have.';
-        // The state remains 'main_menu' so the next message is treated as a general question.
     } else if (text === '3') {
         lastBotMsg.innerHTML = 'To talk to a human, please contact our admin on WhatsApp: <a href="https://wa.me/601111033154" target="_blank">Click Here</a>';
     } else {
-        // This handles general questions
         const response = await postToRender('getSmartAnswer', { question: text });
         lastBotMsg.innerHTML = response.answer || 'Sorry, I had trouble finding an answer.';
     }
@@ -643,7 +638,6 @@ async function handleMyAccountMenu(text) {
         message = `Error: ${result.message}`;
     }
     lastBotMsg.innerHTML = message;
-    // After showing the result, re-display the menu for another action
     displayMyAccountMenu();
 }
 
