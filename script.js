@@ -31,7 +31,7 @@ async function fetchData() {
         products = data.products || [];
         allJobs = data.jobsListings || [];
         shippingRules = data.shippingRules || [];
-        
+
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
@@ -39,18 +39,20 @@ async function fetchData() {
         renderAboutUs(data.aboutUsContent);
         renderJobs(allJobs);
         buildEnquiryForm();
-        
+
         buildCartModal(data.aboutUsContent);
         buildJobApplicationModal();
         buildFabButtons();
         buildChatbotWidget();
-        
+
         document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v21.0)`;
-        
+
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
         document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
         document.getElementById('chat-send-btn').addEventListener('click', handleChatSubmit);
-        document.getElementById('chat-input').addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
+        document.getElementById('chat-input').addEventListener('keyup', (event) => {
+            if (event.key === "Enter") handleChatSubmit();
+        });
 
         showTab('homepage');
 
@@ -73,7 +75,7 @@ function renderMainContentShell() {
     const main = document.getElementById('main-content');
     main.innerHTML = `
         <div id="homepage" class="tab-content">
-            <!-- AI Suggester will be built here by the next function -->
+            <!-- Homepage content will be rendered here -->
         </div>
         <div id="products" class="tab-content">
             <div class="search-container">
@@ -91,12 +93,24 @@ function renderMainContentShell() {
 
 function renderHomepageContent(about, jobs, testimonies) {
     const container = document.getElementById('homepage');
-    if (!about) { container.innerHTML = '<p>Welcome</p>'; return; }
+    if (!about) {
+        container.innerHTML = '<p>Welcome</p>';
+        return;
+    }
 
     const heroHtml = `<section id="homepage-hero" class="hero-section"><h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p></section>`;
-    
+
+    const aiSuggesterHtml = `
+        <section class="ai-suggestion-box">
+            <h3><i class="fa-solid fa-robot"></i> AI Product Suggester</h3>
+            <p>Describe your health concern (e.g., "dry skin", "low energy") and our AI will suggest a product for you.</p>
+            <input type="text" id="symptom-input" placeholder="Enter your symptom or concern...">
+            <button id="suggest-btn" class="btn" onclick="suggestProduct()">Get Suggestion</button>
+            <div id="suggestion-result"></div>
+        </section>`;
+
     const whyChooseUsHtml = `<section id="why-choose-us" class="dynamic-content-wrapper"><h2>${about.WhyChooseUs_Title || 'Why Choose Us?'}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div></section>`;
-    
+
     let youtubeHtml = '';
     const videoUrls = about.YoutubeURL ? String(about.YoutubeURL).split(',').map(url => url.trim()) : [];
     if (videoUrls.length > 0 && videoUrls[0]) {
@@ -105,24 +119,11 @@ function renderHomepageContent(about, jobs, testimonies) {
             try {
                 const videoId = new URL(url).searchParams.get('v');
                 if (videoId) return `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
-            } catch(e) {}
+            } catch (e) {}
             return '';
         }).join('');
         youtubeHtml = `<section id="youtube-videos" class="dynamic-content-wrapper"><h2>${youtubeTitle}</h2><div id="youtube-videos-container">${videosHtml}</div></section>`;
     }
-     // This builds the complete content for your homepage tab
-    container.innerHTML = `
-        <section class="hero-section" id="hero-section">
-            <h2 id="hero-title"><i class="fa-solid fa-store"></i> Welcome to Our Store</h2>
-            <p id="hero-subtitle">Enjoy high-quality wellness products for a healthier lifestyle.</p>
-        </section>
-        <section class="ai-suggestion-box">
-            <h3><i class="fa-solid fa-robot"></i> AI Product Suggester</h3>
-            <p>Describe your health concern (e.g., "dry skin", "low energy") and our AI will suggest a product for you.</p>
-            <input type="text" id="symptom-input" placeholder="Enter your symptom or concern...">
-            <button id="suggest-btn" class="btn" onclick="suggestProduct()">Get Suggestion</button>
-            <div id="suggestion-result"></div>
-        </section>
 
     let testimoniesHtml = '';
     if (testimonies && testimonies.length > 0) {
@@ -135,7 +136,7 @@ function renderHomepageContent(about, jobs, testimonies) {
         }).join('');
         testimoniesHtml = `<section id="homepage-testimonies" class="dynamic-content-wrapper"><h2>What Our Customers Say</h2><div id="testimonies-container">${testimoniesContent}</div></section>`;
     }
-    
+
     let featuredJobsHtml = '';
     const featuredJobs = jobs ? jobs.filter(j => j.isFeatured) : [];
     if (featuredJobs.length > 0) {
@@ -143,12 +144,16 @@ function renderHomepageContent(about, jobs, testimonies) {
         featuredJobsHtml = `<section id="homepage-featured-jobs" class="dynamic-content-wrapper"><h2>Join Our Team</h2><div id="featured-jobs-container">${jobsContent}</div><a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0; max-width: 300px;">View All Career Opportunities</a></section>`;
     }
 
-    container.innerHTML = heroHtml + whyChooseUsHtml + youtubeHtml + testimoniesHtml + featuredJobsHtml;
+    container.innerHTML = heroHtml + aiSuggesterHtml + whyChooseUsHtml + youtubeHtml + testimoniesHtml + featuredJobsHtml;
 }
+
 
 function renderProducts(productsToRender) {
     const container = document.getElementById('product-list-container');
-    if (!productsToRender || productsToRender.length === 0) { container.innerHTML = `<p>No products available.</p>`; return; }
+    if (!productsToRender || productsToRender.length === 0) {
+        container.innerHTML = `<p>No products available.</p>`;
+        return;
+    }
     container.innerHTML = `<div class="product-list">${productsToRender.map(p => `
         <div class="product">
             <div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div>
@@ -161,9 +166,13 @@ function renderProducts(productsToRender) {
             </div>
         </div>`).join('')}</div>`;
 }
+
 function renderAboutUs(content) {
     const container = document.getElementById('about-us-content');
-    if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
+    if (!content) {
+        container.innerHTML = '<p>About information is unavailable.</p>';
+        return;
+    }
     const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
     const emailLink = content.EmailAddress ? `<a href="mailto:${content.EmailAddress}"><i class="fa-solid fa-envelope"></i> ${content.EmailAddress}</a>` : '';
     const whatsappLink = content.Whatsapp ? `<a href="https://wa.me/${String(content.Whatsapp).replace(/\D/g,'')}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${content.Whatsapp}</a>` : '';
@@ -193,7 +202,10 @@ function renderAboutUs(content) {
 
 function renderJobs(jobs) {
     const container = document.getElementById('job-listings-container');
-    if (!jobs || jobs.length === 0) { container.innerHTML = '<p>There are currently no open positions.</p>'; return; }
+    if (!jobs || jobs.length === 0) {
+        container.innerHTML = '<p>There are currently no open positions.</p>';
+        return;
+    }
     container.innerHTML = jobs.map(job => `
         <div class="job-card">
             <div class="job-header"><h3>${job.position}</h3></div>
@@ -215,40 +227,6 @@ function buildEnquiryForm() {
     container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">Submit</button><p id="enquiry-status"></p></form>`;
 }
 
-function buildCartModal(content) {
-    const container = document.getElementById('cart-modal');
-    const bankDetailsHTML = `<strong>Bank:</strong> MAYBANK<br>
-           <strong>Account No:</strong> 102037147223<br>
-           <strong>Name:</strong> Arvinderan M Ganeson<br>
-           <img src="duitnow_high_quality.png" alt="DuitNow QR" style="max-width: 200px; margin-top: 10px;">`;
-
-    container.innerHTML = `
-        <div class="modal-content">
-            <span class="close" onclick="toggleCart(true)">&times;</span>
-            <h2>Your Cart</h2>
-            <div id="cart-items"></div>
-            <div class="cart-summary">
-                <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal"></span></div>
-                <div class="summary-line"><span>Shipping</span><span id="cart-shipping"></span></div>
-                <div class="summary-line total"><span>Total</span><span id="cart-total"></span></div>
-            </div>
-            <div class="customer-info-form">
-                <h3>Customer Info</h3>
-                <input type="text" id="customer-name" placeholder="Full Name" required>
-                <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
-                <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
-                <h3>Payment</h3>
-                <p>Please transfer to the details below and upload a receipt.</p>
-                <div class="payment-details" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #eee;">
-                    ${bankDetailsHTML}
-                </div>
-                <label for="payment-proof" style="display: block; margin-bottom: 5px;">Upload Payment Receipt (Required)</label>
-                <input type="file" id="payment-proof" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
-            </div>
-            <button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin: 20px 0 0;" onclick="initiateCheckout()">Complete Order</button>
-        </div>`;
-}
-
 function buildJobApplicationModal() {
     const container = document.getElementById('job-application-modal');
     container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleJobModal(false)">&times;</span><h2>Apply for <span id="job-modal-title"></span></h2><form id="job-application-form" class="enquiry-form"><input type="hidden" id="job-id-input"><input type="hidden" id="job-position-input"><input type="text" id="applicant-name" placeholder="Full Name" required><input type="email" id="applicant-email" placeholder="Email" required><input type="tel" id="applicant-phone" placeholder="Phone" required><input type="text" id="applicant-citizenship" placeholder="Citizenship" required><textarea id="applicant-message" placeholder="Tell us about yourself" rows="4"></textarea><label for="applicant-resume">Upload Resume (Mandatory)</label><input type="file" id="applicant-resume" required><button type="submit" class="btn btn-primary">Submit</button><p id="job-application-status"></p></form></div>`;
@@ -267,11 +245,8 @@ function buildChatbotWidget() {
 // ===========================================================
 // [ 4.0 ] CART LOGIC
 // ===========================================================
-
 function buildCartModal(content) {
     const container = document.getElementById('cart-modal');
-    
-    // Using your hard-coded bank details and QR code path
     const bankDetailsHTML = `<strong>Bank:</strong> MAYBANK<br>
            <strong>Account No:</strong> 102037147223<br>
            <strong>Name:</strong> Arvinderan M Ganeson<br>
@@ -291,17 +266,17 @@ function buildCartModal(content) {
                 <h3>Customer Info</h3>
                 <input type="text" id="customer-name" placeholder="Full Name" required>
                 <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
+                <input type="email" id="customer-email" placeholder="Email Address (Optional)">
                 <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
-                
                 <h3>Payment</h3>
                 <p>Please transfer to the details below and upload a receipt.</p>
                 <div class="payment-details" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #eee;">
                     ${bankDetailsHTML}
                 </div>
                 <label for="payment-proof" style="display: block; margin-bottom: 5px;">Upload Payment Receipt (Required)</label>
-                <input type="file" id="payment-proof" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
+                <input type="file" id="payment-proof" accept="image/*,application/pdf" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
             </div>
-            <button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="initiateCheckout()">Complete Order</button>
+            <button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin: 20px 0 0;" onclick="initiateCheckout()">Complete Order</button>
         </div>`;
 }
 
@@ -309,20 +284,39 @@ function addToCart(productId) {
     const product = products.find(p => p.id == productId);
     if (!product) return;
     const existingItem = cart.find(item => item.id == productId);
-    if (existingItem) { existingItem.quantity++; } else { cart.push({ ...product, quantity: 1 }); }
+    if (existingItem) {
+        existingItem.quantity++;
+    } else {
+        cart.push({ ...product,
+            quantity: 1
+        });
+    }
     updateCartDisplay();
 }
 
 function increaseQuantity(productId) {
-    const item = cart.find(i => i.id == productId); if (item) { item.quantity++; } updateCartDisplay();
+    const item = cart.find(i => i.id == productId);
+    if (item) {
+        item.quantity++;
+    }
+    updateCartDisplay();
 }
 
 function decreaseQuantity(productId) {
-    const item = cart.find(i => i.id == productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } }
+    const item = cart.find(i => i.id == productId);
+    if (item) {
+        item.quantity--;
+        if (item.quantity <= 0) {
+            removeItemFromCart(productId);
+        } else {
+            updateCartDisplay();
+        }
+    }
 }
 
 function removeItemFromCart(productId) {
-    cart = cart.filter(item => item.id != productId); updateCartDisplay();
+    cart = cart.filter(item => item.id != productId);
+    updateCartDisplay();
 }
 
 function updateCartDisplay() {
@@ -330,7 +324,7 @@ function updateCartDisplay() {
     const checkoutBtn = document.getElementById('checkout-btn');
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     document.getElementById('cart-count').textContent = totalItems;
-    
+
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p style="text-align:center;">Your cart is empty.</p>';
         if (checkoutBtn) checkoutBtn.style.display = 'none';
@@ -351,9 +345,9 @@ function updateCartDisplay() {
             </div>`).join('');
         if (checkoutBtn) checkoutBtn.style.display = 'block';
     }
-        
+
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
+
     let shippingFee = 0;
     if (shippingRules && shippingRules.length > 0) {
         const promoFree = shippingRules.find(r => r.ruleType === 'Free' && subtotal >= r.minSpend);
@@ -398,7 +392,7 @@ async function initiateCheckout() {
     const name = document.getElementById('customer-name').value.trim();
     const phone = document.getElementById('customer-phone').value.trim();
     const address = document.getElementById('customer-address').value.trim();
-    const email = document.getElementById('customer-email') ? document.getElementById('customer-email').value.trim() : ''; // Handle optional email
+    const email = document.getElementById('customer-email').value.trim();
     const proofFile = document.getElementById('payment-proof').files[0];
 
     if (!name || !phone || !address || !proofFile) {
@@ -413,20 +407,26 @@ async function initiateCheckout() {
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const shippingFee = parseFloat(document.getElementById('cart-shipping').textContent.replace('RM ', ''));
         const totalAmount = subtotal + shippingFee;
-        const itemsPurchased = cart.map(item => `${item.id}x${item.quantity}`).join(', ');
-        
+        const itemsPurchased = cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
+
         const payload = {
             action: 'logInitialOrder',
             data: {
-                customerName: name, customerPhone: phone, customerEmail: email, customerAddress: address,
-                itemsPurchased: itemsPurchased, cart: cart,
-                totalAmount: totalAmount, shippingFee: shippingFee,
-                paymentProofFile: base64File.split(',')[1], paymentProofMimeType: proofFile.type
+                customerName: name,
+                customerPhone: phone,
+                customerEmail: email,
+                customerAddress: address,
+                itemsPurchased: itemsPurchased,
+                cart: cart,
+                totalAmount: totalAmount,
+                shippingFee: shippingFee,
+                paymentProofFile: base64File.split(',')[1],
+                paymentProofMimeType: proofFile.type
             }
         };
 
         const response = await postDataToGScript(payload, true);
-        
+
         const invoiceId = response.proformaUrl.split('/').pop().replace('.pdf', '');
         document.getElementById('main-content').innerHTML = `
             <div class="dynamic-content-wrapper" style="text-align: center;">
@@ -436,7 +436,7 @@ async function initiateCheckout() {
                 <p>We will contact you via WhatsApp shortly to confirm payment and shipping.</p>
                 <a href="${response.proformaUrl}" target="_blank" class="btn btn-primary" style="max-width: 300px; margin: 20px auto 0;">Download Your Invoice</a>
             </div>`;
-        
+
         cart = [];
         toggleCart(true);
         updateCartDisplay();
@@ -445,12 +445,13 @@ async function initiateCheckout() {
         console.error('Checkout failed:', error);
         alert('There was an error placing your order. Please try again or contact us directly.');
     } finally {
-        if(checkoutBtn) {
+        if (checkoutBtn) {
             checkoutBtn.disabled = false;
             checkoutBtn.textContent = 'Complete Order';
         }
     }
 }
+
 // ===========================================================
 // [ 5.0 ] FORMS, CHATBOT & UTILITIES
 // ===========================================================
@@ -472,7 +473,16 @@ async function handleEnquirySubmit(event) {
     const statusEl = document.getElementById('enquiry-status');
     statusEl.textContent = 'Sending...';
     try {
-        const payload = { action: 'logEnquiry', data: { name: document.getElementById('enquiry-name').value, email: document.getElementById('enquiry-email').value, phone: document.getElementById('enquiry-phone').value, type: document.getElementById('enquiry-type').value, message: document.getElementById('enquiry-message').value } };
+        const payload = {
+            action: 'logEnquiry',
+            data: {
+                name: document.getElementById('enquiry-name').value,
+                email: document.getElementById('enquiry-email').value,
+                phone: document.getElementById('enquiry-phone').value,
+                type: document.getElementById('enquiry-type').value,
+                message: document.getElementById('enquiry-message').value
+            }
+        };
         await postDataToGScript(payload);
         statusEl.textContent = 'Enquiry sent successfully!';
         event.target.reset();
@@ -510,7 +520,9 @@ async function handleJobApplicationSubmit(event) {
     try {
         await postDataToGScript(payload);
         statusEl.textContent = 'Application submitted successfully!';
-        setTimeout(() => { toggleJobModal(false); }, 3000);
+        setTimeout(() => {
+            toggleJobModal(false);
+        }, 3000);
     } catch (error) {
         statusEl.textContent = 'An error occurred.';
     }
@@ -594,14 +606,18 @@ async function handleMainMenu(text) {
     } else if (text === '3') {
         lastBotMsg.innerHTML = 'To talk to a human, please contact our admin on WhatsApp: <a href="https://wa.me/601111033154" target="_blank">Click Here</a>';
     } else {
-        const response = await postToRender('getSmartAnswer', { question: text });
+        const response = await postToRender('getSmartAnswer', {
+            question: text
+        });
         lastBotMsg.innerHTML = response.answer || 'Sorry, I had trouble finding an answer.';
     }
 }
 
 async function startVerification(identifier) {
     const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
-    const result = await postToRender('issueChatVerificationCode', { identifier: identifier });
+    const result = await postToRender('issueChatVerificationCode', {
+        identifier: identifier
+    });
     if (result.success) {
         chatSession.state = 'awaiting_code';
         chatSession.pac = result.pac;
@@ -614,7 +630,10 @@ async function startVerification(identifier) {
 
 async function submitVerificationCode(code) {
     const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
-    const result = await postToRender('verifyChatCode', { pac: chatSession.pac, code: code });
+    const result = await postToRender('verifyChatCode', {
+        pac: chatSession.pac,
+        code: code
+    });
     if (result.success) {
         sessionStorage.setItem('eshop_session_token', result.token);
         lastBotMsg.innerHTML = 'Verified!';
@@ -637,25 +656,31 @@ async function handleMyAccountMenu(text) {
         action = 'getPurchaseHistory';
     } else if (text === '2') {
         action = 'getPointsHistory';
-    } else if (text === '3') { 
+    } else if (text === '3') {
         lastBotMsg.remove();
         displayMainMenu();
-        return; 
-    }
-    else { 
+        return;
+    } else {
         lastBotMsg.innerHTML = 'Invalid option. Please choose from the menu.';
         addChatMessage('bot', '<strong>My Account</strong><br>1. View My Last 5 Orders<br>2. Check My Total Points<br>3. Back to Main Menu');
         return;
     }
 
     const token = sessionStorage.getItem('eshop_session_token');
-    const result = await postToRender(action, { token: token });
+    const result = await postToRender(action, {
+        token: token
+    });
     let message = '';
-    if(result.success) {
-        if(action === 'getPurchaseHistory') {
+    if (result.success) {
+        if (action === 'getPurchaseHistory') {
             message = "<strong>Your Last 5 Orders:</strong><br>";
-            if (result.history.length === 0) { message = 'You have no purchase history.'; }
-            else { result.history.forEach(order => { message += `<br><strong>ID:</strong> ${order.invoiceId}<br><strong>Date:</strong> ${order.date}<br><strong>Total:</strong> RM ${order.totalAmount}<br><strong>Status:</strong> ${order.status}`; }); }
+            if (result.history.length === 0) {
+                message = 'You have no purchase history.';
+            } else {
+                result.history.forEach(order => {
+                    message += `<br><strong>ID:</strong> ${order.invoiceId}<br><strong>Date:</strong> ${order.date}<br><strong>Total:</strong> RM ${order.totalAmount}<br><strong>Status:</strong> ${order.status}`;
+                });
+            }
         } else {
             message = `Your total points: <strong>${result.currentBalance}</strong>`;
         }
@@ -666,11 +691,14 @@ async function handleMyAccountMenu(text) {
     displayMyAccountMenu();
 }
 
+
 async function postDataToGScript(payload, expectJsonResponse = false) {
     const options = {
         method: 'POST',
         body: JSON.stringify(payload),
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json'
+        },
         redirect: 'follow'
     };
 
@@ -687,7 +715,9 @@ async function postDataToGScript(payload, expectJsonResponse = false) {
             }
             return await response.json();
         }
-        return { status: 'success' };
+        return {
+            status: 'success'
+        };
     } catch (error) {
         console.error('Error posting to Google Script:', error);
         throw error;
@@ -698,8 +728,14 @@ async function postToRender(action, data) {
     try {
         const response = await fetch(botServerURL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, apiKey, data })
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action,
+                apiKey,
+                data
+            })
         });
         if (!response.ok) {
             const err = await response.json();
@@ -716,169 +752,21 @@ function showTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
 }
+
 // ===========================================================
-// [ 6.0 ] CHATBOT LOGIC
-// ===========================================================
-function toggleChatWidget(show) {
-    const chatWidget = document.getElementById('eshop-chat-widget');
-    const fabContainer = document.getElementById('fab-container');
-    if (show) {
-        chatWidget.classList.add('active');
-        fabContainer.style.right = '370px';
-        if (document.getElementById('chat-body').innerHTML.trim() === '') {
-            displayMainMenu();
-        }
-    } else {
-        chatWidget.classList.remove('active');
-        fabContainer.style.right = '20px';
-    }
-}
-
-function addChatMessage(sender, text, type = 'html') {
-    const chatBody = document.getElementById('chat-body');
-    const msg = document.createElement('div');
-    msg.classList.add('chat-message', sender === 'bot' ? 'bot-message' : 'user-message');
-    msg.innerHTML = text;
-    chatBody.appendChild(msg);
-    chatBody.scrollTop = chatBody.scrollHeight;
-    return msg;
-}
-
-function displayMainMenu() {
-    chatSession.state = 'main_menu';
-    const menu = `<strong>Welcome! How can I help you?</strong><br>1. My Account<br>2. General Answers<br>3. Talk to a Human`;
-    addChatMessage('bot', menu);
-}
-
-async function handleChatSubmit() {
-    const input = document.getElementById('chat-input');
-    const text = input.value.trim();
-    if (!text) return;
-    addChatMessage('user', text);
-    input.value = '';
-    const thinkingMsg = addChatMessage('bot', '<i>Thinking...</i>');
-
-    try {
-        if (chatSession.state === 'awaiting_identifier') {
-            await startVerification(text);
-        } else if (chatSession.state === 'awaiting_code') {
-            await submitVerificationCode(text);
-        } else if (chatSession.state === 'my_account_menu') {
-            await handleMyAccountMenu(text);
-        } else {
-            await handleMainMenu(text);
-        }
-    } catch (error) {
-        thinkingMsg.innerHTML = 'There was an error connecting to the assistant.';
-    }
-}
-
-async function handleMainMenu(text) {
-    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
-    if (text === '1') {
-        if (sessionStorage.getItem('eshop_session_token')) {
-            lastBotMsg.remove();
-            displayMyAccountMenu();
-        } else {
-            chatSession.state = 'awaiting_identifier';
-            lastBotMsg.innerHTML = 'Please enter your PAC or Email to verify your account.';
-        }
-    } else if (text === '2') {
-        lastBotMsg.innerHTML = 'Please ask any general question you have.';
-    } else if (text === '3') {
-        lastBotMsg.innerHTML = 'To talk to a human, please contact our admin on WhatsApp: <a href="https://wa.me/601111033154" target="_blank">Click Here</a>';
-    } else {
-        const response = await postToRender('getSmartAnswer', { question: text });
-        lastBotMsg.innerHTML = response.answer || 'Sorry, I had trouble finding an answer.';
-    }
-}
-
-async function startVerification(identifier) {
-    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
-    const result = await postToRender('issueChatVerificationCode', { identifier: identifier });
-    if (result.success) {
-        chatSession.state = 'awaiting_code';
-        chatSession.pac = result.pac;
-        lastBotMsg.innerHTML = 'A code has been sent to your WhatsApp. Please enter it here.';
-    } else {
-        chatSession.state = 'main_menu';
-        lastBotMsg.innerHTML = `Verification failed: ${result.message}`;
-    }
-}
-
-async function submitVerificationCode(code) {
-    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
-    const result = await postToRender('verifyChatCode', { pac: chatSession.pac, code: code });
-    if (result.success) {
-        sessionStorage.setItem('eshop_session_token', result.token);
-        lastBotMsg.innerHTML = 'Verified!';
-        displayMyAccountMenu();
-    } else {
-        chatSession.state = 'main_menu';
-        lastBotMsg.innerHTML = `Verification failed: ${result.message}`;
-    }
-}
-
-function displayMyAccountMenu() {
-    chatSession.state = 'my_account_menu';
-    addChatMessage('bot', '<strong>My Account</strong><br>1. View My Last 5 Orders<br>2. Check My Total Points<br>3. Back to Main Menu');
-}
-
-async function handleMyAccountMenu(text) {
-    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
-    let action = '';
-    if (text === '1') {
-        action = 'getPurchaseHistory';
-    } else if (text === '2') {
-        action = 'getPointsHistory';
-    } else if (text === '3') { 
-        lastBotMsg.remove();
-        displayMainMenu();
-        return; 
-    }
-    else { 
-        lastBotMsg.innerHTML = 'Invalid option. Please choose from the menu.';
-        addChatMessage('bot', '<strong>My Account</strong><br>1. View My Last 5 Orders<br>2. Check My Total Points<br>3. Back to Main Menu');
-        return;
-    }
-
-    const token = sessionStorage.getItem('eshop_session_token');
-    const result = await postToRender(action, { token: token });
-    let message = '';
-    if(result.success) {
-        if(action === 'getPurchaseHistory') {
-            message = "<strong>Your Last 5 Orders:</strong><br>";
-            if (result.history.length === 0) { message = 'You have no purchase history.'; }
-            else { result.history.forEach(order => { message += `<br><strong>ID:</strong> ${order.invoiceId}<br><strong>Date:</strong> ${order.date}<br><strong>Total:</strong> RM ${order.totalAmount}<br><strong>Status:</strong> ${order.status}`; }); }
-        } else {
-            message = `Your total points: <strong>${result.currentBalance}</strong>`;
-        }
-    } else {
-        message = `Error: ${result.message}`;
-    }
-    lastBotMsg.innerHTML = message;
-    displayMyAccountMenu();
-}
-// ===========================================================
-// [ 7.0 ] AI SUGGESTER & SEARCH FUNCTIONS
+// [ 6.0 ] AI SUGGESTER & SEARCH FUNCTIONS
 // ===========================================================
 
 function filterProducts() {
     const searchTerm = document.getElementById("product-search").value.toLowerCase();
-    document.querySelectorAll(".product-list").forEach(list => {
-        let sectionHasVisibleProducts = false;
-        list.querySelectorAll(".product").forEach(product => {
-            const productName = product.querySelector("h3").textContent.toLowerCase();
-            if (productName.includes(searchTerm)) {
-                product.style.display = "flex";
-                sectionHasVisibleProducts = true;
-            } else {
-                product.style.display = "none";
-            }
-        });
-        const promoSection = list.closest(".promo-section");
-        if (promoSection) {
-            promoSection.style.display = sectionHasVisibleProducts ? "block" : "none";
+    const products = document.querySelectorAll("#product-list-container .product");
+
+    products.forEach(product => {
+        const productName = product.querySelector("h3").textContent.toLowerCase();
+        if (productName.includes(searchTerm)) {
+            product.style.display = "flex";
+        } else {
+            product.style.display = "none";
         }
     });
 }
@@ -891,17 +779,43 @@ function suggestProduct() {
         return;
     }
 
-    // This is the hard-coded "database" from your original file.
     const symptomDB = {
-        'digestion': { keywords: ['digestion', 'stomach', 'tummy', 'bloated', 'indigestion', 'constipation'], ids: [1, 2, 3, 7, 11, 18] },
-        'immune': { keywords: ['immune', 'sick', 'flu', 'cold', 'cough', 'fever', 'infection'], ids: [1, 2, 14, 15, 17] },
-        'energy': { keywords: ['energy', 'tired', 'fatigue', 'stamina', 'lethargic', 'weak'], ids: [12, 13, 15, 8] },
-        'weight': { keywords: ['weight', 'diet', 'slim', 'lose weight', 'kurus'], ids: [4, 5, 6, 7] },
-        'skin': { keywords: ['skin', 'dry', 'acne', 'eczema', 'sunburn', 'aging', 'wrinkles', 'kulit'], ids: [30, 32, 29, 39, 52, 24, 21, 22, 31, 38, 41] },
-        'joint': { keywords: ['joint', 'muscle', 'pain', 'sore', 'arthritis', 'sakit', 'otot'], ids: [34, 16, 33] },
-        'heart': { keywords: ['heart', 'cholesterol', 'blood pressure', 'jantung'], ids: [16] },
-        'bone': { keywords: ['bone', 'calcium', 'osteoporosis', 'tulang'], ids: [19] },
-        'headache': { keywords: ['headache', 'migraine', 'pening', 'sakit kepala'], ids: [33] }
+        'digestion': {
+            keywords: ['digestion', 'stomach', 'tummy', 'bloated', 'indigestion', 'constipation'],
+            ids: [1, 2, 3, 7, 11, 18]
+        },
+        'immune': {
+            keywords: ['immune', 'sick', 'flu', 'cold', 'cough', 'fever', 'infection'],
+            ids: [1, 2, 14, 15, 17]
+        },
+        'energy': {
+            keywords: ['energy', 'tired', 'fatigue', 'stamina', 'lethargic', 'weak'],
+            ids: [12, 13, 15, 8]
+        },
+        'weight': {
+            keywords: ['weight', 'diet', 'slim', 'lose weight', 'kurus'],
+            ids: [4, 5, 6, 7]
+        },
+        'skin': {
+            keywords: ['skin', 'dry', 'acne', 'eczema', 'sunburn', 'aging', 'wrinkles', 'kulit'],
+            ids: [30, 32, 29, 39, 52, 24, 21, 22, 31, 38, 41]
+        },
+        'joint': {
+            keywords: ['joint', 'muscle', 'pain', 'sore', 'arthritis', 'sakit', 'otot'],
+            ids: [34, 16, 33]
+        },
+        'heart': {
+            keywords: ['heart', 'cholesterol', 'blood pressure', 'jantung'],
+            ids: [16]
+        },
+        'bone': {
+            keywords: ['bone', 'calcium', 'osteoporosis', 'tulang'],
+            ids: [19]
+        },
+        'headache': {
+            keywords: ['headache', 'migraine', 'pening', 'sakit kepala'],
+            ids: [33]
+        }
     };
 
     const suggestedSKUs = new Set();
@@ -909,7 +823,7 @@ function suggestProduct() {
 
     searchWords.forEach(word => {
         for (const category in symptomDB) {
-            if (symptomDB[category].keywords.includes(word)) {
+            if (symptomDB[category].keywords.some(kw => word.includes(kw))) {
                 symptomDB[category].ids.forEach(id => suggestedSKUs.add(id));
             }
         }
