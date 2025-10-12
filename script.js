@@ -134,11 +134,12 @@ function renderProducts(productsToRender) {
             <div class="product-info">
                 <h3>${p.name}</h3>
                 <div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div>
+                <div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div>
+                <div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div>
                 <div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div>
             </div>
         </div>`).join('')}</div>`;
 }
-
 function renderAboutUs(content) {
     const container = document.getElementById('about-us-content');
     if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
