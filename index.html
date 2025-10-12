@@ -63,7 +63,122 @@
     #maintenance-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; background: rgba(26,82,118,0.95); color: white; justify-content: center; align-items: center; text-align: center; }
 </style>
 
-<div id="maintenance-overlay"></div>
+<!-- =========================================================== -->
+<!-- [ 3.0 ] DYNAMIC CONTENT & PAGES MODULE                      -->
+<!-- =========================================================== -->
+<style>
+    /* [ 3.1 ] Homepage Section Styles */
+    .hero-section { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: var(--light-text); padding: 80px 20px; text-align: center; border-radius: var(--border-radius); margin-bottom: 30px; }
+    .hero-section h2 { color: var(--light-text); }
+    .dynamic-content-wrapper { background: var(--light-text); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; }
+    .why-choose-us-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; margin-top: 2rem; }
+    .why-choose-us-grid i { font-size: 2.5rem; color: var(--accent-color); margin-bottom: 1rem; }
+    #youtube-videos-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
+    .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius); box-shadow: var(--shadow); }
+    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    #testimonies-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+    .testimony-card { background: var(--light-gray); padding: 1.5rem; border-radius: var(--border-radius); text-align: center; }
+    .testimony-header { margin-bottom: 1rem; }
+    .testimony-rating { color: var(--secondary-color); font-size: 1.2rem; }
+    .job-listing-summary { padding: 1rem; border: 1px solid var(--light-gray); border-radius: 8px; }
+
+    /* [ 3.2 ] About Us & NEW Careers Page Styles */
+    .owner-profile { display: flex; flex-wrap: wrap; align-items: center; gap: 2rem; margin-bottom: 2rem;}
+    .owner-image { flex-shrink: 0; width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+    .owner-details { flex: 1; }
+    .about-section { background: #fdfefe; border-left: 5px solid var(--accent-color); padding: 20px; margin-top: 25px; border-radius: 8px; box-shadow: 0 0 20px rgba(39, 174, 96, 0.2); }
+    .about-section h4 { margin-bottom: 10px; }
+    
+    /* NEW: Attractive Careers Page Styles */
+    .job-card { background: #fff; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; overflow: hidden; transition: all 0.3s ease; }
+    .job-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+    .job-header { background: var(--primary-color); color: white; padding: 20px 25px; }
+    .job-header h3 { color: white; margin: 0; font-size: 1.4rem; }
+    .job-body { padding: 25px; }
+    .job-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .job-detail-item { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; }
+    .job-detail-item i { color: var(--accent-color); font-size: 1.2rem; width: 20px; text-align: center; }
+    .job-description { white-space: pre-wrap; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--light-gray); }
+    .job-card .btn { max-width: 200px; margin-top: 20px; }
+</style>
+
+<!-- =========================================================== -->
+<!-- [ 4.0 ] PRODUCTS MODULE                                     -->
+<!-- =========================================================== -->
+<style>
+    /* [ 4.1 ] Product Grid & Card Styles */
+    .product-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+    .product { background: var(--light-text); border-radius: var(--border-radius); box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .product-image-container { height: 280px; padding: 15px; display: flex; align-items: center; justify-content: center; }
+    .product img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+    .product h3 { margin: 0 0 10px; font-size: 1.25rem; }
+    .product-actions { margin-top: auto; }
+    .price-section { margin-bottom: 10px; }
+    .new-price { font-weight: 700; font-size: 1.4rem; color: var(--primary-color); }
+    .product .benefits, .product .consumption { font-size: .85rem; color: #555; margin: 10px 0; }
+</style>
+
+<!-- =========================================================== -->
+<!-- [ 5.0 ] SHOPPING CART MODULE                                -->
+<!-- =========================================================== -->
+<style>
+    /* [ 5.1 ] Floating Cart Icon Styles */
+    .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; gap: 15px; }
+    .fab { width: 60px; height: 60px; background-color: var(--primary-color); color: var(--light-text); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 4px 12px rgba(0,0,0,.25); cursor: pointer; position: relative; }
+    #cart-count { position: absolute; top: -2px; right: -2px; background-color: var(--secondary-color); color: var(--light-text); border-radius: 50%; padding: 3px 8px; font-size: .8rem; font-weight: 700; }
+    
+    /* [ 5.2 ] NEW: Attractive Cart Modal Styles */
+    .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,.6); justify-content: center; align-items: center; }
+    .modal-content { background-color: #fefefe; padding: 0; border-radius: var(--border-radius); width: 90%; max-width: 650px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
+    .modal-header { padding: 20px 30px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { margin: 0; }
+    .close { color: #aaa; background: none; border: none; font-size: 28px; font-weight: 700; cursor: pointer; }
+    .modal-body { padding: 10px 30px; overflow-y: auto; }
+    .cart-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #eee; }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-image { width: 80px; height: 80px; object-fit: contain; background: #fff; padding: 5px; border-radius: 8px; border: 1px solid #eee; }
+    .cart-item-details { flex-grow: 1; }
+    .quantity-controls { display:flex; align-items:center; gap:10px; margin-top:8px; }
+    .quantity-btn { width: 30px; height: 30px; background: var(--light-gray); border: 1px solid #ccc; border-radius: 50%; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .remove-item-btn { background: none; border: none; color: var(--danger-color); font-size: 1.2rem; cursor: pointer; }
+    .modal-footer { padding: 20px 30px; border-top: 1px solid #eee; background: var(--light-gray); }
+    .summary-line { display: flex; justify-content: space-between; padding: 8px 0; font-size: 1.1rem; }
+    .summary-line.total { font-weight: 700; font-size: 1.3rem; color: var(--primary-color); }
+    .customer-info-form { padding: 20px 30px; background: #fff; }
+    .customer-info-form h3 { margin-top: 0; margin-bottom: 1rem; }
+    .customer-info-form input, .customer-info-form textarea { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; }
+</style>
+
+<!-- =========================================================== -->
+<!-- [ 6.0 ] CHATBOT MODULE                                      -->
+<!-- =========================================================== -->
+<style>
+    /* [ 6.1 ] Chatbot Widget Styles */
+    #eshop-chat-widget { position: fixed; bottom: 95px; right: 20px; width: 350px; height: 500px; background: #fff; border-radius: var(--border-radius); box-shadow: 0 5px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; visibility: hidden; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-in-out; z-index: 998; }
+    #eshop-chat-widget.active { visibility: visible; opacity: 1; transform: translateY(0); }
+    
+    /* [ 6.2 ] Chatbot Content Styles */
+    #chat-header { background: var(--primary-color); color: var(--light-text); padding: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    #close-chat-btn { background: none; border: none; color: var(--light-text); font-size: 24px; cursor: pointer; }
+    #chat-body { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .chat-message { max-width: 85%; padding: 10px 15px; border-radius: 18px; line-height: 1.5; }
+    .bot-message { background: var(--light-gray); color: var(--dark-text); border-radius: 18px 18px 18px 5px; align-self: flex-start; }
+    .user-message { background: var(--primary-color); color: var(--light-text); border-radius: 18px 18px 5px 18px; align-self: flex-end; }
+    #chat-input-container { display: flex; padding: 10px; border-top: 1px solid #eee; }
+    #chat-input { flex-grow: 1; border: 1px solid #ccc; border-radius: 20px; padding: 10px 15px; }
+    #chat-send-btn { background: none; border: none; font-size: 20px; color: var(--primary-color); cursor: pointer; padding: 0 10px; }
+</style>
+
+<!-- =========================================================== -->
+<!-- [ 7.0 ] FORMS MODULE (Jobs & Enquiries)                     -->
+<!-- =========================================================== -->
+<style>
+    /* [ 7.1 ] General Form Styles */
+    .enquiry-form input, .enquiry-form textarea, .enquiry-form select { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
+    .enquiry-form label { margin-top: 1rem; display: block; font-weight: 500; }
+</style>
+
 <div id="store-wrapper">
   <header>
     <div class="container">
@@ -95,186 +210,10 @@
   </footer>
 </div>
 
-<!-- =========================================================== -->
-<!-- [ 3.0 ] DYNAMIC CONTENT & PAGES MODULE                      -->
-<!-- =========================================================== -->
-<style>
-    /* [ 3.1 ] Homepage Section Styles */
-    .hero-section { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: var(--light-text); padding: 80px 20px; text-align: center; border-radius: var(--border-radius); margin-bottom: 30px; }
-    .hero-section h2 { color: var(--light-text); }
-    .dynamic-content-wrapper { background: var(--light-text); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; }
-    .why-choose-us-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; margin-top: 2rem; }
-    .why-choose-us-grid i { font-size: 2.5rem; color: var(--accent-color); margin-bottom: 1rem; }
-    #youtube-videos-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
-    .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius); box-shadow: var(--shadow); }
-    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-    #testimonies-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-    .testimony-card { background: var(--light-gray); padding: 1.5rem; border-radius: var(--border-radius); text-align: center; }
-    .testimony-header { margin-bottom: 1rem; }
-    .testimony-rating { color: var(--secondary-color); font-size: 1.2rem; }
-    .job-listing-summary { padding: 1rem; border: 1px solid var(--light-gray); border-radius: 8px; }
-
-    /* [ 3.2 ] About Us & Careers Page Styles */
-    .owner-profile { 
-        display: flex; 
-        flex-wrap: wrap; 
-        align-items: center; 
-        gap: 2rem; 
-        margin-bottom: 2rem;
-    }
-    .owner-image { 
-        flex-shrink: 0; 
-        width: 200px; 
-        height: 200px; 
-        border-radius: 50%; 
-        object-fit: cover; 
-        border: 4px solid var(--primary-color); 
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
-    }
-    .owner-details { 
-        flex: 1; 
-    }
-    .contact-links { 
-        margin: 15px 0; 
-        display: flex; 
-        flex-wrap: wrap; 
-        gap: 15px 20px;
-    }
-    .contact-links a { 
-        text-decoration: none; 
-        color: var(--dark-text); 
-        font-weight: 500; 
-        align-items: center; 
-        display: inline-flex; 
-        gap: 8px;
-    }
-    .contact-links a:hover { 
-        color: var(--primary-color); 
-    }
-    .contact-links i { 
-        color: var(--accent-color); 
-        font-size: 1.2rem; 
-    }
-    .contact-links .address-link {
-        flex-basis: 100%;
-    }
-    .about-section { 
-        background: #fdfefe; 
-        border-left: 5px solid var(--accent-color); 
-        padding: 20px; 
-        margin-top: 25px; 
-        border-radius: 8px; 
-        box-shadow: 0 0 20px rgba(39, 174, 96, 0.2); 
-        transition: all 0.3s ease; 
-    }
-    .about-section:hover { 
-        transform: translateY(-5px); 
-        box-shadow: 0 5px 25px rgba(39, 174, 96, 0.3); 
-    }
-    .about-section h4 { 
-        margin-bottom: 10px; 
-    }
-    .job-listing { 
-        border: 1px solid var(--light-gray); 
-        padding: 1.5rem; 
-        margin-bottom: 1.5rem; 
-        border-radius: var(--border-radius); 
-    }
-    .job-listing ul { 
-        list-style: none; 
-        padding-left: 0; 
-        margin-top: 1rem; 
-    }
-    .job-listing li { 
-        display: inline-block; 
-        background-color: var(--light-gray); 
-        padding: 5px 10px; 
-        border-radius: 15px; 
-        margin: 5px 5px 5px 0; 
-        font-size: 0.9rem; 
-    }
-    .job-description { 
-        white-space: pre-wrap; 
-        margin-top: 1rem; 
-    }
-</style>
-
-<!-- =========================================================== -->
-<!-- [ 4.0 ] PRODUCTS MODULE                                     -->
-<!-- =========================================================== -->
-<style>
-    /* [ 4.1 ] Product Grid & Card Styles */
-    .product-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
-    .product { background: var(--light-text); border-radius: var(--border-radius); box-shadow: var(--shadow); display: flex; flex-direction: column; }
-    .product-image-container { height: 280px; padding: 15px; display: flex; align-items: center; justify-content: center; }
-    .product img { max-width: 100%; max-height: 100%; object-fit: contain; }
-    .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-    .product h3 { margin: 0 0 10px; font-size: 1.25rem; }
-    .product-actions { margin-top: auto; }
-    .price-section { margin-bottom: 10px; }
-    .new-price { font-weight: 700; font-size: 1.4rem; color: var(--primary-color); }
-    .product .benefits, .product .consumption { font-size: .85rem; color: #555; margin: 10px 0; }
-</style>
-
-<!-- =========================================================== -->
-<!-- [ 5.0 ] SHOPPING CART MODULE                                -->
-<!-- =========================================================== -->
-<style>
-    /* [ 5.1 ] Floating Cart Icon Styles */
-    .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; gap: 15px; }
-    .fab { width: 60px; height: 60px; background-color: var(--primary-color); color: var(--light-text); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 4px 12px rgba(0,0,0,.25); cursor: pointer; position: relative; }
-    #cart-count { position: absolute; top: -2px; right: -2px; background-color: var(--secondary-color); color: var(--light-text); border-radius: 50%; padding: 3px 8px; font-size: .8rem; font-weight: 700; }
-    
-    /* [ 5.2 ] Cart Modal & Content Styles */
-    .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,.6); justify-content: center; align-items: center; }
-    .modal-content { background-color: #fefefe; padding: 30px; border-radius: var(--border-radius); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
-    .close { color: #aaa; float: right; font-size: 28px; font-weight: 700; cursor: pointer; }
-    .cart-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; }
-    .cart-item-details { flex-grow:1; }
-    .quantity-controls { display:flex; align-items:center; gap:8px; margin-top:5px; }
-    .quantity-btn { width:28px; height:28px; background:var(--light-gray); border:1px solid #ccc; border-radius:50%; cursor:pointer; font-weight:700; }
-    .remove-item-btn { background:none; border:none; color:var(--danger-color); font-size:1.2rem; cursor:pointer; margin-left:15px; }
-    .cart-summary { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #ddd; }
-    .summary-line { display: flex; justify-content: space-between; padding: 8px 0; }
-    .summary-line.total { font-weight: 700; font-size: 1.3rem; }
-    .customer-info-form h3 { margin-top: 1.5rem; }
-</style>
-
 <div id="cart-modal" class="modal"></div>
-<div class="fab-container" id="fab-container"></div>
-
-<!-- =========================================================== -->
-<!-- [ 6.0 ] CHATBOT MODULE                                      -->
-<!-- =========================================================== -->
-<style>
-    /* [ 6.1 ] Chatbot Widget Styles */
-    #eshop-chat-widget { position: fixed; bottom: 95px; right: 20px; width: 350px; height: 500px; background: #fff; border-radius: var(--border-radius); box-shadow: 0 5px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; visibility: hidden; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-in-out; z-index: 998; }
-    #eshop-chat-widget.active { visibility: visible; opacity: 1; transform: translateY(0); }
-    
-    /* [ 6.2 ] Chatbot Content Styles */
-    #chat-header { background: var(--primary-color); color: var(--light-text); padding: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-    #close-chat-btn { background: none; border: none; color: var(--light-text); font-size: 24px; cursor: pointer; }
-    #chat-body { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-    .chat-message { max-width: 85%; padding: 10px 15px; border-radius: 18px; line-height: 1.5; }
-    .bot-message { background: var(--light-gray); color: var(--dark-text); border-radius: 18px 18px 18px 5px; align-self: flex-start; }
-    .user-message { background: var(--primary-color); color: var(--light-text); border-radius: 18px 18px 5px 18px; align-self: flex-end; }
-    #chat-input-container { display: flex; padding: 10px; border-top: 1px solid #eee; }
-    #chat-input { flex-grow: 1; border: 1px solid #ccc; border-radius: 20px; padding: 10px 15px; }
-    #chat-send-btn { background: none; border: none; font-size: 20px; color: var(--primary-color); cursor: pointer; padding: 0 10px; }
-</style>
-
-<div id="eshop-chat-widget"></div>
-
-<!-- =========================================================== -->
-<!-- [ 7.0 ] FORMS MODULE (Jobs & Enquiries)                     -->
-<!-- =========================================================== -->
-<style>
-    /* [ 7.1 ] General Form Styles */
-    .enquiry-form input, .enquiry-form textarea, .enquiry-form select { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
-    .enquiry-form label { margin-top: 1rem; display: block; font-weight: 500; }
-</style>
-
 <div id="job-application-modal" class="modal"></div>
+<div class="fab-container" id="fab-container"></div>
+<div id="eshop-chat-widget"></div>
 
 <script src="script.js"></script>
 
