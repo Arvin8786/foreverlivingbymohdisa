@@ -695,3 +695,75 @@ function showTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
 }
+// ===========================================================
+// [ 8.0 ] AI SUGGESTER & SEARCH FUNCTIONS
+// ===========================================================
+
+function filterProducts() {
+    const searchTerm = document.getElementById("product-search").value.toLowerCase();
+    document.querySelectorAll(".product-list").forEach(list => {
+        let sectionHasVisibleProducts = false;
+        list.querySelectorAll(".product").forEach(product => {
+            const productName = product.querySelector("h3").textContent.toLowerCase();
+            if (productName.includes(searchTerm)) {
+                product.style.display = "flex";
+                sectionHasVisibleProducts = true;
+            } else {
+                product.style.display = "none";
+            }
+        });
+        const promoSection = list.closest(".promo-section");
+        if (promoSection) {
+            promoSection.style.display = sectionHasVisibleProducts ? "block" : "none";
+        }
+    });
+}
+
+function suggestProduct() {
+    const symptom = document.getElementById("symptom-input").value.toLowerCase().trim();
+    const resultDiv = document.getElementById("suggestion-result");
+    if (!symptom) {
+        resultDiv.innerHTML = '<p style="color:red">Please enter a symptom or health concern.</p>';
+        return;
+    }
+
+    // This is the hard-coded "database" from your original file.
+    const symptomDB = {
+        'digestion': { keywords: ['digestion', 'stomach', 'tummy', 'bloated', 'indigestion', 'constipation'], ids: [1, 2, 3, 7, 11, 18] },
+        'immune': { keywords: ['immune', 'sick', 'flu', 'cold', 'cough', 'fever', 'infection'], ids: [1, 2, 14, 15, 17] },
+        'energy': { keywords: ['energy', 'tired', 'fatigue', 'stamina', 'lethargic', 'weak'], ids: [12, 13, 15, 8] },
+        'weight': { keywords: ['weight', 'diet', 'slim', 'lose weight', 'kurus'], ids: [4, 5, 6, 7] },
+        'skin': { keywords: ['skin', 'dry', 'acne', 'eczema', 'sunburn', 'aging', 'wrinkles', 'kulit'], ids: [30, 32, 29, 39, 52, 24, 21, 22, 31, 38, 41] },
+        'joint': { keywords: ['joint', 'muscle', 'pain', 'sore', 'arthritis', 'sakit', 'otot'], ids: [34, 16, 33] },
+        'heart': { keywords: ['heart', 'cholesterol', 'blood pressure', 'jantung'], ids: [16] },
+        'bone': { keywords: ['bone', 'calcium', 'osteoporosis', 'tulang'], ids: [19] },
+        'headache': { keywords: ['headache', 'migraine', 'pening', 'sakit kepala'], ids: [33] }
+    };
+
+    const suggestedSKUs = new Set();
+    const searchWords = symptom.split(" ");
+
+    searchWords.forEach(word => {
+        for (const category in symptomDB) {
+            if (symptomDB[category].keywords.includes(word)) {
+                symptomDB[category].ids.forEach(id => suggestedSKUs.add(id));
+            }
+        }
+    });
+
+    if (suggestedSKUs.size > 0) {
+        resultDiv.innerHTML = "<h4>Based on your concern, we suggest:</h4>";
+        [...suggestedSKUs].slice(0, 3).forEach(sku => {
+            const product = products.find(p => p.id === sku);
+            if (product) {
+                resultDiv.innerHTML += `
+                    <div class="suggestion-product">
+                        <span><strong>${product.name}</strong> - ${product.benefits.split(",")[0]}</span>
+                        <button class="btn btn-primary" style="width:auto;padding:8px 15px" onclick="addToCart(${product.id});toggleCart()">Add</button>
+                    </div>`;
+            }
+        });
+    } else {
+        resultDiv.innerHTML = "<p>We could not find a specific match. Try searching for products directly.</p>";
+    }
+}
