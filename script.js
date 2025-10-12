@@ -72,8 +72,16 @@ function renderStaticContent(content) {
 function renderMainContentShell() {
     const main = document.getElementById('main-content');
     main.innerHTML = `
-        <div id="homepage" class="tab-content"></div>
-        <div id="products" class="tab-content"><div id="product-list-container"></div></div>
+        <div id="homepage" class="tab-content">
+            <!-- AI Suggester will be built here by the next function -->
+        </div>
+        <div id="products" class="tab-content">
+            <div class="search-container">
+                <input type="text" id="product-search" onkeyup="filterProducts()" placeholder="Search for products by name...">
+                <i class="fa-solid fa-search search-icon"></i>
+            </div>
+            <div id="product-list-container"></div>
+        </div>
         <div id="about" class="tab-content"><section id="about-us-content" class="dynamic-content-wrapper"></section></div>
         <div id="jobs" class="tab-content"><section id="jobs-content" class="dynamic-content-wrapper"><h2>All Career Opportunities</h2><div id="job-listings-container"></div></section></div>
         <div id="enquiries" class="tab-content"><section id="enquiries-form-content" class="dynamic-content-wrapper"></section></div>
@@ -102,6 +110,19 @@ function renderHomepageContent(about, jobs, testimonies) {
         }).join('');
         youtubeHtml = `<section id="youtube-videos" class="dynamic-content-wrapper"><h2>${youtubeTitle}</h2><div id="youtube-videos-container">${videosHtml}</div></section>`;
     }
+     // This builds the complete content for your homepage tab
+    container.innerHTML = `
+        <section class="hero-section" id="hero-section">
+            <h2 id="hero-title"><i class="fa-solid fa-store"></i> Welcome to Our Store</h2>
+            <p id="hero-subtitle">Enjoy high-quality wellness products for a healthier lifestyle.</p>
+        </section>
+        <section class="ai-suggestion-box">
+            <h3><i class="fa-solid fa-robot"></i> AI Product Suggester</h3>
+            <p>Describe your health concern (e.g., "dry skin", "low energy") and our AI will suggest a product for you.</p>
+            <input type="text" id="symptom-input" placeholder="Enter your symptom or concern...">
+            <button id="suggest-btn" class="btn" onclick="suggestProduct()">Get Suggestion</button>
+            <div id="suggestion-result"></div>
+        </section>
 
     let testimoniesHtml = '';
     if (testimonies && testimonies.length > 0) {
