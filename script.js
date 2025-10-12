@@ -1,5 +1,5 @@
 // =================================================================
-// E-Shop Frontend Script - v18.4 (Upgraded & Consolidated)
+// E-Shop Frontend Script - v18.6 (Final UI & Feature Upgrade)
 // =================================================================
 
 // ===========================================================
@@ -42,7 +42,7 @@ async function fetchData() {
         buildFabButtons();
         buildChatbotWidget();
         
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v18.4)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v18.6)`;
         
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
         document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
@@ -79,9 +79,9 @@ function renderMainContentShell() {
         <div id="homepage" class="tab-content">
             <section id="homepage-hero" class="hero-section"></section>
             <section id="why-choose-us" class="dynamic-content-wrapper"></section>
-            <section id="youtube-videos" class="dynamic-content-wrapper"><h2>Learn More</h2><div id="youtube-videos-container"></div></section>
+            <section id="youtube-videos" class="dynamic-content-wrapper"></section>
             <section id="homepage-testimonies" class="dynamic-content-wrapper"><h2>What Our Customers Say</h2><div id="testimonies-container"></div></section>
-            <section id="homepage-featured-jobs" class="dynamic-content-wrapper"><h2>Join Our Team</h2><div id="featured-jobs-container"></div><a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0;">View All Career Opportunities</a></section>
+            <section id="homepage-featured-jobs" class="dynamic-content-wrapper"><h2>Join Our Team</h2><div id="featured-jobs-container"></div><a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0; max-width: 300px;">View All Career Opportunities</a></section>
         </div>
         <div id="products" class="tab-content"><div id="product-list-container"></div></div>
         <div id="about" class="tab-content"><section id="about-us-content" class="dynamic-content-wrapper"></section></div>
@@ -99,18 +99,20 @@ function renderHomepageContent(about, jobs, testimonies) {
     const whyChooseUsContainer = document.getElementById('why-choose-us');
     if (whyChooseUsContainer) whyChooseUsContainer.innerHTML = `<h2>${about.WhyChooseUs_Title}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div>`;
         
-    const videosContainer = document.getElementById('youtube-videos-container');
+    const youtubeSection = document.getElementById('youtube-videos');
     const videoUrls = about.YoutubeURL ? String(about.YoutubeURL).split(',').map(url => url.trim()) : [];
-    if (videosContainer && videoUrls.length > 0 && videoUrls[0]) {
-        videosContainer.innerHTML = videoUrls.map(url => {
+    if (youtubeSection && videoUrls.length > 0 && videoUrls[0]) {
+        const videosHtml = videoUrls.map(url => {
             try {
                 const videoId = new URL(url).searchParams.get('v');
                 if (videoId) return `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
             } catch(e) { console.error("Invalid YouTube URL:", url); }
             return '';
         }).join('');
-    } else if(videosContainer) {
-        document.getElementById('youtube-videos').style.display = 'none';
+        const youtubeTitle = about.YoutubeSection_Title || 'Learn More';
+        youtubeSection.innerHTML = `<h2>${youtubeTitle}</h2><div id="youtube-videos-container">${videosHtml}</div>`;
+    } else if(youtubeSection) {
+        youtubeSection.style.display = 'none';
     }
 
     const testimoniesContainer = document.getElementById('testimonies-container');
@@ -136,29 +138,29 @@ function renderHomepageContent(about, jobs, testimonies) {
 function renderProducts(productsToRender) {
     const container = document.getElementById('product-list-container');
     if (!productsToRender || productsToRender.length === 0) { container.innerHTML = `<p>No products available.</p>`; return; }
-    container.innerHTML = `<div class="product-list">${productsToRender.map(p => `<div class="product"><div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div><div class="product-info"><h3>${p.name}</h3><div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div><div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div><div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div><div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div></div></div>`).join('')}</div>`;
+    container.innerHTML = `<div class="product-list">${productsToRender.map(p => `
+        <div class="product">
+            <div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div>
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div>
+                <div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div>
+                <div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div>
+                <div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div>
+            </div>
+        </div>`).join('')}</div>`;
 }
 
 function renderAboutUs(content) {
     const container = document.getElementById('about-us-content');
-    if (!content) { 
-        container.innerHTML = '<p>About information is unavailable.</p>'; 
-        return; 
-    }
-
+    if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
     const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
-    const emailLink = content.EmailAddress ? `<a href="mailto:${content.EmailAddress}"><i class="fa-solid fa-envelope"></i> ${content.EmailAddress}</a>` : '';
-    const whatsappLink = content.Whatsapp ? `<a href="https://wa.me/${String(content.Whatsapp).replace(/\D/g,'')}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${content.Whatsapp}</a>` : '';
-    const addressLink = content.Address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content.Address)}" target="_blank" class="address-link"><i class="fa-solid fa-location-dot"></i> ${content.Address}</a>` : '';
-    const contactLinksHtml = (emailLink || whatsappLink || addressLink) ? `<div class="contact-links">${emailLink}${whatsappLink}${addressLink}</div>` : '';
-
     container.innerHTML = `
         <h2>About ${content.CompanyName}</h2>
         <div class="owner-profile">
             <img src="arvind.jpg" alt="${content.Owner}" class="owner-image" onerror="this.style.display='none'">
             <div class="owner-details">
                 <h3>${content.Owner} - ${content.Role}</h3>
-                ${contactLinksHtml}
                 <div>${content.MoreDetails}</div>
             </div>
         </div>
@@ -170,24 +172,59 @@ function renderAboutUs(content) {
             <h4>Our Vision</h4>
             <p>${content.OurVision}</p>
         </div>
-        ${historySection}
-    `;
+        ${historySection}`;
 }
 
+// UPGRADED to render new attractive job cards
 function renderJobs(jobs) {
     const container = document.getElementById('job-listings-container');
     if (!jobs || jobs.length === 0) { container.innerHTML = '<p>There are currently no open positions.</p>'; return; }
-    container.innerHTML = jobs.map(job => `<div class="job-listing"><h3>${job.position}</h3><ul><li><strong>Location:</strong> ${job.location}</li><li><strong>Type:</strong> ${job.type}</li><li><strong>Citizenship:</strong> ${job.citizenship}</li><li><strong>Gender:</strong> ${job.gender}</li><li><strong>Age Range:</strong> ${job.ageRange}</li><li><strong>Salary:</strong> ${job.salary} RM</li><li><strong>Accommodation:</strong> ${job.accommodation}</li><li><strong>Work Pattern:</strong> ${job.workDayPattern}</li><li><strong>Availability:</strong> ${job.availability}</li></ul><div class="job-description">${job.description}</div><button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button></div>`).join('');
+    container.innerHTML = jobs.map(job => `
+        <div class="job-card">
+            <div class="job-header"><h3>${job.position}</h3></div>
+            <div class="job-body">
+                <div class="job-details">
+                    <div class="job-detail-item"><i class="fa-solid fa-location-dot"></i> <span>${job.location} | ${job.type}</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-money-bill-wave"></i> <span>${job.salary} RM</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-house-user"></i> <span>${job.accommodation}</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-calendar-days"></i> <span>${job.workDayPattern}</span></div>
+                </div>
+                <div class="job-description">${job.description}</div>
+                <button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button>
+            </div>
+        </div>`).join('');
 }
 
 function buildEnquiryForm() {
     const container = document.getElementById('enquiries-form-content');
-    container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary">Submit</button><p id="enquiry-status"></p></form>`;
+    container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">Submit</button><p id="enquiry-status"></p></form>`;
 }
 
+// UPGRADED for new attractive cart modal
 function buildCartModal() {
     const container = document.getElementById('cart-modal');
-    container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleCart(true)">&times;</span><h2>Your Cart</h2><div id="cart-items"><p>Your cart is empty.</p></div><div class="cart-summary"><div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div><div class="summary-line"><span>Shipping</span><span id="cart-shipping">RM 0.00</span></div><div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div></div><div class="customer-info-form"><h3>Customer Info</h3><input type="text" id="customer-name" placeholder="Full Name" required><input type="tel" id="customer-phone" placeholder="WhatsApp Number" required><input type="email" id="customer-email" placeholder="Email" required><textarea id="customer-address" placeholder="Address" rows="4" required></textarea></div><button class="btn btn-primary" onclick="initiateCheckout()">Complete Order</button></div>`;
+    container.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Your Cart</h2>
+                <button class="close" onclick="toggleCart(true)">&times;</button>
+            </div>
+            <div class="modal-body" id="cart-items"><p>Your cart is empty.</p></div>
+            <div id="cart-checkout-area">
+                <div class="modal-footer">
+                    <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+                    <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
+                </div>
+                <div class="customer-info-form">
+                    <h3>Customer Info</h3>
+                    <input type="text" id="customer-name" placeholder="Full Name" required>
+                    <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
+                    <input type="email" id="customer-email" placeholder="Email (Optional)">
+                    <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
+                </div>
+                <div style="padding: 0 30px 20px;"><button class="btn btn-primary" style="width: 100%;" onclick="initiateCheckout()">Complete Order</button></div>
+            </div>
+        </div>`;
 }
 
 function buildJobApplicationModal() {
@@ -219,21 +256,38 @@ function increaseQuantity(productId) { const item = cart.find(i => i.id == produ
 function decreaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } } }
 function removeItemFromCart(productId) { cart = cart.filter(item => item.id != productId); updateCartDisplay(); }
 
+// UPGRADED to render new attractive cart items
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
-    document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotalEl = document.getElementById('cart-subtotal');
-    const totalEl = document.getElementById('cart-total');
+    const checkoutArea = document.getElementById('cart-checkout-area');
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    document.getElementById('cart-count').textContent = totalItems;
+    
     if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
-        subtotalEl.textContent = 'RM 0.00';
-        totalEl.textContent = 'RM 0.00';
+        cartItemsContainer.innerHTML = '<p style="text-align:center; padding: 20px 0;">Your cart is empty.</p>';
+        checkoutArea.style.display = 'none';
         return;
     }
-    cartItemsContainer.innerHTML = cart.map(item => `<div class="cart-item"><div class="cart-item-details"><strong>${item.name}</strong><div class="quantity-controls"><button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button><span class="quantity-display">${item.quantity}</span><button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button></div></div><div style="text-align:right">RM ${(item.price * item.quantity).toFixed(2)}</div><button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button></div>`).join('');
+    
+    checkoutArea.style.display = 'block';
+    cartItemsContainer.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <img src="${item.image}" alt="${item.name}" class="cart-item-image"/>
+            <div class="cart-item-details">
+                <strong>${item.name}</strong>
+                <div class="quantity-controls">
+                    <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
+                    <span>${item.quantity}</span>
+                    <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
+                </div>
+            </div>
+            <strong>RM ${(item.price * item.quantity).toFixed(2)}</strong>
+            <button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button>
+        </div>`).join('');
+        
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    subtotalEl.textContent = `RM ${subtotal.toFixed(2)}`;
-    totalEl.textContent = `RM ${subtotal.toFixed(2)}`;
+    document.getElementById('cart-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
+    document.getElementById('cart-total').textContent = `RM ${subtotal.toFixed(2)}`;
 }
 
 function toggleCart(hide = false) {
