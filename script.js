@@ -1,5 +1,5 @@
 // =================================================================
-// E-Shop Frontend Script - v20.3 (Final Complete Version)
+// E-Shop Frontend Script - v21.0 (Final Verified Complete)
 // =================================================================
 
 // ===========================================================
@@ -30,7 +30,7 @@ async function fetchData() {
 
         products = data.products || [];
         allJobs = data.jobsListings || [];
-        shippingRules = data.shippingRules || []; // This line is new
+        shippingRules = data.shippingRules || [];
         
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
@@ -40,12 +40,12 @@ async function fetchData() {
         renderJobs(allJobs);
         buildEnquiryForm();
         
-        buildCartModal(data.aboutUsContent); // Pass content for bank details
+        buildCartModal(data.aboutUsContent);
         buildJobApplicationModal();
         buildFabButtons();
         buildChatbotWidget();
         
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v20.2)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v21.0)`;
         
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
         document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
@@ -85,7 +85,6 @@ function renderHomepageContent(about, jobs, testimonies) {
     const container = document.getElementById('homepage');
     if (!about) { container.innerHTML = '<p>Welcome</p>'; return; }
 
-    // Rebuild all the sections for the homepage
     const heroHtml = `<section id="homepage-hero" class="hero-section"><h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p></section>`;
     
     const whyChooseUsHtml = `<section id="why-choose-us" class="dynamic-content-wrapper"><h2>${about.WhyChooseUs_Title || 'Why Choose Us?'}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div></section>`;
@@ -135,8 +134,6 @@ function renderProducts(productsToRender) {
             <div class="product-info">
                 <h3>${p.name}</h3>
                 <div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div>
-                <div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div>
-                <div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div>
                 <div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div>
             </div>
         </div>`).join('')}</div>`;
@@ -144,22 +141,12 @@ function renderProducts(productsToRender) {
 
 function renderAboutUs(content) {
     const container = document.getElementById('about-us-content');
-    if (!content) { 
-        container.innerHTML = '<p>About information is unavailable.</p>'; 
-        return; 
-    }
-
+    if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
     const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
-    
-    // --- THIS IS THE RESTORED LOGIC THAT WAS MISSING ---
     const emailLink = content.EmailAddress ? `<a href="mailto:${content.EmailAddress}"><i class="fa-solid fa-envelope"></i> ${content.EmailAddress}</a>` : '';
     const whatsappLink = content.Whatsapp ? `<a href="https://wa.me/${String(content.Whatsapp).replace(/\D/g,'')}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${content.Whatsapp}</a>` : '';
     const addressLink = content.Address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content.Address)}" target="_blank"><i class="fa-solid fa-location-dot"></i> ${content.Address}</a>` : '';
-    
-    const contactLinksHtml = (emailLink || whatsappLink || addressLink) 
-        ? `<div class="contact-links">${emailLink}${whatsappLink}${addressLink}</div>` 
-        : '';
-    // --- END OF RESTORED LOGIC ---
+    const contactLinksHtml = (emailLink || whatsappLink || addressLink) ? `<div class="contact-links">${emailLink}${whatsappLink}${addressLink}</div>` : '';
 
     container.innerHTML = `
         <h2>About ${content.CompanyName}</h2>
@@ -179,8 +166,7 @@ function renderAboutUs(content) {
             <h4>Our Vision</h4>
             <p>${content.OurVision}</p>
         </div>
-        ${historySection}
-    `;
+        ${historySection}`;
 }
 
 function renderJobs(jobs) {
@@ -207,9 +193,8 @@ function buildEnquiryForm() {
     container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">Submit</button><p id="enquiry-status"></p></form>`;
 }
 
-function buildCartModal() {
+function buildCartModal(content) {
     const container = document.getElementById('cart-modal');
-    
     const bankDetailsHTML = `<strong>Bank:</strong> MAYBANK<br>
            <strong>Account No:</strong> 102037147223<br>
            <strong>Name:</strong> Arvinderan M Ganeson<br>
@@ -230,7 +215,6 @@ function buildCartModal() {
                 <input type="text" id="customer-name" placeholder="Full Name" required>
                 <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
                 <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
-                
                 <h3>Payment</h3>
                 <p>Please transfer to the details below and upload a receipt.</p>
                 <div class="payment-details" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #eee;">
@@ -239,9 +223,10 @@ function buildCartModal() {
                 <label for="payment-proof" style="display: block; margin-bottom: 5px;">Upload Payment Receipt (Required)</label>
                 <input type="file" id="payment-proof" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
             </div>
-            <button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="initiateCheckout()">Complete Order</button>
+            <button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin: 20px 0 0;" onclick="initiateCheckout()">Complete Order</button>
         </div>`;
 }
+
 function buildJobApplicationModal() {
     const container = document.getElementById('job-application-modal');
     container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleJobModal(false)">&times;</span><h2>Apply for <span id="job-modal-title"></span></h2><form id="job-application-form" class="enquiry-form"><input type="hidden" id="job-id-input"><input type="hidden" id="job-position-input"><input type="text" id="applicant-name" placeholder="Full Name" required><input type="email" id="applicant-email" placeholder="Email" required><input type="tel" id="applicant-phone" placeholder="Phone" required><input type="text" id="applicant-citizenship" placeholder="Citizenship" required><textarea id="applicant-message" placeholder="Tell us about yourself" rows="4"></textarea><label for="applicant-resume">Upload Resume (Mandatory)</label><input type="file" id="applicant-resume" required><button type="submit" class="btn btn-primary">Submit</button><p id="job-application-status"></p></form></div>`;
@@ -260,13 +245,6 @@ function buildChatbotWidget() {
 // ===========================================================
 // [ 4.0 ] CART LOGIC
 // ===========================================================
-function showCartView(viewNumber) {
-    document.getElementById('cart-view-1').style.display = 'none';
-    document.getElementById('cart-view-2').style.display = 'none';
-    document.getElementById('cart-view-3').style.display = 'none';
-    document.getElementById(`cart-view-${viewNumber}`).style.display = 'block';
-}
-
 function addToCart(productId) {
     const product = products.find(p => p.id == productId);
     if (!product) return;
@@ -284,16 +262,18 @@ function decreaseQuantity(productId) {
 }
 
 function removeItemFromCart(productId) {
-    cart = cart.filter(item => item.id != productId); discountInfo = null; updateCartDisplay();
+    cart = cart.filter(item => item.id != productId); updateCartDisplay();
 }
 
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
+    const checkoutBtn = document.getElementById('checkout-btn');
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     document.getElementById('cart-count').textContent = totalItems;
     
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p style="text-align:center;">Your cart is empty.</p>';
+        if (checkoutBtn) checkoutBtn.style.display = 'none';
     } else {
         cartItemsContainer.innerHTML = cart.map(item => `
             <div class="cart-item">
@@ -309,6 +289,7 @@ function updateCartDisplay() {
                 <strong>RM ${(item.price * item.quantity).toFixed(2)}</strong>
                 <button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button>
             </div>`).join('');
+        if (checkoutBtn) checkoutBtn.style.display = 'block';
     }
         
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -331,41 +312,14 @@ function updateCartDisplay() {
     document.getElementById('cart-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
     document.getElementById('cart-total').textContent = `RM ${total.toFixed(2)}`;
 }
-async function applyDiscount() {
-    const codeInput = document.getElementById('discount-code');
-    const code = codeInput.value.trim();
-    if (!code) return;
-    try {
-        const response = await postDataToGScript({ action: 'validateDiscountCode', data: { code } }, true);
-        if (response.success) {
-            discountInfo = response.discount;
-            alert('Discount applied successfully!');
-            codeInput.disabled = true;
-        } else {
-            discountInfo = null;
-            alert(`Error: ${response.message}`);
-            codeInput.value = '';
-        }
-        updateCartDisplay();
-    } catch (error) {
-        alert('Could not validate discount code.');
-    }
-}
 
-unction toggleCart(hide = false) {
+function toggleCart(hide = false) {
     const modal = document.getElementById('cart-modal');
-    if (!modal) {
-        console.error("Cart modal not found!");
-        return;
-    }
-
-    // Determine the new display state
+    if (!modal) return;
     const isCurrentlyVisible = modal.style.display === 'flex';
-    const shouldShow = !isCurrentlyVisible && !hide;
-
-    if (shouldShow) {
+    if (!isCurrentlyVisible && !hide) {
         modal.style.display = 'flex';
-        updateCartDisplay(); // Refresh cart content when showing
+        updateCartDisplay();
     } else {
         modal.style.display = 'none';
     }
@@ -379,7 +333,6 @@ async function initiateCheckout() {
     const name = document.getElementById('customer-name').value.trim();
     const phone = document.getElementById('customer-phone').value.trim();
     const address = document.getElementById('customer-address').value.trim();
-    const email = document.getElementById('customer-email').value.trim();
     const proofFile = document.getElementById('payment-proof').files[0];
 
     if (!name || !phone || !address || !proofFile) {
@@ -399,16 +352,10 @@ async function initiateCheckout() {
         const payload = {
             action: 'logInitialOrder',
             data: {
-                customerName: name,
-                customerPhone: phone,
-                customerEmail: email,
-                customerAddress: address,
-                itemsPurchased: itemsPurchased,
-                cart: cart,
-                totalAmount: totalAmount,
-                shippingFee: shippingFee,
-                paymentProofFile: base64File.split(',')[1],
-                paymentProofMimeType: proofFile.type
+                customerName: name, customerPhone: phone, customerAddress: address,
+                itemsPurchased: itemsPurchased, cart: cart,
+                totalAmount: totalAmount, shippingFee: shippingFee,
+                paymentProofFile: base64File.split(',')[1], paymentProofMimeType: proofFile.type
             }
         };
 
@@ -689,7 +636,10 @@ async function postToRender(action, data) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, apiKey, data })
         });
-        if (!response.ok) throw new Error('Server error');
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.message || 'Server error');
+        }
         return await response.json();
     } catch (error) {
         console.error('Error posting to Render:', error);
