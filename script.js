@@ -696,7 +696,150 @@ function showTab(tabId) {
     document.getElementById(tabId).classList.add('active');
 }
 // ===========================================================
-// [ 8.0 ] AI SUGGESTER & SEARCH FUNCTIONS
+// [ 6.0 ] CHATBOT LOGIC
+// ===========================================================
+function toggleChatWidget(show) {
+    const chatWidget = document.getElementById('eshop-chat-widget');
+    const fabContainer = document.getElementById('fab-container');
+    if (show) {
+        chatWidget.classList.add('active');
+        fabContainer.style.right = '370px';
+        if (document.getElementById('chat-body').innerHTML.trim() === '') {
+            displayMainMenu();
+        }
+    } else {
+        chatWidget.classList.remove('active');
+        fabContainer.style.right = '20px';
+    }
+}
+
+function addChatMessage(sender, text, type = 'html') {
+    const chatBody = document.getElementById('chat-body');
+    const msg = document.createElement('div');
+    msg.classList.add('chat-message', sender === 'bot' ? 'bot-message' : 'user-message');
+    msg.innerHTML = text;
+    chatBody.appendChild(msg);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return msg;
+}
+
+function displayMainMenu() {
+    chatSession.state = 'main_menu';
+    const menu = `<strong>Welcome! How can I help you?</strong><br>1. My Account<br>2. General Answers<br>3. Talk to a Human`;
+    addChatMessage('bot', menu);
+}
+
+async function handleChatSubmit() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+    addChatMessage('user', text);
+    input.value = '';
+    const thinkingMsg = addChatMessage('bot', '<i>Thinking...</i>');
+
+    try {
+        if (chatSession.state === 'awaiting_identifier') {
+            await startVerification(text);
+        } else if (chatSession.state === 'awaiting_code') {
+            await submitVerificationCode(text);
+        } else if (chatSession.state === 'my_account_menu') {
+            await handleMyAccountMenu(text);
+        } else {
+            await handleMainMenu(text);
+        }
+    } catch (error) {
+        thinkingMsg.innerHTML = 'There was an error connecting to the assistant.';
+    }
+}
+
+async function handleMainMenu(text) {
+    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
+    if (text === '1') {
+        if (sessionStorage.getItem('eshop_session_token')) {
+            lastBotMsg.remove();
+            displayMyAccountMenu();
+        } else {
+            chatSession.state = 'awaiting_identifier';
+            lastBotMsg.innerHTML = 'Please enter your PAC or Email to verify your account.';
+        }
+    } else if (text === '2') {
+        lastBotMsg.innerHTML = 'Please ask any general question you have.';
+    } else if (text === '3') {
+        lastBotMsg.innerHTML = 'To talk to a human, please contact our admin on WhatsApp: <a href="https://wa.me/601111033154" target="_blank">Click Here</a>';
+    } else {
+        const response = await postToRender('getSmartAnswer', { question: text });
+        lastBotMsg.innerHTML = response.answer || 'Sorry, I had trouble finding an answer.';
+    }
+}
+
+async function startVerification(identifier) {
+    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
+    const result = await postToRender('issueChatVerificationCode', { identifier: identifier });
+    if (result.success) {
+        chatSession.state = 'awaiting_code';
+        chatSession.pac = result.pac;
+        lastBotMsg.innerHTML = 'A code has been sent to your WhatsApp. Please enter it here.';
+    } else {
+        chatSession.state = 'main_menu';
+        lastBotMsg.innerHTML = `Verification failed: ${result.message}`;
+    }
+}
+
+async function submitVerificationCode(code) {
+    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
+    const result = await postToRender('verifyChatCode', { pac: chatSession.pac, code: code });
+    if (result.success) {
+        sessionStorage.setItem('eshop_session_token', result.token);
+        lastBotMsg.innerHTML = 'Verified!';
+        displayMyAccountMenu();
+    } else {
+        chatSession.state = 'main_menu';
+        lastBotMsg.innerHTML = `Verification failed: ${result.message}`;
+    }
+}
+
+function displayMyAccountMenu() {
+    chatSession.state = 'my_account_menu';
+    addChatMessage('bot', '<strong>My Account</strong><br>1. View My Last 5 Orders<br>2. Check My Total Points<br>3. Back to Main Menu');
+}
+
+async function handleMyAccountMenu(text) {
+    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
+    let action = '';
+    if (text === '1') {
+        action = 'getPurchaseHistory';
+    } else if (text === '2') {
+        action = 'getPointsHistory';
+    } else if (text === '3') { 
+        lastBotMsg.remove();
+        displayMainMenu();
+        return; 
+    }
+    else { 
+        lastBotMsg.innerHTML = 'Invalid option. Please choose from the menu.';
+        addChatMessage('bot', '<strong>My Account</strong><br>1. View My Last 5 Orders<br>2. Check My Total Points<br>3. Back to Main Menu');
+        return;
+    }
+
+    const token = sessionStorage.getItem('eshop_session_token');
+    const result = await postToRender(action, { token: token });
+    let message = '';
+    if(result.success) {
+        if(action === 'getPurchaseHistory') {
+            message = "<strong>Your Last 5 Orders:</strong><br>";
+            if (result.history.length === 0) { message = 'You have no purchase history.'; }
+            else { result.history.forEach(order => { message += `<br><strong>ID:</strong> ${order.invoiceId}<br><strong>Date:</strong> ${order.date}<br><strong>Total:</strong> RM ${order.totalAmount}<br><strong>Status:</strong> ${order.status}`; }); }
+        } else {
+            message = `Your total points: <strong>${result.currentBalance}</strong>`;
+        }
+    } else {
+        message = `Error: ${result.message}`;
+    }
+    lastBotMsg.innerHTML = message;
+    displayMyAccountMenu();
+}
+// ===========================================================
+// [ 7.0 ] AI SUGGESTER & SEARCH FUNCTIONS
 // ===========================================================
 
 function filterProducts() {
