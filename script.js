@@ -246,6 +246,44 @@ function buildChatbotWidget() {
 // ===========================================================
 // [ 4.0 ] CART LOGIC
 // ===========================================================
+
+function buildCartModal(content) {
+    const container = document.getElementById('cart-modal');
+    
+    // Using your hard-coded bank details and QR code path
+    const bankDetailsHTML = `<strong>Bank:</strong> MAYBANK<br>
+           <strong>Account No:</strong> 102037147223<br>
+           <strong>Name:</strong> Arvinderan M Ganeson<br>
+           <img src="duitnow_high_quality.png" alt="DuitNow QR" style="max-width: 200px; margin-top: 10px;">`;
+
+    container.innerHTML = `
+        <div class="modal-content">
+            <span class="close" onclick="toggleCart(true)">&times;</span>
+            <h2>Your Cart</h2>
+            <div id="cart-items"></div>
+            <div class="cart-summary">
+                <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal"></span></div>
+                <div class="summary-line"><span>Shipping</span><span id="cart-shipping"></span></div>
+                <div class="summary-line total"><span>Total</span><span id="cart-total"></span></div>
+            </div>
+            <div class="customer-info-form">
+                <h3>Customer Info</h3>
+                <input type="text" id="customer-name" placeholder="Full Name" required>
+                <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
+                <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
+                
+                <h3>Payment</h3>
+                <p>Please transfer to the details below and upload a receipt.</p>
+                <div class="payment-details" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #eee;">
+                    ${bankDetailsHTML}
+                </div>
+                <label for="payment-proof" style="display: block; margin-bottom: 5px;">Upload Payment Receipt (Required)</label>
+                <input type="file" id="payment-proof" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
+            </div>
+            <button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="initiateCheckout()">Complete Order</button>
+        </div>`;
+}
+
 function addToCart(productId) {
     const product = products.find(p => p.id == productId);
     if (!product) return;
@@ -278,7 +316,7 @@ function updateCartDisplay() {
     } else {
         cartItemsContainer.innerHTML = cart.map(item => `
             <div class="cart-item">
-                <img src="${item.image}" class="cart-item-image" />
+                <img src="${item.image}" alt="${item.name}" class="cart-item-image" />
                 <div class="cart-item-details">
                     <strong>${item.name}</strong>
                     <div class="quantity-controls">
@@ -318,11 +356,16 @@ function toggleCart(hide = false) {
     const modal = document.getElementById('cart-modal');
     if (!modal) return;
     const isCurrentlyVisible = modal.style.display === 'flex';
-    if (!isCurrentlyVisible && !hide) {
-        modal.style.display = 'flex';
-        updateCartDisplay();
-    } else {
+
+    if (hide) {
         modal.style.display = 'none';
+    } else {
+        if (isCurrentlyVisible) {
+            modal.style.display = 'none';
+        } else {
+            modal.style.display = 'flex';
+            updateCartDisplay();
+        }
     }
 }
 
@@ -334,6 +377,7 @@ async function initiateCheckout() {
     const name = document.getElementById('customer-name').value.trim();
     const phone = document.getElementById('customer-phone').value.trim();
     const address = document.getElementById('customer-address').value.trim();
+    const email = document.getElementById('customer-email') ? document.getElementById('customer-email').value.trim() : ''; // Handle optional email
     const proofFile = document.getElementById('payment-proof').files[0];
 
     if (!name || !phone || !address || !proofFile) {
@@ -353,7 +397,7 @@ async function initiateCheckout() {
         const payload = {
             action: 'logInitialOrder',
             data: {
-                customerName: name, customerPhone: phone, customerAddress: address,
+                customerName: name, customerPhone: phone, customerEmail: email, customerAddress: address,
                 itemsPurchased: itemsPurchased, cart: cart,
                 totalAmount: totalAmount, shippingFee: shippingFee,
                 paymentProofFile: base64File.split(',')[1], paymentProofMimeType: proofFile.type
@@ -386,7 +430,6 @@ async function initiateCheckout() {
         }
     }
 }
-
 // ===========================================================
 // [ 5.0 ] FORMS, CHATBOT & UTILITIES
 // ===========================================================
