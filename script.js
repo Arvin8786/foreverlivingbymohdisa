@@ -144,14 +144,30 @@ function renderProducts(productsToRender) {
 
 function renderAboutUs(content) {
     const container = document.getElementById('about-us-content');
-    if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
+    if (!content) { 
+        container.innerHTML = '<p>About information is unavailable.</p>'; 
+        return; 
+    }
+
     const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
+    
+    // --- THIS IS THE RESTORED LOGIC THAT WAS MISSING ---
+    const emailLink = content.EmailAddress ? `<a href="mailto:${content.EmailAddress}"><i class="fa-solid fa-envelope"></i> ${content.EmailAddress}</a>` : '';
+    const whatsappLink = content.Whatsapp ? `<a href="https://wa.me/${String(content.Whatsapp).replace(/\D/g,'')}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${content.Whatsapp}</a>` : '';
+    const addressLink = content.Address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content.Address)}" target="_blank"><i class="fa-solid fa-location-dot"></i> ${content.Address}</a>` : '';
+    
+    const contactLinksHtml = (emailLink || whatsappLink || addressLink) 
+        ? `<div class="contact-links">${emailLink}${whatsappLink}${addressLink}</div>` 
+        : '';
+    // --- END OF RESTORED LOGIC ---
+
     container.innerHTML = `
         <h2>About ${content.CompanyName}</h2>
         <div class="owner-profile">
             <img src="arvind.jpg" alt="${content.Owner}" class="owner-image" onerror="this.style.display='none'">
             <div class="owner-details">
                 <h3>${content.Owner} - ${content.Role}</h3>
+                ${contactLinksHtml}
                 <div>${content.MoreDetails}</div>
             </div>
         </div>
@@ -163,7 +179,8 @@ function renderAboutUs(content) {
             <h4>Our Vision</h4>
             <p>${content.OurVision}</p>
         </div>
-        ${historySection}`;
+        ${historySection}
+    `;
 }
 
 function renderJobs(jobs) {
@@ -190,14 +207,13 @@ function buildEnquiryForm() {
     container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">Submit</button><p id="enquiry-status"></p></form>`;
 }
 
-function buildCartModal(content) {
+function buildCartModal() {
     const container = document.getElementById('cart-modal');
-    const bankDetailsHTML = (content && content.BankAccountNumber) 
-        ? `<strong>Bank:</strong> ${content.BankName || 'N/A'}<br>
-           <strong>Account No:</strong> ${content.BankAccountNumber}<br>
-           <strong>Name:</strong> ${content.BankAccountName || 'N/A'}<br>
-           <img src="https://i.ibb.co/L6Wn00G/duitnow.png" alt="DuitNow QR" style="max-width: 200px; margin-top: 10px;">`
-        : "Payment details are not available. Please contact us.";
+    
+    const bankDetailsHTML = `<strong>Bank:</strong> MAYBANK<br>
+           <strong>Account No:</strong> 102037147223<br>
+           <strong>Name:</strong> Arvinderan M Ganeson<br>
+           <img src="duitnow_high_quality.png" alt="DuitNow QR" style="max-width: 200px; margin-top: 10px;">`;
 
     container.innerHTML = `
         <div class="modal-content">
@@ -226,7 +242,6 @@ function buildCartModal(content) {
             <button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="initiateCheckout()">Complete Order</button>
         </div>`;
 }
-
 function buildJobApplicationModal() {
     const container = document.getElementById('job-application-modal');
     container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleJobModal(false)">&times;</span><h2>Apply for <span id="job-modal-title"></span></h2><form id="job-application-form" class="enquiry-form"><input type="hidden" id="job-id-input"><input type="hidden" id="job-position-input"><input type="text" id="applicant-name" placeholder="Full Name" required><input type="email" id="applicant-email" placeholder="Email" required><input type="tel" id="applicant-phone" placeholder="Phone" required><input type="text" id="applicant-citizenship" placeholder="Citizenship" required><textarea id="applicant-message" placeholder="Tell us about yourself" rows="4"></textarea><label for="applicant-resume">Upload Resume (Mandatory)</label><input type="file" id="applicant-resume" required><button type="submit" class="btn btn-primary">Submit</button><p id="job-application-status"></p></form></div>`;
@@ -492,29 +507,39 @@ function toggleChatWidget(show) {
     if (show) {
         chatWidget.classList.add('active');
         fabContainer.style.right = '370px';
+        // Check if chat is empty, and if so, display the main menu
+        if (document.getElementById('chat-body').innerHTML.trim() === '') {
+            displayMainMenu();
+        }
     } else {
         chatWidget.classList.remove('active');
         fabContainer.style.right = '20px';
     }
 }
 
-function addChatMessage(sender, text) {
+function addChatMessage(sender, text, type = 'html') {
     const chatBody = document.getElementById('chat-body');
     const msg = document.createElement('div');
     msg.classList.add('chat-message', sender === 'bot' ? 'bot-message' : 'user-message');
-    msg.innerHTML = text;
+    msg.innerHTML = text; // Use innerHTML to render HTML like <i> and <a> tags
     chatBody.appendChild(msg);
     chatBody.scrollTop = chatBody.scrollHeight;
+    return msg;
 }
 
-// THE FULLY RESTORED, STATEFUL CHATBOT LOGIC
+function displayMainMenu() {
+    chatSession.state = 'main_menu';
+    const menu = `<strong>Welcome! How can I help you?</strong><br>1. My Account<br>2. General Answers<br>3. Talk to a Human`;
+    addChatMessage('bot', menu);
+}
+
 async function handleChatSubmit() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
     if (!text) return;
     addChatMessage('user', text);
     input.value = '';
-    addChatMessage('bot', '<i>Thinking...</i>');
+    const thinkingMsg = addChatMessage('bot', '<i>Thinking...</i>');
 
     try {
         if (chatSession.state === 'awaiting_identifier') {
@@ -524,46 +549,59 @@ async function handleChatSubmit() {
         } else if (chatSession.state === 'my_account_menu') {
             await handleMyAccountMenu(text);
         } else {
+            // This is the main menu logic
             await handleMainMenu(text);
         }
     } catch (error) {
-        document.querySelector('#chat-body .bot-message:last-child').innerHTML = 'There was an error connecting to the assistant.';
+        thinkingMsg.innerHTML = 'There was an error connecting to the assistant.';
     }
 }
 
 async function handleMainMenu(text) {
+    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
     if (text === '1') {
-        chatSession.state = 'awaiting_identifier';
-        document.querySelector('#chat-body .bot-message:last-child').innerHTML = 'Please enter your PAC or Email to verify your account.';
+        if (sessionStorage.getItem('eshop_session_token')) {
+            lastBotMsg.remove(); // Remove "Thinking..."
+            displayMyAccountMenu();
+        } else {
+            chatSession.state = 'awaiting_identifier';
+            lastBotMsg.innerHTML = 'Please enter your PAC or Email to verify your account.';
+        }
     } else if (text === '2') {
-        document.querySelector('#chat-body .bot-message:last-child').innerHTML = 'Please contact our admin directly on WhatsApp: <a href="https://wa.me/601111033154" target="_blank">Click Here</a>';
+        lastBotMsg.innerHTML = 'Please ask any general question you have.';
+        // The state remains 'main_menu' so the next message is treated as a general question.
+    } else if (text === '3') {
+        lastBotMsg.innerHTML = 'To talk to a human, please contact our admin on WhatsApp: <a href="https://wa.me/601111033154" target="_blank">Click Here</a>';
     } else {
+        // This handles general questions
         const response = await postToRender('getSmartAnswer', { question: text });
-        document.querySelector('#chat-body .bot-message:last-child').innerHTML = response.answer || 'Sorry, I had trouble finding an answer.';
+        lastBotMsg.innerHTML = response.answer || 'Sorry, I had trouble finding an answer.';
     }
 }
 
 async function startVerification(identifier) {
+    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
     const result = await postToRender('issueChatVerificationCode', { identifier: identifier });
     if (result.success) {
         chatSession.state = 'awaiting_code';
         chatSession.pac = result.pac;
-        document.querySelector('#chat-body .bot-message:last-child').innerHTML = 'A code has been sent to your WhatsApp. Please enter it here.';
+        lastBotMsg.innerHTML = 'A code has been sent to your WhatsApp. Please enter it here.';
     } else {
         chatSession.state = 'main_menu';
-        document.querySelector('#chat-body .bot-message:last-child').innerHTML = `Verification failed: ${result.message}`;
+        lastBotMsg.innerHTML = `Verification failed: ${result.message}`;
     }
 }
 
 async function submitVerificationCode(code) {
+    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
     const result = await postToRender('verifyChatCode', { pac: chatSession.pac, code: code });
     if (result.success) {
         sessionStorage.setItem('eshop_session_token', result.token);
-        document.querySelector('#chat-body .bot-message:last-child').innerHTML = 'Verified!';
+        lastBotMsg.innerHTML = 'Verified!';
         displayMyAccountMenu();
     } else {
         chatSession.state = 'main_menu';
-        document.querySelector('#chat-body .bot-message:last-child').innerHTML = `Verification failed: ${result.message}`;
+        lastBotMsg.innerHTML = `Verification failed: ${result.message}`;
     }
 }
 
@@ -573,16 +611,22 @@ function displayMyAccountMenu() {
 }
 
 async function handleMyAccountMenu(text) {
+    const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
     let action = '';
-    if (text === '1') action = 'getPurchaseHistory';
-    else if (text === '2') action = 'getPointsHistory';
-    else if (text === '3') { 
-        chatSession.state = 'main_menu';
-        document.querySelector('#chat-body .bot-message:last-child').innerHTML = "Returning to main menu...";
-        addChatMessage('bot', '<strong>Welcome!</strong><br>1. My Account<br>2. Talk to a Human<br>Or ask a question.');
+    if (text === '1') {
+        action = 'getPurchaseHistory';
+    } else if (text === '2') {
+        action = 'getPointsHistory';
+    } else if (text === '3') { 
+        lastBotMsg.remove();
+        displayMainMenu();
         return; 
     }
-    else { addChatMessage('bot', 'Invalid option.'); return; }
+    else { 
+        lastBotMsg.innerHTML = 'Invalid option. Please choose from the menu.';
+        addChatMessage('bot', '<strong>My Account</strong><br>1. View My Last 5 Orders<br>2. Check My Total Points<br>3. Back to Main Menu');
+        return;
+    }
 
     const token = sessionStorage.getItem('eshop_session_token');
     const result = await postToRender(action, { token: token });
@@ -598,8 +642,9 @@ async function handleMyAccountMenu(text) {
     } else {
         message = `Error: ${result.message}`;
     }
-    document.querySelector('#chat-body .bot-message:last-child').innerHTML = message;
-    displayMyAccountMenu(); // Re-display the menu for another action
+    lastBotMsg.innerHTML = message;
+    // After showing the result, re-display the menu for another action
+    displayMyAccountMenu();
 }
 
 async function postDataToGScript(payload, expectJsonResponse = false) {
