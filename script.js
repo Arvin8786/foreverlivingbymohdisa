@@ -295,9 +295,67 @@ function toggleCart(hide = false) {
     modal.style.display = hide ? 'none' : 'flex';
     if (!hide) updateCartDisplay();
 }
+    async function initiateCheckout() {
+    const checkoutBtn = document.querySelector('#cart-checkout-area button');
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = 'Processing...';
 
-function initiateCheckout() { alert('Checkout feature is under development.'); }
+    // 1. Get and validate form fields
+    const name = document.getElementById('customer-name').value.trim();
+    const phone = document.getElementById('customer-phone').value.trim();
+    const address = document.getElementById('customer-address').value.trim();
+    const email = document.getElementById('customer-email').value.trim();
 
+    if (!name || !phone || !address) {
+        alert('Please fill in all required customer details: Name, Phone, and Address.');
+        checkoutBtn.disabled = false;
+        checkoutBtn.textContent = 'Complete Order';
+        return;
+    }
+
+    // 2. Prepare the order data payload
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shippingFee = 0.0; // Assuming free shipping for now, can be updated later
+    const totalAmount = subtotal + shippingFee;
+
+    const itemsPurchased = cart.map(item => `${item.id}x${item.quantity}`).join(', ');
+
+    const payload = {
+        action: 'logInitialOrder',
+        data: {
+            customerName: name,
+            customerPhone: phone,
+            customerEmail: email,
+            customerAddress: address,
+            itemsPurchased: itemsPurchased,
+            cart: cart, // Send full cart data for detailed logging
+            totalAmount: totalAmount,
+            shippingFee: shippingFee,
+            totalPointsForThisPurchase: 0 // Backend can calculate points if needed
+        }
+    };
+
+    // 3. Send the order to the Google Apps Script backend
+    try {
+        await postDataToGScript(payload);
+
+        // 4. Handle success: show message, clear cart, and close modal
+        alert('Your order has been placed successfully! We will contact you via WhatsApp shortly to confirm payment and shipping.');
+        
+        cart = []; // Clear the cart array
+        toggleCart(true); // Close the cart modal
+        updateCartDisplay(); // Update the cart icon to show 0
+
+    } catch (error) {
+        // 5. Handle failure
+        console.error('Checkout failed:', error);
+        alert('There was an error placing your order. Please try again or contact us directly.');
+    } finally {
+        // 6. Re-enable the button regardless of success or failure
+        checkoutBtn.disabled = false;
+        checkoutBtn.textContent = 'Complete Order';
+    }
+}
 // ===========================================================
 // [ 5.0 ] FORMS LOGIC
 // ===========================================================
