@@ -247,10 +247,6 @@ function buildChatbotWidget() {
 // ===========================================================
 function buildCartModal(content) {
     const container = document.getElementById('cart-modal');
-    const bankDetailsHTML = `<strong>Bank:</strong> MAYBANK<br>
-           <strong>Account No:</strong> 102037147223<br>
-           <strong>Name:</strong> Arvinderan M Ganeson<br>
-           <img src="duitnow_high_quality.png" alt="DuitNow QR" style="max-width: 200px; margin-top: 10px;">`;
 
     container.innerHTML = `
         <div class="modal-content">
@@ -263,20 +259,16 @@ function buildCartModal(content) {
                 <div class="summary-line total"><span>Total</span><span id="cart-total"></span></div>
             </div>
             <div class="customer-info-form">
-                <h3>Customer Info</h3>
+                <h3>Your Details</h3>
                 <input type="text" id="customer-name" placeholder="Full Name" required>
                 <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
-                <input type="email" id="customer-email" placeholder="Email Address (Optional)">
+                <input type="email" id="customer-email" placeholder="Email (Optional)">
                 <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
-                <h3>Payment</h3>
-                <p>Please transfer to the details below and upload a receipt.</p>
-                <div class="payment-details" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #eee;">
-                    ${bankDetailsHTML}
-                </div>
-                <label for="payment-proof" style="display: block; margin-bottom: 5px;">Upload Payment Receipt (Required)</label>
-                <input type="file" id="payment-proof" accept="image/*,application/pdf" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
             </div>
-            <button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin: 20px 0 0;" onclick="initiateCheckout()">Complete Order</button>
+            <p style="text-align:center; margin-top:1rem; font-size:0.9rem;">
+                Clicking the button below will log your order and open WhatsApp to finalize payment.
+            </p>
+            <button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin: 20px 0 0;" onclick="initiateCheckout()">Place Order via WhatsApp</button>
         </div>`;
 }
 
@@ -392,63 +384,62 @@ async function initiateCheckout() {
     const name = document.getElementById('customer-name').value.trim();
     const phone = document.getElementById('customer-phone').value.trim();
     const address = document.getElementById('customer-address').value.trim();
-    const email = document.getElementById('customer-email').value.trim();
-    const proofFile = document.getElementById('payment-proof').files[0];
+    const email = document.getElementById('customer-email') ? document.getElementById('customer-email').value.trim() : 'N/A';
 
-    if (!name || !phone || !address || !proofFile) {
-        alert('Please fill in all required fields and upload a payment receipt.');
+    if (!name || !phone || !address) {
+        alert('Please fill in your Name, WhatsApp Number, and Address.');
         checkoutBtn.disabled = false;
-        checkoutBtn.textContent = 'Complete Order';
+        checkoutBtn.textContent = 'Place Order via WhatsApp';
         return;
     }
 
-    try {
-        const base64File = await getBase64(proofFile);
-        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const shippingFee = parseFloat(document.getElementById('cart-shipping').textContent.replace('RM ', ''));
-        const totalAmount = subtotal + shippingFee;
-        const itemsPurchased = cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shippingFee = parseFloat(document.getElementById('cart-shipping').textContent.replace('RM ', ''));
+    const totalAmount = subtotal + shippingFee;
+    
+    const itemsSummaryForWhatsapp = cart.map(item => `- ${item.name} (x${item.quantity})`).join('\n');
+    const itemsPurchasedForSheet = cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
 
+    try {
         const payload = {
-            action: 'logInitialOrder',
+            action: 'logPendingOrder',
             data: {
-                customerName: name,
-                customerPhone: phone,
-                customerEmail: email,
-                customerAddress: address,
-                itemsPurchased: itemsPurchased,
-                cart: cart,
-                totalAmount: totalAmount,
-                shippingFee: shippingFee,
-                paymentProofFile: base64File.split(',')[1],
-                paymentProofMimeType: proofFile.type
+                customerName: name, customerPhone: phone, customerEmail: email, customerAddress: address,
+                itemsPurchased: itemsPurchasedForSheet, cart: cart,
+                totalAmount: totalAmount, shippingFee: shippingFee,
             }
         };
-
         const response = await postDataToGScript(payload, true);
 
-        const invoiceId = response.proformaUrl.split('/').pop().replace('.pdf', '');
+        if (response.status !== 'success' || !response.invoiceId) {
+            throw new Error(response.message || 'Failed to log order.');
+        }
+
+        const adminPhoneNumber = "601111033154"; // Your WhatsApp number
+        const whatsappMessage = `Hi, I would like to place an order:\n\n*Invoice ID:* ${response.invoiceId}\n\n*Items:*\n${itemsSummaryForWhatsapp}\n\n*Subtotal:* RM ${subtotal.toFixed(2)}\n*Shipping:* RM ${shippingFee.toFixed(2)}\n*TOTAL:* RM ${totalAmount.toFixed(2)}\n\n*My Details:*\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n\nPlease advise on payment. Thank you!`;
+        const whatsappUrl = `https://wa.me/${adminPhoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+        
         document.getElementById('main-content').innerHTML = `
             <div class="dynamic-content-wrapper" style="text-align: center;">
-                <h2>Thank You! Your Order is Pending Verification.</h2>
-                <p>Your order has been placed successfully.</p>
-                <p><strong>Invoice Number:</strong> ${invoiceId}</p>
-                <p>We will contact you via WhatsApp shortly to confirm payment and shipping.</p>
-                <a href="${response.proformaUrl}" target="_blank" class="btn btn-primary" style="max-width: 300px; margin: 20px auto 0;">Download Your Invoice</a>
+                <h2>Thank You! Your Order Has Been Logged.</h2>
+                <p><strong>Invoice Number:</strong> ${response.invoiceId}</p>
+                <p>We are now redirecting you to WhatsApp to finalize payment with our team.</p>
+                <a href="${whatsappUrl}" class="btn btn-primary" style="max-width: 300px; margin: 20px auto 0;">Click here if not redirected</a>
             </div>`;
-
+        
         cart = [];
         toggleCart(true);
         updateCartDisplay();
+        
+        setTimeout(() => {
+            window.location.href = whatsappUrl;
+        }, 2500);
 
     } catch (error) {
         console.error('Checkout failed:', error);
         alert('There was an error placing your order. Please try again or contact us directly.');
-    } finally {
-        if (checkoutBtn) {
-            checkoutBtn.disabled = false;
-            checkoutBtn.textContent = 'Complete Order';
-        }
+        checkoutBtn.disabled = false;
+        checkoutBtn.textContent = 'Place Order via WhatsApp';
     }
 }
 
