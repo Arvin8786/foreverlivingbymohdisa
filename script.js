@@ -23,15 +23,28 @@ document.addEventListener('DOMContentLoaded', fetchData);
 
 async function fetchData() {
     try {
-        const response = await fetch(googleScriptURL);
-        if (!response.ok) throw new Error('Network response failed');
-        const data = await response.json();
-        if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
+        // Display a loading message to the user while data is being fetched
+        document.getElementById('main-content').innerHTML = `<p style="text-align: center; font-size: 1.2rem; padding: 2rem;">Loading store, please wait...</p>`;
 
+        const response = await fetch(googleScriptURL);
+        if (!response.ok) {
+            throw new Error('Network response failed. Please check the backend URL and deployment.');
+        }
+
+        const data = await response.json();
+        if (data.status !== 'success') {
+            throw new Error(data.message || 'The backend returned an error.');
+        }
+
+        // --- CRITICAL DATA ASSIGNMENT ---
+        // These lines take the data from your Google Sheet and store it in the global variables.
+        // This is where the shipping rules are loaded into the application.
         products = data.products || [];
         allJobs = data.jobsListings || [];
-        shippingRules = data.shippingRules || [];
+        shippingRules = data.shippingRules || []; // <-- THIS LINE IS ESSENTIAL FOR SHIPPING LOGIC
 
+        // --- RENDER THE ENTIRE PAGE ---
+        // Now that all the data has been loaded, call all the functions to build the HTML.
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
@@ -39,24 +52,29 @@ async function fetchData() {
         renderAboutUs(data.aboutUsContent);
         renderJobs(allJobs);
         buildEnquiryForm();
-
+        
         buildCartModal(data.aboutUsContent);
         buildJobApplicationModal();
         buildFabButtons();
         buildChatbotWidget();
-
+        
+        // Update the timestamp in the footer
         document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v21.0)`;
-
+        
+        // --- ADD EVENT LISTENERS ---
+        // Make the forms and buttons interactive.
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
         document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
         document.getElementById('chat-send-btn').addEventListener('click', handleChatSubmit);
-        document.getElementById('chat-input').addEventListener('keyup', (event) => {
-            if (event.key === "Enter") handleChatSubmit();
+        document.getElementById('chat-input').addEventListener('keyup', (event) => { 
+            if (event.key === "Enter") handleChatSubmit(); 
         });
 
+        // Finally, show the homepage tab
         showTab('homepage');
 
     } catch (error) {
+        // If anything fails, log the error and show a user-friendly message.
         console.error("Fatal Error fetching store data:", error);
         document.getElementById('main-content').innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
     }
@@ -316,7 +334,7 @@ function updateCartDisplay() {
     const checkoutBtn = document.getElementById('checkout-btn');
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     document.getElementById('cart-count').textContent = totalItems;
-
+    
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p style="text-align:center;">Your cart is empty.</p>';
         if (checkoutBtn) checkoutBtn.style.display = 'none';
@@ -337,21 +355,33 @@ function updateCartDisplay() {
             </div>`).join('');
         if (checkoutBtn) checkoutBtn.style.display = 'block';
     }
-
+        
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // =====================================================
+    // == START OF NEW, MORE ROBUST SHIPPING LOGIC        ==
+    // =====================================================
+    let shippingFee = 0; // Default to 0 if no rules apply
 
-    let shippingFee = 0;
     if (shippingRules && shippingRules.length > 0) {
-        const promoFree = shippingRules.find(r => r.ruleType === 'Free' && subtotal >= r.minSpend);
-        if (promoFree) {
-            shippingFee = 0;
-        } else {
-            const applicableTier = shippingRules.find(r => r.ruleType === 'Tiered' && subtotal >= r.minSpend && subtotal <= r.maxSpend);
-            if (applicableTier) {
-                shippingFee = applicableTier.charge;
-            }
+        // 1. Find all rules where the subtotal is high enough to qualify.
+        const applicableRules = shippingRules.filter(rule => subtotal >= rule.minSpend);
+
+        if (applicableRules.length > 0) {
+            // 2. Find the best rule by selecting the one with the highest minimum spend.
+            // This correctly finds the most specific tier (e.g., "Spend > 100" wins over "Spend > 50").
+            const bestRule = applicableRules.reduce((best, current) => {
+                return (current.minSpend > best.minSpend) ? current : best;
+            });
+            
+            // 3. Set the shipping fee from the best matching rule.
+            shippingFee = bestRule.charge;
         }
     }
+    // =====================================================
+    // == END OF NEW SHIPPING LOGIC                       ==
+    // =====================================================
+    
     const total = subtotal + shippingFee;
 
     document.getElementById('cart-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
