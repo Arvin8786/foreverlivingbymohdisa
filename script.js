@@ -795,50 +795,74 @@ function filterProducts() {
 function suggestProduct() {
     const symptom = document.getElementById("symptom-input").value.toLowerCase().trim();
     const resultDiv = document.getElementById("suggestion-result");
+    
+    // Clear previous results and show a thinking message
+    resultDiv.innerHTML = '<i>Finding suggestions...</i>';
+
     if (!symptom) {
         resultDiv.innerHTML = '<p style="color:red">Please enter a symptom or health concern.</p>';
         return;
     }
 
+    // The hard-coded "database" of symptoms and corresponding product IDs
     const symptomDB = {
-        'digestion': {
-            keywords: ['digestion', 'stomach', 'tummy', 'bloated', 'indigestion', 'constipation'],
-            ids: [1, 2, 3, 7, 11, 18]
+        'digestion': { keywords: ['digestion', 'stomach', 'tummy', 'bloated', 'indigestion', 'constipation'], ids: [1, 2, 3, 7, 11, 18] },
+        'immune': { keywords: ['immune', 'sick', 'flu', 'cold', 'cough', 'fever', 'infection'], ids: [1, 2, 14, 15, 17] },
+        'energy': { keywords: ['energy', 'tired', 'fatigue', 'stamina', 'lethargic', 'weak'], ids: [12, 13, 15, 8] },
+        'weight': { keywords: ['weight', 'diet', 'slim', 'lose weight', 'kurus'], ids: [4, 5, 6, 7] },
+        'skin': { keywords: ['skin', 'dry', 'acne', 'eczema', 'sunburn', 'aging', 'wrinkles', 'kulit'], ids: [30, 32, 29, 39, 52, 24, 21, 22, 31, 38, 41] },
+        'joint': { keywords: ['joint', 'muscle', 'pain', 'sore', 'arthritis', 'sakit', 'otot'], ids: [34, 16, 33] },
+        'heart': { keywords: ['heart', 'cholesterol', 'blood pressure', 'jantung'], ids: [16] },
+        'bone': { keywords: ['bone', 'calcium', 'osteoporosis', 'tulang'], ids: [19] },
+        'headache': { keywords: ['headache', 'migraine', 'pening', 'sakit kepala'], ids: [33] }
+        'detox': {
+            keywords: ['detox', 'cuci usus', 'toksin', 'nyah toksin', 'cleanse'],
+            ids: [1, 2, 7] // Aloe Vera, Fields of Green, etc.
         },
-        'immune': {
-            keywords: ['immune', 'sick', 'flu', 'cold', 'cough', 'fever', 'infection'],
-            ids: [1, 2, 14, 15, 17]
+        'womens_health': {
+            keywords: ['women', 'wanita', 'period pain', 'senggugut', 'pms', 'menopause', 'keputihan', 'kesuburan', 'fertility'],
+            ids: [1, 15, 19] // General wellness, antioxidants, calcium
         },
-        'energy': {
-            keywords: ['energy', 'tired', 'fatigue', 'stamina', 'lethargic', 'weak'],
-            ids: [12, 13, 15, 8]
+        'mens_health': {
+            keywords: ['men', 'lelaki', 'prostate', 'testosterone', 'tenaga batin'],
+            ids: [8, 12, 13, 15] // Gin-Chia, Royal Jelly, Bee Pollen, etc.
         },
-        'weight': {
-            keywords: ['weight', 'diet', 'slim', 'lose weight', 'kurus'],
-            ids: [4, 5, 6, 7]
+        'stress_sleep': {
+            keywords: ['stress', 'tekanan', 'susah tidur', 'insomnia', 'anxiety', 'risau', 'gelisah', 'sleep', 'relax'],
+            ids: [33, 12] // Royal Jelly, Aloe Blossom Tea
         },
-        'skin': {
-            keywords: ['skin', 'dry', 'acne', 'eczema', 'sunburn', 'aging', 'wrinkles', 'kulit'],
-            ids: [30, 32, 29, 39, 52, 24, 21, 22, 31, 38, 41]
+        'hair_nails': {
+            keywords: ['hair loss', 'rambut gugur', 'kelemumur', 'dandruff', 'kuku rapuh', 'brittle nails', 'hair growth'],
+            ids: [30, 31, 32, 1] // Aloe-Jojoba Shampoo, Conditioner, etc.
         },
-        'joint': {
-            keywords: ['joint', 'muscle', 'pain', 'sore', 'arthritis', 'sakit', 'otot'],
-            ids: [34, 16, 33]
-        },
-        'heart': {
-            keywords: ['heart', 'cholesterol', 'blood pressure', 'jantung'],
-            ids: [16]
-        },
-        'bone': {
-            keywords: ['bone', 'calcium', 'osteoporosis', 'tulang'],
-            ids: [19]
-        },
-        'headache': {
-            keywords: ['headache', 'migraine', 'pening', 'sakit kepala'],
-            ids: [33]
+        'eyes': {
+            keywords: ['eye', 'mata', 'penglihatan', 'vision', 'rabun', 'eye strain', 'silau'],
+            ids: [15] // Absorbent-C (Vitamin C is good for eyes)
         }
     };
 
+    const suggestedSKUs = new Set();
+
+    // =====================================================
+    // == START OF NEW, CORRECTED SUGGESTION LOGIC        ==
+    // =====================================================
+
+    // 1. Iterate over each category (like 'skin', 'weight') in our database.
+    for (const category in symptomDB) {
+        // 2. For each category, iterate over its list of keywords.
+        for (const keyword of symptomDB[category].keywords) {
+            // 3. Check if the user's FULL input string contains the current keyword.
+            // This correctly handles multi-word keywords like "lose weight" or "blood pressure".
+            if (symptom.includes(keyword)) {
+                // 4. If a match is found, add all associated product IDs to our set.
+                symptomDB[category].ids.forEach(id => suggestedSKUs.add(id));
+            }
+        }
+    }
+    
+    // =====================================================
+    // == END OF NEW SUGGESTION LOGIC                     ==
+    // =====================================================
     const suggestedSKUs = new Set();
     const searchWords = symptom.split(" ");
 
