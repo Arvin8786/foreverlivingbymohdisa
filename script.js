@@ -806,87 +806,102 @@ function suggestProduct() {
 
     // The hard-coded "database" of symptoms and corresponding product IDs
     const symptomDB = {
-        'digestion': { keywords: ['digestion', 'stomach', 'tummy', 'bloated', 'indigestion', 'constipation'], ids: [1, 2, 3, 7, 11, 18] },
-        'immune': { keywords: ['immune', 'sick', 'flu', 'cold', 'cough', 'fever', 'infection'], ids: [1, 2, 14, 15, 17] },
-        'energy': { keywords: ['energy', 'tired', 'fatigue', 'stamina', 'lethargic', 'weak'], ids: [12, 13, 15, 8] },
-        'weight': { keywords: ['weight', 'diet', 'slim', 'lose weight', 'kurus'], ids: [4, 5, 6, 7] },
-        'skin': { keywords: ['skin', 'dry', 'acne', 'eczema', 'sunburn', 'aging', 'wrinkles', 'kulit'], ids: [30, 32, 29, 39, 52, 24, 21, 22, 31, 38, 41] },
-        'joint': { keywords: ['joint', 'muscle', 'pain', 'sore', 'arthritis', 'sakit', 'otot'], ids: [34, 16, 33] },
-        'heart': { keywords: ['heart', 'cholesterol', 'blood pressure', 'jantung'], ids: [16] },
-        'bone': { keywords: ['bone', 'calcium', 'osteoporosis', 'tulang'], ids: [19] },
-        'headache': { keywords: ['headache', 'migraine', 'pening', 'sakit kepala'], ids: [33] }
+        // --- EXISTING CATEGORIES (EXPANDED) ---
+        'digestion': { 
+            keywords: ['digestion', 'stomach', 'tummy', 'bloated', 'indigestion', 'constipation', 'gastric', 'gerd', 'acid reflux', 'pedih ulu hati', 'sembelit', 'cirit-birit', 'buasir', 'angin', 'wind'], 
+            ids: [1, 2, 3, 7, 11, 18] 
+        },
+        'immune': { 
+            keywords: ['immune', 'sick', 'flu', 'cold', 'cough', 'fever', 'infection', 'selesema', 'batuk', 'demam', 'jangkitan', 'allergy', 'alahan', 'resdung', 'sinus'], 
+            ids: [1, 2, 14, 15, 17] 
+        },
+        'energy': { 
+            keywords: ['energy', 'tired', 'fatigue', 'stamina', 'lethargic', 'weak', 'letih', 'lesu', 'tak bertenaga', 'mengantuk', 'penat', 'brain fog', 'focus'], 
+            ids: [12, 13, 15, 8] 
+        },
+        'weight': { 
+            keywords: ['weight', 'diet', 'slim', 'lose weight', 'kurus', 'gemuk', 'berat badan', 'bakar lemak', 'fat burn', 'metabolism', 'metabolisma', 'obesity', 'kegemukan'], 
+            ids: [4, 5, 6, 7] 
+        },
+        'skin': { 
+            keywords: ['skin', 'dry', 'acne', 'eczema', 'sunburn', 'aging', 'wrinkles', 'kulit', 'jerawat', 'jeragat', 'parut', 'scar', 'pigmentation', 'gatal', 'itchy', 'psoriasis', 'kulit kusam', 'dull skin'], 
+            ids: [30, 32, 29, 39, 52, 24, 21, 22, 31, 38, 41] 
+        },
+        'joint': { 
+            keywords: ['joint', 'muscle', 'pain', 'sore', 'arthritis', 'sakit', 'otot', 'sakit sendi', 'lenguh', 'gout', 'sakit lutut', 'sakit belakang', 'back pain', 'knee pain', 'inflammation', 'radang'], 
+            ids: [34, 16, 33] 
+        },
+        'heart': { 
+            keywords: ['heart', 'cholesterol', 'blood pressure', 'jantung', 'darah tinggi', 'high blood', 'cardiovascular', 'strok'], 
+            ids: [16] 
+        },
+        'bone': { 
+            keywords: ['bone', 'calcium', 'osteoporosis', 'tulang', 'tulang rapuh', 'bone density'], 
+            ids: [19] 
+        },
+        'headache': { 
+            keywords: ['headache', 'migraine', 'pening', 'sakit kepala', 'stress', 'tekanan'], 
+            ids: [33] 
+        }, // <-- COMMA WAS MISSING HERE
+
+        // --- NEW CATEGORIES ---
         'detox': {
             keywords: ['detox', 'cuci usus', 'toksin', 'nyah toksin', 'cleanse'],
-            ids: [1, 2, 7] // Aloe Vera, Fields of Green, etc.
+            ids: [1, 2, 7]
         },
         'womens_health': {
             keywords: ['women', 'wanita', 'period pain', 'senggugut', 'pms', 'menopause', 'keputihan', 'kesuburan', 'fertility'],
-            ids: [1, 15, 19] // General wellness, antioxidants, calcium
+            ids: [1, 15, 19]
         },
         'mens_health': {
             keywords: ['men', 'lelaki', 'prostate', 'testosterone', 'tenaga batin'],
-            ids: [8, 12, 13, 15] // Gin-Chia, Royal Jelly, Bee Pollen, etc.
+            ids: [8, 12, 13, 15]
         },
         'stress_sleep': {
             keywords: ['stress', 'tekanan', 'susah tidur', 'insomnia', 'anxiety', 'risau', 'gelisah', 'sleep', 'relax'],
-            ids: [33, 12] // Royal Jelly, Aloe Blossom Tea
+            ids: [33, 12]
         },
         'hair_nails': {
             keywords: ['hair loss', 'rambut gugur', 'kelemumur', 'dandruff', 'kuku rapuh', 'brittle nails', 'hair growth'],
-            ids: [30, 31, 32, 1] // Aloe-Jojoba Shampoo, Conditioner, etc.
+            ids: [30, 31, 32, 1]
         },
         'eyes': {
             keywords: ['eye', 'mata', 'penglihatan', 'vision', 'rabun', 'eye strain', 'silau'],
-            ids: [15] // Absorbent-C (Vitamin C is good for eyes)
+            ids: [15]
         }
     };
 
     const suggestedSKUs = new Set();
 
-    // =====================================================
-    // == START OF NEW, CORRECTED SUGGESTION LOGIC        ==
-    // =====================================================
-
-    // 1. Iterate over each category (like 'skin', 'weight') in our database.
+    // Iterate over each category in our database.
     for (const category in symptomDB) {
-        // 2. For each category, iterate over its list of keywords.
+        // For each category, iterate over its list of keywords.
         for (const keyword of symptomDB[category].keywords) {
-            // 3. Check if the user's FULL input string contains the current keyword.
-            // This correctly handles multi-word keywords like "lose weight" or "blood pressure".
+            // Check if the user's FULL input string contains the current keyword.
+            // This correctly handles multi-word keywords like "lose weight".
             if (symptom.includes(keyword)) {
-                // 4. If a match is found, add all associated product IDs to our set.
+                // If a match is found, add all associated product IDs to our set.
                 symptomDB[category].ids.forEach(id => suggestedSKUs.add(id));
             }
         }
     }
     
-    // =====================================================
-    // == END OF NEW SUGGESTION LOGIC                     ==
-    // =====================================================
-    const suggestedSKUs = new Set();
-    const searchWords = symptom.split(" ");
-
-    searchWords.forEach(word => {
-        for (const category in symptomDB) {
-            if (symptomDB[category].keywords.some(kw => word.includes(kw))) {
-                symptomDB[category].ids.forEach(id => suggestedSKUs.add(id));
-            }
-        }
-    });
-
     if (suggestedSKUs.size > 0) {
-        resultDiv.innerHTML = "<h4>Based on your concern, we suggest:</h4>";
+        let suggestionsHtml = "<h4>Based on your concern, we suggest:</h4>";
+        
+        // Convert the Set to an array and limit to a maximum of 3 suggestions
         [...suggestedSKUs].slice(0, 3).forEach(sku => {
             const product = products.find(p => p.id === sku);
             if (product) {
-                resultDiv.innerHTML += `
+                suggestionsHtml += `
                     <div class="suggestion-product">
                         <span><strong>${product.name}</strong> - ${product.benefits.split(",")[0]}</span>
                         <button class="btn btn-primary" style="width:auto;padding:8px 15px" onclick="addToCart(${product.id});toggleCart()">Add</button>
                     </div>`;
             }
         });
+        resultDiv.innerHTML = suggestionsHtml;
     } else {
-        resultDiv.innerHTML = "<p>We could not find a specific match. Try searching for products directly.</p>";
+        resultDiv.innerHTML = "<p>We could not find a specific match. Try searching for products directly on the Products page.</p>";
     }
 }
