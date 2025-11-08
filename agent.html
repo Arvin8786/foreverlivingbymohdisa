@@ -37,24 +37,24 @@
     #portal-view nav .btn { width: auto; margin-right: 10px; }
     .view { border-top: 1px solid #eee; padding-top: 20px; }
     
-    /* Create New Order View */
     #order-creation-workflow { display: grid; grid-template-columns: 1fr 450px; gap: 20px; }
-    #product-selection, #customer-selection { max-height: 600px; overflow-y: auto; }
-    .product-item-selectable { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
-    .product-item-selectable:hover { background: #f0f0f0; }
+    #product-selection-list, #customer-list { max-height: 500px; overflow-y: auto; }
+    .product-item-selectable, .customer-item-selectable { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
+    .product-item-selectable:hover, .customer-item-selectable:hover { background: #f0f0f0; }
     .product-item-selectable img { width: 50px; height: 50px; object-fit: contain; }
 
     #order-summary-card { position: sticky; top: 20px; }
-    .summary-item { display: grid; grid-template-columns: 1fr 80px 80px 20px; align-items: center; gap: 10px; padding: 10px 0; }
-    .summary-item input { width: 100%; padding: 5px; text-align: center; }
-    .price-input-invalid { border: 2px solid var(--danger-color); }
+    .summary-item { display: grid; grid-template-columns: 1fr 60px 80px 20px; align-items: center; gap: 10px; padding: 10px 0; font-size: 0.9rem;}
+    .summary-item input { width: 100%; padding: 5px; text-align: center; font-size: 0.9rem; }
+    .price-input-invalid { border: 2px solid var(--danger-color) !important; }
     .summary-item .remove-btn { color: var(--danger-color); cursor: pointer; text-align: center; }
     .summary-total { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--dark-text); }
     .summary-line { display: flex; justify-content: space-between; padding: 5px 0; }
     .summary-line.total { font-weight: 700; font-size: 1.4rem; }
-
-    /* My Orders View */
-    #my-orders-list .order-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+    .price-error-message { font-size: 0.8rem; color: var(--danger-color); font-weight: 600; }
+    
+    #my-orders-list .order-item { border-bottom: 1px solid #eee; padding: 15px 5px; }
+    .order-item strong { color: var(--primary-color); }
 </style>
 
 <!-- =========================================================== -->
@@ -86,7 +86,7 @@
 
     <!-- [ 2.1 ] PRODUCTS VIEW -->
     <div id="products-view" class="view">
-        <button id="create-order-btn" class="btn btn-primary" style="margin-bottom: 20px; width: auto;"><i class="fa-solid fa-plus"></i> Create New Order</button>
+        <button id="show-create-order-view-btn" class="btn btn-primary" style="margin-bottom: 20px; width: auto;"><i class="fa-solid fa-plus"></i> Create New Order</button>
         <div class="card">
             <h2>Product Catalog</h2>
             <div id="product-catalog-list"></div>
@@ -103,15 +103,15 @@
 
     <!-- [ 2.3 ] CREATE NEW ORDER WORKFLOW VIEW -->
     <div id="create-order-view" class="view hidden">
+        <button id="back-to-products-btn" class="btn btn-secondary" style="width:auto; margin-bottom: 20px;"><i class="fa-solid fa-arrow-left"></i> Back to Products</button>
         <div id="order-creation-workflow">
             
-            <!-- Left Side: Customer & Product Selection -->
             <div>
                 <div class="card" id="customer-selection-card">
                     <h3>Step 1: Select or Create a Customer</h3>
                     <select id="customer-dropdown"></select>
-                    <button id="new-customer-btn" class="btn btn-secondary" style="width: auto;">Create New Customer</button>
-                    <div id="new-customer-form" class="hidden" style="margin-top: 15px;">
+                    <button id="new-customer-btn" class="btn btn-secondary" style="width: auto; margin-top: 10px;">Create New Customer</button>
+                    <div id="new-customer-form" class="hidden" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
                         <input type="text" id="new-customer-name" placeholder="Customer Name">
                         <input type="email" id="new-customer-email" placeholder="Customer Email">
                         <input type="tel" id="new-customer-phone" placeholder="Customer Phone">
@@ -125,7 +125,6 @@
                 </div>
             </div>
 
-            <!-- Right Side: Order Summary -->
             <div id="order-summary-card" class="card">
                 <h3>Order Summary</h3>
                 <div id="summary-items-list"><p>No items added yet.</p></div>
@@ -142,13 +141,432 @@
                     <p id="submit-status"></p>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
-
 <script>
-    // The JavaScript to power this portal will go here in the next step.
+// =================================================================
+// AGENT PORTAL SCRIPT - v1.0 (Complete & Functional)
+// =================================================================
+
+// --- CONFIGURATION ---
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzg13WXScOnIf8H07ZpuaXWlVs67fHbfN5Vcz-mli45fxLOsS2ajuRB2GMv3PW4O88Ptw/exec';
+
+// --- GLOBAL STATE ---
+let products = [];
+let customers = [];
+let shippingRules = [];
+let currentAgent = null;
+let currentOrder = {
+    customer: null,
+    items: [],
+};
+
+// --- INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Login/Logout
+    document.getElementById('login-btn').addEventListener('click', handleLogin);
+    document.getElementById('logout-btn').addEventListener('click', handleLogout);
+    
+    // Navigation
+    document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
+    document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
+    document.getElementById('show-create-order-view-btn').addEventListener('click', startNewOrder);
+    document.getElementById('back-to-products-btn').addEventListener('click', () => showView('products-view'));
+
+    // Order Creation
+    document.getElementById('new-customer-btn').addEventListener('click', () => {
+        document.getElementById('new-customer-form').classList.toggle('hidden');
+    });
+    document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
+});
+
+// ===========================================================
+// [ 1.0 ] LOGIN & DATA FETCHING
+// ===========================================================
+async function handleLogin() {
+    const agentId = document.getElementById('agent-id-input').value.trim();
+    const loginStatus = document.getElementById('login-status');
+    if (!agentId) {
+        loginStatus.textContent = "Agent ID cannot be empty.";
+        return;
+    }
+    
+    document.getElementById('login-btn').disabled = true;
+    loginStatus.textContent = "Verifying...";
+    try {
+        const response = await postToGoogleScript('verifyAgent', { agentId });
+        if (response.success) {
+            currentAgent = response.agent;
+            await fetchPortalData();
+            
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('portal-view').style.opacity = '1';
+            document.getElementById('agent-info').innerHTML = `<h2>Welcome, ${currentAgent.name}</h2><p>Agent ID: ${currentAgent.id}</p>`;
+            showView('products-view');
+        } else {
+            loginStatus.textContent = response.message || "Invalid Agent ID or not active.";
+        }
+    } catch (error) {
+        loginStatus.textContent = "Error connecting to the server.";
+    } finally {
+        document.getElementById('login-btn').disabled = false;
+    }
+}
+
+async function fetchPortalData() {
+    try {
+        const response = await postToGoogleScript('getPortalData');
+        if (response.success) {
+            products = response.products;
+            customers = response.customers;
+            shippingRules = response.shippingRules;
+            renderProductCatalog();
+            renderCustomerDropdown();
+        } else {
+            throw new Error(response.message);
+        }
+    } catch (error) {
+        console.error("Failed to fetch portal data:", error);
+        alert("Could not load essential data. Please try logging in again.");
+    }
+}
+
+function handleLogout(){
+    currentAgent = null;
+    products = [];
+    customers = [];
+    document.getElementById('login-view').classList.remove('hidden');
+    document.getElementById('portal-view').style.opacity = '0';
+    document.getElementById('agent-id-input').value = '';
+    document.getElementById('login-status').textContent = '';
+    setTimeout(() => {
+        document.getElementById('portal-view').classList.add('hidden');
+    }, 500);
+}
+
+// ===========================================================
+// [ 2.0 ] UI RENDERING & NAVIGATION
+// ===========================================================
+function showView(viewId) {
+    ['products-view', 'my-orders-view', 'create-order-view'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+    document.getElementById(viewId).classList.remove('hidden');
+
+    if (viewId === 'my-orders-view') {
+        renderMyOrders();
+    }
+}
+
+function renderProductCatalog() {
+    const container = document.getElementById('product-catalog-list');
+    const selectionContainer = document.getElementById('product-selection-list');
+    if (!products || products.length === 0) {
+        container.innerHTML = "<p>No products found.</p>";
+        selectionContainer.innerHTML = "<p>No products found.</p>";
+        return;
+    }
+    const productHtml = products.map(p => `
+        <div class="product-item-selectable">
+            <img src="${p.image}" alt="${p.name}">
+            <div class="product-item-info">
+                <strong>${p.name}</strong>
+                <p>RM ${p.rsp.toFixed(2)}</p>
+            </div>
+            <button class="btn btn-primary" onclick="addProductToOrder(${p.id})">Add</button>
+        </div>
+    `).join('');
+    container.innerHTML = productHtml;
+    selectionContainer.innerHTML = productHtml;
+}
+
+function renderCustomerDropdown() {
+    const select = document.getElementById('customer-dropdown');
+    select.innerHTML = `<option value="">-- Select Existing Customer --</option>`;
+    customers.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.pac;
+        option.textContent = `${c.name} (${c.email})`;
+        select.appendChild(option);
+    });
+}
+
+function renderMyOrders() {
+    const container = document.getElementById('my-orders-list');
+    container.innerHTML = '<p>Loading orders...</p>';
+    postToGoogleScript('getAgentOrders', { agentId: currentAgent.id })
+        .then(response => {
+            if (response.success && response.orders.length > 0) {
+                container.innerHTML = response.orders.map(order => `
+                    <div class="order-item">
+                        <p><strong>Invoice ID:</strong> ${order.invoiceId}</p>
+                        <p><strong>Date:</strong> ${order.date}</p>
+                        <p><strong>Customer:</strong> ${order.customerName}</p>
+                        <p><strong>Total:</strong> RM ${order.total}</p>
+                        <p><strong>Status:</strong> ${order.status}</p>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = "<p>No past orders found.</p>";
+            }
+        })
+        .catch(() => {
+            container.innerHTML = "<p>Could not load past orders.</p>";
+        });
+}
+
+function renderOrderSummary() {
+    const container = document.getElementById('summary-items-list');
+    if (currentOrder.items.length === 0) {
+        container.innerHTML = "<p>No items added yet.</p>";
+    } else {
+        container.innerHTML = currentOrder.items.map((item, index) => `
+            <div class="summary-item">
+                <div class="summary-item-info">
+                    <strong>${item.name}</strong>
+                    <div class="price-error-message" id="price-error-${item.id}"></div>
+                </div>
+                <input type="number" value="${item.quantity}" onchange="updateQuantity(${item.id}, this.value)">
+                <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice(${item.id}, this.value)">
+                <span class="remove-btn" onclick="removeItemFromOrder(${item.id})"><i class="fa-solid fa-trash"></i></span>
+            </div>
+        `).join('');
+    }
+    calculateTotals();
+}
+
+// ===========================================================
+// [ 3.0 ] ORDER CREATION LOGIC
+// ===========================================================
+function startNewOrder() {
+    currentOrder = { customer: null, items: [] };
+    // Reset all form fields
+    document.getElementById('customer-dropdown').value = '';
+    document.getElementById('new-customer-form').classList.add('hidden');
+    document.getElementById('new-customer-name').value = '';
+    document.getElementById('new-customer-email').value = '';
+    document.getElementById('new-customer-phone').value = '';
+    document.getElementById('new-customer-address').value = '';
+    document.getElementById('payment-proof').value = '';
+    document.getElementById('submit-status').textContent = '';
+    renderOrderSummary();
+    showView('create-order-view');
+}
+
+function addProductToOrder(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    const existingItem = currentOrder.items.find(item => item.id === productId);
+    if (existingItem) {
+        existingItem.quantity++;
+    } else {
+        currentOrder.items.push({
+            id: product.id,
+            name: product.name,
+            rsp: product.rsp,
+            quantity: 1,
+            customPrice: product.rsp,
+            minPrice: product.rsp * 0.70
+        });
+    }
+    renderOrderSummary();
+}
+
+function removeItemFromOrder(productId) {
+    currentOrder.items = currentOrder.items.filter(item => item.id !== productId);
+    renderOrderSummary();
+}
+
+function updateQuantity(productId, newQuantity) {
+    const item = currentOrder.items.find(i => i.id === productId);
+    const qty = parseInt(newQuantity, 10);
+    if (item && qty > 0) {
+        item.quantity = qty;
+        renderOrderSummary();
+    }
+}
+
+function updatePrice(productId, newPrice) {
+    const item = currentOrder.items.find(i => i.id === productId);
+    const price = parseFloat(newPrice);
+    if (item && !isNaN(price)) {
+        item.customPrice = price;
+        const priceInput = document.querySelector(`input[onchange="updatePrice(${item.id}, this.value)"]`);
+        const errorDiv = document.getElementById(`price-error-${item.id}`);
+        
+        if (price < item.minPrice) {
+            priceInput.classList.add('price-input-invalid');
+            errorDiv.textContent = `Min price: RM ${item.minPrice.toFixed(2)}`;
+        } else {
+            priceInput.classList.remove('price-input-invalid');
+            errorDiv.textContent = '';
+        }
+    }
+    calculateTotals();
+}
+
+function calculateTotals() {
+    let subtotal = 0;
+    currentOrder.items.forEach(item => {
+        subtotal += item.customPrice * item.quantity;
+    });
+
+    let shippingFee = 0;
+    if (shippingRules && shippingRules.length > 0) {
+        const promoFree = shippingRules.find(r => r.ruleType === 'Free' && subtotal >= r.minSpend);
+        if (promoFree) {
+            shippingFee = 0;
+        } else {
+            const applicableTier = shippingRules.find(r => r.ruleType === 'Tiered' && subtotal >= r.minSpend && subtotal <= r.maxSpend);
+            if (applicableTier) {
+                shippingFee = applicableTier.charge;
+            }
+        }
+    }
+    
+    const finalTotal = subtotal + shippingFee;
+
+    document.getElementById('summary-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
+    document.getElementById('summary-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `RM ${finalTotal.toFixed(2)}`;
+}
+    async function submitOrder() {
+    const submitBtn = document.getElementById('submit-order-btn');
+    const statusEl = document.getElementById('submit-status');
+    submitBtn.disabled = true;
+    statusEl.textContent = "Processing...";
+
+    // --- 1. Validate Inputs ---
+    let isPriceValid = true;
+    currentOrder.items.forEach(item => {
+        if (item.customPrice < item.minPrice) {
+            isPriceValid = false;
+        }
+    });
+    if (!isPriceValid) {
+        statusEl.textContent = "One or more item prices are below the minimum allowed.";
+        submitBtn.disabled = false;
+        return;
+    }
+    
+    let customerInfo;
+    const existingCustomerPac = document.getElementById('customer-dropdown').value;
+    if (existingCustomerPac) {
+        const existingCustomer = customers.find(c => c.pac === existingCustomerPac);
+        customerInfo = { ...existingCustomer };
+    } else {
+        customerInfo = {
+            name: document.getElementById('new-customer-name').value.trim(),
+            email: document.getElementById('new-customer-email').value.trim(),
+            phone: document.getElementById('new-customer-phone').value.trim(),
+            address: document.getElementById('new-customer-address').value.trim(),
+        };
+        if (!customerInfo.name || !customerInfo.email || !customerInfo.phone || !customerInfo.address) {
+            statusEl.textContent = "Please fill in all new customer details.";
+            submitBtn.disabled = false;
+            return;
+        }
+    }
+    
+    if (currentOrder.items.length === 0) {
+        statusEl.textContent = "Please add at least one product to the order.";
+        submitBtn.disabled = false;
+        return;
+    }
+
+    const proofFile = document.getElementById('payment-proof').files[0];
+    if (!proofFile) {
+        statusEl.textContent = "Payment proof is required.";
+        submitBtn.disabled = false;
+        return;
+    }
+
+    // --- 2. Prepare Payload ---
+    try {
+        const base64File = await getBase64(proofFile);
+        const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
+        
+        let shippingFee = 0;
+        if (shippingRules && shippingRules.length > 0) {
+            const applicableTier = shippingRules.find(r => r.ruleType === 'Tiered' && subtotal >= r.minSpend && subtotal <= r.maxSpend);
+            if (applicableTier) shippingFee = applicableTier.charge;
+        }
+        
+        const payload = {
+            agentId: currentAgent.id,
+            customer: customerInfo,
+            items: currentOrder.items.map(item => ({
+                id: item.id,
+                quantity: item.quantity,
+                price: item.customPrice
+            })),
+            shippingFee: shippingFee,
+            paymentProof: {
+                file: base64File.split(',')[1],
+                mimeType: proofFile.type,
+                fileName: proofFile.name
+            }
+        };
+
+        // --- 3. Submit to Backend ---
+        const response = await postToGoogleScript('submitAgentOrder', payload);
+        if (response.success) {
+            statusEl.textContent = `Order submitted successfully! Invoice ID: ${response.invoiceId}`;
+            statusEl.style.color = 'var(--accent-color)';
+            setTimeout(() => {
+                showView('products-view');
+            }, 5000);
+        } else {
+            throw new Error(response.message || "An unknown error occurred.");
+        }
+
+    } catch (error) {
+        statusEl.textContent = `Error: ${error.message}`;
+        statusEl.style.color = 'var(--danger-color)';
+    } finally {
+        submitBtn.disabled = false;
+    }
+}
+
+
+// ===========================================================
+// [ 5.0 ] UTILITY FUNCTIONS
+// ===========================================================
+async function postToGoogleScript(action, data = {}) {
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action, data }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            let errorMessage = `Network response was not ok.`;
+            try {
+                const errorJson = JSON.parse(errorText);
+                errorMessage = errorJson.message || errorMessage;
+            } catch (e) {
+                // Not a JSON error, use the raw text
+            }
+            throw new Error(errorMessage);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error posting to Google Script:', error);
+        throw error;
+    }
+}
+
+function getBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
 </script>
 
 </body>
