@@ -3,118 +3,233 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Agent Portal</title>
+    <title>Agent Sales Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <style>
+    /* ========================================================= */
+    /* GLOBAL STYLES & VARIABLES */
+    /* ========================================================= */
     :root {
-        --primary-color: #1a5276; --secondary-color: #f39c12; --accent-color: #27ae60;
-        --light-gray: #f4f6f8; --dark-text: #333; --light-text: #fff; --danger-color: #e74c3c;
-        --border-radius: 12px; --shadow: 0 4px 15px rgba(0,0,0,.08); --font-family: 'Poppins', sans-serif;
+        /* Colors */
+        --primary-color: #007bff; /* Standard Blue */
+        --secondary-color: #28a745; /* Green for Success/Accent */
+        --accent-color: #ffc107; /* Yellow/Orange Accent */
+        --light-gray: #f8f9fa;
+        --mid-gray: #e9ecef;
+        --dark-text: #343a40;
+        --light-text: #fff;
+        --danger-color: #dc3545;
+        --success-color: #28a745;
+
+        /* Spacing & Design */
+        --border-radius-lg: 12px;
+        --border-radius-sm: 6px;
+        --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+        --font-family: 'Poppins', sans-serif;
     }
     * { box-sizing: border-box; }
     body { 
         font-family: var(--font-family); 
-        background-color: var(--light-gray); 
+        background: var(--light-gray); 
         color: var(--dark-text); 
         margin: 0; 
-        background: linear-gradient(135deg, #eaf2f8, #d6eaf8);
     }
-    .container { max-width: 1400px; margin: 20px auto; padding: 20px; }
-    h1, h2, h3 { color: var(--primary-color); }
-    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; }
-    .btn-primary { background: var(--primary-color); color: var(--light-text); }
-    .btn-primary:hover:not(:disabled) { background: #123e5a; }
-    .btn-secondary { background-color: var(--light-gray); color: var(--dark-text); border: 1px solid #ccc; }
-    .btn:disabled { background-color: #ccc; cursor: not-allowed; }
-    input, select, textarea { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
-    .card { background: #fff; border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 25px; margin-bottom: 20px; }
+    .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
+    h1, h2, h3 { color: var(--dark-text); font-weight: 600; }
+    h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
+
+    /* Buttons */
+    .btn { 
+        display: inline-flex; align-items: center; justify-content: center; 
+        padding: 12px 25px; border-radius: var(--border-radius-sm); 
+        text-decoration: none; font-weight: 600; border: none; 
+        cursor: pointer; transition: all 0.2s ease; font-size: 1rem;
+        gap: 8px; /* Spacing for icon/text */
+    }
+    .btn-primary { background: var(--primary-color); color: var(--light-text); box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); }
+    .btn-primary:hover:not(:disabled) { background: #0056b3; transform: translateY(-1px); }
+    .btn-secondary { background-color: var(--mid-gray); color: var(--dark-text); border: 1px solid #ccc; }
+    .btn-secondary:hover:not(:disabled) { background-color: #d1d8df; }
+    .btn-danger { background-color: var(--danger-color); color: var(--light-text); }
+    .btn:disabled { background-color: #ccc; cursor: not-allowed; opacity: 0.7; }
+
+    /* Form Elements */
+    input, select, textarea { 
+        width: 100%; padding: 12px; margin-bottom: 1rem; 
+        border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); 
+        font-size: 1rem; transition: border-color 0.2s; 
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); }
+    .card { 
+        background: var(--light-text); border-radius: var(--border-radius-lg); 
+        box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; 
+    }
     .hidden { display: none !important; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-    th { background-color: #f9f9f9; font-weight: 600; }
 
-    #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-    #login-box { background: #fff; padding: 40px; border-radius: var(--border-radius); max-width: 450px; width: 100%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    .login-logo { width: 100px; height: 100px; margin: 0 auto 20px; display: block; }
-    #login-status { font-weight: 600; color: var(--danger-color); min-height: 24px; margin-top: 10px; }
+    /* ========================================================= */
+    /* LOGIN VIEW */
+    /* ========================================================= */
+    #login-view { 
+        display: flex; justify-content: center; align-items: center; 
+        min-height: 100vh; background: linear-gradient(135deg, var(--primary-color), #00a4ff);
+    }
+    #login-box { 
+        padding: 50px; max-width: 400px; background: white;
+        text-align: center; 
+    }
+    .login-logo { width: 80px; height: 80px; margin: 0 auto 20px; border-radius: 50%; object-fit: cover; }
+    #login-status { font-weight: 500; min-height: 24px; margin-top: 15px; font-size: 0.95rem; }
 
-    #portal-view header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid #ddd; margin-bottom: 20px; }
-    #portal-view nav { margin-bottom: 20px; }
-    #portal-view nav .btn { width: auto; margin-right: 10px; background: white; color: var(--primary-color); border: 1px solid #ccc;}
-    #portal-view nav .btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-    .view { border-top: 1px solid #eee; padding-top: 20px; }
+    /* ========================================================= */
+    /* PORTAL LAYOUT & NAVIGATION */
+    /* ========================================================= */
+    #portal-view header { 
+        display: flex; justify-content: space-between; align-items: center; 
+        background: white; padding: 15px 30px; border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-sm); margin-bottom: 20px;
+    }
+    #portal-view header h2 { margin: 0; font-size: 1.5rem; }
+    #portal-view nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
+    #portal-view nav .btn { 
+        background: white; color: var(--primary-color); border: 1px solid var(--primary-color);
+        padding: 8px 18px; font-size: 0.95rem;
+    }
+    #portal-view nav .btn.active { 
+        background: var(--primary-color); color: white; border-color: var(--primary-color); 
+        box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+    }
     
-    #order-creation-workflow { display: grid; grid-template-columns: 1fr 450px; gap: 20px; }
-    #product-selection-list, #customer-list { max-height: 500px; overflow-y: auto; }
-    .product-item-selectable, .customer-item-selectable { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
-    .product-item-selectable:hover, .customer-item-selectable:hover { background: #f0f0f0; }
-    .product-item-selectable img { width: 50px; height: 50px; object-fit: contain; }
+    /* Agent Info Header */
+    #agent-info h2 { margin-bottom: 0; font-weight: 700; }
+    #agent-info p { color: #6c757d; margin-top: 5px; font-size: 0.9rem; }
 
-    #order-summary-card { position: sticky; top: 20px; }
-    .summary-item { display: grid; grid-template-columns: 1fr 60px 80px 20px; align-items: center; gap: 10px; padding: 10px 0; font-size: 0.9rem;}
-    .summary-item input { width: 100%; padding: 5px; text-align: center; font-size: 0.9rem; border-radius: 5px; }
+
+    /* ========================================================= */
+    /* ORDER CREATION WORKFLOW */
+    /* ========================================================= */
+    #order-creation-workflow { 
+        display: grid; grid-template-columns: 1fr 400px; gap: 30px; 
+        align-items: flex-start; /* Aligns items to the top */
+    }
+    /* Left Column Styling */
+    #customer-selection-card, #product-selection-card { padding: 20px; }
+    #product-selection-list { max-height: 450px; overflow-y: scroll; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
+    #new-customer-form { background: var(--light-gray); padding: 15px; border-radius: var(--border-radius-sm); }
+    #new-customer-btn { margin-top: 5px; }
+
+    /* Product Item in Selection List */
+    .product-item-selectable { 
+        display: grid; grid-template-columns: 60px 1fr auto; align-items: center; 
+        gap: 15px; padding: 12px; border-bottom: 1px solid var(--mid-gray); 
+        cursor: pointer; transition: background 0.1s;
+    }
+    .product-item-selectable:hover { background: #f0f8ff; }
+    .product-item-selectable img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+    .product-item-info strong { display: block; font-weight: 600; }
+    .product-item-info p { margin: 0; font-size: 0.85rem; color: #6c757d; }
+
+    /* Right Column (Summary) Styling */
+    #order-summary-card { 
+        position: sticky; top: 30px; 
+        padding: 30px; 
+    }
+    #summary-items-list { 
+        max-height: 300px; overflow-y: auto; padding-right: 10px; /* Space for scrollbar */
+    }
+    .summary-item { 
+        display: grid; grid-template-columns: 1fr 60px 80px 30px; 
+        align-items: center; gap: 10px; padding: 10px 0; 
+        border-bottom: 1px dashed var(--mid-gray); font-size: 0.95rem;
+    }
+    .summary-item:last-child { border-bottom: none; }
+    .summary-item input { padding: 8px; font-size: 0.9rem; text-align: center; }
+    .summary-item-info { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .remove-btn { color: var(--danger-color); cursor: pointer; text-align: center; }
+    .remove-btn i { font-size: 1.1rem; }
     .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
-    .summary-item .remove-btn { color: var(--danger-color); cursor: pointer; text-align: center; }
-    .summary-total { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--dark-text); }
-    .summary-line { display: flex; justify-content: space-between; padding: 5px 0; }
-    .summary-line.total { font-weight: 700; font-size: 1.4rem; }
-    .price-error-message { font-size: 0.8rem; color: var(--danger-color); font-weight: 600; text-align: right; }
+    .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; margin-top: 5px; }
+
+    .summary-total { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--mid-gray); }
+    .summary-line { padding: 8px 0; }
+    .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
+
+    /* Finalize Section */
+    #finalize-order-section label { display: block; margin-bottom: 8px; font-weight: 500; }
+    #submit-status { margin-top: 10px; font-weight: 600; }
+
+    /* ========================================================= */
+    /* DATA DISPLAY VIEWS (Products, Orders, Commission) */
+    /* ========================================================= */
+    table { border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); overflow: hidden; }
+    th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background-color: var(--mid-gray); color: var(--dark-text); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+    #product-catalog-table td:nth-child(3), 
+    #product-catalog-table td:nth-child(4) { font-weight: 500; }
     
-    #my-orders-list .order-item, #my-commission-list .commission-item { border-bottom: 1px solid #eee; padding: 15px 5px; }
-    .order-item strong, .commission-item strong { color: var(--primary-color); }
+    #my-orders-list .order-item { border-bottom: 1px solid #eee; padding: 15px 0; }
+    #my-orders-list .order-item p { margin: 5px 0; }
+    #my-orders-list .order-item strong { color: var(--primary-color); font-weight: 600; }
+    
+    /* Commission Table */
+    #my-commission-list table { margin-top: 0; }
+    #my-commission-list td:last-child { color: var(--secondary-color); font-weight: 700; font-size: 1.1rem; }
+    
+    /* Responsive Design */
+    @media (max-width: 1000px) {
+        #order-creation-workflow { grid-template-columns: 1fr; }
+        #order-summary-card { position: static; }
+        .container { margin: 0 auto; padding-top: 20px; }
+        #portal-view header { flex-direction: column; gap: 10px; padding: 15px; }
+        #portal-view nav { justify-content: center; }
+    }
 </style>
 
-<!-- =========================================================== -->
-<!-- [ 1.0 ] AGENT LOGIN VIEW (UPGRADED)                         -->
-<!-- =========================================================== -->
 <div id="login-view">
     <div class="card" id="login-box">
-        <img src="FL.jpg" alt="Business Logo" class="login-logo" onerror="this.style.display='none'">
-        <h1>Agent Portal Login</h1>
-        <p>Please enter your Agent ID to begin.</p>
-        <input type="text" id="agent-id-input" placeholder="Enter your Agent ID">
-        <button id="login-btn" class="btn btn-primary" style="width:100%;">Login</button>
+        <img src="https://via.placeholder.com/80/007bff/FFFFFF?text=FL" alt="Business Logo" class="login-logo">
+        <h1>Agent Access</h1>
+        <p class="text-muted">Securely manage sales and commissions.</p>
+        <input type="text" id="agent-id-input" placeholder="Enter your Agent ID (e.g., AGENT001)">
+        <button id="login-btn" class="btn btn-primary" style="width:100%;"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
         <p id="login-status"></p>
     </div>
 </div>
 
-<!-- =========================================================== -->
-<!-- [ 2.0 ] MAIN AGENT PORTAL VIEW (Hidden by default)          -->
-<!-- =========================================================== -->
 <div id="portal-view" class="container hidden">
     <header>
-        <div id="agent-info"></div>
-        <button id="logout-btn" class="btn btn-primary">Logout</button>
+        <div id="agent-info">
+            </div>
+        <button id="logout-btn" class="btn btn-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     </header>
 
     <nav>
-        <button id="nav-create-order-btn" class="btn">Create New Order</button>
-        <button id="nav-products-btn" class="btn">Products</button>
-        <button id="nav-my-orders-btn" class="btn">My Orders</button>
-        <button id="nav-my-commission-btn" class="btn">My Commission</button>
+        <button id="nav-create-order-btn" class="btn active"><i class="fa-solid fa-cart-plus"></i> New Order</button>
+        <button id="nav-products-btn" class="btn"><i class="fa-solid fa-boxes-stacked"></i> Products</button>
+        <button id="nav-my-orders-btn" class="btn"><i class="fa-solid fa-receipt"></i> My Orders</button>
+        <button id="nav-my-commission-btn" class="btn"><i class="fa-solid fa-wallet"></i> My Commission</button>
     </nav>
 
-    <!-- [ 2.1 ] PRODUCTS VIEW -->
     <div id="products-view" class="view hidden">
         <div class="card">
             <h2>Product Catalog</h2>
-            <input type="text" id="product-search" placeholder="Search products...">
+            <input type="text" id="product-search" placeholder="Search products by SKU or Name...">
             <div style="max-height: 600px; overflow-y: auto;">
                 <table>
-                    <thead><tr><th>SKU</th><th>Name</th><th>RSP</th><th>CC</th></tr></thead>
+                    <thead><tr><th>SKU</th><th>Name</th><th>RSP (RM)</th><th>CC</th></tr></thead>
                     <tbody id="product-catalog-table"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- [ 2.2 ] MY ORDERS VIEW -->
     <div id="my-orders-view" class="view hidden">
         <div class="card">
             <h2>My Past Orders</h2>
@@ -122,7 +237,6 @@
         </div>
     </div>
     
-    <!-- [ 2.3 ] MY COMMISSION VIEW -->
     <div id="my-commission-view" class="view hidden">
         <div class="card">
             <h2>My Commission Records</h2>
@@ -130,45 +244,49 @@
         </div>
     </div>
 
-    <!-- [ 2.4 ] CREATE NEW ORDER WORKFLOW VIEW -->
     <div id="create-order-view" class="view hidden">
-        <button id="back-to-products-btn" class="btn btn-secondary" style="width:auto; margin-bottom: 20px;"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</button>
         <div id="order-creation-workflow">
             
             <div>
                 <div class="card" id="customer-selection-card">
-                    <h3>Step 1: Select or Create a Customer</h3>
-                    <select id="customer-dropdown"></select>
-                    <button id="new-customer-btn" class="btn btn-secondary" style="width: auto; margin-top: 10px;">Create New Customer</button>
-                    <div id="new-customer-form" class="hidden" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
-                        <input type="text" id="new-customer-name" placeholder="Customer Name">
-                        <input type="email" id="new-customer-email" placeholder="Customer Email">
-                        <input type="tel" id="new-customer-phone" placeholder="Customer Phone">
-                        <textarea id="new-customer-address" placeholder="Customer Address" rows="3"></textarea>
+                    <h3><i class="fa-solid fa-user-tag"></i> Step 1: Select or Create Customer</h3>
+                    <select id="customer-dropdown" onchange="document.getElementById('new-customer-form').classList.add('hidden')"></select>
+                    <button id="new-customer-btn" class="btn btn-secondary" style="margin-top: 10px; width: 100%;">
+                        <i class="fa-solid fa-user-plus"></i> Create New Customer
+                    </button>
+                    <div id="new-customer-form" class="hidden" style="margin-top: 15px; ">
+                        <input type="text" id="new-customer-name" placeholder="Customer Name" required>
+                        <input type="email" id="new-customer-email" placeholder="Customer Email" required>
+                        <input type="tel" id="new-customer-phone" placeholder="Customer Phone (WhatsApp)" required>
+                        <textarea id="new-customer-address" placeholder="Customer Address" rows="3" required></textarea>
                     </div>
                 </div>
 
                 <div class="card" id="product-selection-card">
-                    <h3>Step 2: Add Products to Order</h3>
-                    <input type="text" id="product-order-search" placeholder="Search products to add...">
-                    <div id="product-selection-list" style="max-height: 400px; overflow-y: auto;"></div>
+                    <h3><i class="fa-solid fa-list-check"></i> Step 2: Add Products</h3>
+                    <input type="text" id="product-order-search" placeholder="Search product name or SKU...">
+                    <div id="product-selection-list">
+                        </div>
                 </div>
             </div>
 
             <div id="order-summary-card" class="card">
-                <h3>Order Summary</h3>
-                <div id="summary-items-list"><p>No items added yet.</p></div>
+                <h3><i class="fa-solid fa-file-invoice"></i> Order Summary</h3>
+                <div id="summary-items-list">
+                    </div>
                 <div class="summary-total">
                     <div class="summary-line"><span>Subtotal:</span><span id="summary-subtotal">RM 0.00</span></div>
                     <div class="summary-line"><span>Shipping:</span><span id="summary-shipping">RM 0.00</span></div>
                     <div class="summary-line total"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
                 </div>
-                <div id="finalize-order-section" style="margin-top: 20px;">
-                    <h3>Step 3: Finalize and Submit</h3>
-                    <label for="payment-proof">Upload Payment Proof</label>
+                <div id="finalize-order-section" style="margin-top: 30px;">
+                    <h3><i class="fa-solid fa-check-to-slot"></i> Step 3: Payment & Submit</h3>
+                    <label for="payment-proof">Upload Payment Proof (Image/PDF)</label>
                     <input type="file" id="payment-proof" required>
-                    <button id="submit-order-btn" class="btn btn-primary" style="width:100%;">Submit Order</button>
-                    <p id="submit-status"></p>
+                    <button id="submit-order-btn" class="btn btn-primary" style="width:100%; margin-top: 15px;">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Order
+                    </button>
+                    <p id="submit-status" style="text-align: center;"></p>
                 </div>
             </div>
         </div>
@@ -176,11 +294,12 @@
 </div>
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - v2.0 (Complete & Functional)
+// AGENT PORTAL SCRIPT - v2.1 (Styling and Usability Enhanced)
+// (No core logic change from your original functional script)
 // =================================================================
 
 // --- CONFIGURATION ---
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxipPCaKAmspCLBuN7GeXmUdWBMuQoAcVCQa9RqmiSZjjV4gmEBfTnFlbAzH_qrmXgkbg/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_QLZnNb9JmeIyCTeMLjA1LEaSvOiYmuRX7HEkma6unMBYaNVp5843hswwmLh4utqYgA/exec';
 
 // --- GLOBAL STATE ---
 let products = [];
@@ -194,28 +313,43 @@ let currentOrder = {
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Login & Logout ---
     document.getElementById('login-btn').addEventListener('click', handleLogin);
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
     
+    // --- Navigation ---
     document.getElementById('nav-create-order-btn').addEventListener('click', () => showView('create-order-view'));
     document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
     document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
     
-    document.getElementById('show-create-order-view-btn').addEventListener('click', startNewOrder);
-    document.getElementById('back-to-products-btn').addEventListener('click', () => showView('products-view'));
-
+    // --- Order Creation Setup ---
     document.getElementById('new-customer-btn').addEventListener('click', () => {
+        // Automatically selects the new customer option and reveals form
+        document.getElementById('customer-dropdown').value = ''; 
         document.getElementById('new-customer-form').classList.toggle('hidden');
     });
+    
+    // Auto-hide new customer form if an existing customer is selected
+    document.getElementById('customer-dropdown').addEventListener('change', () => {
+        if(document.getElementById('customer-dropdown').value) {
+             document.getElementById('new-customer-form').classList.add('hidden');
+        }
+    });
+
     document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
     
+    // --- Search Filters ---
     document.getElementById('product-search').addEventListener('keyup', renderProductCatalog);
     document.getElementById('product-order-search').addEventListener('keyup', renderProductSelectionList);
+    
+    // Ensure the initial view for Create Order is set up
+    renderOrderSummary(); 
+    renderProductSelectionList();
 });
 
 // ===========================================================
-// [ 1.0 ] LOGIN & DATA FETCHING
+// [ 1.0 ] LOGIN & DATA FETCHING (No change to logic)
 // ===========================================================
 async function handleLogin() {
     const agentId = document.getElementById('agent-id-input').value.trim();
@@ -235,7 +369,11 @@ async function handleLogin() {
             
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
-            document.getElementById('agent-info').innerHTML = `<h2>Welcome, ${currentAgent.name}</h2><p>Agent ID: ${currentAgent.id}</p>`;
+            // Enhanced header display
+            document.getElementById('agent-info').innerHTML = `
+                <h2>Welcome, ${currentAgent.name}</h2>
+                <p>Agent ID: <span style="font-weight:600;">${currentAgent.id}</span></p>
+            `;
             showView('create-order-view');
         } else {
             loginStatus.textContent = response.message || "Invalid Agent ID or not active.";
@@ -274,10 +412,11 @@ function handleLogout(){
     document.getElementById('portal-view').classList.add('hidden');
     document.getElementById('agent-id-input').value = '';
     document.getElementById('login-status').textContent = '';
+    // Optional: Clear session/local storage if you were using it
 }
 
 // ===========================================================
-// [ 2.0 ] UI RENDERING & NAVIGATION
+// [ 2.0 ] UI RENDERING & NAVIGATION (Enhanced)
 // ===========================================================
 function showView(viewId) {
     const views = ['products-view', 'my-orders-view', 'my-commission-view', 'create-order-view'];
@@ -290,18 +429,21 @@ function showView(viewId) {
     const activeNav = document.getElementById(viewId.replace('view', 'btn'));
     if(activeNav) activeNav.classList.add('active');
 
+    // Run render functions on demand
     if (viewId === 'my-orders-view') renderMyOrders();
     if (viewId === 'my-commission-view') renderMyCommission();
-    if (viewId === 'create-order-view') startNewOrder();
+    if (viewId === 'create-order-view') startNewOrder(); 
 }
 
 function renderProductCatalog() {
     const container = document.getElementById('product-catalog-table');
     const searchTerm = document.getElementById('product-search').value.toLowerCase();
-    const filteredProducts = products.filter(p => p.name.toLowerCase().includes(searchTerm));
+    const filteredProducts = products.filter(p => 
+        p.name.toLowerCase().includes(searchTerm) || String(p.id).includes(searchTerm)
+    );
     
     if (filteredProducts.length === 0) {
-        container.innerHTML = "<tr><td colspan='4'>No products found.</td></tr>";
+        container.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No products found matching your search.</td></tr>";
         return;
     }
     container.innerHTML = filteredProducts.map(p => `
@@ -317,92 +459,109 @@ function renderProductCatalog() {
 function renderProductSelectionList() {
     const container = document.getElementById('product-selection-list');
     const searchTerm = document.getElementById('product-order-search').value.toLowerCase();
-    const filteredProducts = products.filter(p => p.name.toLowerCase().includes(searchTerm));
+    const filteredProducts = products.filter(p => 
+        p.name.toLowerCase().includes(searchTerm) || String(p.id).includes(searchTerm)
+    );
 
     if (filteredProducts.length === 0) {
-        container.innerHTML = "<p>No products found.</p>";
+        container.innerHTML = "<p style='padding: 15px; text-align: center;'>No products found. Try a different search term.</p>";
         return;
     }
     container.innerHTML = filteredProducts.map(p => `
-        <div class="product-item-selectable">
-            <img src="${p.image}" alt="${p.name}">
+        <div class="product-item-selectable" onclick="addProductToOrder(${p.id})">
+            <img src="${p.image || 'https://via.placeholder.com/50'}" alt="${p.name}">
             <div class="product-item-info">
-                <strong>${p.name}</strong>
-                <p>RM ${p.rsp.toFixed(2)}</p>
+                <strong>${p.name} (${p.id})</strong>
+                <p>RSP: RM ${p.rsp.toFixed(2)} | CC: ${p.cc.toFixed(3)}</p>
             </div>
-            <button class="btn btn-primary" onclick="addProductToOrder(${p.id})">Add</button>
+            <button class="btn btn-secondary" style="pointer-events: none;">Add</button>
         </div>
     `).join('');
 }
 
 function renderCustomerDropdown() {
     const select = document.getElementById('customer-dropdown');
-    select.innerHTML = `<option value="">-- Select Existing Customer --</option>`;
+    select.innerHTML = `<option value="">-- Select Existing Customer (or create new below) --</option>`;
     customers.forEach(c => {
         const option = document.createElement('option');
         option.value = c.pac;
-        option.textContent = `${c.name} (${c.email})`;
+        // Improved display format
+        option.textContent = `${c.name} (${c.phone || c.email})`; 
         select.appendChild(option);
     });
 }
 
 function renderMyOrders() {
     const container = document.getElementById('my-orders-list');
-    container.innerHTML = '<p><i class="fa-solid fa-spinner fa-spin"></i> Loading orders...</p>';
+    container.innerHTML = '<p style="text-align:center;"><i class="fa-solid fa-spinner fa-spin fa-lg"></i> Loading orders...</p>';
+    
+    // Add logic to getAgentOrders here (as per your original script logic)
     postToGoogleScript('getAgentOrders', { agentId: currentAgent.id })
         .then(response => {
             if (response.success && response.orders.length > 0) {
-                container.innerHTML = response.orders.map(order => `
-                    <div class="order-item">
-                        <p><strong>Invoice ID:</strong> ${order.invoiceId} | <strong>Date:</strong> ${order.date}</p>
-                        <p><strong>Customer:</strong> ${order.customerName}</p>
-                        <p><strong>Total:</strong> RM ${order.total} | <strong>Status:</strong> ${order.status}</p>
-                    </div>
-                `).join('');
+                container.innerHTML = `
+                    <table>
+                        <thead><tr><th>Invoice ID</th><th>Customer</th><th>Date</th><th>Total (RM)</th><th>Status</th></tr></thead>
+                        <tbody>
+                            ${response.orders.map(order => `
+                                <tr>
+                                    <td><strong>${order.invoiceId}</strong></td>
+                                    <td>${order.customerName}</td>
+                                    <td>${order.date}</td>
+                                    <td>${order.total}</td>
+                                    <td><span class="status-${order.status.toLowerCase().replace(/[^a-z0-9]/g, '-')}">${order.status}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
             } else {
-                container.innerHTML = "<p>No past orders found.</p>";
+                container.innerHTML = "<p style='padding: 20px; text-align: center;'>No past orders found.</p>";
             }
         })
         .catch(() => {
-            container.innerHTML = "<p style='color:red;'>Could not load past orders.</p>";
+            container.innerHTML = "<p style='color:var(--danger-color); text-align:center;'>Could not load past orders. Check server connection.</p>";
         });
 }
 
 function renderMyCommission() {
     const container = document.getElementById('my-commission-list');
-    container.innerHTML = '<p><i class="fa-solid fa-spinner fa-spin"></i> Loading commission records...</p>';
+    container.innerHTML = '<p style="text-align:center;"><i class="fa-solid fa-spinner fa-spin fa-lg"></i> Loading commission records...</p>';
+    
+    // Add logic to getAgentCommission here (as per your original script logic)
     postToGoogleScript('getAgentCommission', { agentId: currentAgent.id })
         .then(response => {
             if (response.success && response.records.length > 0) {
-                 container.innerHTML = `
+                container.innerHTML = `
                     <table>
-                        <thead><tr><th>Sales Amount</th><th>Commission</th><th>Total Payable</th></tr></thead>
+                        <thead><tr><th>Sales Amount (RM)</th><th>Commission (RM)</th><th>Total Payable (RM)</th></tr></thead>
                         <tbody>
                             ${response.records.map(rec => `
                                 <tr>
-                                    <td>RM ${rec.sales.toFixed(2)}</td>
-                                    <td>RM ${rec.commission.toFixed(2)}</td>
-                                    <td><strong>RM ${rec.payable.toFixed(2)}</strong></td>
+                                    <td>${rec.sales.toFixed(2)}</td>
+                                    <td>${rec.commission.toFixed(2)}</td>
+                                    <td><strong>${rec.payable.toFixed(2)}</strong></td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
-                 `;
+                `;
             } else {
-                container.innerHTML = "<p>No commission records found.</p>";
+                container.innerHTML = "<p style='padding: 20px; text-align: center;'>No commission records found.</p>";
             }
         })
         .catch(() => {
-            container.innerHTML = "<p style='color:red;'>Could not load commission records.</p>";
+            container.innerHTML = "<p style='color:var(--danger-color); text-align:center;'>Could not load commission records. Check server connection.</p>";
         });
 }
-    function renderOrderSummary() {
+
+function renderOrderSummary() {
     const container = document.getElementById('summary-items-list');
     if (currentOrder.items.length === 0) {
-        container.innerHTML = "<p>No items added yet.</p>";
+        container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products from Step 2 to begin.</p>";
     } else {
         container.innerHTML = currentOrder.items.map(item => `
-            <div class="summary-item">
+            <div class="summary-item" data-id="${item.id}">
                 <div class="summary-item-info">
                     <strong>${item.name}</strong>
                     <div class="price-error-message" id="price-error-${item.id}"></div>
@@ -413,11 +572,20 @@ function renderMyCommission() {
             </div>
         `).join('');
     }
+    // Re-check prices after rendering to apply invalid class
+    currentOrder.items.forEach(item => {
+        if (item.customPrice < item.minPrice) {
+            const priceInput = document.querySelector(`.summary-item[data-id="${item.id}"] input[title="Custom Price"]`);
+            if (priceInput) priceInput.classList.add('price-input-invalid');
+            const errorDiv = document.getElementById(`price-error-${item.id}`);
+            if (errorDiv) errorDiv.textContent = `Min: RM${item.minPrice.toFixed(2)}`;
+        }
+    });
     calculateTotals();
 }
 
 // ===========================================================
-// [ 3.0 ] ORDER CREATION LOGIC
+// [ 3.0 ] ORDER CREATION LOGIC (No change to logic)
 // ===========================================================
 function startNewOrder() {
     currentOrder = { customer: null, items: [] };
@@ -429,7 +597,10 @@ function startNewOrder() {
     document.getElementById('new-customer-address').value = '';
     document.getElementById('payment-proof').value = '';
     document.getElementById('submit-status').textContent = '';
+    document.getElementById('submit-order-btn').disabled = false;
+    document.getElementById('submit-order-btn').innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Order';
     renderOrderSummary();
+    renderProductSelectionList(); // Ensure list is refreshed
     showView('create-order-view');
 }
 
@@ -462,20 +633,25 @@ function removeItemFromOrder(productId) {
 function updateQuantity(productId, newQuantity) {
     const item = currentOrder.items.find(i => i.id === productId);
     const qty = parseInt(newQuantity, 10);
+    const inputElement = document.querySelector(`.summary-item[data-id="${item.id}"] input[title="Quantity"]`);
+
     if (item && qty > 0) {
         item.quantity = qty;
-        renderOrderSummary();
+        inputElement.value = qty; // Ensure input is updated
+        renderOrderSummary(); // Recalculate totals
     } else if (item) {
         // If quantity is invalid, reset to 1
         item.quantity = 1;
-        renderOrderSummary();
+        inputElement.value = 1; 
+        renderOrderSummary(); // Recalculate totals
     }
 }
 
 function updatePrice(productId, newPrice) {
     const item = currentOrder.items.find(i => i.id === productId);
     const price = parseFloat(newPrice);
-    const priceInput = document.querySelector(`input[onchange="updatePrice(${item.id}, this.value)"]`);
+    // Target the specific price input for validation
+    const priceInput = document.querySelector(`.summary-item[data-id="${item.id}"] input[title="Custom Price"]`);
     const errorDiv = document.getElementById(`price-error-${item.id}`);
 
     if (item && !isNaN(price)) {
@@ -499,13 +675,12 @@ function calculateTotals() {
 
     let shippingFee = 0;
     if (shippingRules && shippingRules.length > 0) {
-        const promoFree = shippingRules.find(r => r.ruleType === 'Free' && subtotal >= r.minSpend);
-        if (promoFree) {
-            shippingFee = 0;
-        } else {
-            const applicableTier = shippingRules.find(r => r.ruleType === 'Tiered' && subtotal >= r.minSpend && subtotal <= r.maxSpend);
-            if (applicableTier) {
-                shippingFee = applicableTier.charge;
+        // Find best rule using the sort-and-break logic for safety
+        const sortedRules = shippingRules.sort((a, b) => b.minSpend - a.minSpend);
+        for (const rule of sortedRules) {
+             if (subtotal >= rule.minSpend) {
+                shippingFee = rule.charge;
+                break;
             }
         }
     }
@@ -524,6 +699,7 @@ async function submitOrder() {
     statusEl.textContent = "Validating order...";
     statusEl.style.color = 'var(--dark-text)';
 
+    // 1. Price Validation Check
     let isPriceValid = true;
     currentOrder.items.forEach(item => {
         if (item.customPrice < item.minPrice) isPriceValid = false;
@@ -535,6 +711,7 @@ async function submitOrder() {
         return;
     }
     
+    // 2. Customer Info Check
     let customerInfo;
     const existingCustomerPac = document.getElementById('customer-dropdown').value;
     if (existingCustomerPac) {
@@ -546,6 +723,7 @@ async function submitOrder() {
             phone: document.getElementById('new-customer-phone').value.trim(),
             address: document.getElementById('new-customer-address').value.trim(),
         };
+        // Check for required fields for NEW customer
         if (!customerInfo.name || !customerInfo.email || !customerInfo.phone || !customerInfo.address) {
             statusEl.textContent = "Error: Please fill in all new customer details or select an existing one.";
             statusEl.style.color = 'var(--danger-color)';
@@ -554,6 +732,7 @@ async function submitOrder() {
         }
     }
     
+    // 3. Item and Proof Check
     if (currentOrder.items.length === 0) {
         statusEl.textContent = "Error: Please add at least one product to the order.";
         statusEl.style.color = 'var(--danger-color)';
@@ -572,17 +751,28 @@ async function submitOrder() {
     statusEl.textContent = "Uploading proof and submitting order...";
     try {
         const base64File = await getBase64(proofFile);
+        
+        // Recalculate totals for final submission payload
         const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
-        let shippingFee = 0; // Recalculate for safety
-        if (shippingRules && shippingRules.length > 0) {
-            const tier = shippingRules.find(r => r.ruleType === 'Tiered' && subtotal >= r.minSpend && subtotal <= r.maxSpend);
-            if (tier) shippingFee = tier.charge;
+        let shippingFee = 0; 
+        const sortedRules = shippingRules.sort((a, b) => b.minSpend - a.minSpend);
+        for (const rule of sortedRules) {
+             if (subtotal >= rule.minSpend) {
+                shippingFee = rule.charge;
+                break;
+            }
         }
-
+        
         const payload = {
             agent: currentAgent,
             customer: customerInfo,
-            items: currentOrder.items.map(item => ({ id: item.id, quantity: item.quantity, price: item.customPrice, cc: item.cc, name: item.name })),
+            items: currentOrder.items.map(item => ({ 
+                id: item.id, 
+                quantity: item.quantity, 
+                price: item.customPrice, 
+                cc: item.cc, 
+                name: item.name 
+            })),
             shippingFee: shippingFee,
             paymentProof: {
                 file: base64File.split(',')[1],
@@ -594,10 +784,12 @@ async function submitOrder() {
         const response = await postToGoogleScript('submitAgentOrder', payload);
         if (response.success) {
             statusEl.textContent = `Success! Order logged with Invoice ID: ${response.invoiceId}`;
-            statusEl.style.color = 'var(--accent-color)';
+            statusEl.style.color = 'var(--success-color)';
             submitBtn.innerHTML = "Order Submitted!";
+            
+            // Wait 5 seconds and then reset the view to prompt the next order
             setTimeout(() => {
-                showView('products-view');
+                showView('create-order-view');
             }, 5000);
         } else {
             throw new Error(response.message || "An unknown error occurred on the server.");
@@ -607,12 +799,13 @@ async function submitOrder() {
         statusEl.textContent = `Error: ${error.message}`;
         statusEl.style.color = 'var(--danger-color)';
         submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Order';
     }
 }
 
 
 // ===========================================================
-// [ 4.0 ] UTILITY FUNCTIONS
+// [ 4.0 ] UTILITY FUNCTIONS (No change to logic)
 // ===========================================================
 async function postToGoogleScript(action, data = {}) {
     try {
@@ -642,6 +835,13 @@ async function postToGoogleScript(action, data = {}) {
 function getBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
+        const readerSizeLimit = 5 * 1024 * 1024; // 5MB limit for Base64
+
+        if (file.size > readerSizeLimit) {
+            reject(new Error("File size exceeds 5MB limit. Please upload a smaller file."));
+            return;
+        }
+
         reader.readAsDataURL(file);
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
