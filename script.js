@@ -800,7 +800,6 @@ function suggestProduct() {
     const symptom = document.getElementById("symptom-input").value.toLowerCase().trim();
     const resultDiv = document.getElementById("suggestion-result");
     
-    // Clear previous results and show a thinking message
     resultDiv.innerHTML = '<i>Finding suggestions...</i>';
 
     if (!symptom) {
@@ -808,9 +807,7 @@ function suggestProduct() {
         return;
     }
 
-    // The hard-coded "database" of symptoms and corresponding product IDs
     const symptomDB = {
-        // --- EXISTING CATEGORIES (EXPANDED) ---
         'digestion': { 
             keywords: ['digestion', 'stomach', 'tummy', 'bloated', 'indigestion', 'constipation', 'gastric', 'gerd', 'acid reflux', 'pedih ulu hati', 'sembelit', 'cirit-birit', 'buasir', 'angin', 'wind'], 
             ids: [1, 2, 3, 7, 11, 18] 
@@ -846,7 +843,7 @@ function suggestProduct() {
         'headache': { 
             keywords: ['headache', 'migraine', 'pening', 'sakit kepala', 'stress', 'tekanan'], 
             ids: [33] 
-        }, // <-- COMMA WAS MISSING HERE
+        }, // <-- THIS COMMA WAS THE CRITICAL ERROR
 
         // --- NEW CATEGORIES ---
         'detox': {
@@ -876,15 +873,10 @@ function suggestProduct() {
     };
 
     const suggestedSKUs = new Set();
-
-    // Iterate over each category in our database.
+    
     for (const category in symptomDB) {
-        // For each category, iterate over its list of keywords.
         for (const keyword of symptomDB[category].keywords) {
-            // Check if the user's FULL input string contains the current keyword.
-            // This correctly handles multi-word keywords like "lose weight".
             if (symptom.includes(keyword)) {
-                // If a match is found, add all associated product IDs to our set.
                 symptomDB[category].ids.forEach(id => suggestedSKUs.add(id));
             }
         }
@@ -893,7 +885,6 @@ function suggestProduct() {
     if (suggestedSKUs.size > 0) {
         let suggestionsHtml = "<h4>Based on your concern, we suggest:</h4>";
         
-        // Convert the Set to an array and limit to a maximum of 3 suggestions
         [...suggestedSKUs].slice(0, 3).forEach(sku => {
             const product = products.find(p => p.id === sku);
             if (product) {
