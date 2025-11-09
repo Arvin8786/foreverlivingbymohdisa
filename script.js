@@ -714,21 +714,27 @@ async function handleMyAccountMenu(text) {
 
 
 async function postDataToGScript(payload, expectJsonResponse = false) {
-    const options = {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        redirect: 'follow'
-    };
-
-    if (!expectJsonResponse) {
-        options.mode = 'no-cors';
-    }
-
     try {
-        const response = await fetch(googleScriptURL, options);
+        // First, send a preflight request to handle CORS
+        await fetch(googleScriptURL, {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ preflight: true }),
+            redirect: 'follow'
+        });
+
+        // Now, send the actual data request
+        const response = await fetch(googleScriptURL, {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            redirect: 'follow'
+        });
+        
         if (expectJsonResponse) {
             if (!response.ok) {
                 const errorText = await response.text();
@@ -736,9 +742,7 @@ async function postDataToGScript(payload, expectJsonResponse = false) {
             }
             return await response.json();
         }
-        return {
-            status: 'success'
-        };
+        return { status: 'success' };
     } catch (error) {
         console.error('Error posting to Google Script:', error);
         throw error;
