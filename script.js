@@ -1,12 +1,12 @@
 // =================================================================
-// E-Shop Frontend Script - v21.3 (Final Synchronized)
+// E-Shop Frontend Script - v21.6 (Final Synchronized)
 // =================================================================
 
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
 // *** SYNCHRONIZED URL: Must match the newest deployment. ***
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbyHvFotZsIVLZVo_jsDbs_hOR9eYaIcGZofH4D1zRxI8cbbubKykoK19Lya-1BA_YMfYw/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzFfPhUFWDCnLhUPP8QlmD8I9duKdKtdJ8e_ld5CRxGpo9eT1y70ZLRhwIfIbU3HlVDFA/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
@@ -29,7 +29,7 @@ async function fetchData() {
 
         const response = await fetch(googleScriptURL);
         if (!response.ok) {
-            throw new Error('Network response failed. Please check the backend URL and deployment.');
+            throw new Error('Network response failed. Check backend URL and deployment status.');
         }
 
         const data = await response.json();
@@ -57,7 +57,7 @@ async function fetchData() {
         buildChatbotWidget();
         
         // Update the timestamp in the footer
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v21.3)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v21.6)`;
         
         // --- ADD EVENT LISTENERS ---
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
@@ -191,9 +191,9 @@ function renderAboutUs(content) {
     const emailLink = content.EmailAddress ? `<a href="mailto:${content.EmailAddress}"><i class="fa-solid fa-envelope"></i> ${content.EmailAddress}</a>` : '';
     const whatsappLink = content.Whatsapp ? `<a href="https://wa.me/${String(content.Whatsapp).replace(/\D/g,'')}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${content.Whatsapp}</a>` : '';
     
-    // RETAINING the original map link logic here, as it lives in the E-Shop script provided previously,
-    // though the URL structure remains questionable for reliable navigation:
+    // FIX: Simplified the map link generation for robustness (as the old string was complex)
     const addressLink = content.Address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content.Address)}" target="_blank"><i class="fa-solid fa-location-dot"></i> ${content.Address}</a>` : '';
+    
     const contactLinksHtml = (emailLink || whatsappLink || addressLink) ? `<div class="contact-links">${emailLink}${whatsappLink}${addressLink}</div>` : '';
 
     container.innerHTML = `
