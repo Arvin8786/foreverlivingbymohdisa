@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- =========================================================== -->
-    <!-- [ 1.0 ] Global Head Content                                 -->
-    <!-- =========================================================== -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Forever Living by Muhd Arvind Isa</title>
@@ -12,12 +9,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="icon" type="image/jpeg" href="FL.jpg">
 </head>
 <body>
 
-<!-- =========================================================== -->
-<!-- [ 2.0 ] GLOBAL STYLES & CORE HTML SHELL                       -->
-<!-- =========================================================== -->
 <style>
     /* [ 2.1 ] Core Styles */
     :root {
@@ -61,9 +57,6 @@
     .timestamp { font-size: 0.9rem; color: #ddd; margin-top: 10px; }
 </style>
 
-<!-- =========================================================== -->
-<!-- [ 3.0 ] DYNAMIC CONTENT & PAGES MODULE                      -->
-<!-- =========================================================== -->
 <style>
     /* [ 3.1 ] Homepage Section Styles */
     .hero-section { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: var(--light-text); padding: 80px 20px; text-align: center; border-radius: var(--border-radius); margin-bottom: 30px; }
@@ -107,9 +100,6 @@
     .job-card .btn { max-width: 200px; margin-top: 20px; }
 </style>
 
-<!-- =========================================================== -->
-<!-- [ 4.0 ] PRODUCTS MODULE                                     -->
-<!-- =========================================================== -->
 <style>
     /* [ 4.1 ] Product Grid & Card Styles */
     .search-container { margin-bottom: 2rem; position: relative; }
@@ -128,9 +118,6 @@
     .product-benefits, .product-consumption { font-size: .85rem; color: #555; margin: 10px 0; }
 </style>
 
-<!-- =========================================================== -->
-<!-- [ 5.0 ] SHOPPING CART & MODALS                              -->
-<!-- =========================================================== -->
 <style>
     /* [ 5.1 ] Floating Action Buttons */
     .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; gap: 15px; transition: right 0.3s ease-in-out; }
@@ -154,9 +141,6 @@
     .customer-info-form input, .customer-info-form textarea, .customer-info-form select { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
 </style>
 
-<!-- =========================================================== -->
-<!-- [ 6.0 ] CHATBOT MODULE                                      -->
-<!-- =========================================================== -->
 <style>
     /* [ 6.1 ] Chatbot Widget Styles */
     #eshop-chat-widget { position: fixed; bottom: 95px; right: 20px; width: 350px; height: 500px; background: #fff; border-radius: var(--border-radius); box-shadow: 0 5px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; visibility: hidden; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-in-out; z-index: 998; }
@@ -174,18 +158,12 @@
     #chat-send-btn { background: none; border: none; font-size: 20px; color: var(--primary-color); cursor: pointer; padding: 0 10px; }
 </style>
 
-<!-- =========================================================== -->
-<!-- [ 7.0 ] FORMS MODULE (Jobs & Enquiries)                     -->
-<!-- =========================================================== -->
 <style>
     /* [ 7.1 ] General Form Styles */
     .enquiry-form input, .enquiry-form textarea, .enquiry-form select { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
     .enquiry-form label { margin-top: 1rem; display: block; font-weight: 500; }
 </style>
 
-<!-- =========================================================== -->
-<!-- [ 8.0 ] HTML BODY STRUCTURE                                 -->
-<!-- =========================================================== -->
 <div id="store-wrapper">
   <header>
     <div class="container">
@@ -208,30 +186,25 @@
     </div>
   </nav>
   <main id="main-content" class="container">
-      <!-- JavaScript will populate the page content here -->
-      <div class="loader">
+    <div class="loader">
           <i class="fa-solid fa-spinner fa-spin"></i> Loading e-shop, please wait...
       </div>
   </main>
   <footer>
-      <div class="container">
-        <p id="footer-text"></p>
-        <div class="timestamp">Last updated: <span id="update-timestamp"></span></div>
-      </div>
+    <div class="container">
+      <p id="footer-text"></p>
+      <div class="timestamp">Last updated: <span id="update-timestamp"></span></div>
+    </div>
   </footer>
 </div>
 
-<!-- Modal containers - JavaScript will build the content inside these -->
 <div id="cart-modal" class="modal"></div>
 <div id="job-application-modal" class="modal"></div>
 
-<!-- Floating Action Button container -->
 <div class="fab-container" id="fab-container"></div>
 
-<!-- Chatbot Widget container -->
 <div id="eshop-chat-widget"></div>
 
-<!-- Link to the JavaScript file -->
 <script src="script.js"></script>
 
 </body>
