@@ -5,7 +5,6 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-// *** SYNCHRONIZED URL: Must match the newest deployment. ***
 const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxiFOvNTOnuIzGcnvmAtXSNqCXsuHJoZbvyJwpIa3kl8SX1SlKg2PjGGaNeKNcl3RBX1w/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
@@ -24,25 +23,16 @@ document.addEventListener('DOMContentLoaded', fetchData);
 
 async function fetchData() {
     try {
-        // Display a loading message to the user while data is being fetched
         document.getElementById('main-content').innerHTML = `<p style="text-align: center; font-size: 1.2rem; padding: 2rem;">Loading store, please wait...</p>`;
-
         const response = await fetch(googleScriptURL);
-        if (!response.ok) {
-            throw new Error('Network response failed. Check backend URL and deployment status.');
-        }
-
+        if (!response.ok) { throw new Error('Network response failed. Please check the backend URL and deployment.'); }
         const data = await response.json();
-        if (data.status !== 'success') {
-            throw new Error(data.message || 'The backend returned an error.');
-        }
+        if (data.status !== 'success') { throw new Error(data.message || 'The backend returned an error.'); }
 
-        // --- CRITICAL DATA ASSIGNMENT ---
         products = data.products || [];
         allJobs = data.jobsListings || [];
-        shippingRules = data.shippingRules || []; 
+        shippingRules = data.shippingRules || [];
 
-        // --- RENDER THE ENTIRE PAGE ---
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
@@ -50,28 +40,20 @@ async function fetchData() {
         renderAboutUs(data.aboutUsContent);
         renderJobs(allJobs);
         buildEnquiryForm();
-        
         buildCartModal(data.aboutUsContent);
         buildJobApplicationModal();
         buildFabButtons();
         buildChatbotWidget();
         
-        // Update the timestamp in the footer
         document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v21.6)`;
         
-        // --- ADD EVENT LISTENERS ---
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
         document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
         document.getElementById('chat-send-btn').addEventListener('click', handleChatSubmit);
-        document.getElementById('chat-input').addEventListener('keyup', (event) => { 
-            if (event.key === "Enter") handleChatSubmit(); 
-        });
+        document.getElementById('chat-input').addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
 
-        // Finally, show the homepage tab
         showTab('homepage');
-
     } catch (error) {
-        // If anything fails, log the error and show a user-friendly message.
         console.error("Fatal Error fetching store data:", error);
         document.getElementById('main-content').innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
     }
@@ -89,8 +71,7 @@ function renderStaticContent(content) {
 function renderMainContentShell() {
     const main = document.getElementById('main-content');
     main.innerHTML = `
-        <div id="homepage" class="tab-content">
-                     </div>
+        <div id="homepage" class="tab-content"></div>
         <div id="products" class="tab-content">
             <div class="search-container">
                 <input type="text" id="product-search" onkeyup="filterProducts()" placeholder="Search for products by name...">
@@ -107,67 +88,34 @@ function renderMainContentShell() {
 
 function renderHomepageContent(about, jobs, testimonies) {
     const container = document.getElementById('homepage');
-    if (!about) {
-        container.innerHTML = '<p>Welcome</p>';
-        return;
-    }
-
+    if (!about) { container.innerHTML = '<p>Welcome</p>'; return; }
     const heroHtml = `<section id="homepage-hero" class="hero-section"><h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p></section>`;
-
-    const aiSuggesterHtml = `
-        <section class="ai-suggestion-box">
-            <h3><i class="fa-solid fa-robot"></i> AI Product Suggester</h3>
-            <p>Describe your health concern (e.g., "dry skin", "low energy") and our AI will suggest a product for you.</p>
-            <input type="text" id="symptom-input" placeholder="Enter your symptom or concern...">
-            <button id="suggest-btn" class="btn" onclick="suggestProduct()">Get Suggestion</button>
-            <div id="suggestion-result"></div>
-        </section>`;
-
+    const aiSuggesterHtml = `<section class="ai-suggestion-box"><h3><i class="fa-solid fa-robot"></i> AI Product Suggester</h3><p>Describe your health concern (e.g., "dry skin", "low energy") and our AI will suggest a product for you.</p><input type="text" id="symptom-input" placeholder="Enter your symptom or concern..."><button id="suggest-btn" class="btn" onclick="suggestProduct()">Get Suggestion</button><div id="suggestion-result"></div></section>`;
     const whyChooseUsHtml = `<section id="why-choose-us" class="dynamic-content-wrapper"><h2>${about.WhyChooseUs_Title || 'Why Choose Us?'}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div></section>`;
-
     let youtubeHtml = '';
     const videoUrls = about.YoutubeURL ? String(about.YoutubeURL).split(',').map(url => url.trim()) : [];
     if (videoUrls.length > 0 && videoUrls[0]) {
         const youtubeTitle = about.YoutubeSection_Title || 'Learn More';
-        const videosHtml = videoUrls.map(url => {
-            try {
-                const videoId = new URL(url).searchParams.get('v');
-                if (videoId) return `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
-            } catch (e) {}
-            return '';
-        }).join('');
+        const videosHtml = videoUrls.map(url => { try { const videoId = new URL(url).searchParams.get('v'); if (videoId) return `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`; } catch (e) {} return ''; }).join('');
         youtubeHtml = `<section id="youtube-videos" class="dynamic-content-wrapper"><h2>${youtubeTitle}</h2><div id="youtube-videos-container">${videosHtml}</div></section>`;
     }
-
     let testimoniesHtml = '';
     if (testimonies && testimonies.length > 0) {
-        const testimoniesContent = testimonies.map(t => {
-            let stars = '';
-            for (let i = 0; i < 5; i++) {
-                stars += `<i class="fa-solid fa-star" style="color: ${i < t.Rating ? 'var(--secondary-color)' : '#ccc'}"></i>`;
-            }
-            return `<div class="testimony-card"><div class="testimony-header"><h4>${t.ClientName}</h4><div class="testimony-rating">${stars}</div></div><p>"${t.Quote}"</p></div>`;
-        }).join('');
+        const testimoniesContent = testimonies.map(t => { let stars = ''; for (let i = 0; i < 5; i++) { stars += `<i class="fa-solid fa-star" style="color: ${i < t.Rating ? 'var(--secondary-color)' : '#ccc'}"></i>`; } return `<div class="testimony-card"><div class="testimony-header"><h4>${t.ClientName}</h4><div class="testimony-rating">${stars}</div></div><p>"${t.Quote}"</p></div>`; }).join('');
         testimoniesHtml = `<section id="homepage-testimonies" class="dynamic-content-wrapper"><h2>What Our Customers Say</h2><div id="testimonies-container">${testimoniesContent}</div></section>`;
     }
-
     let featuredJobsHtml = '';
     const featuredJobs = jobs ? jobs.filter(j => j.isFeatured) : [];
     if (featuredJobs.length > 0) {
         const jobsContent = featuredJobs.map(job => `<div class="job-listing-summary"><h4>${job.position}</h4><p>${job.location} | ${job.type}</p></div>`).join('');
         featuredJobsHtml = `<section id="homepage-featured-jobs" class="dynamic-content-wrapper"><h2>Join Our Team</h2><div id="featured-jobs-container">${jobsContent}</div><a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0; max-width: 300px;">View All Career Opportunities</a></section>`;
     }
-
     container.innerHTML = heroHtml + aiSuggesterHtml + whyChooseUsHtml + youtubeHtml + testimoniesHtml + featuredJobsHtml;
 }
 
-
 function renderProducts(productsToRender) {
     const container = document.getElementById('product-list-container');
-    if (!productsToRender || productsToRender.length === 0) {
-        container.innerHTML = `<p>No products available.</p>`;
-        return;
-    }
+    if (!productsToRender || productsToRender.length === 0) { container.innerHTML = `<p>No products available.</p>`; return; }
     container.innerHTML = `<div class="product-list">${productsToRender.map(p => `
         <div class="product">
             <div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div>
@@ -183,60 +131,19 @@ function renderProducts(productsToRender) {
 
 function renderAboutUs(content) {
     const container = document.getElementById('about-us-content');
-    if (!content) {
-        container.innerHTML = '<p>About information is unavailable.</p>';
-        return;
-    }
+    if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
     const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
     const emailLink = content.EmailAddress ? `<a href="mailto:${content.EmailAddress}"><i class="fa-solid fa-envelope"></i> ${content.EmailAddress}</a>` : '';
     const whatsappLink = content.Whatsapp ? `<a href="https://wa.me/${String(content.Whatsapp).replace(/\D/g,'')}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${content.Whatsapp}</a>` : '';
-    
-    // FIX: Simplified the map link generation for robustness (as the old string was complex)
     const addressLink = content.Address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content.Address)}" target="_blank"><i class="fa-solid fa-location-dot"></i> ${content.Address}</a>` : '';
-    
     const contactLinksHtml = (emailLink || whatsappLink || addressLink) ? `<div class="contact-links">${emailLink}${whatsappLink}${addressLink}</div>` : '';
-
-    container.innerHTML = `
-        <h2>About ${content.CompanyName}</h2>
-        <div class="owner-profile">
-            <img src="arvind.jpg" alt="${content.Owner}" class="owner-image" onerror="this.style.display='none'">
-            <div class="owner-details">
-                <h3>${content.Owner} - ${content.Role}</h3>
-                ${contactLinksHtml}
-                <div>${content.MoreDetails}</div>
-            </div>
-        </div>
-        <div class="about-section">
-            <h4>Our Mission</h4>
-            <p>${content.OurMission}</p>
-        </div>
-        <div class="about-section">
-            <h4>Our Vision</h4>
-            <p>${content.OurVision}</p>
-        </div>
-        ${historySection}`;
+    container.innerHTML = `<h2>About ${content.CompanyName}</h2><div class="owner-profile"><img src="arvind.jpg" alt="${content.Owner}" class="owner-image" onerror="this.style.display='none'"><div class="owner-details"><h3>${content.Owner} - ${content.Role}</h3>${contactLinksHtml}<div>${content.MoreDetails}</div></div></div><div class="about-section"><h4>Our Mission</h4><p>${content.OurMission}</p></div><div class="about-section"><h4>Our Vision</h4><p>${content.OurVision}</p></div>${historySection}`;
 }
 
 function renderJobs(jobs) {
     const container = document.getElementById('job-listings-container');
-    if (!jobs || jobs.length === 0) {
-        container.innerHTML = '<p>There are currently no open positions.</p>';
-        return;
-    }
-    container.innerHTML = jobs.map(job => `
-        <div class="job-card">
-            <div class="job-header"><h3>${job.position}</h3></div>
-            <div class="job-body">
-                <div class="job-details">
-                    <div class="job-detail-item"><i class="fa-solid fa-location-dot"></i> <span>${job.location} | ${job.type}</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-money-bill-wave"></i> <span>${job.salary} RM</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-house-user"></i> <span>${job.accommodation}</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-calendar-days"></i> <span>${job.workDayPattern}</span></div>
-                </div>
-                <div class="job-description">${job.description}</div>
-                <button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')" style="width: auto;">Apply Now</button>
-            </div>
-        </div>`).join('');
+    if (!jobs || jobs.length === 0) { container.innerHTML = '<p>There are currently no open positions.</p>'; return; }
+    container.innerHTML = jobs.map(job => `<div class="job-card"><div class="job-header"><h3>${job.position}</h3></div><div class="job-body"><div class="job-details"><div class="job-detail-item"><i class="fa-solid fa-location-dot"></i> <span>${job.location} | ${job.type}</span></div><div class="job-detail-item"><i class="fa-solid fa-money-bill-wave"></i> <span>${job.salary} RM</span></div><div class="job-detail-item"><i class="fa-solid fa-house-user"></i> <span>${job.accommodation}</span></div><div class="job-detail-item"><i class="fa-solid fa-calendar-days"></i> <span>${job.workDayPattern}</span></div></div><div class="job-description">${job.description}</div><button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')" style="width: auto;">Apply Now</button></div></div>`).join('');
 }
 
 function buildEnquiryForm() {
@@ -264,68 +171,27 @@ function buildChatbotWidget() {
 // ===========================================================
 function buildCartModal(content) {
     const container = document.getElementById('cart-modal');
-
-    container.innerHTML = `
-        <div class="modal-content">
-            <span class="close" onclick="toggleCart(true)">×</span>
-            <h2>Your Cart</h2>
-            <div id="cart-items"></div>
-            <div class="cart-summary">
-                <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal"></span></div>
-                <div class="summary-line"><span>Shipping</span><span id="cart-shipping"></span></div>
-                <div class="summary-line total"><span>Total</span><span id="cart-total"></span></div>
-            </div>
-            <div class="customer-info-form">
-                <h3>Your Details</h3>
-                <input type="text" id="customer-name" placeholder="Full Name" required>
-                <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
-                <input type="email" id="customer-email" placeholder="Email (Optional)">
-                <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
-            </div>
-            <p style="text-align:center; margin-top:1rem; font-size:0.9rem;">
-                Clicking the button below will log your order and open WhatsApp to finalize payment.
-            </p>
-            <button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin: 20px 0 0;" onclick="initiateCheckout()">Place Order via WhatsApp</button>
-        </div>`;
+    container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleCart(true)">×</span><h2>Your Cart</h2><div id="cart-items"></div><div class="cart-summary"><div class="summary-line"><span>Subtotal</span><span id="cart-subtotal"></span></div><div class="summary-line"><span>Shipping</span><span id="cart-shipping"></span></div><div class="summary-line total"><span>Total</span><span id="cart-total"></span></div></div><div class="customer-info-form"><h3>Your Details</h3><input type="text" id="customer-name" placeholder="Full Name" required><input type="tel" id="customer-phone" placeholder="WhatsApp Number" required><input type="email" id="customer-email" placeholder="Email (Optional)"><textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea></div><p style="text-align:center; margin-top:1rem; font-size:0.9rem;">Clicking the button below will log your order and open WhatsApp to finalize payment.</p><button id="checkout-btn" class="btn btn-primary" style="width: 100%; margin: 20px 0 0;" onclick="initiateCheckout()">Place Order via WhatsApp</button></div>`;
 }
 
 function addToCart(productId) {
     const product = products.find(p => p.id == productId);
     if (!product) return;
     const existingItem = cart.find(item => item.id == productId);
-    if (existingItem) {
-        existingItem.quantity++;
-    } else {
-        cart.push({ ...product,
-            quantity: 1
-        });
-    }
+    if (existingItem) { existingItem.quantity++; } else { cart.push({ ...product, quantity: 1 }); }
     updateCartDisplay();
 }
 
 function increaseQuantity(productId) {
-    const item = cart.find(i => i.id == productId);
-    if (item) {
-        item.quantity++;
-    }
-    updateCartDisplay();
+    const item = cart.find(i => i.id == productId); if (item) { item.quantity++; } updateCartDisplay();
 }
 
 function decreaseQuantity(productId) {
-    const item = cart.find(i => i.id == productId);
-    if (item) {
-        item.quantity--;
-        if (item.quantity <= 0) {
-            removeItemFromCart(productId);
-        } else {
-            updateCartDisplay();
-        }
-    }
+    const item = cart.find(i => i.id == productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } }
 }
 
 function removeItemFromCart(productId) {
-    cart = cart.filter(item => item.id != productId);
-    updateCartDisplay();
+    cart = cart.filter(item => item.id != productId); updateCartDisplay();
 }
 
 function updateCartDisplay() {
@@ -338,36 +204,18 @@ function updateCartDisplay() {
         cartItemsContainer.innerHTML = '<p style="text-align:center;">Your cart is empty.</p>';
         if (checkoutBtn) checkoutBtn.style.display = 'none';
     } else {
-        cartItemsContainer.innerHTML = cart.map(item => `
-            <div class="cart-item">
-                <img src="${item.image}" alt="${item.name}" class="cart-item-image" />
-                <div class="cart-item-details">
-                    <strong>${item.name}</strong>
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
-                        <span>${item.quantity}</span>
-                        <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
-                    </div>
-                </div>
-                <strong>RM ${(item.price * item.quantity).toFixed(2)}</strong>
-                <button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button>
-            </div>`).join('');
+        cartItemsContainer.innerHTML = cart.map(item => `<div class="cart-item"><img src="${item.image}" alt="${item.name}" class="cart-item-image" /><div class="cart-item-details"><strong>${item.name}</strong><div class="quantity-controls"><button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button><span>${item.quantity}</span><button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button></div></div><strong>RM ${(item.price * item.quantity).toFixed(2)}</strong><button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button></div>`).join('');
         if (checkoutBtn) checkoutBtn.style.display = 'block';
     }
-    
+        
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
     let shippingFee = 0; 
-
     if (shippingRules && shippingRules.length > 0) {
-        // Sort rules by minSpend descending (highest spend first) to ensure the most specific rule is applied
         const sortedRules = shippingRules.sort((a, b) => b.minSpend - a.minSpend); 
-
-        for (const rule of sortedRules) {
-            if (subtotal >= rule.minSpend) {
-                shippingFee = rule.charge;
-                break; // Stop and use this rule
-            }
+        const bestRule = sortedRules.find(rule => subtotal >= rule.minSpend);
+        if (bestRule) {
+            shippingFee = bestRule.charge;
         }
     }
     
@@ -381,17 +229,11 @@ function updateCartDisplay() {
 function toggleCart(hide = false) {
     const modal = document.getElementById('cart-modal');
     if (!modal) return;
-    const isCurrentlyVisible = modal.style.display === 'flex';
-
     if (hide) {
         modal.style.display = 'none';
     } else {
-        if (isCurrentlyVisible) {
-            modal.style.display = 'none';
-        } else {
-            modal.style.display = 'flex';
-            updateCartDisplay();
-        }
+        modal.style.display = 'flex';
+        updateCartDisplay();
     }
 }
 
@@ -435,25 +277,17 @@ async function initiateCheckout() {
             throw new Error(response.message || 'Failed to log order.');
         }
 
-        const adminPhoneNumber = "601111033154"; // Your WhatsApp number
+        const adminPhoneNumber = "601111033154";
         const whatsappMessage = `Hi, I would like to place an order:\n\n*Invoice ID:* ${response.invoiceId}\n\n*Items:*\n${itemsSummaryForWhatsapp}\n\n*Subtotal:* RM ${subtotal.toFixed(2)}\n*Shipping:* RM ${shippingFee.toFixed(2)}\n*TOTAL:* RM ${totalAmount.toFixed(2)}\n\n*My Details:*\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n\nPlease advise on payment. Thank you!`;
         const whatsappUrl = `https://wa.me/${adminPhoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
         
-        document.getElementById('main-content').innerHTML = `
-            <div class="dynamic-content-wrapper" style="text-align: center;">
-                <h2>Thank You! Your Order Has Been Logged.</h2>
-                <p><strong>Invoice Number:</strong> ${response.invoiceId}</p>
-                <p>We are now redirecting you to WhatsApp to finalize payment with our team.</p>
-                <a href="${whatsappUrl}" class="btn btn-primary" style="max-width: 300px; margin: 20px auto 0;">Click here if not redirected</a>
-            </div>`;
+        document.getElementById('main-content').innerHTML = `<div class="dynamic-content-wrapper" style="text-align: center;"><h2>Thank You! Your Order Has Been Logged.</h2><p><strong>Invoice Number:</strong> ${response.invoiceId}</p><p>We are now redirecting you to WhatsApp to finalize payment with our team.</p><a href="${whatsappUrl}" class="btn btn-primary" style="max-width: 300px; margin: 20px auto 0;">Click here if not redirected</a></div>`;
         
         cart = [];
         toggleCart(true);
         updateCartDisplay();
         
-        setTimeout(() => {
-            window.location.href = whatsappUrl;
-        }, 2500);
+        setTimeout(() => { window.location.href = whatsappUrl; }, 2500);
 
     } catch (error) {
         console.error('Checkout failed:', error);
@@ -484,59 +318,36 @@ async function handleEnquirySubmit(event) {
     const statusEl = document.getElementById('enquiry-status');
     statusEl.textContent = 'Sending...';
     try {
-        const payload = {
-            action: 'logEnquiry',
-            data: {
-                name: document.getElementById('enquiry-name').value,
-                email: document.getElementById('enquiry-email').value,
-                phone: document.getElementById('enquiry-phone').value,
-                type: document.getElementById('enquiry-type').value,
-                message: document.getElementById('enquiry-message').value
-            }
-        };
+        const payload = { action: 'logEnquiry', data: { name: document.getElementById('enquiry-name').value, email: document.getElementById('enquiry-email').value, phone: document.getElementById('enquiry-phone').value, type: document.getElementById('enquiry-type').value, message: document.getElementById('enquiry-message').value } };
         await postDataToGScript(payload);
         statusEl.textContent = 'Enquiry sent successfully!';
         event.target.reset();
-    } catch (error) {
-        statusEl.textContent = 'An error occurred.';
-    }
+    } catch (error) { statusEl.textContent = 'An error occurred.'; }
 }
 
 async function handleJobApplicationSubmit(event) {
     event.preventDefault();
     const statusEl = document.getElementById('job-application-status');
     const fileInput = document.getElementById('applicant-resume');
-    if (fileInput.files.length === 0) {
-        statusEl.textContent = 'Resume upload is mandatory.';
-        return;
-    }
+    if (fileInput.files.length === 0) { statusEl.textContent = 'Resume upload is mandatory.'; return; }
     statusEl.textContent = 'Submitting...';
     const file = fileInput.files[0];
     const base64File = await getBase64(file);
     const payload = {
         action: 'logJobApplication',
         data: {
-            jobId: document.getElementById('job-id-input').value,
-            position: document.getElementById('job-position-input').value,
-            name: document.getElementById('applicant-name').value,
-            email: document.getElementById('applicant-email').value,
-            phone: document.getElementById('applicant-phone').value,
-            citizenship: document.getElementById('applicant-citizenship').value,
-            message: document.getElementById('applicant-message').value,
-            resumeFile: base64File.split(',')[1],
-            resumeMimeType: file.type,
-            resumeFileName: file.name
+            jobId: document.getElementById('job-id-input').value, position: document.getElementById('job-position-input').value,
+            name: document.getElementById('applicant-name').value, email: document.getElementById('applicant-email').value,
+            phone: document.getElementById('applicant-phone').value, citizenship: document.getElementById('applicant-citizenship').value,
+            message: document.getElementById('applicant-message').value, resumeFile: base64File.split(',')[1],
+            resumeMimeType: file.type, resumeFileName: file.name
         }
     };
     try {
         await postDataToGScript(payload);
         statusEl.textContent = 'Application submitted successfully!';
-        setTimeout(() => {
-            toggleJobModal(false);
-        }, 3000);
-    } catch (error) {
-        statusEl.textContent = 'An error occurred.';
-    }
+        setTimeout(() => { toggleJobModal(false); }, 3000);
+    } catch (error) { statusEl.textContent = 'An error occurred.'; }
 }
 
 function getBase64(file) {
@@ -554,9 +365,7 @@ function toggleChatWidget(show) {
     if (show) {
         chatWidget.classList.add('active');
         fabContainer.style.right = '370px';
-        if (document.getElementById('chat-body').innerHTML.trim() === '') {
-            displayMainMenu();
-        }
+        if (document.getElementById('chat-body').innerHTML.trim() === '') { displayMainMenu(); }
     } else {
         chatWidget.classList.remove('active');
         fabContainer.style.right = '20px';
@@ -586,17 +395,11 @@ async function handleChatSubmit() {
     addChatMessage('user', text);
     input.value = '';
     const thinkingMsg = addChatMessage('bot', '<i>Thinking...</i>');
-
     try {
-        if (chatSession.state === 'awaiting_identifier') {
-            await startVerification(text);
-        } else if (chatSession.state === 'awaiting_code') {
-            await submitVerificationCode(text);
-        } else if (chatSession.state === 'my_account_menu') {
-            await handleMyAccountMenu(text);
-        } else {
-            await handleMainMenu(text);
-        }
+        if (chatSession.state === 'awaiting_identifier') { await startVerification(text); } 
+        else if (chatSession.state === 'awaiting_code') { await submitVerificationCode(text); } 
+        else if (chatSession.state === 'my_account_menu') { await handleMyAccountMenu(text); } 
+        else { await handleMainMenu(text); }
     } catch (error) {
         thinkingMsg.innerHTML = 'There was an error connecting to the assistant.';
     }
@@ -617,18 +420,14 @@ async function handleMainMenu(text) {
     } else if (text === '3') {
         lastBotMsg.innerHTML = 'To talk to a human, please contact our admin on WhatsApp: <a href="https://wa.me/601111033154" target="_blank">Click Here</a>';
     } else {
-        const response = await postToRender('getSmartAnswer', {
-            question: text
-        });
+        const response = await postToRender('getSmartAnswer', { question: text });
         lastBotMsg.innerHTML = response.answer || 'Sorry, I had trouble finding an answer.';
     }
 }
 
 async function startVerification(identifier) {
     const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
-    const result = await postToRender('issueChatVerificationCode', {
-        identifier: identifier
-    });
+    const result = await postToRender('issueChatVerificationCode', { identifier: identifier });
     if (result.success) {
         chatSession.state = 'awaiting_code';
         chatSession.pac = result.pac;
@@ -641,10 +440,7 @@ async function startVerification(identifier) {
 
 async function submitVerificationCode(code) {
     const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
-    const result = await postToRender('verifyChatCode', {
-        pac: chatSession.pac,
-        code: code
-    });
+    const result = await postToRender('verifyChatCode', { pac: chatSession.pac, code: code });
     if (result.success) {
         sessionStorage.setItem('eshop_session_token', result.token);
         lastBotMsg.innerHTML = 'Verified!';
@@ -663,49 +459,32 @@ function displayMyAccountMenu() {
 async function handleMyAccountMenu(text) {
     const lastBotMsg = document.querySelector('#chat-body .bot-message:last-child');
     let action = '';
-    if (text === '1') {
-        action = 'getPurchaseHistory';
-    } else if (text === '2') {
-        action = 'getPointsHistory';
-    } else if (text === '3') {
-        lastBotMsg.remove();
-        displayMainMenu();
-        return;
-    } else {
+    if (text === '1') { action = 'getPurchaseHistory'; } 
+    else if (text === '2') { action = 'getPointsHistory'; } 
+    else if (text === '3') { lastBotMsg.remove(); displayMainMenu(); return; } 
+    else { 
         lastBotMsg.innerHTML = 'Invalid option. Please choose from the menu.';
         addChatMessage('bot', '<strong>My Account</strong><br>1. View My Last 5 Orders<br>2. Check My Total Points<br>3. Back to Main Menu');
         return;
     }
-
     const token = sessionStorage.getItem('eshop_session_token');
-    const result = await postToRender(action, {
-        token: token
-    });
+    const result = await postToRender(action, { token: token });
     let message = '';
     if (result.success) {
         if (action === 'getPurchaseHistory') {
             message = "<strong>Your Last 5 Orders:</strong><br>";
-            if (result.history.length === 0) {
-                message = 'You have no purchase history.';
-            } else {
-                result.history.forEach(order => {
-                    message += `<br><strong>ID:</strong> ${order.invoiceId}<br><strong>Date:</strong> ${order.date}<br><strong>Total:</strong> RM ${order.totalAmount}<br><strong>Status:</strong> ${order.status}`;
-                });
-            }
+            if (result.history.length === 0) { message = 'You have no purchase history.'; } 
+            else { result.history.forEach(order => { message += `<br><strong>ID:</strong> ${order.invoiceId}<br><strong>Date:</strong> ${order.date}<br><strong>Total:</strong> RM ${order.totalAmount}<br><strong>Status:</strong> ${order.status}`; }); }
         } else {
             message = `Your total points: <strong>${result.currentBalance}</strong>`;
         }
-    } else {
-        message = `Error: ${result.message}`;
-    }
+    } else { message = `Error: ${result.message}`; }
     lastBotMsg.innerHTML = message;
     displayMyAccountMenu();
 }
 
-
 async function postDataToGScript(payload, expectJsonResponse = false) {
     try {
-        
         const response = await fetch(googleScriptURL, {
             method: 'POST',
             mode: 'cors',
@@ -714,7 +493,6 @@ async function postDataToGScript(payload, expectJsonResponse = false) {
             body: JSON.stringify(payload),
             redirect: 'follow'
         });
-        
         if (expectJsonResponse) {
             if (!response.ok) {
                 const errorText = await response.text();
@@ -733,14 +511,8 @@ async function postToRender(action, data) {
     try {
         const response = await fetch(botServerURL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                action,
-                apiKey,
-                data
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, apiKey, data })
         });
         if (!response.ok) {
             const err = await response.json();
@@ -761,11 +533,9 @@ function showTab(tabId) {
 // ===========================================================
 // [ 6.0 ] AI SUGGESTER & SEARCH FUNCTIONS
 // ===========================================================
-
 function filterProducts() {
     const searchTerm = document.getElementById("product-search").value.toLowerCase();
     const products = document.querySelectorAll("#product-list-container .product");
-
     products.forEach(product => {
         const productName = product.querySelector("h3").textContent.toLowerCase();
         if (productName.includes(searchTerm)) {
@@ -779,7 +549,6 @@ function filterProducts() {
 function suggestProduct() {
     const symptom = document.getElementById("symptom-input").value.toLowerCase().trim();
     const resultDiv = document.getElementById("suggestion-result");
-    
     resultDiv.innerHTML = '<i>Finding suggestions...</i>';
 
     if (!symptom) {
@@ -788,68 +557,21 @@ function suggestProduct() {
     }
 
     const symptomDB = {
-        'digestion': { 
-            keywords: ['digestion', 'stomach', 'tummy', 'bloated', 'indigestion', 'constipation', 'gastric', 'gerd', 'acid reflux', 'pedih ulu hati', 'sembelit', 'cirit-birit', 'buasir', 'angin', 'wind'], 
-            ids: [1, 2, 3, 7, 11, 18] 
-        },
-        'immune': { 
-            keywords: ['immune', 'sick', 'flu', 'cold', 'cough', 'fever', 'infection', 'selesema', 'batuk', 'demam', 'jangkitan', 'allergy', 'alahan', 'resdung', 'sinus'], 
-            ids: [1, 2, 14, 15, 17] 
-        },
-        'energy': { 
-            keywords: ['energy', 'tired', 'fatigue', 'stamina', 'lethargic', 'weak', 'letih', 'lesu', 'tak bertenaga', 'mengantuk', 'penat', 'brain fog', 'focus'], 
-            ids: [12, 13, 15, 8] 
-        },
-        'weight': { 
-            keywords: ['weight', 'diet', 'slim', 'lose weight', 'kurus', 'gemuk', 'berat badan', 'bakar lemak', 'fat burn', 'metabolism', 'metabolisma', 'obesity', 'kegemukan'], 
-            ids: [4, 5, 6, 7] 
-        },
-        'skin': { 
-            keywords: ['skin', 'dry', 'acne', 'eczema', 'sunburn', 'aging', 'wrinkles', 'kulit', 'jerawat', 'jeragat', 'parut', 'scar', 'pigmentation', 'gatal', 'itchy', 'psoriasis', 'kulit kusam', 'dull skin'], 
-            ids: [30, 32, 29, 39, 52, 24, 21, 22, 31, 38, 41] 
-        },
-        'joint': { 
-            keywords: ['joint', 'muscle', 'pain', 'sore', 'arthritis', 'sakit', 'otot', 'sakit sendi', 'lenguh', 'gout', 'sakit lutut', 'sakit belakang', 'back pain', 'knee pain', 'inflammation', 'radang'], 
-            ids: [34, 16, 33] 
-        },
-        'heart': { 
-            keywords: ['heart', 'cholesterol', 'blood pressure', 'jantung', 'darah tinggi', 'high blood', 'cardiovascular', 'strok'], 
-            ids: [16] 
-        },
-        'bone': { 
-            keywords: ['bone', 'calcium', 'osteoporosis', 'tulang', 'tulang rapuh', 'bone density'], 
-            ids: [19] 
-        },
-        'headache': { 
-            keywords: ['headache', 'migraine', 'pening', 'sakit kepala', 'stress', 'tekanan'], 
-            ids: [33] 
-        }, 
-
-        // --- NEW CATEGORIES ---
-        'detox': {
-            keywords: ['detox', 'cuci usus', 'toksin', 'nyah toksin', 'cleanse'],
-            ids: [1, 2, 7]
-        },
-        'womens_health': {
-            keywords: ['women', 'wanita', 'period pain', 'senggugut', 'pms', 'menopause', 'keputihan', 'kesuburan', 'fertility'],
-            ids: [1, 15, 19]
-        },
-        'mens_health': {
-            keywords: ['men', 'lelaki', 'prostate', 'testosterone', 'tenaga batin'],
-            ids: [8, 12, 13, 15]
-        },
-        'stress_sleep': {
-            keywords: ['stress', 'tekanan', 'susah tidur', 'insomnia', 'anxiety', 'risau', 'gelisah', 'sleep', 'relax'],
-            ids: [33, 12]
-        },
-        'hair_nails': {
-            keywords: ['hair loss', 'rambut gugur', 'kelemumur', 'dandruff', 'kuku rapuh', 'brittle nails', 'hair growth'],
-            ids: [30, 31, 32, 1]
-        },
-        'eyes': {
-            keywords: ['eye', 'mata', 'penglihatan', 'vision', 'rabun', 'eye strain', 'silau'],
-            ids: [15]
-        }
+        'digestion': { keywords: ['digestion', 'stomach', 'tummy', 'bloated', 'indigestion', 'constipation', 'gastric', 'gerd', 'acid reflux', 'pedih ulu hati', 'sembelit', 'cirit-birit', 'buasir', 'angin', 'wind'], ids: [1, 2, 3, 7, 11, 18] },
+        'immune': { keywords: ['immune', 'sick', 'flu', 'cold', 'cough', 'fever', 'infection', 'selesema', 'batuk', 'demam', 'jangkitan', 'allergy', 'alahan', 'resdung', 'sinus'], ids: [1, 2, 14, 15, 17] },
+        'energy': { keywords: ['energy', 'tired', 'fatigue', 'stamina', 'lethargic', 'weak', 'letih', 'lesu', 'tak bertenaga', 'mengantuk', 'penat', 'brain fog', 'focus'], ids: [12, 13, 15, 8] },
+        'weight': { keywords: ['weight', 'diet', 'slim', 'lose weight', 'kurus', 'gemuk', 'berat badan', 'bakar lemak', 'fat burn', 'metabolism', 'metabolisma', 'obesity', 'kegemukan'], ids: [4, 5, 6, 7] },
+        'skin': { keywords: ['skin', 'dry', 'acne', 'eczema', 'sunburn', 'aging', 'wrinkles', 'kulit', 'jerawat', 'jeragat', 'parut', 'scar', 'pigmentation', 'gatal', 'itchy', 'psoriasis', 'kulit kusam', 'dull skin'], ids: [30, 32, 29, 39, 52, 24, 21, 22, 31, 38, 41] },
+        'joint': { keywords: ['joint', 'muscle', 'pain', 'sore', 'arthritis', 'sakit', 'otot', 'sakit sendi', 'lenguh', 'gout', 'sakit lutut', 'sakit belakang', 'back pain', 'knee pain', 'inflammation', 'radang'], ids: [34, 16, 33] },
+        'heart': { keywords: ['heart', 'cholesterol', 'blood pressure', 'jantung', 'darah tinggi', 'high blood', 'cardiovascular', 'strok'], ids: [16] },
+        'bone': { keywords: ['bone', 'calcium', 'osteoporosis', 'tulang', 'tulang rapuh', 'bone density'], ids: [19] },
+        'headache': { keywords: ['headache', 'migraine', 'pening', 'sakit kepala', 'stress', 'tekanan'], ids: [33] },
+        'detox': { keywords: ['detox', 'cuci usus', 'toksin', 'nyah toksin', 'cleanse'], ids: [1, 2, 7] },
+        'womens_health': { keywords: ['women', 'wanita', 'period pain', 'senggugut', 'pms', 'menopause', 'keputihan', 'kesuburan', 'fertility'], ids: [1, 15, 19] },
+        'mens_health': { keywords: ['men', 'lelaki', 'prostate', 'testosterone', 'tenaga batin'], ids: [8, 12, 13, 15] },
+        'stress_sleep': { keywords: ['stress', 'tekanan', 'susah tidur', 'insomnia', 'anxiety', 'risau', 'gelisah', 'sleep', 'relax'], ids: [33, 12] },
+        'hair_nails': { keywords: ['hair loss', 'rambut gugur', 'kelemumur', 'dandruff', 'kuku rapuh', 'brittle nails', 'hair growth'], ids: [30, 31, 32, 1] },
+        'eyes': { keywords: ['eye', 'mata', 'penglihatan', 'vision', 'rabun', 'eye strain', 'silau'], ids: [15] }
     };
 
     const suggestedSKUs = new Set();
@@ -868,11 +590,7 @@ function suggestProduct() {
         [...suggestedSKUs].slice(0, 3).forEach(sku => {
             const product = products.find(p => p.id === sku);
             if (product) {
-                suggestionsHtml += `
-                    <div class="suggestion-product">
-                        <span><strong>${product.name}</strong> - ${product.benefits.split(",")[0]}</span>
-                        <button class="btn btn-primary" style="width:auto;padding:8px 15px" onclick="addToCart(${product.id});toggleCart()">Add</button>
-                    </div>`;
+                suggestionsHtml += `<div class="suggestion-product"><span><strong>${product.name}</strong> - ${product.benefits.split(",")[0]}</span><button class="btn btn-primary" style="width:auto;padding:8px 15px" onclick="addToCart(${product.id});toggleCart()">Add</button></div>`;
             }
         });
         resultDiv.innerHTML = suggestionsHtml;
