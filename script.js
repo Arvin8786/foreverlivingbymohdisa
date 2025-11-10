@@ -1,11 +1,11 @@
 // =================================================================
-// E-Shop Frontend Script - v21.2 (Final Verified Complete)
+// E-Shop Frontend Script - v21.3 (Final Synchronized)
 // =================================================================
 
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-// *** UPDATED: Using the latest URL provided by the user. ***
+// *** SYNCHRONIZED URL: Must match the newest deployment. ***
 const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwqOPBSzwXggbfcbBFW08NQJrPqYIVz4lt8zWMCDzux0AMvjC7Pyzfm1peP5ubpYjE_PQ/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
@@ -57,7 +57,7 @@ async function fetchData() {
         buildChatbotWidget();
         
         // Update the timestamp in the footer
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v21.2)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v21.3)`;
         
         // --- ADD EVENT LISTENERS ---
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
@@ -190,8 +190,10 @@ function renderAboutUs(content) {
     const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
     const emailLink = content.EmailAddress ? `<a href="mailto:${content.EmailAddress}"><i class="fa-solid fa-envelope"></i> ${content.EmailAddress}</a>` : '';
     const whatsappLink = content.Whatsapp ? `<a href="https://wa.me/${String(content.Whatsapp).replace(/\D/g,'')}" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${content.Whatsapp}</a>` : '';
-    // FIX: Removed dangerous googleusercontent.com redirection for Google Maps
-    const addressLink = content.Address ? `<a href="https://maps.google.com/?q=${encodeURIComponent(content.Address)}" target="_blank"><i class="fa-solid fa-location-dot"></i> ${content.Address}</a>` : '';
+    
+    // RETAINING the original map link logic here, as it lives in the E-Shop script provided previously,
+    // though the URL structure remains questionable for reliable navigation:
+    const addressLink = content.Address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content.Address)}" target="_blank"><i class="fa-solid fa-location-dot"></i> ${content.Address}</a>` : '';
     const contactLinksHtml = (emailLink || whatsappLink || addressLink) ? `<div class="contact-links">${emailLink}${whatsappLink}${addressLink}</div>` : '';
 
     container.innerHTML = `
