@@ -295,12 +295,12 @@
 </div>
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - v2.3 (Final Cleaned & Verified)
+// AGENT PORTAL SCRIPT - v2.4 (Final Cleaned & Verified)
 // =================================================================
 
 // --- CONFIGURATION ---
 // *** SYNCHRONIZED URL: Must match the newest deployment. ***
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHvFotZsIVLZVo_jsDbs_hOR9eYaIcGZofH4D1zRxI8cbbubKykoK19Lya-1BA_YMfYw/exec'
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFfPhUFWDCnLhUPP8QlmD8I9duKdKtdJ8e_ld5CRxGpo9eT1y70ZLRhwIfIbU3HlVDFA/exec'
 
 // --- GLOBAL STATE ---
 let products = [];
@@ -359,8 +359,6 @@ async function handleLogin() {
         loginStatus.textContent = "Agent ID cannot be empty.";
         return;
     }
-    
-    // *** FIX: Removed redundant/broken GOOGLE_SCRIPT_URL check ***
     
     document.getElementById('login-btn').disabled = true;
     loginStatus.textContent = "Verifying...";
@@ -757,99 +755,4 @@ async function submitOrder() {
     try {
         const base64File = await getBase64(proofFile);
         
-        // Recalculate totals for final submission payload
-        const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
-        let shippingFee = 0; 
-        const sortedRules = shippingRules.sort((a, b) => b.minSpend - a.minSpend);
-        for (const rule of sortedRules) {
-             if (subtotal >= rule.minSpend) {
-                shippingFee = rule.charge;
-                break;
-            }
-        }
-        
-        const payload = {
-            agent: currentAgent,
-            customer: customerInfo,
-            items: currentOrder.items.map(item => ({ 
-                id: item.id, 
-                quantity: item.quantity, 
-                price: item.customPrice, 
-                cc: item.cc, 
-                name: item.name 
-            })),
-            shippingFee: shippingFee,
-            paymentProof: {
-                file: base64File.split(',')[1],
-                mimeType: proofFile.type,
-                fileName: proofFile.name
-            }
-        };
-
-        const response = await postToGoogleScript('submitAgentOrder', payload);
-        if (response.success) {
-            statusEl.textContent = `Success! Order logged with Invoice ID: ${response.invoiceId}`;
-            statusEl.style.color = 'var(--success-color)';
-            submitBtn.innerHTML = "Order Submitted!";
-            
-            // Wait 5 seconds and then reset the view to prompt the next order
-            setTimeout(() => {
-                showView('create-order-view');
-            }, 5000);
-        } else {
-            throw new Error(response.message || "An unknown error occurred on the server.");
-        }
-
-    } catch (error) {
-        statusEl.textContent = `Error: ${error.message}`;
-        statusEl.style.color = 'var(--danger-color)';
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Order';
-    }
-}
-
-
-// ===========================================================
-// [ 4.0 ] UTILITY FUNCTIONS
-// ===========================================================
-async function postToGoogleScript(action, data = {}) {
-    try {
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'cors',
-            credentials: 'omit',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, data })
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            let errorMessage = `Network response was not ok.`;
-            try {
-                const errorJson = JSON.parse(errorText);
-                errorMessage = errorJson.message || errorMessage;
-            } catch (e) {}
-            throw new Error(errorMessage);
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('Error posting to Google Script:', error);
-        throw error;
-    }
-}
-
-function getBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        const readerSizeLimit = 5 * 1024 * 1024; // 5MB limit for Base64
-
-        if (file.size > readerSizeLimit) {
-            reject(new Error("File size exceeds 5MB limit. Please upload a smaller file."));
-            return;
-        }
-
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-}
-</script>
+        // Recal
