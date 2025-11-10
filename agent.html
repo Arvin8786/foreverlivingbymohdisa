@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/jpeg" href="FL.jpg">
 </head>
 <body>
 
@@ -194,7 +195,7 @@
 
 <div id="login-view">
     <div class="card" id="login-box">
-        <img src="https://via.placeholder.com/80/007bff/FFFFFF?text=FL" alt="Business Logo" class="login-logo">
+        <img src="FL.jpg" alt="Business Logo" class="login-logo">
         <h1>Agent Access</h1>
         <p class="text-muted">Securely manage sales and commissions.</p>
         <input type="text" id="agent-id-input" placeholder="Enter your Agent ID (e.g., AGENT001)">
@@ -294,12 +295,12 @@
 </div>
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - v2.1 (Styling and Usability Enhanced)
-// (No core logic change from your original functional script)
+// AGENT PORTAL SCRIPT - v2.2 (Final Front-End Fixes Applied)
 // =================================================================
 
 // --- CONFIGURATION ---
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwsfCOrJjOesuIZ6gcAfYaMwGTnRoAFh6QikNTrFSBaY-zKBmnUXr2qgvK0riP5KaYifQ/exec';
+// IMPORTANT: REPLACE THIS PLACEHOLDER URL WITH YOUR LATEST DEPLOYED APPS SCRIPT URL!
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwsfCOrJjOesuIZ6gcAfYaMwGTnRoAFh6QikNTrFSBaY-zKBmnUXr2qgvK0riP5KaYifQ/exec'; // E.g., 'https://script.google.com/macros/s/AKfyc.../exec'
 
 // --- GLOBAL STATE ---
 let products = [];
@@ -349,13 +350,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===========================================================
-// [ 1.0 ] LOGIN & DATA FETCHING (No change to logic)
+// [ 1.0 ] LOGIN & DATA FETCHING
 // ===========================================================
 async function handleLogin() {
     const agentId = document.getElementById('agent-id-input').value.trim();
     const loginStatus = document.getElementById('login-status');
     if (!agentId) {
         loginStatus.textContent = "Agent ID cannot be empty.";
+        return;
+    }
+    
+    // Check if the URL has been set
+    if (GOOGLE_SCRIPT_URL.includes('YOUR_NEWLY_DEPLOYED_APPS_SCRIPT_URL_HERE')) {
+        loginStatus.textContent = "Configuration Error: Please update GOOGLE_SCRIPT_URL.";
         return;
     }
     
@@ -379,7 +386,9 @@ async function handleLogin() {
             loginStatus.textContent = response.message || "Invalid Agent ID or not active.";
         }
     } catch (error) {
-        loginStatus.textContent = "Error connecting to the server.";
+        // If the fetch fails due to CORS or a network error, display a specific troubleshooting message.
+        console.error("Login attempt failed:", error);
+        loginStatus.textContent = "Connection Failed. Please ensure the Apps Script URL is correct and re-deployed with public access.";
     } finally {
         document.getElementById('login-btn').disabled = false;
     }
@@ -416,7 +425,7 @@ function handleLogout(){
 }
 
 // ===========================================================
-// [ 2.0 ] UI RENDERING & NAVIGATION (Enhanced)
+// [ 2.0 ] UI RENDERING & NAVIGATION
 // ===========================================================
 function showView(viewId) {
     const views = ['products-view', 'my-orders-view', 'my-commission-view', 'create-order-view'];
@@ -469,7 +478,7 @@ function renderProductSelectionList() {
     }
     container.innerHTML = filteredProducts.map(p => `
         <div class="product-item-selectable" onclick="addProductToOrder(${p.id})">
-            <img src="${p.image || 'https://via.placeholder.com/50'}" alt="${p.name}">
+            <img src="${p.image || 'FL.jpg'}" alt="${p.name}">
             <div class="product-item-info">
                 <strong>${p.name} (${p.id})</strong>
                 <p>RSP: RM ${p.rsp.toFixed(2)} | CC: ${p.cc.toFixed(3)}</p>
@@ -585,7 +594,7 @@ function renderOrderSummary() {
 }
 
 // ===========================================================
-// [ 3.0 ] ORDER CREATION LOGIC (No change to logic)
+// [ 3.0 ] ORDER CREATION LOGIC
 // ===========================================================
 function startNewOrder() {
     currentOrder = { customer: null, items: [] };
@@ -805,7 +814,7 @@ async function submitOrder() {
 
 
 // ===========================================================
-// [ 4.0 ] UTILITY FUNCTIONS (No change to logic)
+// [ 4.0 ] UTILITY FUNCTIONS
 // ===========================================================
 async function postToGoogleScript(action, data = {}) {
     try {
