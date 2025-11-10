@@ -295,11 +295,11 @@
 </div>
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - v2.2 (Final Front-End Fixes Applied)
+// AGENT PORTAL SCRIPT - v2.3 (Final Cleaned & Verified)
 // =================================================================
 
 // --- CONFIGURATION ---
-// IMPORTANT: REPLACE THIS PLACEHOLDER URL WITH YOUR LATEST DEPLOYED APPS SCRIPT URL!
+// *** SYNCHRONIZED URL: Must match the newest deployment. ***
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqOPBSzwXggbfcbBFW08NQJrPqYIVz4lt8zWMCDzux0AMvjC7Pyzfm1peP5ubpYjE_PQ/exec'
 
 // --- GLOBAL STATE ---
@@ -360,11 +360,7 @@ async function handleLogin() {
         return;
     }
     
-    // Check if the URL has been set
-    if (GOOGLE_SCRIPT_URL.includes('https://script.google.com/macros/s/AKfycbwqOPBSzwXggbfcbBFW08NQJrPqYIVz4lt8zWMCDzux0AMvjC7Pyzfm1peP5ubpYjE_PQ/exec')) {
-        loginStatus.textContent = "Configuration Error: Please update GOOGLE_SCRIPT_URL.";
-        return;
-    }
+    // *** FIX: Removed redundant/broken GOOGLE_SCRIPT_URL check ***
     
     document.getElementById('login-btn').disabled = true;
     loginStatus.textContent = "Verifying...";
@@ -386,7 +382,7 @@ async function handleLogin() {
             loginStatus.textContent = response.message || "Invalid Agent ID or not active.";
         }
     } catch (error) {
-        // If the fetch fails due to CORS or a network error, display a specific troubleshooting message.
+        // This catch block handles the persistent CORS/Network errors.
         console.error("Login attempt failed:", error);
         loginStatus.textContent = "Connection Failed. Please ensure the Apps Script URL is correct and re-deployed with public access.";
     } finally {
@@ -857,6 +853,3 @@ function getBase64(file) {
     });
 }
 </script>
-
-</body>
-</html>
