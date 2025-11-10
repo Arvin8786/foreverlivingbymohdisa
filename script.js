@@ -6,7 +6,7 @@
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
 // *** SYNCHRONIZED URL: Must match the newest deployment. ***
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzFfPhUFWDCnLhUPP8QlmD8I9duKdKtdJ8e_ld5CRxGpo9eT1y70ZLRhwIfIbU3HlVDFA/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxiFOvNTOnuIzGcnvmAtXSNqCXsuHJoZbvyJwpIa3kl8SX1SlKg2PjGGaNeKNcl3RBX1w/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
