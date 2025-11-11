@@ -1,187 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Agent Sales Portal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/jpeg" href="FL.jpg">
-    
-    <style>
-        :root {
-            --primary-color: #007bff;
-            --secondary-color: #28a745;
-            --light-gray: #f8f9fa;
-            --mid-gray: #e9ecef;
-            --dark-text: #343a40;
-            --light-text: #fff;
-            --danger-color: #dc3545;
-            --success-color: #28a745;
-            --border-radius-lg: 12px;
-            --border-radius-sm: 6px;
-            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
-            --font-family: 'Poppins', sans-serif;
-        }
-        * { box-sizing: border-box; }
-        body { font-family: var(--font-family); background: var(--light-gray); color: var(--dark-text); margin: 0; }
-        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
-        h1, h2, h3 { color: var(--dark-text); font-weight: 600; }
-        h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border-radius: var(--border-radius-sm); text-decoration: none; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
-        .btn-primary { background: var(--primary-color); color: var(--light-text); }
-        .btn-primary:hover:not(:disabled) { background: #0056b3; }
-        .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; }
-        .card { background: var(--light-text); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; }
-        .hidden { display: none !important; }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent Sales Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/jpeg" href="FL.jpg">
+    
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #28a745;
+            --light-gray: #f8f9fa;
+            --mid-gray: #e9ecef;
+            --dark-text: #343a40;
+            --light-text: #fff;
+            --danger-color: #dc3545;
+            --success-color: #28a745;
+            --border-radius-lg: 12px;
+            --border-radius-sm: 6px;
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+            --font-family: 'Poppins', sans-serif;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: var(--font-family); background: var(--light-gray); color: var(--dark-text); margin: 0; }
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
+        h1, h2, h3 { color: var(--dark-text); font-weight: 600; }
+        h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border-radius: var(--border-radius-sm); text-decoration: none; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
+        .btn-primary { background: var(--primary-color); color: var(--light-text); }
+        .btn-primary:hover:not(:disabled) { background: #0056b3; }
+        .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; }
+        .card { background: var(--light-text); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; }
+        .hidden { display: none !important; }
 
-        /* Login View */
-        #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary-color), #00a4ff); }
-        #login-box { padding: 50px; max-width: 400px; text-align: center; }
-        #login-box input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); font-size: 1rem; }
-        #login-status { font-weight: 500; min-height: 24px; margin-top: 15px; font-size: 0.95rem; }
+        /* Login View */
+        #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary-color), #00a4ff); }
+        #login-box { padding: 50px; max-width: 400px; text-align: center; }
+        #login-box input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); font-size: 1rem; }
+        #login-status { font-weight: 500; min-height: 24px; margin-top: 15px; font-size: 0.95rem; }
 
-        /* Portal Layout */
-        #portal-view header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 30px; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 20px; }
-        #portal-view header h2 { margin: 0; font-size: 1.5rem; }
-        #portal-view nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
-        #portal-view nav .btn { background: white; color: var(--primary-color); border: 1px solid var(--primary-color); }
-        #portal-view nav .btn.active { background: var(--primary-color); color: white; }
-        
-        /* Order Creation Workflow */
-        #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
-        #product-selection-list { max-height: 450px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
-        .product-item-selectable { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 15px; padding: 12px; border-bottom: 1px solid var(--mid-gray); cursor: pointer; transition: background 0.1s; }
-        .product-item-selectable:hover { background: #f0f8ff; }
-        .product-item-selectable img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
-        #order-summary-card { position: sticky; top: 30px; }
-        #summary-items-list { max-height: 300px; overflow-y: auto; }
-        .summary-item { display: grid; grid-template-columns: 1fr 60px 80px 30px; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--mid-gray); }
-        .summary-item-info strong { display: block; }
-        .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; }
-        .summary-item input { padding: 8px; text-align: center; border-radius: var(--border-radius-sm); border: 1px solid var(--mid-gray); }
-        .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
-        .summary-total { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--mid-gray); }
-        .summary-line { display: flex; justify-content: space-between; padding: 8px 0; }
-        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
+        /* Portal Layout */
+        #portal-view header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 30px; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 20px; }
+        #portal-view header h2 { margin: 0; font-size: 1.5rem; }
+        #portal-view nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
+        #portal-view nav .btn { background: white; color: var(--primary-color); border: 1px solid var(--primary-color); }
+        #portal-view nav .btn.active { background: var(--primary-color); color: white; }
+        
+        /* Order Creation Workflow */
+        #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
+        #product-selection-list { max-height: 450px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
+        .product-item-selectable { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 15px; padding: 12px; border-bottom: 1px solid var(--mid-gray); cursor: pointer; transition: background 0.1s; }
+        .product-item-selectable:hover { background: #f0f8ff; }
+        .product-item-selectable img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+        #order-summary-card { position: sticky; top: 30px; }
+        #summary-items-list { max-height: 300px; overflow-y: auto; }
+        .summary-item { display: grid; grid-template-columns: 1fr 60px 80px 30px; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--mid-gray); }
+        .summary-item-info strong { display: block; }
+        .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; }
+        .summary-item input { padding: 8px; text-align: center; border-radius: var(--border-radius-sm); border: 1px solid var(--mid-gray); }
+        .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
+        .summary-total { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--mid-gray); }
+        .summary-line { display: flex; justify-content: space-between; padding: 8px 0; }
+        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
 
-        /* Data Tables */
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+        /* Data Tables */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
 
-        @media (max-width: 1000px) {
-            #order-creation-workflow { grid-template-columns: 1fr; }
-            #order-summary-card { position: static; }
-        }
-    </style>
+        @media (max-width: 1000px) {
+            #order-creation-workflow { grid-template-columns: 1fr; }
+            #order-summary-card { position: sticky; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- [ 1.0 ] LOGIN VIEW -->
 <div id="login-view">
-    <div class="card" id="login-box">
-        <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
-        <h1>Agent Portal</h1>
-        <p>Please enter your Agent ID to proceed.</p>
-        <input type="text" id="agent-id-input" placeholder="e.g., AGENT001">
-        <button id="login-btn" class="btn btn-primary" style="width:100%;">
-            <i class="fa-solid fa-right-to-bracket"></i> Login
-        </button>
-        <p id="login-status"></p>
-    </div>
+    <div class="card" id="login-box">
+        <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
+        <h1>Agent Portal</h1>
+        <p>Please enter your Agent ID to proceed.</p>
+        <input type="text" id="agent-id-input" placeholder="e.g., AGENT001">
+        <button id="login-btn" class="btn btn-primary" style="width:100%;">
+            <i class="fa-solid fa-right-to-bracket"></i> Login
+        </button>
+        <p id="login-status"></p>
+    </div>
 </div>
 
-<!-- [ 2.0 ] MAIN PORTAL VIEW (Initially Hidden) -->
 <div id="portal-view" class="container hidden">
-    <header>
-        <h2 id="agent-welcome-header"></h2>
-        <button id="logout-btn" class="btn btn-primary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-    </header>
+    <header>
+        <h2 id="agent-welcome-header"></h2>
+        <button id="logout-btn" class="btn btn-primary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </header>
 
-    <nav>
-        <button id="nav-create-order-btn" class="btn active"><i class="fa-solid fa-cart-plus"></i> New Order</button>
-        <button id="nav-products-btn" class="btn"><i class="fa-solid fa-boxes-stacked"></i> Products</button>
-        <button id="nav-my-orders-btn" class="btn"><i class="fa-solid fa-receipt"></i> My Orders</button>
-        <button id="nav-my-commission-btn" class="btn"><i class="fa-solid fa-wallet"></i> My Commission</button>
-    </nav>
+    <nav>
+        <button id="nav-create-order-btn" class="btn active"><i class="fa-solid fa-cart-plus"></i> New Order</button>
+        <button id="nav-products-btn" class="btn"><i class="fa-solid fa-boxes-stacked"></i> Products</button>
+        <button id="nav-my-orders-btn" class="btn"><i class="fa-solid fa-receipt"></i> My Orders</button>
+        <button id="nav-my-commission-btn" class="btn"><i class="fa-solid fa-wallet"></i> My Commission</button>
+    </nav>
 
-    <!-- [ 2.1 ] Create Order View -->
-    <div id="create-order-view" class="view">
-        <div id="order-creation-workflow">
-            <!-- Left Column: Customer & Product Selection -->
-            <div>
-                <div class="card">
-                    <h3>Step 1: Select or Create Customer</h3>
-                    <select id="customer-dropdown"></select>
-                    <button id="new-customer-btn" class="btn" style="background-color: var(--mid-gray); color: var(--dark-text); margin-top: 10px;">
-                        <i class="fa-solid fa-user-plus"></i> Create New Customer
-                    </button>
-                    <div id="new-customer-form" class="hidden" style="margin-top: 15px; background: var(--light-gray); padding: 15px; border-radius: var(--border-radius-sm);">
-                        <input type="text" id="new-customer-name" placeholder="Customer Name" required>
-                        <input type="email" id="new-customer-email" placeholder="Customer Email" required>
-                        <input type="tel" id="new-customer-phone" placeholder="Customer Phone (WhatsApp)" required>
-                        <textarea id="new-customer-address" placeholder="Customer Address" rows="3" required></textarea>
-                    </div>
-                </div>
+        <div id="create-order-view" class="view">
+        <div id="order-creation-workflow">
+                        <div>
+                <div class="card">
+                    <h3>Step 1: Select or Create Customer</h3>
+                    <select id="customer-dropdown"></select>
+                    <button id="new-customer-btn" class="btn" style="background-color: var(--mid-gray); color: var(--dark-text); margin-top: 10px;">
+                        <i class="fa-solid fa-user-plus"></i> Create New Customer
+                    </button>
+                    <div id="new-customer-form" class="hidden" style="margin-top: 15px; background: var(--light-gray); padding: 15px; border-radius: var(--border-radius-sm);">
+                        <input type="text" id="new-customer-name" placeholder="Customer Name" required>
+                        <input type="email" id="new-customer-email" placeholder="Customer Email" required>
+                        <input type="tel" id="new-customer-phone" placeholder="Customer Phone (WhatsApp)" required>
+                        <textarea id="new-customer-address" placeholder="Customer Address" rows="3" required></textarea>
+                    </div>
+                </div>
 
-                <div class="card">
-                    <h3>Step 2: Add Products</h3>
-                    <input type="text" id="product-order-search" placeholder="Search product name or SKU...">
-                    <div id="product-selection-list"></div>
-                </div>
-            </div>
-            <!-- Right Column: Order Summary -->
-            <div id="order-summary-card" class="card">
-                <h3>Order Summary</h3>
-                <div id="summary-items-list"></div>
-                <div class="summary-total">
-                    <div class="summary-line"><span>Subtotal:</span><span id="summary-subtotal">RM 0.00</span></div>
-                    <div class="summary-line"><span>Shipping:</span><span id="summary-shipping">RM 0.00</span></div>
-                    <div class="summary-line total"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
-                </div>
-                <div id="finalize-order-section" style="margin-top: 30px;">
-                    <h3>Step 3: Payment & Submit</h3>
-                    <label for="payment-proof">Upload Payment Proof (Required)</label>
-                    <input type="file" id="payment-proof" required>
-                    <button id="submit-order-btn" class="btn btn-primary" style="width:100%; margin-top: 15px;">
-                        <i class="fa-solid fa-paper-plane"></i> Submit Order
-                    </button>
-                    <p id="submit-status" style="text-align: center; margin-top: 10px; font-weight: 600;"></p>
-                </div>
-            </div>
-        </div>
-    </div>
+                <div class="card">
+                    <h3>Step 2: Add Products</h3>
+                    <input type="text" id="product-order-search" placeholder="Search product name or SKU...">
+                    <div id="product-selection-list"></div>
+                </div>
+            </div>
+                        <div id="order-summary-card" class="card">
+                <h3>Order Summary</h3>
+                <div id="summary-items-list"></div>
+                <div class="summary-total">
+                    <div class="summary-line"><span>Subtotal:</span><span id="summary-subtotal">RM 0.00</span></div>
+                    <div class="summary-line"><span>Shipping:</span><span id="summary-shipping">RM 0.00</span></div>
+                    <div class="summary-line total"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
+                </div>
+                <div id="finalize-order-section" style="margin-top: 30px;">
+                    <h3>Step 3: Payment & Submit</h3>
+                    <label for="payment-proof">Upload Payment Proof (Required)</label>
+                    <input type="file" id="payment-proof" required>
+                    <button id="submit-order-btn" class="btn btn-primary" style="width:100%; margin-top: 15px;">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Order
+                    </button>
+                    <p id="submit-status" style="text-align: center; margin-top: 10px; font-weight: 600;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- [ 2.2 ] Other Views (Products, Orders, Commission) -->
-    <div id="products-view" class="view hidden card">
-        <h2>Product Catalog</h2>
-        <table>
-            <thead><tr><th>SKU</th><th>Name</th><th>RSP (RM)</th><th>CC</th></tr></thead>
-            <tbody id="product-catalog-table"></tbody>
-        </table>
-    </div>
+        <div id="products-view" class="view hidden card">
+        <h2>Product Catalog</h2>
+        <table>
+            <thead><tr><th>SKU</th><th>Name</th><th>RSP (RM)</th><th>CC</th></tr></thead>
+            <tbody id="product-catalog-table"></tbody>
+        </table>
+    </div>
 
-    <div id="my-orders-view" class="view hidden card">
-        <h2>My Past Orders</h2>
-        <div id="my-orders-list"></div>
-    </div>
-    
-    <div id="my-commission-view" class="view hidden card">
-        <h2>My Commission Records</h2>
-        <div id="my-commission-list"></div>
-    </div>
+    <div id="my-orders-view" class="view hidden card">
+        <h2>My Past Orders</h2>
+        <div id="my-orders-list"></div>
+    </div>
+    
+    <div id="my-commission-view" class="view hidden card">
+            <h2>My Commission Records</h2>
+            <p>This page requires the Agent Portal to have a dedicated `getAgentCommission` function in `code.gs`.</p>
+            <div id="my-commission-list"></div>
+    </div>
 </div>
 
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - v31.0 (Built from Scratch)
+// AGENT PORTAL SCRIPT - v31.1 (FIXED FOR UNKNOWN ACTION ERROR)
 // =================================================================
 
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ-MehyztD4CvRcu346cshS1LDNuZqY2mXw3IQq4VSsYo9K8vs-GWVw6a4KuMXCkvgHA/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwOBztQr8EqihS0trsXLKCrtiGvOv-G6xQJrkZsglgzn0b8V_9xYPixzuylT5apEQ4vQw/exec';
 
 // --- Global State Variables ---
 let products = [];
@@ -194,444 +189,492 @@ let currentOrder = { items: [] };
 // [ 2.0 ] INITIALIZATION & EVENT LISTENERS
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Login & Logout ---
-    document.getElementById('login-btn').addEventListener('click', handleLogin);
-    document.getElementById('logout-btn').addEventListener('click', handleLogout);
-    
-    // --- Navigation ---
-    document.getElementById('nav-create-order-btn').addEventListener('click', () => showView('create-order-view'));
-    document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
-    document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
-    document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
-    
-    // --- Order Creation ---
-    document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
-    document.getElementById('customer-dropdown').addEventListener('change', handleCustomerSelection);
-    document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
-    document.getElementById('product-order-search').addEventListener('keyup', renderProductSelectionList);
+    // --- Login & Logout ---
+    document.getElementById('login-btn').addEventListener('click', handleLogin);
+    document.getElementById('logout-btn').addEventListener('click', handleLogout);
+    
+    // --- Navigation ---
+    document.getElementById('nav-create-order-btn').addEventListener('click', () => showView('create-order-view'));
+    document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
+    document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
+    document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
+    
+    // --- Order Creation ---
+    document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
+    document.getElementById('customer-dropdown').addEventListener('change', handleCustomerSelection);
+    document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
+    document.getElementById('product-order-search').addEventListener('keyup', renderProductSelectionList);
 });
 
 // =================================================================
 // [ 3.0 ] LOGIN, LOGOUT & DATA FETCHING
 // =================================================================
 async function handleLogin() {
-    const agentId = document.getElementById('agent-id-input').value.trim();
-    const loginBtn = document.getElementById('login-btn');
-    const loginStatus = document.getElementById('login-status');
-    
-    if (!agentId) {
-        loginStatus.textContent = "Agent ID cannot be empty.";
-        loginStatus.style.color = 'var(--danger-color)';
-        return;
-    }
-    
-    loginBtn.disabled = true;
-    loginStatus.textContent = "Verifying...";
-    loginStatus.style.color = 'var(--dark-text)';
+    const agentId = document.getElementById('agent-id-input').value.trim();
+    const loginBtn = document.getElementById('login-btn');
+    const loginStatus = document.getElementById('login-status');
+    
+    if (!agentId) {
+        loginStatus.textContent = "Agent ID cannot be empty.";
+        loginStatus.style.color = 'var(--danger-color)';
+        return;
+    }
+    
+    loginBtn.disabled = true;
+    loginStatus.textContent = "Verifying...";
+    loginStatus.style.color = 'var(--dark-text)';
 
-    try {
-        const response = await postToGoogleScript('verifyAgent', { agentId });
-        if (response.success) {
-            currentAgent = response.agent;
-            await fetchPortalData();
-            
-            document.getElementById('login-view').classList.add('hidden');
-            document.getElementById('portal-view').classList.remove('hidden');
-            document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
-            startNewOrder(); // Go to the New Order screen by default
-        } else {
-            loginStatus.textContent = response.message || "Invalid Agent ID or account not active.";
-            loginStatus.style.color = 'var(--danger-color)';
-        }
-    } catch (error) {
-        loginStatus.textContent = "Connection failed. Please check your internet and try again.";
-        loginStatus.style.color = 'var(--danger-color)';
-        console.error("Login failed:", error);
-    } finally {
-        loginBtn.disabled = false;
-    }
+    try {
+        // Using the ACTION string for postToGoogleScript
+        const response = await postToGoogleScript('verifyAgent', { agentId });
+        if (response.success) {
+            currentAgent = response.agent;
+            await fetchPortalData();
+            
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('portal-view').classList.remove('hidden');
+            document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
+            startNewOrder(); 
+        } else {
+            loginStatus.textContent = response.message || "Invalid Agent ID or account not active.";
+            loginStatus.style.color = 'var(--danger-color)';
+        }
+    } catch (error) {
+        loginStatus.textContent = "Connection failed. Please check your internet and try again. (" + error.message + ")";
+        loginStatus.style.color = 'var(--danger-color)';
+        console.error("Login failed:", error);
+    } finally {
+        loginBtn.disabled = false;
+    }
 }
 
 async function fetchPortalData() {
-    try {
-        const response = await postToGoogleScript('getPortalData');
-        if (response.success) {
-            products = response.products;
-            customers = response.customers;
-            shippingRules = (response.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend);
-            
-            // Render initial content that depends on this data
-            renderProductCatalog();
-            renderProductSelectionList();
-            renderCustomerDropdown();
-        } else {
-            throw new Error(response.message);
-        }
-    } catch (error) {
-        console.error("Failed to fetch portal data:", error);
-        alert("Could not load essential portal data. Please try logging in again.");
-    }
+    try {
+        // Using the ACTION string for postToGoogleScript
+        const response = await postToGoogleScript('getPortalData');
+        if (response.success) {
+            products = response.products;
+            customers = response.customers;
+            shippingRules = (response.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend);
+            
+            // Render initial content that depends on this data
+            renderProductCatalog();
+            renderProductSelectionList();
+            renderCustomerDropdown();
+        } else {
+            throw new Error(response.message);
+        }
+    } catch (error) {
+        console.error("Failed to fetch portal data:", error);
+        alert("Could not load essential portal data. Please check F12 console for details.");
+    }
 }
 
 function handleLogout() {
-    currentAgent = null;
-    products = [];
-    customers = [];
-    shippingRules = [];
-    currentOrder = { items: [] };
-    
-    document.getElementById('login-view').classList.remove('hidden');
-    document.getElementById('portal-view').classList.add('hidden');
-    document.getElementById('agent-id-input').value = '';
-    document.getElementById('login-status').textContent = '';
+    currentAgent = null;
+    products = [];
+    customers = [];
+    shippingRules = [];
+    currentOrder = { items: [] };
+    
+    document.getElementById('login-view').classList.remove('hidden');
+    document.getElementById('portal-view').classList.add('hidden');
+    document.getElementById('agent-id-input').value = '';
+    document.getElementById('login-status').textContent = '';
 }
 
 // =================================================================
 // [ 4.0 ] UI RENDERING & NAVIGATION
 // =================================================================
 function showView(viewId) {
-    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
-    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
+    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
 
-    document.getElementById(viewId).classList.remove('hidden');
-    document.getElementById(`nav-${viewId.replace('view', 'btn')}`).classList.add('active');
+    document.getElementById(viewId).classList.remove('hidden');
+    document.getElementById(`nav-${viewId.replace('view', 'btn')}`).classList.add('active');
 
-    // Fetch data on-demand for certain views
-    if (viewId === 'my-orders-view') renderMyOrders();
-    if (viewId === 'my-commission-view') renderMyCommission();
-    if (viewId === 'create-order-view') startNewOrder();
+    // Fetch data on-demand for certain views
+    if (viewId === 'my-orders-view') renderMyOrders();
+    if (viewId === 'my-commission-view') renderMyCommission();
+    if (viewId === 'create-order-view') startNewOrder();
 }
 
 function renderProductCatalog() {
-    const container = document.getElementById('product-catalog-table');
-    container.innerHTML = products.map(p => `
-        <tr>
-            <td>${p.id}</td>
-            <td>${p.name}</td>
-            <td>RM ${p.rsp.toFixed(2)}</td>
-            <td>${p.cc.toFixed(3)}</td>
-        </tr>
-    `).join('');
+    const container = document.getElementById('product-catalog-table');
+    container.innerHTML = products.map(p => `
+        <tr>
+            <td>${p.id}</td>
+            <td>${p.name}</td>
+            <td>RM ${p.rsp.toFixed(2)}</td>
+            <td>${p.cc.toFixed(3)}</td>
+        </tr>
+    `).join('');
 }
 
 function renderProductSelectionList() {
-    const container = document.getElementById('product-selection-list');
-    const searchTerm = document.getElementById('product-order-search').value.toLowerCase();
-    const filteredProducts = products.filter(p => 
-        p.name.toLowerCase().includes(searchTerm) || String(p.id).toLowerCase().includes(searchTerm)
-    );
+    const container = document.getElementById('product-selection-list');
+    const searchTerm = document.getElementById('product-order-search').value.toLowerCase();
+    const filteredProducts = products.filter(p => 
+        p.name.toLowerCase().includes(searchTerm) || String(p.id).toLowerCase().includes(searchTerm)
+    );
 
-    if (filteredProducts.length === 0) {
-        container.innerHTML = "<p style='padding: 15px; text-align: center;'>No products found.</p>";
-        return;
-    }
-    container.innerHTML = filteredProducts.map(p => `
-        <div class="product-item-selectable" onclick="addProductToOrder(${p.id})">
-            <img src="${p.image || 'FL.jpg'}" alt="${p.name}" onerror="this.style.display='none';">
-            <div>
-                <strong>${p.name} (${p.id})</strong>
-                <p style="font-size: 0.85rem; color: #6c757d;">RSP: RM ${p.rsp.toFixed(2)}</p>
-            </div>
-            <button class="btn btn-primary" style="pointer-events: none;">Add</button>
-        </div>
-    `).join('');
+    if (filteredProducts.length === 0) {
+        container.innerHTML = "<p style='padding: 15px; text-align: center;'>No products found.</p>";
+        return;
+    }
+    container.innerHTML = filteredProducts.map(p => `
+        <div class="product-item-selectable" onclick="addProductToOrder(${p.id})">
+            <img src="${p.image || 'FL.jpg'}" alt="${p.name}" onerror="this.style.display='none';">
+            <div>
+                <strong>${p.name} (${p.id})</strong>
+                <p style="font-size: 0.85rem; color: #6c757d;">RSP: RM ${p.rsp.toFixed(2)}</p>
+            </div>
+            <button class="btn btn-primary" style="pointer-events: none;">Add</button>
+        </div>
+    `).join('');
 }
 
 function renderCustomerDropdown() {
-    const select = document.getElementById('customer-dropdown');
-    select.innerHTML = `<option value="">-- Select Existing Customer --</option>`;
-    customers.forEach(c => {
-        const option = document.createElement('option');
-        option.value = c.pac;
-        option.textContent = `${c.name} (${c.phone || c.email})`;
-        select.appendChild(option);
-    });
+    const select = document.getElementById('customer-dropdown');
+    select.innerHTML = `<option value="">-- Select Existing Customer --</option>`;
+    customers.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.pac;
+        option.textContent = `${c.name} (${c.phone || c.email})`;
+        select.appendChild(option);
+    });
 }
 
 function renderOrderSummary() {
-    const container = document.getElementById('summary-items-list');
-    if (currentOrder.items.length === 0) {
-        container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products to begin.</p>";
-    } else {
-        container.innerHTML = currentOrder.items.map(item => {
-            const isInvalid = item.customPrice < item.minPrice;
-            return `
-            <div class="summary-item" data-id="${item.id}">
-                <div class="summary-item-info">
-                    <strong>${item.name}</strong>
-                    <div class="price-error-message">${isInvalid ? `Min: RM ${item.minPrice.toFixed(2)}` : ''}</div>
-                </div>
-                <input type="number" value="${item.quantity}" onchange="updateQuantity(${item.id}, this.value)" title="Quantity">
-                <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice(${item.id}, this.value)" class="${isInvalid ? 'price-input-invalid' : ''}" title="Custom Price">
-                <span onclick="removeItemFromOrder(${item.id})" style="cursor:pointer; text-align:center; color: var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
-            </div>
-        `}).join('');
-    }
-    calculateTotals();
+    const container = document.getElementById('summary-items-list');
+    if (currentOrder.items.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products to begin.</p>";
+    } else {
+        container.innerHTML = currentOrder.items.map(item => {
+            const isInvalid = item.customPrice < item.minPrice;
+            return `
+            <div class="summary-item" data-id="${item.id}">
+                <div class="summary-item-info">
+                    <strong>${item.name}</strong>
+                    <div class="price-error-message">${isInvalid ? `Min: RM ${item.minPrice.toFixed(2)}` : ''}</div>
+                </div>
+                <input type="number" value="${item.quantity}" onchange="updateQuantity(${item.id}, this.value)" title="Quantity">
+                <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice(${item.id}, this.value)" class="${isInvalid ? 'price-input-invalid' : ''}" title="Custom Price">
+                <span onclick="removeItemFromOrder(${item.id})" style="cursor:pointer; text-align:center; color: var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
+            </div>
+        `}).join('');
+    }
+    calculateTotals();
 }
 
 async function renderMyOrders() {
-    const container = document.getElementById('my-orders-list');
-    container.innerHTML = '<p>Loading orders...</p>';
-    try {
-        const response = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
-        if (response.success && response.orders.length > 0) {
-            container.innerHTML = `
-                <table>
-                    <thead><tr><th>Invoice ID</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
-                    <tbody>${response.orders.map(o => `
-                        <tr>
-                            <td>${o.invoiceId}</td>
-                            <td>${o.date}</td>
-                            <td>${o.customerName}</td>
-                            <td>RM ${o.total}</td>
-                            <td>${o.status}</td>
-                        </tr>`).join('')}
-                    </tbody>
-                </table>`;
-        } else {
-            container.innerHTML = '<p>No past orders found.</p>';
-        }
-    } catch(e) { container.innerHTML = '<p style="color:var(--danger-color);">Could not load orders.</p>'; }
+    const container = document.getElementById('my-orders-list');
+    container.innerHTML = '<p>Loading orders...</p>';
+    try {
+        // Using the ACTION string for postToGoogleScript
+        const response = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
+        if (response.success && response.orders.length > 0) {
+            container.innerHTML = `
+                <table>
+                    <thead><tr><th>Invoice ID</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+                    <tbody>${response.orders.map(o => `
+                        <tr>
+                            <td>${o.invoiceId}</td>
+                            <td>${o.date}</td>
+                            <td>${o.customerName}</td>
+                            <td>RM ${o.total}</td>
+                            <td>${o.status}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>`;
+        } else {
+            container.innerHTML = '<p>No past orders found.</p>';
+        }
+    } catch(e) { container.innerHTML = `<p style="color:var(--danger-color);">Could not load orders. Error: ${e.message}</p>`; }
 }
 
 async function renderMyCommission() {
-    const container = document.getElementById('my-commission-list');
-    container.innerHTML = '<p>Loading records...</p>';
-    try {
-        const response = await postToGoogleScript('getAgentCommission', { agentId: currentAgent.id });
-        if (response.success && response.records.length > 0) {
-            container.innerHTML = `
-                <table>
-                    <thead><tr><th>Sales Amount (RM)</th><th>Commission (RM)</th><th>Total Payable (RM)</th></tr></thead>
-                    <tbody>${response.records.map(r => `
-                        <tr>
-                            <td>${r.sales.toFixed(2)}</td>
-                            <td>${r.commission.toFixed(2)}</td>
-                            <td><strong>${r.payable.toFixed(2)}</strong></td>
-                        </tr>`).join('')}
-                    </tbody>
-                </table>`;
-        } else {
-            container.innerHTML = '<p>No commission records found.</p>';
-        }
-    } catch(e) { container.innerHTML = '<p style="color:var(--danger-color);">Could not load records.</p>'; }
+    const container = document.getElementById('my-commission-list');
+    container.innerHTML = '<p>Loading records...</p>';
+    try {
+        // Using the ACTION string for postToGoogleScript
+        const response = await postToGoogleScript('getAgentCommission', { agentId: currentAgent.id });
+        if (response.success && response.records.length > 0) {
+            container.innerHTML = `
+                <table>
+                    <thead><tr><th>Sales Amount (RM)</th><th>Commission (RM)</th><th>Total Payable (RM)</th></tr></thead>
+                    <tbody>${response.records.map(r => `
+                        <tr>
+                            <td>${r.sales.toFixed(2)}</td>
+                            <td>${r.commission.toFixed(2)}</td>
+                            <td><strong>${r.payable.toFixed(2)}</strong></td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>`;
+        } else {
+            container.innerHTML = '<p>No commission records found.</p>';
+        }
+    } catch(e) { container.innerHTML = `<p style="color:var(--danger-color);">Could not load records. Error: ${e.message}</p>`; }
 }
 
 // =================================================================
-// [ 5.0 ] ORDER CREATION LOGIC
+// [ 5.0 ] ORDER CREATION LOGIC (Minor Fix added for Submit)
 // =================================================================
 function startNewOrder() {
-    currentOrder = { items: [] };
-    document.getElementById('customer-dropdown').value = '';
-    document.getElementById('new-customer-form').classList.add('hidden');
-    document.getElementById('customer-dropdown').disabled = false;
-    document.getElementById('new-customer-form').reset();
-    document.getElementById('payment-proof').value = '';
-    document.getElementById('submit-status').textContent = '';
-    document.getElementById('submit-order-btn').disabled = false;
-    renderOrderSummary();
+    currentOrder = { items: [] };
+    document.getElementById('customer-dropdown').value = '';
+    document.getElementById('new-customer-form').classList.add('hidden');
+    document.getElementById('customer-dropdown').disabled = false;
+    
+    // Reset new customer form fields
+    document.getElementById('new-customer-name').value = '';
+    document.getElementById('new-customer-email').value = '';
+    document.getElementById('new-customer-phone').value = '';
+    document.getElementById('new-customer-address').value = '';
+
+    document.getElementById('payment-proof').value = '';
+    document.getElementById('submit-status').textContent = '';
+    document.getElementById('submit-order-btn').disabled = false;
+    renderOrderSummary();
 }
 
 function handleNewCustomerToggle() {
-    const form = document.getElementById('new-customer-form');
-    const dropdown = document.getElementById('customer-dropdown');
-    form.classList.toggle('hidden');
-    if (!form.classList.contains('hidden')) {
-        dropdown.value = '';
-        dropdown.disabled = true;
-    } else {
-        dropdown.disabled = false;
-    }
+    const form = document.getElementById('new-customer-form');
+    const dropdown = document.getElementById('customer-dropdown');
+    form.classList.toggle('hidden');
+    if (!form.classList.contains('hidden')) {
+        dropdown.value = '';
+        dropdown.disabled = true;
+    } else {
+        dropdown.disabled = false;
+    }
 }
 
 function handleCustomerSelection() {
-    const dropdown = document.getElementById('customer-dropdown');
-    if (dropdown.value) {
-        document.getElementById('new-customer-form').classList.add('hidden');
-        dropdown.disabled = false;
-    }
+    const dropdown = document.getElementById('customer-dropdown');
+    if (dropdown.value) {
+        document.getElementById('new-customer-form').classList.add('hidden');
+        dropdown.disabled = false;
+    }
 }
 
 function addProductToOrder(productId) {
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
-    
-    if (!currentOrder.items.some(item => item.id === productId)) {
-        currentOrder.items.push({
-            id: product.id,
-            name: product.name,
-            quantity: 1,
-            rsp: product.rsp,
-            cc: product.cc,
-            customPrice: product.rsp,
-            minPrice: product.rsp * 0.70 // 30% below RSP
-        });
-    }
-    renderOrderSummary();
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    if (!currentOrder.items.some(item => item.id === productId)) {
+        currentOrder.items.push({
+            id: product.id,
+            name: product.name,
+            quantity: 1,
+            rsp: product.rsp,
+            cc: product.cc,
+            customPrice: product.rsp,
+            minPrice: product.minPrice // Use fetched minPrice
+        });
+    }
+    renderOrderSummary();
 }
 
 function removeItemFromOrder(productId) {
-    currentOrder.items = currentOrder.items.filter(item => item.id !== productId);
-    renderOrderSummary();
+    currentOrder.items = currentOrder.items.filter(item => item.id !== productId);
+    renderOrderSummary();
 }
 
 function updateQuantity(productId, newQuantity) {
-    const item = currentOrder.items.find(i => i.id === productId);
-    const qty = parseInt(newQuantity, 10);
-    if (item && qty > 0) {
-        item.quantity = qty;
-    } else if (item) {
-        item.quantity = 1; // Reset to 1 if invalid
-    }
-    renderOrderSummary();
+    const item = currentOrder.items.find(i => i.id === productId);
+    const qty = parseInt(newQuantity, 10);
+    if (item && qty > 0) {
+        item.quantity = qty;
+    } else if (item) {
+        item.quantity = 1; // Reset to 1 if invalid
+    }
+    renderOrderSummary();
 }
 
 function updatePrice(productId, newPrice) {
-    const item = currentOrder.items.find(i => i.id === productId);
-    const price = parseFloat(newPrice);
-    if (item && !isNaN(price)) {
-        item.customPrice = price;
-    }
-    renderOrderSummary();
+    const item = currentOrder.items.find(i => i.id === productId);
+    const price = parseFloat(newPrice);
+    if (item && !isNaN(price)) {
+        item.customPrice = price;
+    }
+    renderOrderSummary();
 }
 
 function calculateTotals() {
-    const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
-    
-    let shippingFee = 0;
-    const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
-    if (bestRule) shippingFee = bestRule.charge;
-    
-    const finalTotal = subtotal + shippingFee;
+    const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
+    
+    let shippingFee = 0;
+    const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
+    if (bestRule) shippingFee = bestRule.charge;
+    
+    const finalTotal = subtotal + shippingFee;
 
-    document.getElementById('summary-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
-    document.getElementById('summary-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
-    document.getElementById('summary-total').textContent = `RM ${finalTotal.toFixed(2)}`;
+    document.getElementById('summary-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
+    document.getElementById('summary-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `RM ${finalTotal.toFixed(2)}`;
 }
 
 async function submitOrder() {
-    const submitBtn = document.getElementById('submit-order-btn');
-    const statusEl = document.getElementById('submit-status');
-    submitBtn.disabled = true;
-    statusEl.textContent = "Validating order...";
-    statusEl.style.color = 'var(--dark-text)';
+    const submitBtn = document.getElementById('submit-order-btn');
+    const statusEl = document.getElementById('submit-status');
+    
+    // Prevent double submission during slow network/redirect process
+    if (submitBtn.disabled) {
+        statusEl.textContent = "Please wait, submission in progress...";
+        statusEl.style.color = 'var(--dark-text)';
+        return;
+    }
+    submitBtn.disabled = true;
+    statusEl.textContent = "Validating order...";
+    statusEl.style.color = 'var(--dark-text)';
 
-    // --- Validation ---
-    if (currentOrder.items.length === 0) {
-        statusEl.textContent = "Error: Please add at least one product.";
-        statusEl.style.color = 'var(--danger-color)';
-        submitBtn.disabled = false;
-        return;
-    }
-    
-    if (currentOrder.items.some(item => item.customPrice < item.minPrice)) {
-        statusEl.textContent = "Error: One or more prices are below the allowed minimum.";
-        statusEl.style.color = 'var(--danger-color)';
-        submitBtn.disabled = false;
-        return;
-    }
-    
-    let customerInfo;
-    const existingCustomerPac = document.getElementById('customer-dropdown').value;
-    if (existingCustomerPac) {
-        customerInfo = customers.find(c => c.pac === existingCustomerPac);
-    } else {
-        customerInfo = {
-            name: document.getElementById('new-customer-name').value.trim(),
-            email: document.getElementById('new-customer-email').value.trim(),
-            phone: document.getElementById('new-customer-phone').value.trim(),
-            address: document.getElementById('new-customer-address').value.trim(),
-        };
-        if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) {
-            statusEl.textContent = "Error: Please fill in all new customer details.";
-            statusEl.style.color = 'var(--danger-color)';
-            submitBtn.disabled = false;
-            return;
-        }
-    }
+    // --- Validation ---
+    if (currentOrder.items.length === 0) {
+        statusEl.textContent = "Error: Please add at least one product.";
+        statusEl.style.color = 'var(--danger-color)';
+        submitBtn.disabled = false;
+        return;
+    }
+    
+    if (currentOrder.items.some(item => item.customPrice < item.minPrice)) {
+        statusEl.textContent = "Error: One or more prices are below the allowed minimum.";
+        statusEl.style.color = 'var(--danger-color)';
+        submitBtn.disabled = false;
+        return;
+    }
+    
+    let customerInfo;
+    const existingCustomerPac = document.getElementById('customer-dropdown').value;
+    if (existingCustomerPac) {
+        customerInfo = customers.find(c => c.pac === existingCustomerPac);
+    } else {
+        customerInfo = {
+            name: document.getElementById('new-customer-name').value.trim(),
+            email: document.getElementById('new-customer-email').value.trim(),
+            phone: document.getElementById('new-customer-phone').value.trim(),
+            address: document.getElementById('new-customer-address').value.trim(),
+        };
+        if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) {
+            statusEl.textContent = "Error: Please fill in all new customer details.";
+            statusEl.style.color = 'var(--danger-color)';
+            submitBtn.disabled = false;
+            return;
+        }
+    }
 
-    const proofFile = document.getElementById('payment-proof').files[0];
-    if (!proofFile) {
-        statusEl.textContent = "Error: Payment proof is required.";
-        statusEl.style.color = 'var(--danger-color)';
-        submitBtn.disabled = false;
-        return;
-    }
+    const proofFile = document.getElementById('payment-proof').files[0];
+    if (!proofFile) {
+        statusEl.textContent = "Error: Payment proof is required.";
+        statusEl.style.color = 'var(--danger-color)';
+        submitBtn.disabled = false;
+        return;
+    }
 
-    statusEl.textContent = "Uploading proof and submitting...";
-    try {
-        const base64File = await getBase64(proofFile);
-        
-        const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
-        let shippingFee = 0;
-        const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
-        if (bestRule) shippingFee = bestRule.charge;
-        
-        const payload = {
-            action: 'submitAgentOrder',
-            data: {
-                agent: currentAgent,
-                customer: customerInfo,
-                items: currentOrder.items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.customPrice, cc: item.cc })),
-                shippingFee: shippingFee,
-                paymentProof: {
-                    file: base64File.split(',')[1],
-                    mimeType: proofFile.type,
-                }
-            }
-        };
+    statusEl.textContent = "Uploading proof and submitting...";
+    try {
+        const base64File = await getBase64(proofFile);
+        
+        const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
+        let shippingFee = 0;
+        const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
+        if (bestRule) shippingFee = bestRule.charge;
+        
+        const payload = {
+            action: 'submitAgentOrder', // The ACTION string
+            data: {
+                agent: currentAgent,
+                customer: customerInfo,
+                items: currentOrder.items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.customPrice, cc: item.cc })),
+                shippingFee: shippingFee,
+                paymentProof: {
+                    file: base64File.split(',')[1],
+                    mimeType: proofFile.type,
+                }
+            }
+        };
 
-        const response = await postToGoogleScript(payload);
-        if (response.success) {
-            statusEl.textContent = `Success! Invoice ID: ${response.invoiceId}`;
-            statusEl.style.color = 'var(--success-color)';
-            setTimeout(startNewOrder, 5000);
-        } else {
-            throw new Error(response.message || "An unknown server error occurred.");
-        }
+        // Pass the full payload object to the corrected postToGoogleScript
+        const response = await postToGoogleScript(payload); 
+        
+        // Check for server-side success flag
+        if (response.success) {
+            statusEl.textContent = `Success! Invoice ID: ${response.invoiceId}`;
+            statusEl.style.color = 'var(--success-color)';
+            setTimeout(startNewOrder, 5000);
+        } else {
+            // This catches the error message returned by your code.gs functions
+            throw new Error(response.message || "An unknown server error occurred (no success flag).");
+        }
 
-    } catch (error) {
-        statusEl.textContent = `Error: ${error.message}`;
-        statusEl.style.color = 'var(--danger-color)';
-        submitBtn.disabled = false;
-    }
+    } catch (error) {
+        statusEl.textContent = `Error: ${error.message}`;
+        statusEl.style.color = 'var(--danger-color)';
+        submitBtn.disabled = false;
+    }
 }
 
 // =================================================================
-// [ 6.0 ] UTILITY FUNCTIONS
+// [ 6.0 ] UTILITY FUNCTIONS (FIXED FOR 'UNKNOWN ACTION' ERROR)
 // =================================================================
-async function postToGoogleScript(action, data = {}) {
-    const payload = { action, data };
+// Note: This robust version handles both (action, data) calls AND (payload) calls.
+async function postToGoogleScript(actionOrPayload, data = {}) {
+    const isPayloadObject = typeof actionOrPayload === 'object' && actionOrPayload !== null && actionOrPayload.action;
+    const payload = isPayloadObject 
+        ? actionOrPayload 
+        : { action: actionOrPayload, data: data }; // Standard format: {action: "...", data: {...}}
+
     try {
         const response = await fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             mode: 'cors',
             credentials: 'omit',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            // Use 'text/plain' for file uploads/large payloads to avoid preflight issues
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
             body: JSON.stringify(payload)
         });
+
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Network Error: ${errorText}`);
+            console.error('Network Response Not OK:', errorText);
+            throw new Error(`HTTP Error ${response.status}: Failed to reach server.`);
         }
-        return await response.json();
+        
+        // This handles the non-standard JSON response from Apps Script Web Apps
+        const responseText = await response.text();
+        
+        try {
+            return JSON.parse(responseText);
+        } catch (e) {
+            // This happens if the GAS script throws an execution error
+            console.error('Server Execution Error (Not JSON):', responseText);
+            
+            // Check for the execution error message
+            if (responseText.includes("Execution failed")) {
+                throw new Error("Server execution failed (e.g., Timeout, Uncaught Script Error). Check Google Script Logs!");
+            }
+            throw new Error("Invalid server response format.");
+        }
+        
     } catch (error) {
-        console.error('Error posting to Google Script:', error);
+        // Re-throw a specific error if it's the Unknown Action error, although the fix prevents it.
+        if (error.message.includes("Unknown action")) {
+            throw new Error("Critical: Server did not recognize the action '"+payload.action+"'. Check code.gs dispatcher!");
+        }
         throw error;
     }
 }
 
 function getBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-            return reject(new Error("File size exceeds 5MB."));
-        }
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            return reject(new Error("File size exceeds 5MB."));
+        }
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
 }
 </script>
 </body>
