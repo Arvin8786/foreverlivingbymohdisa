@@ -13,12 +13,12 @@
     
     <style>
         /* ================================================================= */
-        /* [ 1.0 ] CORE STYLES & VARIABLES (Refreshed Design) */
+        /* [ 1.0 ] CORE STYLES & VARIABLES */
         /* ================================================================= */
         :root {
             --primary-color: #007bff; 
             --secondary-color: #28a745; 
-            --accent-color: #ffc107; /* New accent for commissions */
+            --accent-color: #ffc107; 
             --light-gray: #f8f9fa; 
             --mid-gray: #e9ecef; 
             --dark-text: #212529; 
@@ -43,7 +43,7 @@
         h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
         
         /* Buttons */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border-radius: 50px; /* More rounded look */ font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border-radius: 50px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
         .btn-primary { background: var(--primary-color); color: var(--light-text); box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); }
         .btn-primary:hover:not(:disabled) { background: #0056b3; box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4); }
         .btn-secondary { background: var(--mid-gray); color: var(--dark-text); border-radius: var(--border-radius-sm); }
@@ -294,7 +294,7 @@ let performanceChartInstance = null;
 // [ 2.0 ] INITIALIZATION & EVENT LISTENERS (FIXED CLICKABILITY & REFRESH)
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // FIX: Attach event listener to the form's submit event to ensure reliability
+    // FIX: Attach event listener to the form's submit event to guarantee handleLogin runs
     document.getElementById('login-form').addEventListener('submit', (event) => {
         event.preventDefault();
         handleLogin();
@@ -328,6 +328,7 @@ async function handleLogin() {
     const loginBtn = document.getElementById('login-btn');
     const loginStatus = document.getElementById('login-status');
     
+    // DEFENSIVE CHECK: Ensure we have data before trying to fetch value
     if (!agentId || !password) { 
         loginStatus.textContent = "ID and Password are required."; 
         loginStatus.style.color = 'var(--danger-color)'; 
@@ -359,7 +360,7 @@ async function handleLogin() {
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
             
             if (currentAgent.isAdmin) {
-                document.getElementById('nav-admin-dashboard-btn').classList.classList.remove('hidden');
+                document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
             }
 
             renderTargetBar(); 
@@ -499,7 +500,6 @@ function refreshPageData() {
             }, 1000);
         });
 }
-
 
 // =================================================================
 // [ 4.0 ] UI RENDERING (Target Bar and Commissions)
@@ -1046,3 +1046,6 @@ function getBase64(file) {
         reader.onerror = error => reject(error);
     });
 }
+</script>
+</body>
+</html>
