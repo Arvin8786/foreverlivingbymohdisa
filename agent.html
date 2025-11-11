@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+]<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -186,6 +186,9 @@
         <div id="header-content">
             <h2 id="agent-welcome-header"></h2>
             <div id="target-bar-display"></div>
+            <button id="refresh-data-btn" class="btn btn-secondary" style="margin-top: 10px; padding: 5px 10px;">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh Data
+            </button>
         </div>
         <button id="logout-btn" class="btn btn-primary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     </header>
@@ -295,31 +298,32 @@
 // =================================================================
 
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyK1iRvOYCGmb3vHymqJzWYvRXShLm9vNX3RXmcB6DYHAnizMs0wluU3YuRnbmS6rD1xQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUR5OXVX3dcM-t2zjLcLLvLipVCnIjOeteEg0dSvD6b0RbXFgJOZC1jNsca5jm1XLl2Q/exec';
 
 // --- Global State Variables ---
 let products = [];
 let customers = [];
 let shippingRules = [];
-let currentAgent = null; // Holds agent, target, and currentSales, isAdmin status
+let currentAgent = null; 
 let currentOrder = { items: [] };
 let performanceChartInstance = null; 
 
 // =================================================================
-// [ 2.0 ] INITIALIZATION & EVENT LISTENERS
+// [ 2.0 ] INITIALIZATION & EVENT LISTENERS (FIXED CLICKABILITY & REFRESH)
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-btn').addEventListener('click', handleLogin);
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
     
-    // Navigation listeners are now robust
+    // NEW: Add listener for the Refresh button
+    document.getElementById('refresh-data-btn').addEventListener('click', refreshPageData);
+
     document.getElementById('nav-create-order-btn').addEventListener('click', () => showView('create-order-view'));
     document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
     document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
     document.getElementById('nav-admin-dashboard-btn').addEventListener('click', () => showView('admin-dashboard-view'));
 
-    // Password Change Listener
     document.getElementById('change-password-btn').addEventListener('click', handleChangePassword);
     
     document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
@@ -352,14 +356,12 @@ async function handleLogin() {
             currentAgent.currentSales = parseFloat(response.currentSales) || 0; 
             currentAgent.isAdmin = response.isAdmin || false;
             
-            // --- SECURITY CHECK: Force Password Change ---
             if (response.mustChangePassword) {
                  document.getElementById('login-view').classList.add('hidden');
                  document.getElementById('password-change-view').classList.remove('hidden');
                  document.getElementById('change-view-agent-id').textContent = `Agent ID: ${agentId}`;
                  return; 
             }
-            // --- END SECURITY CHECK ---
 
             await fetchPortalData();
             
@@ -420,7 +422,6 @@ async function handleChangePassword() {
             document.getElementById('password-change-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
             
-            // Clear password inputs
             document.getElementById('new-password-input').value = '';
             document.getElementById('confirm-password-input').value = '';
 
@@ -470,22 +471,50 @@ function handleLogout() {
     document.getElementById('login-status').textContent = '';
 }
 
+/**
+ * NEW: Manual refresh function for the current active view.
+ */
+function refreshPageData() {
+    const activeViewElement = document.querySelector('#portal-view .view:not(.hidden)');
+    if (!activeViewElement) return;
+
+    const activeViewId = activeViewElement.id;
+    
+    const refreshBtn = document.getElementById('refresh-data-btn');
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Refreshing...';
+
+    // 1. Re-fetch base data (required for Target Bar)
+    postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: document.getElementById('agent-password-input').value })
+        .then(res => {
+            if (res.success) {
+                currentAgent.target = parseFloat(res.target) || 0; 
+                currentAgent.currentSales = parseFloat(res.currentSales) || 0; 
+                renderTargetBar();
+            }
+        })
+        .finally(() => {
+            // 2. Re-render the specific active view
+            if (activeViewId) {
+                // Manually call the correct render function based on the current view ID
+                if (activeViewId === 'create-order-view') { startNewOrder(); }
+                if (activeViewId === 'products-view') { /* Data is static after fetchPortalData */ }
+                if (activeViewId === 'my-orders-view') { renderMyOrders(); }
+                if (activeViewId === 'my-commission-view') { renderMyCommission(); }
+                if (activeViewId === 'admin-dashboard-view') { renderAdminDashboard(); }
+            }
+            
+            // 3. Re-enable button
+            setTimeout(() => {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Refresh Data';
+            }, 1000);
+        });
+}
+
 // =================================================================
 // [ 4.0 ] UI RENDERING (Target Bar and Commissions)
 // =================================================================
-
-function showView(viewId) {
-    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
-    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
-
-    document.getElementById(viewId).classList.remove('hidden');
-    document.getElementById(`nav-${viewId.replace('view', 'btn')}`).classList.add('active');
-
-    // Fetch data on-demand for specific views
-    if (viewId === 'my-orders-view') renderMyOrders();
-    if (viewId === 'my-commission-view') renderMyCommission();
-    if (viewId === 'admin-dashboard-view') renderAdminDashboard();
-}
 
 function renderTargetBar() {
     const container = document.getElementById('target-bar-display');
@@ -558,7 +587,6 @@ function renderOrderSummary() {
         container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products to begin.</p>";
     } else {
         container.innerHTML = currentOrder.items.map(item => {
-            // Min Price is calculated on the server now (minPrice), but we enforce client-side validation here
             const isInvalid = item.customPrice < item.minPrice;
 
             return `
@@ -647,7 +675,8 @@ async function renderAdminDashboard() {
     const agentsOnTargetEl = document.getElementById('admin-agents-on-target');
     const dataTable = document.getElementById('admin-data-table');
 
-    dataContainer.innerHTML = 'Fetching data...';
+    dataContainer.innerHTML = '';
+    dataTable.innerHTML = '<p style="text-align:center;">Loading Admin Data...</p>';
     totalSalesEl.textContent = '...';
     totalCCEl.textContent = '...';
     agentsOnTargetEl.textContent = '...';
@@ -656,10 +685,16 @@ async function renderAdminDashboard() {
         const response = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
 
         if (response.success && response.data.length > 0) {
-            let grandTotalSales = 0;
-            let grandTotalCC = 0;
-            let agentsAchieved = 0;
+            
+            // Update Key Metrics using GRAND TOTALS from server
+            const grandTotalSales = response.data.reduce((sum, a) => sum + a.totalSales, 0);
+            const grandTotalCC = response.data.reduce((sum, a) => sum + a.totalCC, 0);
+            let agentsAchieved = response.data.filter(a => a.targetAchieved >= 1).length;
 
+            totalSalesEl.textContent = `RM ${grandTotalSales.toFixed(2)}`;
+            totalCCEl.textContent = grandTotalCC.toFixed(3);
+            agentsOnTargetEl.textContent = `${agentsAchieved} / ${response.data.length}`;
+            
             const tableHtml = `
                 <table style="width:100%;">
                     <thead>
@@ -673,10 +708,7 @@ async function renderAdminDashboard() {
                     </thead>
                     <tbody>
                         ${response.data.map(a => {
-                            const achieved = (a.totalSales / a.target) * 100;
-                            grandTotalSales += a.totalSales;
-                            grandTotalCC += a.totalCC;
-                            if (achieved >= 100) agentsAchieved++;
+                            const achieved = a.targetAchieved * 100;
                             
                             return `
                                 <tr>
@@ -694,23 +726,16 @@ async function renderAdminDashboard() {
                 </table>
             `;
             
-            // Draw Chart 
             drawPerformanceChart(response.data);
-
-            // Update Key Metrics
-            totalSalesEl.textContent = `RM ${grandTotalSales.toFixed(2)}`;
-            totalCCEl.textContent = grandTotalCC.toFixed(3);
-            agentsOnTargetEl.textContent = `${agentsAchieved} / ${response.data.length}`;
-            
             dataTable.innerHTML = tableHtml;
             dataContainer.innerHTML = ''; 
 
         } else {
-            dataTable.innerHTML = `<p>No agent performance data available.</p>`;
+            dataTable.innerHTML = `<p style="text-align:center;">No agent performance data available.</p>`;
             dataContainer.innerHTML = '';
         }
     } catch(e) {
-        dataContainer.innerHTML = `<p style="color:var(--danger-color);">Error loading admin data: ${e.message}</p>`;
+        dataTable.innerHTML = `<p style="color:var(--danger-color); text-align:center;">Error loading admin data: ${e.message}</p>`;
         console.error('Admin Data Fetch Failed:', e);
     }
 }
@@ -1020,6 +1045,3 @@ function getBase64(file) {
         reader.onerror = error => reject(error);
     });
 }
-</script>
-</body>
-</html>
