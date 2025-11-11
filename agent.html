@@ -107,7 +107,6 @@
             color: var(--dark-text);
             z-index: 10;
         }
-        /* End Target Bar Specifics */
 
         #portal-view nav .btn { border: 1px solid var(--primary-color); padding: 10px 20px; }
         #portal-view nav .btn.active { box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3); }
@@ -116,6 +115,17 @@
         #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
         .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
         
+        /* --- Product Image & List Fix --- */
+        #product-selection-list { max-height: 500px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
+        .product-item-selectable { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid var(--mid-gray); cursor: pointer; transition: background 0.1s; }
+        .product-item-selectable:hover { background: #f0f8ff; }
+        .product-item-selectable img { 
+            width: 50px; /* Smaller image width */
+            height: 50px; /* Smaller image height */
+            object-fit: contain; /* Ensures uniform size without cropping */
+            border-radius: 4px; 
+        }
+
         /* Data Tables */
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
@@ -157,7 +167,7 @@
         <div id="order-creation-workflow">
             <div>
                 <div class="card">
-                    <h3>Step 1: Select or Create Customer</h3>
+                    <h3>Customer Information</h3>
                     <select id="customer-dropdown"></select>
                     <button id="new-customer-btn" class="btn" style="background-color: var(--mid-gray); color: var(--dark-text); margin-top: 10px;">
                         <i class="fa-solid fa-user-plus"></i> Create New Customer
@@ -171,7 +181,7 @@
                 </div>
 
                 <div class="card">
-                    <h3>Step 2: Add Products</h3>
+                    <h3>Product Selection</h3>
                     <input type="text" id="product-order-search" placeholder="Search product name or SKU...">
                     <div id="product-selection-list"></div>
                 </div>
@@ -185,7 +195,7 @@
                     <div class="summary-line total"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
                 </div>
                 <div id="finalize-order-section" style="margin-top: 30px;">
-                    <h3>Step 3: Payment & Submit</h3>
+                    <h3>Payment & Submit</h3>
                     <label for="payment-proof">Upload Payment Proof (Required)</label>
                     <input type="file" id="payment-proof" required>
                     <button id="submit-order-btn" class="btn btn-primary" style="width:100%; margin-top: 15px;">
@@ -223,6 +233,7 @@
 // =================================================================
 
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
+// NOTE: Use your live deployment URL here
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoI2g4RV4gubtaeI5HjEXCSP7AMNm4cuL64epuBYZVypREnPic3LjsAphMopn1MfReJg/exec';
 
 // --- Global State Variables ---
@@ -238,10 +249,13 @@ let currentOrder = { items: [] };
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-btn').addEventListener('click', handleLogin);
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
+    
+    // Allow clicking to view all tabs immediately
     document.getElementById('nav-create-order-btn').addEventListener('click', () => showView('create-order-view'));
     document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
     document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
+    
     document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
     document.getElementById('customer-dropdown').addEventListener('change', handleCustomerSelection);
     document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
@@ -249,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =================================================================
-// [ 3.0 ] LOGIN, LOGOUT & DATA FETCHING (UPDATED for TARGET)
+// [ 3.0 ] LOGIN, LOGOUT & DATA FETCHING (TARGET FIX)
 // =================================================================
 async function handleLogin() {
     const agentId = document.getElementById('agent-id-input').value.trim();
@@ -260,12 +274,12 @@ async function handleLogin() {
     loginBtn.disabled = true; loginStatus.textContent = "Verifying..."; loginStatus.style.color = 'var(--dark-text)';
 
     try {
-        // Fetch agent, target, and current sales
         const response = await postToGoogleScript('verifyAgent', { agentId });
         if (response.success) {
             currentAgent = response.agent;
-            currentAgent.target = response.target || 0; 
-            currentAgent.currentSales = response.currentSales || 0; 
+            // CRITICAL FIX: Ensure currentSales is read and stored as a number
+            currentAgent.target = parseFloat(response.target) || 0; 
+            currentAgent.currentSales = parseFloat(response.currentSales) || 0; 
 
             await fetchPortalData();
             
@@ -274,7 +288,7 @@ async function handleLogin() {
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
             
             renderTargetBar(); // Render the new target visualization
-            startNewOrder(); 
+            showView('create-order-view'); // Default to the main order tab
         } else {
             loginStatus.textContent = response.message || "Invalid Agent ID or account not active.";
             loginStatus.style.color = 'var(--danger-color)';
