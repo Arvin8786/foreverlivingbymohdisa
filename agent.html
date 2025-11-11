@@ -50,7 +50,7 @@
         
         /* Cards & Form Elements */
         .card { background: var(--light-text); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; }
-        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea {
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="password"], select, textarea {
             width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem;
         }
         .hidden { display: none !important; }
@@ -144,6 +144,7 @@
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
         th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
 </head>
 <body>
 
@@ -151,14 +152,34 @@
     <div class="card" id="login-box">
         <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
         <h1>Agent Portal</h1>
-        <p>Please enter your Agent ID to proceed.</p>
-        <input type="text" id="agent-id-input" placeholder="e.g., AGENT001">
+        <p>Please enter your Agent ID and Password to proceed.</p>
+        
+        <input type="text" id="agent-id-input" placeholder="Agent ID">
+        <input type="password" id="agent-password-input" placeholder="Password"> 
+
         <button id="login-btn" class="btn btn-primary" style="width:100%;">
             <i class="fa-solid fa-right-to-bracket"></i> Login
         </button>
         <p id="login-status"></p>
     </div>
 </div>
+
+<div id="password-change-view" class="container hidden" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+    <div class="card" style="max-width: 400px; text-align: center;">
+        <h2>Mandatory Password Change</h2>
+        <p id="change-view-agent-id" style="font-weight: 600;"></p>
+        <p style="color: var(--danger-color); font-weight: 600;">For security, you must change your default password.</p>
+        
+        <input type="password" id="new-password-input" placeholder="New Password" required>
+        <input type="password" id="confirm-password-input" placeholder="Confirm New Password" required>
+        
+        <button id="change-password-btn" class="btn btn-primary" style="width:100%;">
+            Set New Password
+        </button>
+        <p id="password-change-status" style="margin-top: 15px;"></p>
+    </div>
+</div>
+
 
 <div id="portal-view" class="container hidden">
     <header>
@@ -174,6 +195,7 @@
         <button id="nav-products-btn" class="btn"><i class="fa-solid fa-boxes-stacked"></i> Products</button>
         <button id="nav-my-orders-btn" class="btn"><i class="fa-solid fa-receipt"></i> My Orders</button>
         <button id="nav-my-commission-btn" class="btn"><i class="fa-solid fa-wallet"></i> My Commission</button>
+        <button id="nav-admin-dashboard-btn" class="btn hidden"><i class="fa-solid fa-user-shield"></i> Admin Dashboard</button> 
     </nav>
 
     <div id="create-order-view" class="view">
@@ -238,25 +260,53 @@
         <p>Review your processed commission payouts below. Data is sourced from internal financial records.</p>
         <div id="my-commission-list"></div>
     </div>
+
+    <div id="admin-dashboard-view" class="view hidden card">
+        <h2>Admin Dashboard: Performance Overview</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
+            <div class="card" style="padding: 15px;">
+                <h4 style="margin-bottom: 5px;">Total Sales (RM)</h4>
+                <p id="admin-total-sales" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">Loading...</p>
+            </div>
+            <div class="card" style="padding: 15px;">
+                <h4 style="margin-bottom: 5px;">Total CC Accumulated</h4>
+                <p id="admin-total-cc" style="font-size: 1.5rem; font-weight: 700; color: var(--secondary-color);">Loading...</p>
+            </div>
+            <div class="card" style="padding: 15px;">
+                <h4 style="margin-bottom: 5px;">Agents On Target</h4>
+                <p id="admin-agents-on-target" style="font-size: 1.5rem; font-weight: 700; color: #f39c12;">Loading...</p>
+            </div>
+        </div>
+
+        <h3>Agent Performance Chart</h3>
+        <div style="background: white; padding: 20px; border-radius: var(--border-radius-lg);">
+            <canvas id="performanceChart" height="100"></canvas>
+        </div>
+
+        <h3>Raw Data Table</h3>
+        <div id="admin-data-table" style="margin-top: 20px;"></div>
+    </div>
 </div>
 
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE (FIXES)
+// AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE
 // =================================================================
 
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4t81g1nq0voZFOgjLJ7pfDwqt-HPvmH1fiVLeIrhSuskqpkZflTBj9ZJuIC5LuiJL8g/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyK1iRvOYCGmb3vHymqJzWYvRXShLm9vNX3RXmcB6DYHAnizMs0wluU3YuRnbmS6rD1xQ/exec';
 
 // --- Global State Variables ---
 let products = [];
 let customers = [];
 let shippingRules = [];
-let currentAgent = null; // Holds agent, target, and currentSales
+let currentAgent = null; // Holds agent, target, and currentSales, isAdmin status
 let currentOrder = { items: [] };
+let performanceChartInstance = null; 
 
 // =================================================================
-// [ 2.0 ] INITIALIZATION & EVENT LISTENERS (FIXED CLICKABILITY)
+// [ 2.0 ] INITIALIZATION & EVENT LISTENERS
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-btn').addEventListener('click', handleLogin);
@@ -267,6 +317,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
     document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
+    document.getElementById('nav-admin-dashboard-btn').addEventListener('click', () => showView('admin-dashboard-view'));
+
+    // Password Change Listener
+    document.getElementById('change-password-btn').addEventListener('click', handleChangePassword);
     
     document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
     document.getElementById('customer-dropdown').addEventListener('change', handleCustomerSelection);
@@ -275,23 +329,37 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =================================================================
-// [ 3.0 ] LOGIN, LOGOUT & DATA FETCHING (TARGET FIX)
+// [ 3.0 ] LOGIN, LOGOUT & DATA FETCHING (PASSWORD & TARGET FIX)
 // =================================================================
 async function handleLogin() {
     const agentId = document.getElementById('agent-id-input').value.trim();
+    const password = document.getElementById('agent-password-input').value; 
     const loginBtn = document.getElementById('login-btn');
     const loginStatus = document.getElementById('login-status');
     
-    if (!agentId) { loginStatus.textContent = "Agent ID cannot be empty."; loginStatus.style.color = 'var(--danger-color)'; return; }
+    if (!agentId || !password) { 
+        loginStatus.textContent = "ID and Password are required."; 
+        loginStatus.style.color = 'var(--danger-color)'; 
+        return; 
+    }
     loginBtn.disabled = true; loginStatus.textContent = "Verifying..."; loginStatus.style.color = 'var(--dark-text)';
 
     try {
-        const response = await postToGoogleScript('verifyAgent', { agentId });
+        const response = await postToGoogleScript('verifyAgent', { agentId, password });
         if (response.success) {
             currentAgent = response.agent;
-            // CRITICAL FIX: Ensure currentSales is read and stored as a number
             currentAgent.target = parseFloat(response.target) || 0; 
             currentAgent.currentSales = parseFloat(response.currentSales) || 0; 
+            currentAgent.isAdmin = response.isAdmin || false;
+            
+            // --- SECURITY CHECK: Force Password Change ---
+            if (response.mustChangePassword) {
+                 document.getElementById('login-view').classList.add('hidden');
+                 document.getElementById('password-change-view').classList.remove('hidden');
+                 document.getElementById('change-view-agent-id').textContent = `Agent ID: ${agentId}`;
+                 return; 
+            }
+            // --- END SECURITY CHECK ---
 
             await fetchPortalData();
             
@@ -299,18 +367,72 @@ async function handleLogin() {
             document.getElementById('portal-view').classList.remove('hidden');
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
             
+            if (currentAgent.isAdmin) {
+                document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
+            }
+
             renderTargetBar(); 
             showView('create-order-view'); 
         } else {
-            loginStatus.textContent = response.message || "Invalid Agent ID or account not active.";
+            loginStatus.textContent = response.message || "Login failed. Check credentials.";
             loginStatus.style.color = 'var(--danger-color)';
         }
     } catch (error) {
-        loginStatus.textContent = "Connection failed. Please check your internet and try again. (" + error.message + ")";
+        loginStatus.textContent = "Connection failed. Please check internet. (" + error.message + ")";
         loginStatus.style.color = 'var(--danger-color)';
         console.error("Login failed:", error);
     } finally {
         loginBtn.disabled = false;
+    }
+}
+
+async function handleChangePassword() {
+    const newPassword = document.getElementById('new-password-input').value;
+    const confirmPassword = document.getElementById('confirm-password-input').value;
+    const statusEl = document.getElementById('password-change-status');
+    const changeBtn = document.getElementById('change-password-btn');
+
+    if (newPassword.length < 6) {
+        statusEl.textContent = "Password must be at least 6 characters.";
+        statusEl.style.color = 'var(--danger-color)';
+        return;
+    }
+    if (newPassword !== confirmPassword) {
+        statusEl.textContent = "Passwords do not match.";
+        statusEl.style.color = 'var(--danger-color)';
+        return;
+    }
+
+    changeBtn.disabled = true;
+    statusEl.textContent = "Updating password...";
+    statusEl.style.color = 'var(--dark-text)';
+
+    try {
+        const response = await postToGoogleScript('updatePassword', { 
+            agentId: currentAgent.id,
+            newPassword: newPassword
+        });
+
+        if (response.success) {
+            statusEl.textContent = "Success! Logging you in...";
+            statusEl.style.color = 'var(--success-color)';
+            
+            document.getElementById('password-change-view').classList.add('hidden');
+            document.getElementById('portal-view').classList.remove('hidden');
+            
+            // Clear password inputs
+            document.getElementById('new-password-input').value = '';
+            document.getElementById('confirm-password-input').value = '';
+
+            showView('create-order-view'); 
+        } else {
+            throw new Error(response.message || "Failed to save password.");
+        }
+    } catch (error) {
+        statusEl.textContent = `Error: ${error.message}`;
+        statusEl.style.color = 'var(--danger-color)';
+    } finally {
+        changeBtn.disabled = false;
     }
 }
 
@@ -344,11 +466,12 @@ function handleLogout() {
     document.getElementById('login-view').classList.remove('hidden');
     document.getElementById('portal-view').classList.add('hidden');
     document.getElementById('agent-id-input').value = '';
+    document.getElementById('agent-password-input').value = ''; // Clear password field
     document.getElementById('login-status').textContent = '';
 }
 
 // =================================================================
-// [ 4.0 ] UI RENDERING & NAVIGATION
+// [ 4.0 ] UI RENDERING (Target Bar and Commissions)
 // =================================================================
 
 function showView(viewId) {
@@ -358,8 +481,10 @@ function showView(viewId) {
     document.getElementById(viewId).classList.remove('hidden');
     document.getElementById(`nav-${viewId.replace('view', 'btn')}`).classList.add('active');
 
+    // Fetch data on-demand for specific views
     if (viewId === 'my-orders-view') renderMyOrders();
     if (viewId === 'my-commission-view') renderMyCommission();
+    if (viewId === 'admin-dashboard-view') renderAdminDashboard();
 }
 
 function renderTargetBar() {
@@ -515,6 +640,140 @@ function renderMyCommission() {
         });
 }
 
+async function renderAdminDashboard() {
+    const dataContainer = document.getElementById('admin-data-container');
+    const totalSalesEl = document.getElementById('admin-total-sales');
+    const totalCCEl = document.getElementById('admin-total-cc');
+    const agentsOnTargetEl = document.getElementById('admin-agents-on-target');
+    const dataTable = document.getElementById('admin-data-table');
+
+    dataContainer.innerHTML = 'Fetching data...';
+    totalSalesEl.textContent = '...';
+    totalCCEl.textContent = '...';
+    agentsOnTargetEl.textContent = '...';
+
+    try {
+        const response = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
+
+        if (response.success && response.data.length > 0) {
+            let grandTotalSales = 0;
+            let grandTotalCC = 0;
+            let agentsAchieved = 0;
+
+            const tableHtml = `
+                <table style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Agent Name</th>
+                            <th>Target (RM)</th>
+                            <th>Sales (RM)</th>
+                            <th>Total CC</th>
+                            <th>Target Achieved (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${response.data.map(a => {
+                            const achieved = (a.totalSales / a.target) * 100;
+                            grandTotalSales += a.totalSales;
+                            grandTotalCC += a.totalCC;
+                            if (achieved >= 100) agentsAchieved++;
+                            
+                            return `
+                                <tr>
+                                    <td>${a.name}</td>
+                                    <td>${a.target.toFixed(2)}</td>
+                                    <td>${a.totalSales.toFixed(2)}</td>
+                                    <td>${a.totalCC.toFixed(3)}</td>
+                                    <td style="font-weight: 600; color: ${achieved >= 100 ? 'var(--success-color)' : 'var(--danger-color)'};">
+                                        ${achieved.toFixed(1)}%
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            // Draw Chart 
+            drawPerformanceChart(response.data);
+
+            // Update Key Metrics
+            totalSalesEl.textContent = `RM ${grandTotalSales.toFixed(2)}`;
+            totalCCEl.textContent = grandTotalCC.toFixed(3);
+            agentsOnTargetEl.textContent = `${agentsAchieved} / ${response.data.length}`;
+            
+            dataTable.innerHTML = tableHtml;
+            dataContainer.innerHTML = ''; 
+
+        } else {
+            dataTable.innerHTML = `<p>No agent performance data available.</p>`;
+            dataContainer.innerHTML = '';
+        }
+    } catch(e) {
+        dataContainer.innerHTML = `<p style="color:var(--danger-color);">Error loading admin data: ${e.message}</p>`;
+        console.error('Admin Data Fetch Failed:', e);
+    }
+}
+
+function drawPerformanceChart(data) {
+    const ctx = document.getElementById('performanceChart');
+    
+    if (performanceChartInstance) {
+        performanceChartInstance.destroy(); 
+    }
+
+    const labels = data.map(a => a.name);
+    const salesData = data.map(a => a.totalSales);
+    const targetData = data.map(a => a.target);
+
+    performanceChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Monthly Target (RM)',
+                    data: targetData,
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    type: 'line', 
+                    borderWidth: 2,
+                    tension: 0.4
+                },
+                {
+                    label: 'Total Sales (RM)',
+                    data: salesData,
+                    backgroundColor: 'rgba(0, 123, 255, 0.8)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Amount (RM)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Agent Sales vs. Target'
+                }
+            }
+        }
+    });
+}
+
+
 // =================================================================
 // [ 5.0 ] ORDER CREATION LOGIC 
 // =================================================================
@@ -564,7 +823,7 @@ function addProductToOrder(productId) {
             rsp: product.rsp,
             cc: product.cc,
             customPrice: product.rsp,
-            minPrice: product.minPrice // Use the server-calculated minimum price
+            minPrice: product.minPrice // Use server-calculated minimum
         });
     }
     renderOrderSummary();
@@ -624,7 +883,7 @@ async function submitOrder() {
         submitBtn.disabled = false;
         return;
     }
-    // Validation using the server-calculated minPrice (which includes 25% and CP floor)
+    // Validation using the server-calculated minPrice (minPrice includes 25% and CP floor)
     if (currentOrder.items.some(item => item.customPrice < item.minPrice)) {
         statusEl.textContent = "Error: One or more prices are below the allowed minimum.";
         statusEl.style.color = 'var(--danger-color)';
@@ -690,7 +949,7 @@ async function submitOrder() {
             setTimeout(startNewOrder, 5000);
             
             // Refresh Target Bar after sale
-            postToGoogleScript('verifyAgent', { agentId: currentAgent.id }).then(res => {
+            postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: document.getElementById('agent-password-input').value }).then(res => {
                  if(res.success) {
                     currentAgent.currentSales = parseFloat(res.currentSales) || 0;
                     renderTargetBar();
