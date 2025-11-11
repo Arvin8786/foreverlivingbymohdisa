@@ -1,4 +1,4 @@
-]<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -18,6 +18,7 @@
         :root {
             --primary-color: #007bff; 
             --secondary-color: #28a745; 
+            --accent-color: #ff9900; /* For status/alerts */
             --light-gray: #f8f9fa; 
             --mid-gray: #e9ecef; 
             --dark-text: #343a40; 
@@ -25,7 +26,7 @@
             --danger-color: #dc3545;
             --success-color: #28a745;
             --border-radius-lg: 12px;
-            --border-radius-sm: 6px;
+            --border-radius-sm: 8px;
             --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
             --font-family: 'Poppins', sans-serif;
         }
@@ -43,119 +44,90 @@
         h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
         
         /* Buttons */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border-radius: var(--border-radius-sm); text-decoration: none; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
-        .btn-primary { background: var(--primary-color); color: var(--light-text); }
-        .btn-primary:hover:not(:disabled) { background: #0056b3; }
-        .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border-radius: 50px; /* More rounded look */ font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
+        .btn-primary { background: var(--primary-color); color: var(--light-text); box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); }
+        .btn-primary:hover:not(:disabled) { background: #0056b3; box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4); }
+        .btn-secondary { background: var(--mid-gray); color: var(--dark-text); }
+        .btn-secondary:hover:not(:disabled) { background: #d0d7dd; }
+        .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; box-shadow: none; }
         
         /* Cards & Form Elements */
-        .card { background: var(--light-text); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; }
+        .card { 
+            background: var(--light-text); 
+            border-radius: var(--border-radius-lg); 
+            box-shadow: var(--shadow-lg); 
+            padding: 30px; 
+            margin-bottom: 25px; 
+        }
         input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="password"], select, textarea {
-            width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem;
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem;
         }
         .hidden { display: none !important; }
 
         /* ================================================================= */
-        /* [ 2.0 ] LOGIN & LAYOUT STYLES */
+        /* [ 2.0 ] LOGIN & HEADER STYLES */
         /* ================================================================= */
         #login-view { 
             display: flex; justify-content: center; align-items: center; min-height: 100vh; 
-            background: linear-gradient(135deg, var(--primary-color) 0%, #00a4ff 100%); 
+            background: linear-gradient(135deg, #004d99 0%, var(--primary-color) 100%); 
         }
-        #login-box { padding: 50px; max-width: 400px; text-align: center; }
-        
+        #login-box { 
+            padding: 50px; max-width: 400px; text-align: center; 
+            background: #fff; border-radius: 15px;
+        }
+
         #portal-view header { 
-            display: flex; justify-content: space-between; align-items: center; background: white; 
-            padding: 15px 30px; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); 
-            margin-bottom: 20px; 
+            padding: 15px 30px; 
+            display: flex; 
+            align-items: center;
         }
         
-        /* Target Bar Container (NEW) */
+        /* Target Bar Specifics */
         #header-content {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            flex-grow: 1;
+            display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; margin-right: 20px;
         }
-
         .target-bar-container {
-            width: 100%;
-            max-width: 450px;
-            margin-top: 5px;
-            background-color: var(--mid-gray);
-            border-radius: 15px;
-            height: 25px;
-            overflow: hidden;
-            position: relative;
+            width: 100%; max-width: 450px; margin-top: 5px; height: 20px;
+            background-color: var(--mid-gray); border-radius: 10px; overflow: hidden; position: relative;
         }
-
-        .target-progress {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, var(--secondary-color)); /* Green gradient */
-            transition: width 0.5s ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
-
-        .target-text {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--dark-text);
-            z-index: 10;
-        }
-
-        #portal-view nav .btn { border: 1px solid var(--primary-color); padding: 10px 20px; }
+        .target-progress { background: linear-gradient(90deg, #4CAF50, #198754); }
+        .target-text { font-size: 0.8rem; line-height: 20px; color: #000; }
+        
+        #portal-view nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
+        #portal-view nav .btn { border-radius: var(--border-radius-sm); }
         #portal-view nav .btn.active { box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3); }
 
-        /* Order Creation Specifics */
+        /* ================================================================= */
+        /* [ 3.0 ] ORDER CREATION & DATA TABLES */
+        /* ================================================================= */
         #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
-        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
         
-        /* Product Image & List Fix */
+        /* Product List Styling */
         #product-selection-list { max-height: 500px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
-        .product-item-selectable { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid var(--mid-gray); cursor: pointer; transition: background 0.1s; }
-        .product-item-selectable:hover { background: #f0f8ff; }
-        .product-item-selectable img { 
-            width: 50px; 
-            height: 50px; 
-            object-fit: contain; 
-            border-radius: 4px; 
-        }
+        .product-item-selectable { padding: 10px; border-bottom: 1px solid var(--mid-gray); }
+        .product-item-selectable img { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; }
 
-        /* Order Summary Table Inputs FIX */
-        #summary-items-list .summary-item { 
-            display: grid; 
-            grid-template-columns: 1fr 60px 80px 30px; 
-            align-items: center; 
-            gap: 10px; 
-            padding: 10px 0; 
-            border-bottom: 1px dashed var(--mid-gray); 
-        }
-        .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; }
+        /* Order Summary Inputs */
+        #summary-items-list .summary-item { grid-template-columns: 1fr 60px 80px 30px; }
         .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
-
+        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
 
         /* Data Tables */
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
         th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
 </head>
 <body>
 
 <div id="login-view">
     <div class="card" id="login-box">
         <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
-        <h1>Agent Portal</h1>
-        <p>Please enter your Agent ID and Password to proceed.</p>
+        <h1>Agent Portal Login</h1>
+        <p>Enter your credentials to access the sales platform.</p>
         
-        <input type="text" id="agent-id-input" placeholder="Agent ID">
-        <input type="password" id="agent-password-input" placeholder="Password"> 
+        <input type="text" id="agent-id-input" placeholder="Agent ID" onkeypress="if(event.keyCode == 13) handleLogin()">
+        <input type="password" id="agent-password-input" placeholder="Password" onkeypress="if(event.keyCode == 13) handleLogin()"> 
 
         <button id="login-btn" class="btn btn-primary" style="width:100%;">
             <i class="fa-solid fa-right-to-bracket"></i> Login
@@ -164,11 +136,11 @@
     </div>
 </div>
 
-<div id="password-change-view" class="container hidden" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
-    <div class="card" style="max-width: 400px; text-align: center;">
+<div id="password-change-view" class="container hidden" style="min-height: 100vh;">
+    <div class="card" style="max-width: 400px; margin: 50px auto; text-align: center;">
         <h2>Mandatory Password Change</h2>
         <p id="change-view-agent-id" style="font-weight: 600;"></p>
-        <p style="color: var(--danger-color); font-weight: 600;">For security, you must change your default password.</p>
+        <p style="color: var(--danger-color); font-weight: 600;">For security, you must change your default password immediately.</p>
         
         <input type="password" id="new-password-input" placeholder="New Password" required>
         <input type="password" id="confirm-password-input" placeholder="Confirm New Password" required>
@@ -269,15 +241,15 @@
         
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
             <div class="card" style="padding: 15px;">
-                <h4 style="margin-bottom: 5px;">Total Sales (RM)</h4>
+                <h4 style="margin-bottom: 5px;">Total Sales (RM) (All Time)</h4>
                 <p id="admin-total-sales" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">Loading...</p>
             </div>
             <div class="card" style="padding: 15px;">
-                <h4 style="margin-bottom: 5px;">Total CC Accumulated</h4>
+                <h4 style="margin-bottom: 5px;">Total CC Accumulated (All Time)</h4>
                 <p id="admin-total-cc" style="font-size: 1.5rem; font-weight: 700; color: var(--secondary-color);">Loading...</p>
             </div>
             <div class="card" style="padding: 15px;">
-                <h4 style="margin-bottom: 5px;">Agents On Target</h4>
+                <h4 style="margin-bottom: 5px;">Agents On/Above Target</h4>
                 <p id="admin-agents-on-target" style="font-size: 1.5rem; font-weight: 700; color: #f39c12;">Loading...</p>
             </div>
         </div>
@@ -309,21 +281,25 @@ let currentOrder = { items: [] };
 let performanceChartInstance = null; 
 
 // =================================================================
-// [ 2.0 ] INITIALIZATION & EVENT LISTENERS (FIXED CLICKABILITY & REFRESH)
+// [ 2.0 ] INITIALIZATION & EVENT LISTENERS
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
+    // FIX: Attach Login listener robustly
     document.getElementById('login-btn').addEventListener('click', handleLogin);
+    
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
     
-    // NEW: Add listener for the Refresh button
+    // Attach Refresh listener
     document.getElementById('refresh-data-btn').addEventListener('click', refreshPageData);
 
+    // Navigation listeners
     document.getElementById('nav-create-order-btn').addEventListener('click', () => showView('create-order-view'));
     document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
     document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
     document.getElementById('nav-admin-dashboard-btn').addEventListener('click', () => showView('admin-dashboard-view'));
 
+    // Password Change Listener
     document.getElementById('change-password-btn').addEventListener('click', handleChangePassword);
     
     document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
@@ -356,12 +332,14 @@ async function handleLogin() {
             currentAgent.currentSales = parseFloat(response.currentSales) || 0; 
             currentAgent.isAdmin = response.isAdmin || false;
             
+            // --- SECURITY CHECK: Force Password Change ---
             if (response.mustChangePassword) {
                  document.getElementById('login-view').classList.add('hidden');
                  document.getElementById('password-change-view').classList.remove('hidden');
                  document.getElementById('change-view-agent-id').textContent = `Agent ID: ${agentId}`;
                  return; 
             }
+            // --- END SECURITY CHECK ---
 
             await fetchPortalData();
             
@@ -496,7 +474,6 @@ function refreshPageData() {
         .finally(() => {
             // 2. Re-render the specific active view
             if (activeViewId) {
-                // Manually call the correct render function based on the current view ID
                 if (activeViewId === 'create-order-view') { startNewOrder(); }
                 if (activeViewId === 'products-view') { /* Data is static after fetchPortalData */ }
                 if (activeViewId === 'my-orders-view') { renderMyOrders(); }
@@ -512,9 +489,23 @@ function refreshPageData() {
         });
 }
 
+
 // =================================================================
 // [ 4.0 ] UI RENDERING (Target Bar and Commissions)
 // =================================================================
+
+function showView(viewId) {
+    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
+    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
+
+    document.getElementById(viewId).classList.remove('hidden');
+    document.getElementById(`nav-${viewId.replace('view', 'btn')}`).classList.add('active');
+
+    // Fetch data on-demand for specific views
+    if (viewId === 'my-orders-view') renderMyOrders();
+    if (viewId === 'my-commission-view') renderMyCommission();
+    if (viewId === 'admin-dashboard-view') renderAdminDashboard();
+}
 
 function renderTargetBar() {
     const container = document.getElementById('target-bar-display');
