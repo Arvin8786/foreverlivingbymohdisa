@@ -13,14 +13,14 @@
     
     <style>
         /* ================================================================= */
-        /* [ 1.0 ] CORE STYLES & VARIABLES (UNTOUCHED FROM ORIGINAL) */
+        /* [ 1.0 ] CORE STYLES & VARIABLES */
         /* ================================================================= */
         :root {
-            --primary-color: #007bff; /* Bright Blue */
-            --secondary-color: #28a745; /* Success Green */
-            --light-gray: #f8f9fa; /* Very light background */
-            --mid-gray: #e9ecef; /* Border color / Hover background */
-            --dark-text: #343a40; /* Main text color */
+            --primary-color: #007bff; 
+            --secondary-color: #28a745; 
+            --light-gray: #f8f9fa; 
+            --mid-gray: #e9ecef; 
+            --dark-text: #343a40; 
             --light-text: #fff;
             --danger-color: #dc3545;
             --success-color: #28a745;
@@ -31,7 +31,6 @@
         }
         * { box-sizing: border-box; }
         
-        /* Ensure base colors apply immediately */
         body { 
             font-family: var(--font-family); 
             background: var(--light-gray); 
@@ -57,105 +56,70 @@
         .hidden { display: none !important; }
 
         /* ================================================================= */
-        /* [ 2.0 ] LOGIN VIEW */
+        /* [ 2.0 ] LOGIN & LAYOUT STYLES */
         /* ================================================================= */
         #login-view { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; 
             background: linear-gradient(135deg, var(--primary-color) 0%, #00a4ff 100%); 
         }
-        #login-box { 
-            padding: 50px; 
-            max-width: 400px; 
-            text-align: center; 
-        }
-        #login-status { font-weight: 500; min-height: 24px; margin-top: 15px; font-size: 0.95rem; }
-
-        /* ================================================================= */
-        /* [ 3.0 ] PORTAL LAYOUT */
-        /* ================================================================= */
+        #login-box { padding: 50px; max-width: 400px; text-align: center; }
+        
         #portal-view header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: white; 
-            padding: 15px 30px; 
-            border-radius: var(--border-radius-lg); 
-            box-shadow: var(--shadow-lg); 
+            display: flex; justify-content: space-between; align-items: center; background: white; 
+            padding: 15px 30px; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); 
             margin-bottom: 20px; 
         }
-        #portal-view header h2 { margin: 0; font-size: 1.5rem; }
-        #portal-view nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
-        #portal-view nav .btn { 
-            background: white; 
-            color: var(--primary-color); 
-            border: 1px solid var(--primary-color); 
-            padding: 10px 20px;
-        }
-        #portal-view nav .btn.active { 
-            background: var(--primary-color); 
-            color: white; 
-            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
-        }
         
-        /* ================================================================= */
-        /* [ 4.0 ] ORDER CREATION WORKFLOW */
-        /* ================================================================= */
-        #order-creation-workflow { 
-            display: grid; 
-            grid-template-columns: 1fr 400px; 
-            gap: 30px; 
-            align-items: flex-start; 
+        /* Target Bar Container (NEW) */
+        #header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex-grow: 1;
         }
-        #product-selection-list { 
-            max-height: 450px; 
-            overflow-y: auto; 
-            border: 1px solid var(--mid-gray); 
-            border-radius: var(--border-radius-sm); 
-        }
-        
-        /* Product Item Selectable */
-        .product-item-selectable { 
-            display: grid; 
-            grid-template-columns: 60px 1fr auto; 
-            align-items: center; 
-            gap: 15px; 
-            padding: 12px; 
-            border-bottom: 1px solid var(--mid-gray); 
-            cursor: pointer; 
-            transition: background 0.1s; 
-        }
-        .product-item-selectable:hover { background: #f0f8ff; }
-        .product-item-selectable img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
-        
-        /* Order Summary */
-        #order-summary-card { position: sticky; top: 30px; }
-        #summary-items-list { max-height: 300px; overflow-y: auto; }
-        .summary-item { 
-            display: grid; 
-            grid-template-columns: 1fr 60px 80px 30px; 
-            align-items: center; 
-            gap: 10px; 
-            padding: 10px 0; 
-            border-bottom: 1px dashed var(--mid-gray); 
-        }
-        .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; }
-        .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
-        .summary-total { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--mid-gray); }
-        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
 
+        .target-bar-container {
+            width: 100%;
+            max-width: 450px;
+            margin-top: 5px;
+            background-color: var(--mid-gray);
+            border-radius: 15px;
+            height: 25px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .target-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, var(--secondary-color)); /* Green gradient */
+            transition: width 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .target-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            z-index: 10;
+        }
+        /* End Target Bar Specifics */
+
+        #portal-view nav .btn { border: 1px solid var(--primary-color); padding: 10px 20px; }
+        #portal-view nav .btn.active { box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3); }
+
+        /* Order Creation Specifics */
+        #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
+        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
+        
         /* Data Tables */
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
         th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
-
-        /* Responsive Layout */
-        @media (max-width: 1000px) {
-            #order-creation-workflow { grid-template-columns: 1fr; }
-            #order-summary-card { position: static; }
-        }
     </style>
 </head>
 <body>
@@ -175,7 +139,10 @@
 
 <div id="portal-view" class="container hidden">
     <header>
-        <h2 id="agent-welcome-header"></h2>
+        <div id="header-content">
+            <h2 id="agent-welcome-header"></h2>
+            <div id="target-bar-display"></div>
+        </div>
         <button id="logout-btn" class="btn btn-primary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     </header>
 
@@ -245,42 +212,36 @@
     
     <div id="my-commission-view" class="view hidden card">
         <h2>My Commission Records</h2>
-        <p>This data is pulled from your `AgentsPay` sheet via the `getAgentCommission` function.</p>
+        <p>Review your processed commission payouts below. Data is sourced from internal financial records.</p>
         <div id="my-commission-list"></div>
     </div>
 </div>
 
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - v31.2 (CSS & Unknown Action FIXES)
+// AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE
 // =================================================================
 
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
-// This URL must match your Google Apps Script Web App Deployment URL
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ-MehyztD4CvRcu346cshS1LDNuZqY2mXw3IQq4VSsYo9K8vs-GWVw6a4KuMXCkvgHA/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoI2g4RV4gubtaeI5HjEXCSP7AMNm4cuL64epuBYZVypREnPic3LjsAphMopn1MfReJg/exec';
 
 // --- Global State Variables ---
 let products = [];
 let customers = [];
 let shippingRules = [];
-let currentAgent = null;
+let currentAgent = null; // Holds agent, target, and currentSales
 let currentOrder = { items: [] };
 
 // =================================================================
 // [ 2.0 ] INITIALIZATION & EVENT LISTENERS
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Login & Logout ---
     document.getElementById('login-btn').addEventListener('click', handleLogin);
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
-    
-    // --- Navigation ---
     document.getElementById('nav-create-order-btn').addEventListener('click', () => showView('create-order-view'));
     document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
     document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
-    
-    // --- Order Creation ---
     document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
     document.getElementById('customer-dropdown').addEventListener('change', handleCustomerSelection);
     document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
@@ -288,32 +249,31 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =================================================================
-// [ 3.0 ] LOGIN, LOGOUT & DATA FETCHING
+// [ 3.0 ] LOGIN, LOGOUT & DATA FETCHING (UPDATED for TARGET)
 // =================================================================
 async function handleLogin() {
     const agentId = document.getElementById('agent-id-input').value.trim();
     const loginBtn = document.getElementById('login-btn');
     const loginStatus = document.getElementById('login-status');
     
-    if (!agentId) {
-        loginStatus.textContent = "Agent ID cannot be empty.";
-        loginStatus.style.color = 'var(--danger-color)';
-        return;
-    }
-    
-    loginBtn.disabled = true;
-    loginStatus.textContent = "Verifying...";
-    loginStatus.style.color = 'var(--dark-text)';
+    if (!agentId) { loginStatus.textContent = "Agent ID cannot be empty."; loginStatus.style.color = 'var(--danger-color)'; return; }
+    loginBtn.disabled = true; loginStatus.textContent = "Verifying..."; loginStatus.style.color = 'var(--dark-text)';
 
     try {
+        // Fetch agent, target, and current sales
         const response = await postToGoogleScript('verifyAgent', { agentId });
         if (response.success) {
             currentAgent = response.agent;
+            currentAgent.target = response.target || 0; 
+            currentAgent.currentSales = response.currentSales || 0; 
+
             await fetchPortalData();
             
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
+            
+            renderTargetBar(); // Render the new target visualization
             startNewOrder(); 
         } else {
             loginStatus.textContent = response.message || "Invalid Agent ID or account not active.";
@@ -343,8 +303,8 @@ async function fetchPortalData() {
             throw new Error(response.message);
         }
     } catch (error) {
-        console.error("Failed to fetch portal data:", error);
-        alert("Could not load essential portal data. Please check F12 console for details.");
+        console.error('Failed to fetch portal data:', error);
+        alert('Could not load essential portal data. Please check F12 console for details.');
     }
 }
 
@@ -362,21 +322,34 @@ function handleLogout() {
 }
 
 // =================================================================
-// [ 4.0 ] UI RENDERING & NAVIGATION 
+// [ 4.0 ] UI RENDERING (Target Bar and Commissions)
 // =================================================================
-function showView(viewId) {
-    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
-    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
 
-    document.getElementById(viewId).classList.remove('hidden');
-    document.getElementById(`nav-${viewId.replace('view', 'btn')}`).classList.add('active');
+function renderTargetBar() {
+    const container = document.getElementById('target-bar-display');
+    const sales = currentAgent.currentSales;
+    const target = currentAgent.target;
+    
+    // Calculate percentage, capping at 100%
+    const percentage = Math.min(100, target > 0 ? (sales / target) * 100 : 0);
+    const targetFormatted = (target || 0).toFixed(2);
+    const salesFormatted = (sales || 0).toFixed(2);
 
-    if (viewId === 'my-orders-view') renderMyOrders();
-    if (viewId === 'my-commission-view') renderMyCommission();
-    if (viewId === 'create-order-view') startNewOrder();
+    container.innerHTML = `
+        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+            Monthly Target: **RM ${salesFormatted}** / RM ${targetFormatted}
+            (${percentage.toFixed(1)}%)
+        </div>
+        <div class="target-bar-container">
+            <div class="target-text">
+                RM ${salesFormatted} / RM ${targetFormatted}
+            </div>
+            <div class="target-progress" style="width: ${percentage}%;"></div>
+        </div>
+    `;
 }
 
-function renderProductCatalog() {
+function renderProductCatalog() { 
     const container = document.getElementById('product-catalog-table');
     container.innerHTML = products.map(p => `
         <tr>
@@ -387,13 +360,10 @@ function renderProductCatalog() {
         </tr>
     `).join('');
 }
-
-function renderProductSelectionList() {
+function renderProductSelectionList() { 
     const container = document.getElementById('product-selection-list');
     const searchTerm = document.getElementById('product-order-search').value.toLowerCase();
-    const filteredProducts = products.filter(p => 
-        p.name.toLowerCase().includes(searchTerm) || String(p.id).toLowerCase().includes(searchTerm)
-    );
+    const filteredProducts = products.filter(p => p.name.toLowerCase().includes(searchTerm) || String(p.id).toLowerCase().includes(searchTerm));
 
     if (filteredProducts.length === 0) {
         container.innerHTML = "<p style='padding: 15px; text-align: center;'>No products found.</p>";
@@ -410,8 +380,7 @@ function renderProductSelectionList() {
         </div>
     `).join('');
 }
-
-function renderCustomerDropdown() {
+function renderCustomerDropdown() { 
     const select = document.getElementById('customer-dropdown');
     select.innerHTML = `<option value="">-- Select Existing Customer --</option>`;
     customers.forEach(c => {
@@ -421,8 +390,7 @@ function renderCustomerDropdown() {
         select.appendChild(option);
     });
 }
-
-function renderOrderSummary() {
+function renderOrderSummary() { 
     const container = document.getElementById('summary-items-list');
     if (currentOrder.items.length === 0) {
         container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products to begin.</p>";
@@ -451,7 +419,7 @@ async function renderMyOrders() {
         const response = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
         if (response.success && response.orders.length > 0) {
             container.innerHTML = `
-                <table>
+                <table class="my-orders-table">
                     <thead><tr><th>Invoice ID</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
                     <tbody>${response.orders.map(o => `
                         <tr>
@@ -469,34 +437,49 @@ async function renderMyOrders() {
     } catch(e) { container.innerHTML = `<p style="color:var(--danger-color);">Could not load orders. Error: ${e.message}</p>`; }
 }
 
-async function renderMyCommission() {
+function renderMyCommission() {
     const container = document.getElementById('my-commission-list');
     container.innerHTML = '<p>Loading records...</p>';
-    try {
-        const response = await postToGoogleScript('getAgentCommission', { agentId: currentAgent.id });
-        if (response.success && response.records.length > 0) {
-            container.innerHTML = `
-                <table>
-                    <thead><tr><th>Sales Amount (RM)</th><th>Commission (RM)</th><th>Total Payable (RM)</th></tr></thead>
-                    <tbody>${response.records.map(r => `
-                        <tr>
-                            <td>${r.sales.toFixed(2)}</td>
-                            <td>${r.commission.toFixed(2)}</td>
-                            <td><strong>${r.payable.toFixed(2)}</strong></td>
-                        </tr>`).join('')}
-                    </tbody>
-                </table>`;
-        } else {
-            container.innerHTML = '<p>No commission records found.</p>';
-        }
-    } catch(e) { container.innerHTML = `<p style="color:var(--danger-color);">Could not load records. Error: ${e.message}</p>`; }
+    
+    postToGoogleScript('getAgentCommission', { agentId: currentAgent.id })
+        .then(response => {
+            if (response.success && response.records.length > 0) {
+                container.innerHTML = `
+                    <table class="commission-table">
+                        <thead>
+                            <tr>
+                                <th>Order Number</th>
+                                <th>Sales Amount (RM)</th>
+                                <th>Rate (%)</th>
+                                <th>Commission (RM)</th>
+                                <th>Incentive (RM)</th>
+                                <th>Final Payable (RM)</th>
+                            </tr>
+                        </thead>
+                        <tbody>${response.records.map(r => `
+                            <tr>
+                                <td>${r.invoiceId}</td>
+                                <td>${r.salesAmount.toFixed(2)}</td>
+                                <td>${r.commissionRate}%</td>
+                                <td>${r.commissionAmount.toFixed(2)}</td>
+                                <td>${r.incentive.toFixed(2)}</td>
+                                <td><strong>${r.finalAmount.toFixed(2)}</strong></td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>`;
+            } else {
+                container.innerHTML = '<p>No commission records found.</p>';
+            }
+        })
+        .catch(e => {
+            container.innerHTML = `<p style="color:var(--danger-color);">Could not load records. Error: ${e.message}</p>`; 
+        });
 }
-
 
 // =================================================================
 // [ 5.0 ] ORDER CREATION LOGIC 
 // =================================================================
-function startNewOrder() {
+function startNewOrder() { 
     currentOrder = { items: [] };
     document.getElementById('customer-dropdown').value = '';
     document.getElementById('new-customer-form').classList.add('hidden');
@@ -512,7 +495,6 @@ function startNewOrder() {
     document.getElementById('submit-order-btn').disabled = false;
     renderOrderSummary();
 }
-
 function handleNewCustomerToggle() {
     const form = document.getElementById('new-customer-form');
     const dropdown = document.getElementById('customer-dropdown');
@@ -524,7 +506,6 @@ function handleNewCustomerToggle() {
         dropdown.disabled = false;
     }
 }
-
 function handleCustomerSelection() {
     const dropdown = document.getElementById('customer-dropdown');
     if (dropdown.value) {
@@ -532,7 +513,6 @@ function handleCustomerSelection() {
         dropdown.disabled = false;
     }
 }
-
 function addProductToOrder(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
@@ -550,12 +530,10 @@ function addProductToOrder(productId) {
     }
     renderOrderSummary();
 }
-
 function removeItemFromOrder(productId) {
     currentOrder.items = currentOrder.items.filter(item => item.id !== productId);
     renderOrderSummary();
 }
-
 function updateQuantity(productId, newQuantity) {
     const item = currentOrder.items.find(i => i.id === productId);
     const qty = parseInt(newQuantity, 10);
@@ -566,7 +544,6 @@ function updateQuantity(productId, newQuantity) {
     }
     renderOrderSummary();
 }
-
 function updatePrice(productId, newPrice) {
     const item = currentOrder.items.find(i => i.id === productId);
     const price = parseFloat(newPrice);
@@ -575,7 +552,6 @@ function updatePrice(productId, newPrice) {
     }
     renderOrderSummary();
 }
-
 function calculateTotals() {
     const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
     
@@ -589,7 +565,6 @@ function calculateTotals() {
     document.getElementById('summary-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
     document.getElementById('summary-total').textContent = `RM ${finalTotal.toFixed(2)}`;
 }
-
 async function submitOrder() {
     const submitBtn = document.getElementById('submit-order-btn');
     const statusEl = document.getElementById('submit-status');
@@ -684,8 +659,9 @@ async function submitOrder() {
     }
 }
 
+
 // =================================================================
-// [ 6.0 ] UTILITY FUNCTIONS (FIXED FOR 'UNKNOWN ACTION' ERROR)
+// [ 6.0 ] UTILITY FUNCTIONS 
 // =================================================================
 async function postToGoogleScript(actionOrPayload, data = {}) {
     const isPayloadObject = typeof actionOrPayload === 'object' && actionOrPayload !== null && actionOrPayload.action;
