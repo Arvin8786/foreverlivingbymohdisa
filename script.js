@@ -4,7 +4,7 @@
 // =================================================================
 
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycby4MtPVpYIBv0VlFE3PjwGIwSTcYQmBkp1JbEFlFwHxwijQZ8FJZ5MhqzR6Q7H5oVjCvw/exec'; // <-- IMPORTANT: PASTE YOUR DEPLOYED URL HERE
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwfly8yaagPNaxrP1OHlrkGG9uBYP0b92JVq9ADWj6fkXoY2PAHVwtJqy1NYFJ_Uiv5lA/exec'; // <-- IMPORTANT: PASTE YOUR DEPLOYED URL HERE
 
 // --- Global State Variables ---
 let products = [];
