@@ -43,7 +43,7 @@
         h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
         
         /* Buttons */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border-radius: 50px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border-radius: 50px; /* More rounded look */ font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
         .btn-primary { background: var(--primary-color); color: var(--light-text); box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); }
         .btn-primary:hover:not(:disabled) { background: #0056b3; box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4); }
         .btn-secondary { background: var(--mid-gray); color: var(--dark-text); border-radius: var(--border-radius-sm); }
@@ -85,13 +85,14 @@
         #header-content {
             display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; margin-right: 20px;
         }
+
         .target-bar-container {
             width: 100%; max-width: 450px; margin-top: 5px; height: 20px;
             background-color: var(--mid-gray); border-radius: 10px; overflow: hidden; position: relative;
         }
         .target-progress { background: linear-gradient(90deg, #4CAF50, #198754); }
         .target-text { font-size: 0.8rem; line-height: 20px; color: #000; }
-        
+
         #portal-view nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
         #portal-view nav .btn { border-radius: var(--border-radius-sm); }
         #portal-view nav .btn.active { box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3); }
@@ -133,13 +134,15 @@
         <h1>Agent Portal Login</h1>
         <p>Enter your credentials to access the sales platform.</p>
         
-        <input type="text" id="agent-id-input" placeholder="Agent ID">
-        <input type="password" id="agent-password-input" placeholder="Password"> 
+        <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
+            <input type="text" id="agent-id-input" placeholder="Agent ID" required>
+            <input type="password" id="agent-password-input" placeholder="Password" required> 
 
-        <button id="login-btn" class="btn btn-primary" style="width:100%;">
-            <i class="fa-solid fa-right-to-bracket"></i> Login
-        </button>
-        <p id="login-status"></p>
+            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
+            <p id="login-status"></p>
+        </form>
     </div>
 </div>
 
@@ -291,21 +294,17 @@ let performanceChartInstance = null;
 // [ 2.0 ] INITIALIZATION & EVENT LISTENERS (FIXED CLICKABILITY & REFRESH)
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // FIX: Explicitly bind the login button
-    const loginButton = document.getElementById('login-btn');
-    loginButton.addEventListener('click', handleLogin);
-    
-    // Allow 'Enter' key to press the login button from the password field
-    document.getElementById('agent-password-input').addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            handleLogin();
-        }
+    // FIX: Attach event listener to the form's submit event to ensure reliability
+    document.getElementById('login-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        handleLogin();
     });
-
+    
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
+    
     document.getElementById('refresh-data-btn').addEventListener('click', refreshPageData);
 
-    // Navigation listeners
+    // Navigation listeners are now robust
     document.getElementById('nav-create-order-btn').addEventListener('click', () => showView('create-order-view'));
     document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
@@ -360,7 +359,7 @@ async function handleLogin() {
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
             
             if (currentAgent.isAdmin) {
-                document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
+                document.getElementById('nav-admin-dashboard-btn').classList.classList.remove('hidden');
             }
 
             renderTargetBar(); 
@@ -501,9 +500,23 @@ function refreshPageData() {
         });
 }
 
+
 // =================================================================
 // [ 4.0 ] UI RENDERING (Target Bar and Commissions)
 // =================================================================
+
+function showView(viewId) {
+    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
+    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
+
+    document.getElementById(viewId).classList.remove('hidden');
+    document.getElementById(`nav-${viewId.replace('view', 'btn')}`).classList.add('active');
+
+    // Fetch data on-demand for specific views
+    if (viewId === 'my-orders-view') renderMyOrders();
+    if (viewId === 'my-commission-view') renderMyCommission();
+    if (viewId === 'admin-dashboard-view') renderAdminDashboard();
+}
 
 function renderTargetBar() {
     const container = document.getElementById('target-bar-display');
@@ -675,7 +688,6 @@ async function renderAdminDashboard() {
 
         if (response.success && response.data.length > 0) {
             
-            // Update Key Metrics using GRAND TOTALS from server
             const grandTotalSales = response.data.reduce((sum, a) => sum + a.totalSales, 0);
             const grandTotalCC = response.data.reduce((sum, a) => sum + a.totalCC, 0);
             let agentsAchieved = response.data.filter(a => a.targetAchieved >= 1).length;
