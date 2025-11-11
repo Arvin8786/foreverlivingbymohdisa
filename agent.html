@@ -115,7 +115,7 @@
         #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
         .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
         
-        /* --- Product Image & List Fix --- */
+        /* Product Image & List Fix */
         #product-selection-list { max-height: 500px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
         .product-item-selectable { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid var(--mid-gray); cursor: pointer; transition: background 0.1s; }
         .product-item-selectable:hover { background: #f0f8ff; }
@@ -234,7 +234,7 @@
 
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // NOTE: Use your live deployment URL here
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoI2g4RV4gubtaeI5HjEXCSP7AMNm4cuL64epuBYZVypREnPic3LjsAphMopn1MfReJg/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ-MehyztD4CvRcu346cshS1LDNuZqY2mXw3IQq4VSsYo9K8vs-GWVw6a4KuMXCkvgHA/exec';
 
 // --- Global State Variables ---
 let products = [];
@@ -244,13 +244,14 @@ let currentAgent = null; // Holds agent, target, and currentSales
 let currentOrder = { items: [] };
 
 // =================================================================
-// [ 2.0 ] INITIALIZATION & EVENT LISTENERS
+// [ 2.0 ] INITIALIZATION & EVENT LISTENERS (FIXED CLICKABILITY)
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Attach event listeners immediately on DOM ready
     document.getElementById('login-btn').addEventListener('click', handleLogin);
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
     
-    // Allow clicking to view all tabs immediately
+    // Navigation listeners are now robust
     document.getElementById('nav-create-order-btn').addEventListener('click', () => showView('create-order-view'));
     document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
@@ -287,8 +288,9 @@ async function handleLogin() {
             document.getElementById('portal-view').classList.remove('hidden');
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
             
-            renderTargetBar(); // Render the new target visualization
-            showView('create-order-view'); // Default to the main order tab
+            renderTargetBar(); 
+            // Load the default view (New Order)
+            showView('create-order-view'); 
         } else {
             loginStatus.textContent = response.message || "Invalid Agent ID or account not active.";
             loginStatus.style.color = 'var(--danger-color)';
