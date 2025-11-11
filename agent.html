@@ -129,7 +129,7 @@
         /* Order Summary Table Inputs FIX */
         #summary-items-list .summary-item { 
             display: grid; 
-            grid-template-columns: 1fr 60px 80px 30px; /* Ensure 60px for Qty, 80px for Price */
+            grid-template-columns: 1fr 60px 80px 30px; 
             align-items: center; 
             gap: 10px; 
             padding: 10px 0; 
@@ -242,11 +242,11 @@
 
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE
+// AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE (FIXES)
 // =================================================================
 
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoI2g4RV4gubtaeI5HjEXCSP7AMNm4cuL64epuBYZVypREnPic3LjsAphMopn1MfReJg/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4t81g1nq0voZFOgjLJ7pfDwqt-HPvmH1fiVLeIrhSuskqpkZflTBj9ZJuIC5LuiJL8g/exec';
 
 // --- Global State Variables ---
 let products = [];
@@ -259,7 +259,6 @@ let currentOrder = { items: [] };
 // [ 2.0 ] INITIALIZATION & EVENT LISTENERS (FIXED CLICKABILITY)
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Attach event listeners immediately on DOM ready
     document.getElementById('login-btn').addEventListener('click', handleLogin);
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
     
@@ -290,6 +289,7 @@ async function handleLogin() {
         const response = await postToGoogleScript('verifyAgent', { agentId });
         if (response.success) {
             currentAgent = response.agent;
+            // CRITICAL FIX: Ensure currentSales is read and stored as a number
             currentAgent.target = parseFloat(response.target) || 0; 
             currentAgent.currentSales = parseFloat(response.currentSales) || 0; 
 
@@ -300,7 +300,6 @@ async function handleLogin() {
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
             
             renderTargetBar(); 
-            // Load the default view (New Order)
             showView('create-order-view'); 
         } else {
             loginStatus.textContent = response.message || "Invalid Agent ID or account not active.";
@@ -351,6 +350,7 @@ function handleLogout() {
 // =================================================================
 // [ 4.0 ] UI RENDERING & NAVIGATION
 // =================================================================
+
 function showView(viewId) {
     document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
     document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
@@ -358,7 +358,6 @@ function showView(viewId) {
     document.getElementById(viewId).classList.remove('hidden');
     document.getElementById(`nav-${viewId.replace('view', 'btn')}`).classList.add('active');
 
-    // Fetch data on-demand for specific views
     if (viewId === 'my-orders-view') renderMyOrders();
     if (viewId === 'my-commission-view') renderMyCommission();
 }
@@ -434,15 +433,14 @@ function renderOrderSummary() {
         container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products to begin.</p>";
     } else {
         container.innerHTML = currentOrder.items.map(item => {
-            // Re-implementing the 20% max discount validation logic
-            const minPrice = item.rsp * 0.80; // 80% of RSP (max 20% discount)
-            const isInvalid = item.customPrice < minPrice;
+            // Min Price is calculated on the server now (minPrice), but we enforce client-side validation here
+            const isInvalid = item.customPrice < item.minPrice;
 
             return `
             <div class="summary-item" data-id="${item.id}">
                 <div class="summary-item-info">
                     <strong>${item.name}</strong>
-                    <div class="price-error-message">${isInvalid ? `Min: RM ${minPrice.toFixed(2)}` : ''}</div>
+                    <div class="price-error-message">${isInvalid ? `Min: RM ${item.minPrice.toFixed(2)}` : ''}</div>
                 </div>
                 <input type="number" value="${item.quantity}" onchange="updateQuantity(${item.id}, this.value)" title="Quantity" style="width: 60px;">
                 <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice(${item.id}, this.value)" class="${isInvalid ? 'price-input-invalid' : ''}" title="Custom Price" style="width: 80px;">
@@ -566,8 +564,7 @@ function addProductToOrder(productId) {
             rsp: product.rsp,
             cc: product.cc,
             customPrice: product.rsp,
-            // Calculate and store minPrice based on 20% max discount (80% of RSP)
-            minPrice: product.rsp * 0.80 
+            minPrice: product.minPrice // Use the server-calculated minimum price
         });
     }
     renderOrderSummary();
@@ -627,9 +624,9 @@ async function submitOrder() {
         submitBtn.disabled = false;
         return;
     }
-    // Validation using the 80% min price constraint
-    if (currentOrder.items.some(item => item.customPrice < item.rsp * 0.80)) {
-        statusEl.textContent = "Error: One or more prices exceed the 20% maximum discount limit.";
+    // Validation using the server-calculated minPrice (which includes 25% and CP floor)
+    if (currentOrder.items.some(item => item.customPrice < item.minPrice)) {
+        statusEl.textContent = "Error: One or more prices are below the allowed minimum.";
         statusEl.style.color = 'var(--danger-color)';
         submitBtn.disabled = false;
         return;
@@ -691,8 +688,8 @@ async function submitOrder() {
             statusEl.textContent = `Success! Invoice ID: ${response.invoiceId}`;
             statusEl.style.color = 'var(--success-color)';
             setTimeout(startNewOrder, 5000);
-            // After successful submission, the Target Bar should be refreshed to show the new sale
-            // This relies on re-running verifyAgent (or a simplified fetch) to get the latest sales total
+            
+            // Refresh Target Bar after sale
             postToGoogleScript('verifyAgent', { agentId: currentAgent.id }).then(res => {
                  if(res.success) {
                     currentAgent.currentSales = parseFloat(res.currentSales) || 0;
