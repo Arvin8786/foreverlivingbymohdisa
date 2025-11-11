@@ -13,30 +13,29 @@
     
     <style>
         /* ================================================================= */
-        /* [ 1.0 ] CORE STYLES & VARIABLES */
+        /* [ 1.0 ] CORE STYLES & VARIABLES (Refreshed Design) */
         /* ================================================================= */
         :root {
             --primary-color: #007bff; 
             --secondary-color: #28a745; 
-            --accent-color: #ff9900; /* For status/alerts */
+            --accent-color: #ffc107; /* New accent for commissions */
             --light-gray: #f8f9fa; 
             --mid-gray: #e9ecef; 
-            --dark-text: #343a40; 
+            --dark-text: #212529; 
             --light-text: #fff;
             --danger-color: #dc3545;
-            --success-color: #28a745;
+            --success-color: #198754;
             --border-radius-lg: 12px;
             --border-radius-sm: 8px;
             --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
             --font-family: 'Poppins', sans-serif;
         }
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0;}
         
         body { 
             font-family: var(--font-family); 
             background: var(--light-gray); 
             color: var(--dark-text); 
-            margin: 0; 
             line-height: 1.5; 
         }
         .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
@@ -44,10 +43,10 @@
         h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
         
         /* Buttons */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border-radius: 50px; /* More rounded look */ font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border-radius: 50px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
         .btn-primary { background: var(--primary-color); color: var(--light-text); box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); }
         .btn-primary:hover:not(:disabled) { background: #0056b3; box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4); }
-        .btn-secondary { background: var(--mid-gray); color: var(--dark-text); }
+        .btn-secondary { background: var(--mid-gray); color: var(--dark-text); border-radius: var(--border-radius-sm); }
         .btn-secondary:hover:not(:disabled) { background: #d0d7dd; }
         .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; box-shadow: none; }
         
@@ -75,7 +74,7 @@
             padding: 50px; max-width: 400px; text-align: center; 
             background: #fff; border-radius: 15px;
         }
-
+        
         #portal-view header { 
             padding: 15px 30px; 
             display: flex; 
@@ -104,11 +103,18 @@
         
         /* Product List Styling */
         #product-selection-list { max-height: 500px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
-        .product-item-selectable { padding: 10px; border-bottom: 1px solid var(--mid-gray); }
-        .product-item-selectable img { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; }
+        .product-item-selectable { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid var(--mid-gray); cursor: pointer; transition: background 0.1s; }
+        .product-item-selectable:hover { background: #f0f8ff; }
+        .product-item-selectable img { 
+            width: 50px; 
+            height: 50px; 
+            object-fit: contain; 
+            border-radius: 4px; 
+        }
 
         /* Order Summary Inputs */
         #summary-items-list .summary-item { grid-template-columns: 1fr 60px 80px 30px; }
+        .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; }
         .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
         .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
 
@@ -117,6 +123,7 @@
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
         th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
 </head>
 <body>
 
@@ -126,8 +133,8 @@
         <h1>Agent Portal Login</h1>
         <p>Enter your credentials to access the sales platform.</p>
         
-        <input type="text" id="agent-id-input" placeholder="Agent ID" onkeypress="if(event.keyCode == 13) handleLogin()">
-        <input type="password" id="agent-password-input" placeholder="Password" onkeypress="if(event.keyCode == 13) handleLogin()"> 
+        <input type="text" id="agent-id-input" placeholder="Agent ID">
+        <input type="password" id="agent-password-input" placeholder="Password"> 
 
         <button id="login-btn" class="btn btn-primary" style="width:100%;">
             <i class="fa-solid fa-right-to-bracket"></i> Login
@@ -281,15 +288,21 @@ let currentOrder = { items: [] };
 let performanceChartInstance = null; 
 
 // =================================================================
-// [ 2.0 ] INITIALIZATION & EVENT LISTENERS
+// [ 2.0 ] INITIALIZATION & EVENT LISTENERS (FIXED CLICKABILITY & REFRESH)
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // FIX: Attach Login listener robustly
-    document.getElementById('login-btn').addEventListener('click', handleLogin);
+    // FIX: Explicitly bind the login button
+    const loginButton = document.getElementById('login-btn');
+    loginButton.addEventListener('click', handleLogin);
     
+    // Allow 'Enter' key to press the login button from the password field
+    document.getElementById('agent-password-input').addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            handleLogin();
+        }
+    });
+
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
-    
-    // Attach Refresh listener
     document.getElementById('refresh-data-btn').addEventListener('click', refreshPageData);
 
     // Navigation listeners
@@ -299,7 +312,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
     document.getElementById('nav-admin-dashboard-btn').addEventListener('click', () => showView('admin-dashboard-view'));
 
-    // Password Change Listener
     document.getElementById('change-password-btn').addEventListener('click', handleChangePassword);
     
     document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
@@ -450,7 +462,7 @@ function handleLogout() {
 }
 
 /**
- * NEW: Manual refresh function for the current active view.
+ * Manual refresh function for the current active view.
  */
 function refreshPageData() {
     const activeViewElement = document.querySelector('#portal-view .view:not(.hidden)');
@@ -489,23 +501,9 @@ function refreshPageData() {
         });
 }
 
-
 // =================================================================
 // [ 4.0 ] UI RENDERING (Target Bar and Commissions)
 // =================================================================
-
-function showView(viewId) {
-    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
-    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
-
-    document.getElementById(viewId).classList.remove('hidden');
-    document.getElementById(`nav-${viewId.replace('view', 'btn')}`).classList.add('active');
-
-    // Fetch data on-demand for specific views
-    if (viewId === 'my-orders-view') renderMyOrders();
-    if (viewId === 'my-commission-view') renderMyCommission();
-    if (viewId === 'admin-dashboard-view') renderAdminDashboard();
-}
 
 function renderTargetBar() {
     const container = document.getElementById('target-bar-display');
