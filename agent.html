@@ -9,206 +9,96 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/jpeg" href="FL.jpg">
+    
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #28a745;
+            --light-gray: #f8f9fa;
+            --mid-gray: #e9ecef;
+            --dark-text: #343a40;
+            --light-text: #fff;
+            --danger-color: #dc3545;
+            --success-color: #28a745;
+            --border-radius-lg: 12px;
+            --border-radius-sm: 6px;
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+            --font-family: 'Poppins', sans-serif;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: var(--font-family); background: var(--light-gray); color: var(--dark-text); margin: 0; }
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
+        h1, h2, h3 { color: var(--dark-text); font-weight: 600; }
+        h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; border-radius: var(--border-radius-sm); text-decoration: none; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
+        .btn-primary { background: var(--primary-color); color: var(--light-text); }
+        .btn-primary:hover:not(:disabled) { background: #0056b3; }
+        .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; }
+        .card { background: var(--light-text); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; }
+        .hidden { display: none !important; }
+
+        /* Login View */
+        #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary-color), #00a4ff); }
+        #login-box { padding: 50px; max-width: 400px; text-align: center; }
+        #login-box input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); font-size: 1rem; }
+        #login-status { font-weight: 500; min-height: 24px; margin-top: 15px; font-size: 0.95rem; }
+
+        /* Portal Layout */
+        #portal-view header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 30px; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 20px; }
+        #portal-view header h2 { margin: 0; font-size: 1.5rem; }
+        #portal-view nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
+        #portal-view nav .btn { background: white; color: var(--primary-color); border: 1px solid var(--primary-color); }
+        #portal-view nav .btn.active { background: var(--primary-color); color: white; }
+        
+        /* Order Creation Workflow */
+        #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
+        #product-selection-list { max-height: 450px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
+        .product-item-selectable { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 15px; padding: 12px; border-bottom: 1px solid var(--mid-gray); cursor: pointer; transition: background 0.1s; }
+        .product-item-selectable:hover { background: #f0f8ff; }
+        .product-item-selectable img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+        #order-summary-card { position: sticky; top: 30px; }
+        #summary-items-list { max-height: 300px; overflow-y: auto; }
+        .summary-item { display: grid; grid-template-columns: 1fr 60px 80px 30px; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--mid-gray); }
+        .summary-item-info strong { display: block; }
+        .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; }
+        .summary-item input { padding: 8px; text-align: center; border-radius: var(--border-radius-sm); border: 1px solid var(--mid-gray); }
+        .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
+        .summary-total { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--mid-gray); }
+        .summary-line { display: flex; justify-content: space-between; padding: 8px 0; }
+        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
+
+        /* Data Tables */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+
+        @media (max-width: 1000px) {
+            #order-creation-workflow { grid-template-columns: 1fr; }
+            #order-summary-card { position: static; }
+        }
+    </style>
 </head>
 <body>
 
-<style>
-    /* ========================================================= */
-    /* GLOBAL STYLES & VARIABLES */
-    /* ========================================================= */
-    :root {
-        /* Colors */
-        --primary-color: #007bff; /* Standard Blue */
-        --secondary-color: #28a745; /* Green for Success/Accent */
-        --accent-color: #ffc107; /* Yellow/Orange Accent */
-        --light-gray: #f8f9fa;
-        --mid-gray: #e9ecef;
-        --dark-text: #343a40;
-        --light-text: #fff;
-        --danger-color: #dc3545;
-        --success-color: #28a745;
-
-        /* Spacing & Design */
-        --border-radius-lg: 12px;
-        --border-radius-sm: 6px;
-        --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
-        --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-        --font-family: 'Poppins', sans-serif;
-    }
-    * { box-sizing: border-box; }
-    body { 
-        font-family: var(--font-family); 
-        background: var(--light-gray); 
-        color: var(--dark-text); 
-        margin: 0; 
-    }
-    .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
-    h1, h2, h3 { color: var(--dark-text); font-weight: 600; }
-    h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-    h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
-
-    /* Buttons */
-    .btn { 
-        display: inline-flex; align-items: center; justify-content: center; 
-        padding: 12px 25px; border-radius: var(--border-radius-sm); 
-        text-decoration: none; font-weight: 600; border: none; 
-        cursor: pointer; transition: all 0.2s ease; font-size: 1rem;
-        gap: 8px; /* Spacing for icon/text */
-    }
-    .btn-primary { background: var(--primary-color); color: var(--light-text); box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); }
-    .btn-primary:hover:not(:disabled) { background: #0056b3; transform: translateY(-1px); }
-    .btn-secondary { background-color: var(--mid-gray); color: var(--dark-text); border: 1px solid #ccc; }
-    .btn-secondary:hover:not(:disabled) { background-color: #d1d8df; }
-    .btn-danger { background-color: var(--danger-color); color: var(--light-text); }
-    .btn:disabled { background-color: #ccc; cursor: not-allowed; opacity: 0.7; }
-
-    /* Form Elements */
-    input, select, textarea { 
-        width: 100%; padding: 12px; margin-bottom: 1rem; 
-        border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); 
-        font-size: 1rem; transition: border-color 0.2s; 
-    }
-    input:focus, select:focus, textarea:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); }
-    .card { 
-        background: var(--light-text); border-radius: var(--border-radius-lg); 
-        box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; 
-    }
-    .hidden { display: none !important; }
-
-    /* ========================================================= */
-    /* LOGIN VIEW */
-    /* ========================================================= */
-    #login-view { 
-        display: flex; justify-content: center; align-items: center; 
-        min-height: 100vh; background: linear-gradient(135deg, var(--primary-color), #00a4ff);
-    }
-    #login-box { 
-        padding: 50px; max-width: 400px; background: white;
-        text-align: center; 
-    }
-    .login-logo { width: 80px; height: 80px; margin: 0 auto 20px; border-radius: 50%; object-fit: cover; }
-    #login-status { font-weight: 500; min-height: 24px; margin-top: 15px; font-size: 0.95rem; }
-
-    /* ========================================================= */
-    /* PORTAL LAYOUT & NAVIGATION */
-    /* ========================================================= */
-    #portal-view header { 
-        display: flex; justify-content: space-between; align-items: center; 
-        background: white; padding: 15px 30px; border-radius: var(--border-radius-lg);
-        box-shadow: var(--shadow-sm); margin-bottom: 20px;
-    }
-    #portal-view header h2 { margin: 0; font-size: 1.5rem; }
-    #portal-view nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
-    #portal-view nav .btn { 
-        background: white; color: var(--primary-color); border: 1px solid var(--primary-color);
-        padding: 8px 18px; font-size: 0.95rem;
-    }
-    #portal-view nav .btn.active { 
-        background: var(--primary-color); color: white; border-color: var(--primary-color); 
-        box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
-    }
-    
-    /* Agent Info Header */
-    #agent-info h2 { margin-bottom: 0; font-weight: 700; }
-    #agent-info p { color: #6c757d; margin-top: 5px; font-size: 0.9rem; }
-
-
-    /* ========================================================= */
-    /* ORDER CREATION WORKFLOW */
-    /* ========================================================= */
-    #order-creation-workflow { 
-        display: grid; grid-template-columns: 1fr 400px; gap: 30px; 
-        align-items: flex-start; /* Aligns items to the top */
-    }
-    /* Left Column Styling */
-    #customer-selection-card, #product-selection-card { padding: 20px; }
-    #product-selection-list { max-height: 450px; overflow-y: scroll; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
-    #new-customer-form { background: var(--light-gray); padding: 15px; border-radius: var(--border-radius-sm); }
-    #new-customer-btn { margin-top: 5px; }
-
-    /* Product Item in Selection List */
-    .product-item-selectable { 
-        display: grid; grid-template-columns: 60px 1fr auto; align-items: center; 
-        gap: 15px; padding: 12px; border-bottom: 1px solid var(--mid-gray); 
-        cursor: pointer; transition: background 0.1s;
-    }
-    .product-item-selectable:hover { background: #f0f8ff; }
-    .product-item-selectable img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
-    .product-item-info strong { display: block; font-weight: 600; }
-    .product-item-info p { margin: 0; font-size: 0.85rem; color: #6c757d; }
-
-    /* Right Column (Summary) Styling */
-    #order-summary-card { 
-        position: sticky; top: 30px; 
-        padding: 30px; 
-    }
-    #summary-items-list { 
-        max-height: 300px; overflow-y: auto; padding-right: 10px; /* Space for scrollbar */
-    }
-    .summary-item { 
-        display: grid; grid-template-columns: 1fr 60px 80px 30px; 
-        align-items: center; gap: 10px; padding: 10px 0; 
-        border-bottom: 1px dashed var(--mid-gray); font-size: 0.95rem;
-    }
-    .summary-item:last-child { border-bottom: none; }
-    .summary-item input { padding: 8px; font-size: 0.9rem; text-align: center; }
-    .summary-item-info { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-    .remove-btn { color: var(--danger-color); cursor: pointer; text-align: center; }
-    .remove-btn i { font-size: 1.1rem; }
-    .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
-    .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; margin-top: 5px; }
-
-    .summary-total { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--mid-gray); }
-    .summary-line { padding: 8px 0; }
-    .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
-
-    /* Finalize Section */
-    #finalize-order-section label { display: block; margin-bottom: 8px; font-weight: 500; }
-    #submit-status { margin-top: 10px; font-weight: 600; }
-
-    /* ========================================================= */
-    /* DATA DISPLAY VIEWS (Products, Orders, Commission) */
-    /* ========================================================= */
-    table { border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); overflow: hidden; }
-    th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-    th { background-color: var(--mid-gray); color: var(--dark-text); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
-    #product-catalog-table td:nth-child(3), 
-    #product-catalog-table td:nth-child(4) { font-weight: 500; }
-    
-    #my-orders-list .order-item { border-bottom: 1px solid #eee; padding: 15px 0; }
-    #my-orders-list .order-item p { margin: 5px 0; }
-    #my-orders-list .order-item strong { color: var(--primary-color); font-weight: 600; }
-    
-    /* Commission Table */
-    #my-commission-list table { margin-top: 0; }
-    #my-commission-list td:last-child { color: var(--secondary-color); font-weight: 700; font-size: 1.1rem; }
-    
-    /* Responsive Design */
-    @media (max-width: 1000px) {
-        #order-creation-workflow { grid-template-columns: 1fr; }
-        #order-summary-card { position: static; }
-        .container { margin: 0 auto; padding-top: 20px; }
-        #portal-view header { flex-direction: column; gap: 10px; padding: 15px; }
-        #portal-view nav { justify-content: center; }
-    }
-</style>
-
+<!-- [ 1.0 ] LOGIN VIEW -->
 <div id="login-view">
     <div class="card" id="login-box">
-        <img src="FL.jpg" alt="Business Logo" class="login-logo">
-        <h1>Agent Access</h1>
-        <p class="text-muted">Securely manage sales and commissions.</p>
-        <input type="text" id="agent-id-input" placeholder="Enter your Agent ID (e.g., AGENT001)">
-        <button id="login-btn" class="btn btn-primary" style="width:100%;"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+        <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
+        <h1>Agent Portal</h1>
+        <p>Please enter your Agent ID to proceed.</p>
+        <input type="text" id="agent-id-input" placeholder="e.g., AGENT001">
+        <button id="login-btn" class="btn btn-primary" style="width:100%;">
+            <i class="fa-solid fa-right-to-bracket"></i> Login
+        </button>
         <p id="login-status"></p>
     </div>
 </div>
 
+<!-- [ 2.0 ] MAIN PORTAL VIEW (Initially Hidden) -->
 <div id="portal-view" class="container hidden">
     <header>
-        <div id="agent-info">
-            </div>
-        <button id="logout-btn" class="btn btn-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        <h2 id="agent-welcome-header"></h2>
+        <button id="logout-btn" class="btn btn-primary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     </header>
 
     <nav>
@@ -218,44 +108,18 @@
         <button id="nav-my-commission-btn" class="btn"><i class="fa-solid fa-wallet"></i> My Commission</button>
     </nav>
 
-    <div id="products-view" class="view hidden">
-        <div class="card">
-            <h2>Product Catalog</h2>
-            <input type="text" id="product-search" placeholder="Search products by SKU or Name...">
-            <div style="max-height: 600px; overflow-y: auto;">
-                <table>
-                    <thead><tr><th>SKU</th><th>Name</th><th>RSP (RM)</th><th>CC</th></tr></thead>
-                    <tbody id="product-catalog-table"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div id="my-orders-view" class="view hidden">
-        <div class="card">
-            <h2>My Past Orders</h2>
-            <div id="my-orders-list"></div>
-        </div>
-    </div>
-    
-    <div id="my-commission-view" class="view hidden">
-        <div class="card">
-            <h2>My Commission Records</h2>
-            <div id="my-commission-list"></div>
-        </div>
-    </div>
-
-    <div id="create-order-view" class="view hidden">
+    <!-- [ 2.1 ] Create Order View -->
+    <div id="create-order-view" class="view">
         <div id="order-creation-workflow">
-            
+            <!-- Left Column: Customer & Product Selection -->
             <div>
-                <div class="card" id="customer-selection-card">
-                    <h3><i class="fa-solid fa-user-tag"></i> Step 1: Select or Create Customer</h3>
-                    <select id="customer-dropdown" onchange="document.getElementById('new-customer-form').classList.add('hidden')"></select>
-                    <button id="new-customer-btn" class="btn btn-secondary" style="margin-top: 10px; width: 100%;">
+                <div class="card">
+                    <h3>Step 1: Select or Create Customer</h3>
+                    <select id="customer-dropdown"></select>
+                    <button id="new-customer-btn" class="btn" style="background-color: var(--mid-gray); color: var(--dark-text); margin-top: 10px;">
                         <i class="fa-solid fa-user-plus"></i> Create New Customer
                     </button>
-                    <div id="new-customer-form" class="hidden" style="margin-top: 15px; ">
+                    <div id="new-customer-form" class="hidden" style="margin-top: 15px; background: var(--light-gray); padding: 15px; border-radius: var(--border-radius-sm);">
                         <input type="text" id="new-customer-name" placeholder="Customer Name" required>
                         <input type="email" id="new-customer-email" placeholder="Customer Email" required>
                         <input type="tel" id="new-customer-phone" placeholder="Customer Phone (WhatsApp)" required>
@@ -263,56 +127,72 @@
                     </div>
                 </div>
 
-                <div class="card" id="product-selection-card">
-                    <h3><i class="fa-solid fa-list-check"></i> Step 2: Add Products</h3>
+                <div class="card">
+                    <h3>Step 2: Add Products</h3>
                     <input type="text" id="product-order-search" placeholder="Search product name or SKU...">
-                    <div id="product-selection-list">
-                        </div>
+                    <div id="product-selection-list"></div>
                 </div>
             </div>
-
+            <!-- Right Column: Order Summary -->
             <div id="order-summary-card" class="card">
-                <h3><i class="fa-solid fa-file-invoice"></i> Order Summary</h3>
-                <div id="summary-items-list">
-                    </div>
+                <h3>Order Summary</h3>
+                <div id="summary-items-list"></div>
                 <div class="summary-total">
                     <div class="summary-line"><span>Subtotal:</span><span id="summary-subtotal">RM 0.00</span></div>
                     <div class="summary-line"><span>Shipping:</span><span id="summary-shipping">RM 0.00</span></div>
                     <div class="summary-line total"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
                 </div>
                 <div id="finalize-order-section" style="margin-top: 30px;">
-                    <h3><i class="fa-solid fa-check-to-slot"></i> Step 3: Payment & Submit</h3>
-                    <label for="payment-proof">Upload Payment Proof (Image/PDF)</label>
+                    <h3>Step 3: Payment & Submit</h3>
+                    <label for="payment-proof">Upload Payment Proof (Required)</label>
                     <input type="file" id="payment-proof" required>
                     <button id="submit-order-btn" class="btn btn-primary" style="width:100%; margin-top: 15px;">
                         <i class="fa-solid fa-paper-plane"></i> Submit Order
                     </button>
-                    <p id="submit-status" style="text-align: center;"></p>
+                    <p id="submit-status" style="text-align: center; margin-top: 10px; font-weight: 600;"></p>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- [ 2.2 ] Other Views (Products, Orders, Commission) -->
+    <div id="products-view" class="view hidden card">
+        <h2>Product Catalog</h2>
+        <table>
+            <thead><tr><th>SKU</th><th>Name</th><th>RSP (RM)</th><th>CC</th></tr></thead>
+            <tbody id="product-catalog-table"></tbody>
+        </table>
+    </div>
+
+    <div id="my-orders-view" class="view hidden card">
+        <h2>My Past Orders</h2>
+        <div id="my-orders-list"></div>
+    </div>
+    
+    <div id="my-commission-view" class="view hidden card">
+        <h2>My Commission Records</h2>
+        <div id="my-commission-list"></div>
+    </div>
 </div>
+
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - v2.4 (Final Cleaned & Verified)
+// AGENT PORTAL SCRIPT - v31.0 (Built from Scratch)
 // =================================================================
 
-// --- CONFIGURATION ---
-// *** SYNCHRONIZED URL: Must match the newest deployment. ***
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFfPhUFWDCnLhUPP8QlmD8I9duKdKtdJ8e_ld5CRxGpo9eT1y70ZLRhwIfIbU3HlVDFA/exec'
+// [ 1.0 ] GLOBAL CONFIGURATION & STATE
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4MtPVpYIBv0VlFE3PjwGIwSTcYQmBkp1JbEFlFwHxwijQZ8FJZ5MhqzR6Q7H5oVjCvw/exec';
 
-// --- GLOBAL STATE ---
+// --- Global State Variables ---
 let products = [];
 let customers = [];
 let shippingRules = [];
 let currentAgent = null;
-let currentOrder = {
-    customer: null,
-    items: [],
-};
+let currentOrder = { items: [] };
 
-// --- INITIALIZATION ---
+// =================================================================
+// [ 2.0 ] INITIALIZATION & EVENT LISTENERS
+// =================================================================
 document.addEventListener('DOMContentLoaded', () => {
     // --- Login & Logout ---
     document.getElementById('login-btn').addEventListener('click', handleLogin);
@@ -324,44 +204,31 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
     document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
     
-    // --- Order Creation Setup ---
-    document.getElementById('new-customer-btn').addEventListener('click', () => {
-        // Automatically selects the new customer option and reveals form
-        document.getElementById('customer-dropdown').value = ''; 
-        document.getElementById('new-customer-form').classList.toggle('hidden');
-    });
-    
-    // Auto-hide new customer form if an existing customer is selected
-    document.getElementById('customer-dropdown').addEventListener('change', () => {
-        if(document.getElementById('customer-dropdown').value) {
-             document.getElementById('new-customer-form').classList.add('hidden');
-        }
-    });
-
+    // --- Order Creation ---
+    document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
+    document.getElementById('customer-dropdown').addEventListener('change', handleCustomerSelection);
     document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
-    
-    // --- Search Filters ---
-    document.getElementById('product-search').addEventListener('keyup', renderProductCatalog);
     document.getElementById('product-order-search').addEventListener('keyup', renderProductSelectionList);
-    
-    // Ensure the initial view for Create Order is set up
-    renderOrderSummary(); 
-    renderProductSelectionList();
 });
 
-// ===========================================================
-// [ 1.0 ] LOGIN & DATA FETCHING
-// ===========================================================
+// =================================================================
+// [ 3.0 ] LOGIN, LOGOUT & DATA FETCHING
+// =================================================================
 async function handleLogin() {
     const agentId = document.getElementById('agent-id-input').value.trim();
+    const loginBtn = document.getElementById('login-btn');
     const loginStatus = document.getElementById('login-status');
+    
     if (!agentId) {
         loginStatus.textContent = "Agent ID cannot be empty.";
+        loginStatus.style.color = 'var(--danger-color)';
         return;
     }
     
-    document.getElementById('login-btn').disabled = true;
+    loginBtn.disabled = true;
     loginStatus.textContent = "Verifying...";
+    loginStatus.style.color = 'var(--dark-text)';
+
     try {
         const response = await postToGoogleScript('verifyAgent', { agentId });
         if (response.success) {
@@ -370,21 +237,18 @@ async function handleLogin() {
             
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
-            // Enhanced header display
-            document.getElementById('agent-info').innerHTML = `
-                <h2>Welcome, ${currentAgent.name}</h2>
-                <p>Agent ID: <span style="font-weight:600;">${currentAgent.id}</span></p>
-            `;
-            showView('create-order-view');
+            document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
+            startNewOrder(); // Go to the New Order screen by default
         } else {
-            loginStatus.textContent = response.message || "Invalid Agent ID or not active.";
+            loginStatus.textContent = response.message || "Invalid Agent ID or account not active.";
+            loginStatus.style.color = 'var(--danger-color)';
         }
     } catch (error) {
-        // This catch block handles the persistent CORS/Network errors.
-        console.error("Login attempt failed:", error);
-        loginStatus.textContent = "Connection Failed. Please ensure the Apps Script URL is correct and re-deployed with public access.";
+        loginStatus.textContent = "Connection failed. Please check your internet and try again.";
+        loginStatus.style.color = 'var(--danger-color)';
+        console.error("Login failed:", error);
     } finally {
-        document.getElementById('login-btn').disabled = false;
+        loginBtn.disabled = false;
     }
 }
 
@@ -394,7 +258,9 @@ async function fetchPortalData() {
         if (response.success) {
             products = response.products;
             customers = response.customers;
-            shippingRules = response.shippingRules;
+            shippingRules = (response.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend);
+            
+            // Render initial content that depends on this data
             renderProductCatalog();
             renderProductSelectionList();
             renderCustomerDropdown();
@@ -403,53 +269,42 @@ async function fetchPortalData() {
         }
     } catch (error) {
         console.error("Failed to fetch portal data:", error);
-        alert("Could not load essential data. Please try logging in again.");
+        alert("Could not load essential portal data. Please try logging in again.");
     }
 }
 
-function handleLogout(){
+function handleLogout() {
     currentAgent = null;
     products = [];
     customers = [];
+    shippingRules = [];
+    currentOrder = { items: [] };
+    
     document.getElementById('login-view').classList.remove('hidden');
     document.getElementById('portal-view').classList.add('hidden');
     document.getElementById('agent-id-input').value = '';
     document.getElementById('login-status').textContent = '';
-    // Optional: Clear session/local storage if you were using it
 }
 
-// ===========================================================
-// [ 2.0 ] UI RENDERING & NAVIGATION
-// ===========================================================
+// =================================================================
+// [ 4.0 ] UI RENDERING & NAVIGATION
+// =================================================================
 function showView(viewId) {
-    const views = ['products-view', 'my-orders-view', 'my-commission-view', 'create-order-view'];
-    const navs = ['nav-products-btn', 'nav-my-orders-btn', 'nav-my-commission-btn', 'nav-create-order-btn'];
-    
-    views.forEach(id => document.getElementById(id).classList.add('hidden'));
-    navs.forEach(id => document.getElementById(id).classList.remove('active'));
+    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
+    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
 
     document.getElementById(viewId).classList.remove('hidden');
-    const activeNav = document.getElementById(viewId.replace('view', 'btn'));
-    if(activeNav) activeNav.classList.add('active');
+    document.getElementById(`nav-${viewId.replace('view', 'btn')}`).classList.add('active');
 
-    // Run render functions on demand
+    // Fetch data on-demand for certain views
     if (viewId === 'my-orders-view') renderMyOrders();
     if (viewId === 'my-commission-view') renderMyCommission();
-    if (viewId === 'create-order-view') startNewOrder(); 
+    if (viewId === 'create-order-view') startNewOrder();
 }
 
 function renderProductCatalog() {
     const container = document.getElementById('product-catalog-table');
-    const searchTerm = document.getElementById('product-search').value.toLowerCase();
-    const filteredProducts = products.filter(p => 
-        p.name.toLowerCase().includes(searchTerm) || String(p.id).includes(searchTerm)
-    );
-    
-    if (filteredProducts.length === 0) {
-        container.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No products found matching your search.</td></tr>";
-        return;
-    }
-    container.innerHTML = filteredProducts.map(p => `
+    container.innerHTML = products.map(p => `
         <tr>
             <td>${p.id}</td>
             <td>${p.name}</td>
@@ -463,166 +318,154 @@ function renderProductSelectionList() {
     const container = document.getElementById('product-selection-list');
     const searchTerm = document.getElementById('product-order-search').value.toLowerCase();
     const filteredProducts = products.filter(p => 
-        p.name.toLowerCase().includes(searchTerm) || String(p.id).includes(searchTerm)
+        p.name.toLowerCase().includes(searchTerm) || String(p.id).toLowerCase().includes(searchTerm)
     );
 
     if (filteredProducts.length === 0) {
-        container.innerHTML = "<p style='padding: 15px; text-align: center;'>No products found. Try a different search term.</p>";
+        container.innerHTML = "<p style='padding: 15px; text-align: center;'>No products found.</p>";
         return;
     }
     container.innerHTML = filteredProducts.map(p => `
         <div class="product-item-selectable" onclick="addProductToOrder(${p.id})">
-            <img src="${p.image || 'FL.jpg'}" alt="${p.name}">
-            <div class="product-item-info">
+            <img src="${p.image || 'FL.jpg'}" alt="${p.name}" onerror="this.style.display='none';">
+            <div>
                 <strong>${p.name} (${p.id})</strong>
-                <p>RSP: RM ${p.rsp.toFixed(2)} | CC: ${p.cc.toFixed(3)}</p>
+                <p style="font-size: 0.85rem; color: #6c757d;">RSP: RM ${p.rsp.toFixed(2)}</p>
             </div>
-            <button class="btn btn-secondary" style="pointer-events: none;">Add</button>
+            <button class="btn btn-primary" style="pointer-events: none;">Add</button>
         </div>
     `).join('');
 }
 
 function renderCustomerDropdown() {
     const select = document.getElementById('customer-dropdown');
-    select.innerHTML = `<option value="">-- Select Existing Customer (or create new below) --</option>`;
+    select.innerHTML = `<option value="">-- Select Existing Customer --</option>`;
     customers.forEach(c => {
         const option = document.createElement('option');
         option.value = c.pac;
-        // Improved display format
-        option.textContent = `${c.name} (${c.phone || c.email})`; 
+        option.textContent = `${c.name} (${c.phone || c.email})`;
         select.appendChild(option);
     });
-}
-
-function renderMyOrders() {
-    const container = document.getElementById('my-orders-list');
-    container.innerHTML = '<p style="text-align:center;"><i class="fa-solid fa-spinner fa-spin fa-lg"></i> Loading orders...</p>';
-    
-    // Add logic to getAgentOrders here (as per your original script logic)
-    postToGoogleScript('getAgentOrders', { agentId: currentAgent.id })
-        .then(response => {
-            if (response.success && response.orders.length > 0) {
-                container.innerHTML = `
-                    <table>
-                        <thead><tr><th>Invoice ID</th><th>Customer</th><th>Date</th><th>Total (RM)</th><th>Status</th></tr></thead>
-                        <tbody>
-                            ${response.orders.map(order => `
-                                <tr>
-                                    <td><strong>${order.invoiceId}</strong></td>
-                                    <td>${order.customerName}</td>
-                                    <td>${order.date}</td>
-                                    <td>${order.total}</td>
-                                    <td><span class="status-${order.status.toLowerCase().replace(/[^a-z0-9]/g, '-')}">${order.status}</span></td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } else {
-                container.innerHTML = "<p style='padding: 20px; text-align: center;'>No past orders found.</p>";
-            }
-        })
-        .catch(() => {
-            container.innerHTML = "<p style='color:var(--danger-color); text-align:center;'>Could not load past orders. Check server connection.</p>";
-        });
-}
-
-function renderMyCommission() {
-    const container = document.getElementById('my-commission-list');
-    container.innerHTML = '<p style="text-align:center;"><i class="fa-solid fa-spinner fa-spin fa-lg"></i> Loading commission records...</p>';
-    
-    // Add logic to getAgentCommission here (as per your original script logic)
-    postToGoogleScript('getAgentCommission', { agentId: currentAgent.id })
-        .then(response => {
-            if (response.success && response.records.length > 0) {
-                container.innerHTML = `
-                    <table>
-                        <thead><tr><th>Sales Amount (RM)</th><th>Commission (RM)</th><th>Total Payable (RM)</th></tr></thead>
-                        <tbody>
-                            ${response.records.map(rec => `
-                                <tr>
-                                    <td>${rec.sales.toFixed(2)}</td>
-                                    <td>${rec.commission.toFixed(2)}</td>
-                                    <td><strong>${rec.payable.toFixed(2)}</strong></td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } else {
-                container.innerHTML = "<p style='padding: 20px; text-align: center;'>No commission records found.</p>";
-            }
-        })
-        .catch(() => {
-            container.innerHTML = "<p style='color:var(--danger-color); text-align:center;'>Could not load commission records. Check server connection.</p>";
-        });
 }
 
 function renderOrderSummary() {
     const container = document.getElementById('summary-items-list');
     if (currentOrder.items.length === 0) {
-        container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products from Step 2 to begin.</p>";
+        container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products to begin.</p>";
     } else {
-        container.innerHTML = currentOrder.items.map(item => `
+        container.innerHTML = currentOrder.items.map(item => {
+            const isInvalid = item.customPrice < item.minPrice;
+            return `
             <div class="summary-item" data-id="${item.id}">
                 <div class="summary-item-info">
                     <strong>${item.name}</strong>
-                    <div class="price-error-message" id="price-error-${item.id}"></div>
+                    <div class="price-error-message">${isInvalid ? `Min: RM ${item.minPrice.toFixed(2)}` : ''}</div>
                 </div>
                 <input type="number" value="${item.quantity}" onchange="updateQuantity(${item.id}, this.value)" title="Quantity">
-                <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice(${item.id}, this.value)" title="Custom Price">
-                <span class="remove-btn" onclick="removeItemFromOrder(${item.id})"><i class="fa-solid fa-trash"></i></span>
+                <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice(${item.id}, this.value)" class="${isInvalid ? 'price-input-invalid' : ''}" title="Custom Price">
+                <span onclick="removeItemFromOrder(${item.id})" style="cursor:pointer; text-align:center; color: var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
             </div>
-        `).join('');
+        `}).join('');
     }
-    // Re-check prices after rendering to apply invalid class
-    currentOrder.items.forEach(item => {
-        if (item.customPrice < item.minPrice) {
-            const priceInput = document.querySelector(`.summary-item[data-id="${item.id}"] input[title="Custom Price"]`);
-            if (priceInput) priceInput.classList.add('price-input-invalid');
-            const errorDiv = document.getElementById(`price-error-${item.id}`);
-            if (errorDiv) errorDiv.textContent = `Min: RM${item.minPrice.toFixed(2)}`;
-        }
-    });
     calculateTotals();
 }
 
-// ===========================================================
-// [ 3.0 ] ORDER CREATION LOGIC
-// ===========================================================
+async function renderMyOrders() {
+    const container = document.getElementById('my-orders-list');
+    container.innerHTML = '<p>Loading orders...</p>';
+    try {
+        const response = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
+        if (response.success && response.orders.length > 0) {
+            container.innerHTML = `
+                <table>
+                    <thead><tr><th>Invoice ID</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+                    <tbody>${response.orders.map(o => `
+                        <tr>
+                            <td>${o.invoiceId}</td>
+                            <td>${o.date}</td>
+                            <td>${o.customerName}</td>
+                            <td>RM ${o.total}</td>
+                            <td>${o.status}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>`;
+        } else {
+            container.innerHTML = '<p>No past orders found.</p>';
+        }
+    } catch(e) { container.innerHTML = '<p style="color:var(--danger-color);">Could not load orders.</p>'; }
+}
+
+async function renderMyCommission() {
+    const container = document.getElementById('my-commission-list');
+    container.innerHTML = '<p>Loading records...</p>';
+    try {
+        const response = await postToGoogleScript('getAgentCommission', { agentId: currentAgent.id });
+        if (response.success && response.records.length > 0) {
+            container.innerHTML = `
+                <table>
+                    <thead><tr><th>Sales Amount (RM)</th><th>Commission (RM)</th><th>Total Payable (RM)</th></tr></thead>
+                    <tbody>${response.records.map(r => `
+                        <tr>
+                            <td>${r.sales.toFixed(2)}</td>
+                            <td>${r.commission.toFixed(2)}</td>
+                            <td><strong>${r.payable.toFixed(2)}</strong></td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>`;
+        } else {
+            container.innerHTML = '<p>No commission records found.</p>';
+        }
+    } catch(e) { container.innerHTML = '<p style="color:var(--danger-color);">Could not load records.</p>'; }
+}
+
+// =================================================================
+// [ 5.0 ] ORDER CREATION LOGIC
+// =================================================================
 function startNewOrder() {
-    currentOrder = { customer: null, items: [] };
+    currentOrder = { items: [] };
     document.getElementById('customer-dropdown').value = '';
     document.getElementById('new-customer-form').classList.add('hidden');
-    document.getElementById('new-customer-name').value = '';
-    document.getElementById('new-customer-email').value = '';
-    document.getElementById('new-customer-phone').value = '';
-    document.getElementById('new-customer-address').value = '';
+    document.getElementById('customer-dropdown').disabled = false;
+    document.getElementById('new-customer-form').reset();
     document.getElementById('payment-proof').value = '';
     document.getElementById('submit-status').textContent = '';
     document.getElementById('submit-order-btn').disabled = false;
-    document.getElementById('submit-order-btn').innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Order';
     renderOrderSummary();
-    renderProductSelectionList(); // Ensure list is refreshed
-    showView('create-order-view');
+}
+
+function handleNewCustomerToggle() {
+    const form = document.getElementById('new-customer-form');
+    const dropdown = document.getElementById('customer-dropdown');
+    form.classList.toggle('hidden');
+    if (!form.classList.contains('hidden')) {
+        dropdown.value = '';
+        dropdown.disabled = true;
+    } else {
+        dropdown.disabled = false;
+    }
+}
+
+function handleCustomerSelection() {
+    const dropdown = document.getElementById('customer-dropdown');
+    if (dropdown.value) {
+        document.getElementById('new-customer-form').classList.add('hidden');
+        dropdown.disabled = false;
+    }
 }
 
 function addProductToOrder(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
     
-    const existingItem = currentOrder.items.find(item => item.id === productId);
-    if (existingItem) {
-        existingItem.quantity++;
-    } else {
+    if (!currentOrder.items.some(item => item.id === productId)) {
         currentOrder.items.push({
             id: product.id,
             name: product.name,
+            quantity: 1,
             rsp: product.rsp,
             cc: product.cc,
-            quantity: 1,
             customPrice: product.rsp,
-            minPrice: product.rsp * 0.70
+            minPrice: product.rsp * 0.70 // 30% below RSP
         });
     }
     renderOrderSummary();
@@ -636,57 +479,29 @@ function removeItemFromOrder(productId) {
 function updateQuantity(productId, newQuantity) {
     const item = currentOrder.items.find(i => i.id === productId);
     const qty = parseInt(newQuantity, 10);
-    const inputElement = document.querySelector(`.summary-item[data-id="${item.id}"] input[title="Quantity"]`);
-
     if (item && qty > 0) {
         item.quantity = qty;
-        inputElement.value = qty; // Ensure input is updated
-        renderOrderSummary(); // Recalculate totals
     } else if (item) {
-        // If quantity is invalid, reset to 1
-        item.quantity = 1;
-        inputElement.value = 1; 
-        renderOrderSummary(); // Recalculate totals
+        item.quantity = 1; // Reset to 1 if invalid
     }
+    renderOrderSummary();
 }
 
 function updatePrice(productId, newPrice) {
     const item = currentOrder.items.find(i => i.id === productId);
     const price = parseFloat(newPrice);
-    // Target the specific price input for validation
-    const priceInput = document.querySelector(`.summary-item[data-id="${item.id}"] input[title="Custom Price"]`);
-    const errorDiv = document.getElementById(`price-error-${item.id}`);
-
     if (item && !isNaN(price)) {
         item.customPrice = price;
-        if (price < item.minPrice) {
-            priceInput.classList.add('price-input-invalid');
-            errorDiv.textContent = `Min: RM${item.minPrice.toFixed(2)}`;
-        } else {
-            priceInput.classList.remove('price-input-invalid');
-            errorDiv.textContent = '';
-        }
     }
-    calculateTotals();
+    renderOrderSummary();
 }
 
 function calculateTotals() {
-    let subtotal = 0;
-    currentOrder.items.forEach(item => {
-        subtotal += item.customPrice * item.quantity;
-    });
-
+    const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
+    
     let shippingFee = 0;
-    if (shippingRules && shippingRules.length > 0) {
-        // Find best rule using the sort-and-break logic for safety
-        const sortedRules = shippingRules.sort((a, b) => b.minSpend - a.minSpend);
-        for (const rule of sortedRules) {
-             if (subtotal >= rule.minSpend) {
-                shippingFee = rule.charge;
-                break;
-            }
-        }
-    }
+    const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
+    if (bestRule) shippingFee = bestRule.charge;
     
     const finalTotal = subtotal + shippingFee;
 
@@ -702,19 +517,21 @@ async function submitOrder() {
     statusEl.textContent = "Validating order...";
     statusEl.style.color = 'var(--dark-text)';
 
-    // 1. Price Validation Check
-    let isPriceValid = true;
-    currentOrder.items.forEach(item => {
-        if (item.customPrice < item.minPrice) isPriceValid = false;
-    });
-    if (!isPriceValid) {
-        statusEl.textContent = "Error: One or more item prices are below the minimum allowed.";
+    // --- Validation ---
+    if (currentOrder.items.length === 0) {
+        statusEl.textContent = "Error: Please add at least one product.";
         statusEl.style.color = 'var(--danger-color)';
         submitBtn.disabled = false;
         return;
     }
     
-    // 2. Customer Info Check
+    if (currentOrder.items.some(item => item.customPrice < item.minPrice)) {
+        statusEl.textContent = "Error: One or more prices are below the allowed minimum.";
+        statusEl.style.color = 'var(--danger-color)';
+        submitBtn.disabled = false;
+        return;
+    }
+    
     let customerInfo;
     const existingCustomerPac = document.getElementById('customer-dropdown').value;
     if (existingCustomerPac) {
@@ -726,21 +543,12 @@ async function submitOrder() {
             phone: document.getElementById('new-customer-phone').value.trim(),
             address: document.getElementById('new-customer-address').value.trim(),
         };
-        // Check for required fields for NEW customer
-        if (!customerInfo.name || !customerInfo.email || !customerInfo.phone || !customerInfo.address) {
-            statusEl.textContent = "Error: Please fill in all new customer details or select an existing one.";
+        if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) {
+            statusEl.textContent = "Error: Please fill in all new customer details.";
             statusEl.style.color = 'var(--danger-color)';
             submitBtn.disabled = false;
             return;
         }
-    }
-    
-    // 3. Item and Proof Check
-    if (currentOrder.items.length === 0) {
-        statusEl.textContent = "Error: Please add at least one product to the order.";
-        statusEl.style.color = 'var(--danger-color)';
-        submitBtn.disabled = false;
-        return;
     }
 
     const proofFile = document.getElementById('payment-proof').files[0];
@@ -751,82 +559,61 @@ async function submitOrder() {
         return;
     }
 
-    statusEl.textContent = "Uploading proof and submitting order...";
+    statusEl.textContent = "Uploading proof and submitting...";
     try {
         const base64File = await getBase64(proofFile);
         
-        // Recalculate totals for final submission payload
         const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
-        let shippingFee = 0; 
-        const sortedRules = shippingRules.sort((a, b) => b.minSpend - a.minSpend);
-        for (const rule of sortedRules) {
-             if (subtotal >= rule.minSpend) {
-                shippingFee = rule.charge;
-                break;
-            }
-        }
+        let shippingFee = 0;
+        const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
+        if (bestRule) shippingFee = bestRule.charge;
         
         const payload = {
-            agent: currentAgent,
-            customer: customerInfo,
-            items: currentOrder.items.map(item => ({ 
-                id: item.id, 
-                quantity: item.quantity, 
-                price: item.customPrice, 
-                cc: item.cc, 
-                name: item.name 
-            })),
-            shippingFee: shippingFee,
-            paymentProof: {
-                file: base64File.split(',')[1],
-                mimeType: proofFile.type,
-                fileName: proofFile.name
+            action: 'submitAgentOrder',
+            data: {
+                agent: currentAgent,
+                customer: customerInfo,
+                items: currentOrder.items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.customPrice, cc: item.cc })),
+                shippingFee: shippingFee,
+                paymentProof: {
+                    file: base64File.split(',')[1],
+                    mimeType: proofFile.type,
+                }
             }
         };
 
-        const response = await postToGoogleScript('submitAgentOrder', payload);
+        const response = await postToGoogleScript(payload);
         if (response.success) {
-            statusEl.textContent = `Success! Order logged with Invoice ID: ${response.invoiceId}`;
+            statusEl.textContent = `Success! Invoice ID: ${response.invoiceId}`;
             statusEl.style.color = 'var(--success-color)';
-            submitBtn.innerHTML = "Order Submitted!";
-            
-            // Wait 5 seconds and then reset the view to prompt the next order
-            setTimeout(() => {
-                showView('create-order-view');
-            }, 5000);
+            setTimeout(startNewOrder, 5000);
         } else {
-            throw new Error(response.message || "An unknown error occurred on the server.");
+            throw new Error(response.message || "An unknown server error occurred.");
         }
 
     } catch (error) {
         statusEl.textContent = `Error: ${error.message}`;
         statusEl.style.color = 'var(--danger-color)';
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Order';
     }
 }
 
-
-// ===========================================================
-// [ 4.0 ] UTILITY FUNCTIONS
-// ===========================================================
+// =================================================================
+// [ 6.0 ] UTILITY FUNCTIONS
+// =================================================================
 async function postToGoogleScript(action, data = {}) {
+    const payload = { action, data };
     try {
         const response = await fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             mode: 'cors',
             credentials: 'omit',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, data })
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
         });
         if (!response.ok) {
             const errorText = await response.text();
-            let errorMessage = `Network response was not ok.`;
-            try {
-                const errorJson = JSON.parse(errorText);
-                errorMessage = errorJson.message || errorMessage;
-            } catch (e) {}
-            throw new Error(errorMessage);
+            throw new Error(`Network Error: ${errorText}`);
         }
         return await response.json();
     } catch (error) {
@@ -838,16 +625,14 @@ async function postToGoogleScript(action, data = {}) {
 function getBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        const readerSizeLimit = 5 * 1024 * 1024; // 5MB limit for Base64
-
-        if (file.size > readerSizeLimit) {
-            reject(new Error("File size exceeds 5MB limit. Please upload a smaller file."));
-            return;
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            return reject(new Error("File size exceeds 5MB."));
         }
-
         reader.readAsDataURL(file);
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
     });
 }
 </script>
+</body>
+</html>
