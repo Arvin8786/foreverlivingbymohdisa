@@ -1,11 +1,11 @@
 // =================================================================
-// E-Shop Frontend Script - v18.6 (Final UI & Feature Upgrade)
+// E-Shop Frontend Script - v19.1 (Login Button Fix)
 // =================================================================
 
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycby2bLhRi2VVW-htlVlrxVKd-ZyMW4l1nyCwSwps9ic22murKIZgJxes2zNbhZnzpZK1kg/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbyzNLZmyV2pwr3Tcpk-HhXb8wnDiJWvwiQ8KwpHhZIbv1fBv6NQDRYm6MM-5RrHt90chg/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
@@ -15,9 +15,23 @@ let cart = [];
 let chatSession = {};
 
 // ===========================================================
-// [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
+// [ 2.0 ] MAIN CONTROLLER & INITIALIZATION (FIXED)
 // ===========================================================
-document.addEventListener('DOMContentLoaded', fetchData);
+document.addEventListener('DOMContentLoaded', () => {
+    // --- CRITICAL FIX: ATTACH STATIC LISTENERS IMMEDIATELY ---
+    // These elements exist in index.html, so they can be attached now.
+    
+    // Attach listener for Login Modal
+    document.getElementById('nav-login-btn').addEventListener('click', () => toggleLoginModal(true));
+    document.getElementById('close-login-modal-btn').addEventListener('click', () => toggleLoginModal(false));
+    
+    // Attach listener for Chatbot
+    document.getElementById('chat-send-btn').addEventListener('click', handleChatSubmit);
+    document.getElementById('chat-input').addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
+
+    // Start fetching dynamic data
+    fetchData();
+});
 
 async function fetchData() {
     try {
@@ -26,13 +40,34 @@ async function fetchData() {
         const data = await response.json();
         if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
 
+        const marketingData = data.marketingData || {};
+        const activeTheme = data.activeTheme || null;
+
+        // --- NEW: Maintenance Mode Check ---
+        if (marketingData.MaintenanceMode === 'TRUE') {
+            document.getElementById('store-wrapper').style.display = 'none';
+            const overlay = document.getElementById('maintenance-overlay');
+            overlay.style.display = 'flex';
+            document.getElementById('maintenance-message').textContent = marketingData.MaintenanceMessage || 'Site is down for maintenance.';
+            return; // Stop loading the rest of the site
+        }
+
+        // --- NEW: Apply Theme & Marketing Data ---
+        if (activeTheme) {
+            applyTheme(activeTheme);
+        }
+        if (marketingData) {
+            applyMarketing(marketingData, activeTheme);
+        }
+
         products = data.products || [];
         allJobs = data.jobsListings || [];
         
+        // Render all dynamic HTML content
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
-        renderProducts(products);
+        renderProducts(products, marketingData.ProductTagText); // Pass tag text
         renderAboutUs(data.aboutUsContent);
         renderJobs(allJobs);
         buildEnquiryForm();
@@ -42,12 +77,15 @@ async function fetchData() {
         buildFabButtons();
         buildChatbotWidget();
         
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v18.6)`;
+        // NEW: Build the welcome popup modal
+        buildPopupModal(marketingData.PopupMessageText, marketingData.PopupImageURL);
+
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v19.1)`;
         
+        // --- Attach listeners for DYNAMICALLY created elements ---
+        // These listeners must be here, after the HTML is built by the functions above.
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
         document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
-        document.getElementById('chat-send-btn').addEventListener('click', handleChatSubmit);
-        document.getElementById('chat-input').addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
 
         showTab('homepage');
 
@@ -64,13 +102,8 @@ function renderStaticContent(content) {
     if (!content) return;
     document.getElementById('company-name-header').innerHTML = `${content.CompanyName || ''} <span class="by-line">${content.Owner} - ${content.Role}</span> <span class="slogan">${content.Slogan}</span>`;
     document.getElementById('footer-text').textContent = content.Footer || `© ${new Date().getFullYear()} ${content.CompanyName}`;
-    const banner = document.getElementById('promo-running-banner');
-    if (content.RunningBanner) {
-        document.getElementById('promo-banner-text').textContent = content.RunningBanner;
-        banner.style.display = 'block';
-    } else {
-        banner.style.display = 'none';
-    }
+    
+    // Note: Banner text is now handled by applyMarketing()
 }
 
 function renderMainContentShell() {
@@ -135,11 +168,15 @@ function renderHomepageContent(about, jobs, testimonies) {
     }
 }
 
-function renderProducts(productsToRender) {
+function renderProducts(productsToRender, tagText) {
     const container = document.getElementById('product-list-container');
     if (!productsToRender || productsToRender.length === 0) { container.innerHTML = `<p>No products available.</p>`; return; }
+    
+    const tagHtml = tagText ? `<div class="product-tag">${tagText}</div>` : '';
+
     container.innerHTML = `<div class="product-list">${productsToRender.map(p => `
-        <div class="product">
+        <div class="product" style="position: relative;">
+            ${tagHtml}
             <div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div>
             <div class="product-info">
                 <h3>${p.name}</h3>
@@ -175,7 +212,6 @@ function renderAboutUs(content) {
         ${historySection}`;
 }
 
-// UPGRADED to render new attractive job cards
 function renderJobs(jobs) {
     const container = document.getElementById('job-listings-container');
     if (!jobs || jobs.length === 0) { container.innerHTML = '<p>There are currently no open positions.</p>'; return; }
@@ -200,7 +236,6 @@ function buildEnquiryForm() {
     container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">Submit</button><p id="enquiry-status"></p></form>`;
 }
 
-// UPGRADED for new attractive cart modal
 function buildCartModal() {
     const container = document.getElementById('cart-modal');
     container.innerHTML = `
@@ -256,7 +291,6 @@ function increaseQuantity(productId) { const item = cart.find(i => i.id == produ
 function decreaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } } }
 function removeItemFromCart(productId) { cart = cart.filter(item => item.id != productId); updateCartDisplay(); }
 
-// UPGRADED to render new attractive cart items
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
     const checkoutArea = document.getElementById('cart-checkout-area');
@@ -300,7 +334,6 @@ function toggleCart(hide = false) {
     checkoutBtn.disabled = true;
     checkoutBtn.textContent = 'Processing...';
 
-    // 1. Get and validate form fields
     const name = document.getElementById('customer-name').value.trim();
     const phone = document.getElementById('customer-phone').value.trim();
     const address = document.getElementById('customer-address').value.trim();
@@ -313,9 +346,8 @@ function toggleCart(hide = false) {
         return;
     }
 
-    // 2. Prepare the order data payload
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingFee = 0.0; // Assuming free shipping for now, can be updated later
+    const shippingFee = 0.0; 
     const totalAmount = subtotal + shippingFee;
 
     const itemsPurchased = cart.map(item => `${item.id}x${item.quantity}`).join(', ');
@@ -328,30 +360,25 @@ function toggleCart(hide = false) {
             customerEmail: email,
             customerAddress: address,
             itemsPurchased: itemsPurchased,
-            cart: cart, // Send full cart data for detailed logging
+            cart: cart, 
             totalAmount: totalAmount,
             shippingFee: shippingFee,
-            totalPointsForThisPurchase: 0 // Backend can calculate points if needed
+            totalPointsForThisPurchase: 0 
         }
     };
 
-    // 3. Send the order to the Google Apps Script backend
     try {
         await postDataToGScript(payload);
-
-        // 4. Handle success: show message, clear cart, and close modal
         alert('Your order has been placed successfully! We will contact you via WhatsApp shortly to confirm payment and shipping.');
         
-        cart = []; // Clear the cart array
-        toggleCart(true); // Close the cart modal
-        updateCartDisplay(); // Update the cart icon to show 0
+        cart = []; 
+        toggleCart(true); 
+        updateCartDisplay(); 
 
     } catch (error) {
-        // 5. Handle failure
         console.error('Checkout failed:', error);
         alert('There was an error placing your order. Please try again or contact us directly.');
     } finally {
-        // 6. Re-enable the button regardless of success or failure
         checkoutBtn.disabled = false;
         checkoutBtn.textContent = 'Complete Order';
     }
@@ -582,4 +609,74 @@ async function postToRender(action, data) {
         console.error('Error posting to Render:', error);
         throw error;
     }
+}
+
+// ===========================================================
+// [ 8.0 ] NEW: THEME, MARKETING & LOGIN MODAL LOGIC
+// ===========================================================
+function applyTheme(theme) {
+    if (!theme) return;
+    const root = document.documentElement;
+    root.style.setProperty('--primary-color', theme.primaryColor);
+    root.style.setProperty('--secondary-color', theme.secondaryColor);
+    root.style.setProperty('--accent-color', theme.accentColor);
+}
+
+function applyMarketing(marketing, theme) {
+    // 1. Running Banner
+    const banner = document.getElementById('promo-running-banner');
+    // Marketing text overrides festival text
+    let bannerText = marketing.BannerText || (theme ? theme.WelcomeMessage : null);
+    
+    if (bannerText) {
+        document.getElementById('promo-banner-text').textContent = bannerText;
+        banner.style.display = 'block';
+    } else {
+        banner.style.display = 'none';
+    }
+}
+
+function buildPopupModal(message, imageUrl) {
+    if (!message && !imageUrl) return; // No popup to show
+
+    // Check if popup has been shown this session
+    if (sessionStorage.getItem('eshopPopupShown') === 'true') {
+        return;
+    }
+
+    const container = document.getElementById('popup-modal');
+    let modalHTML = '';
+
+    if (imageUrl) {
+        modalHTML = `
+        <div class="modal-content" style="max-width: 500px; padding: 0;">
+             <button class="close" style="position: absolute; top: 10px; right: 20px; font-size: 30px; background: white; border-radius: 50%; width: 40px; height: 40px; opacity: 0.8;" onclick="togglePopup(true)">&times;</button>
+             <img src="${imageUrl}" style="width: 100%; border-radius: var(--border-radius);">
+        </div>`;
+    } else {
+        modalHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Welcome!</h2>
+                <button class="close" onclick="togglePopup(true)">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 30px; font-size: 1.1rem; text-align: center;">
+                ${message}
+            </div>
+        </div>`;
+    }
+    
+    container.innerHTML = modalHTML;
+    togglePopup(false); // Show the popup
+    sessionStorage.setItem('eshopPopupShown', 'true'); // Set session flag
+}
+
+function togglePopup(hide = false) {
+    const modal = document.getElementById('popup-modal');
+    modal.style.display = hide ? 'none' : 'flex';
+}
+
+function toggleLoginModal(show) {
+    const modal = document.getElementById('login-modal');
+    modal.style.display = show ? 'flex' : 'none';
 }
