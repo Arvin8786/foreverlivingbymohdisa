@@ -1,11 +1,12 @@
 // =================================================================
-// E-Shop Frontend Script - v19.1 (Login Button Fix)
+// E-Shop Frontend Script - v19.2 (CRITICAL URL FIX & NEW FEATURES)
 // =================================================================
 
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbyndKpm1dF5nCX5aa7ZKBDvcep1z7oYAXjoG98CbXm3dFUZOXUYHVmYJG4kgx5ZeBZ2uA/exec';
+// CRITICAL FIX: Updated to the new, correct deployment URL
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbztbiAyMkIqqA409ineCiyCsbxJTYKy8FiEZA2JL81kJb314vnaISOa4vXVOQgHRJJGTQ/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
@@ -15,17 +16,13 @@ let cart = [];
 let chatSession = {};
 
 // ===========================================================
-// [ 2.0 ] MAIN CONTROLLER & INITIALIZATION (FIXED)
+// [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
 // ===========================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CRITICAL FIX: ATTACH STATIC LISTENERS IMMEDIATELY ---
-    // These elements exist in index.html, so they can be attached now.
-    
-    // Attach listener for Login Modal
+    // --- Attach static listeners immediately ---
     document.getElementById('nav-login-btn').addEventListener('click', () => toggleLoginModal(true));
     document.getElementById('close-login-modal-btn').addEventListener('click', () => toggleLoginModal(false));
     
-    // Attach listener for Chatbot
     document.getElementById('chat-send-btn').addEventListener('click', handleChatSubmit);
     document.getElementById('chat-input').addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
 
@@ -67,7 +64,7 @@ async function fetchData() {
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
-        renderProducts(products, marketingData.ProductTagText); // Pass tag text
+        renderProducts(products, marketingData.ProductTagText); 
         renderAboutUs(data.aboutUsContent);
         renderJobs(allJobs);
         buildEnquiryForm();
@@ -80,10 +77,9 @@ async function fetchData() {
         // NEW: Build the welcome popup modal
         buildPopupModal(marketingData.PopupMessageText, marketingData.PopupImageURL);
 
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v19.1)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v19.2)`;
         
         // --- Attach listeners for DYNAMICALLY created elements ---
-        // These listeners must be here, after the HTML is built by the functions above.
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
         document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
 
@@ -102,8 +98,6 @@ function renderStaticContent(content) {
     if (!content) return;
     document.getElementById('company-name-header').innerHTML = `${content.CompanyName || ''} <span class="by-line">${content.Owner} - ${content.Role}</span> <span class="slogan">${content.Slogan}</span>`;
     document.getElementById('footer-text').textContent = content.Footer || `© ${new Date().getFullYear()} ${content.CompanyName}`;
-    
-    // Note: Banner text is now handled by applyMarketing()
 }
 
 function renderMainContentShell() {
@@ -617,9 +611,13 @@ async function postToRender(action, data) {
 function applyTheme(theme) {
     if (!theme) return;
     const root = document.documentElement;
-    root.style.setProperty('--primary-color', theme.primaryColor);
-    root.style.setProperty('--secondary-color', theme.secondaryColor);
-    root.style.setProperty('--accent-color', theme.accentColor);
+    // Note: The theme logic in script.js expects a different object from what
+    // your 'Festivals' sheet provides. This code is from your v18.6 file.
+    // To make this work, your 'Festivals' sheet MUST have columns:
+    // primaryColor, secondaryColor, accentColor
+    if (theme.primaryColor) root.style.setProperty('--primary-color', theme.primaryColor);
+    if (theme.secondaryColor) root.style.setProperty('--secondary-color', theme.secondaryColor);
+    if (theme.accentColor) root.style.setProperty('--accent-color', theme.accentColor);
 }
 
 function applyMarketing(marketing, theme) {
