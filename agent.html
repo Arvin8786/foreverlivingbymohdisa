@@ -13,17 +13,18 @@
     
     <style>
         /* ================================================================= */
-        /* [ 1.0 ] CORE STYLES & VARIABLES (Redesigned Look) */
+        /* [ 1.0 ] CORE STYLES & VARIABLES (NEW PROFESSIONAL DESIGN) */
         /* ================================================================= */
         :root {
-            --primary-color: #1a5276; /* Deep Navy */
-            --secondary-color: #f39c12; /* Gold Accent */
-            --success-color: #198754; /* Dark Green */
+            --primary-color: #007bff; /* Vibrant Blue for actions */
+            --primary-dark: #0056b3;
+            --secondary-color: #f39c12; /* Gold/Amber Accent */
             --light-gray: #f4f6f8; /* Softer Background */
             --mid-gray: #e9ecef; 
-            --dark-text: #333; 
+            --dark-text: #212529; 
             --light-text: #fff;
             --danger-color: #dc3545;
+            --success-color: #198754;
             --border-radius-lg: 12px;
             --border-radius-sm: 8px;
             --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
@@ -51,11 +52,11 @@
         .btn-primary { 
             background: var(--primary-color); color: var(--light-text); 
             border-radius: 50px; /* Pill shape */
-            box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
         }
         .btn-primary:hover:not(:disabled) { 
-            background: #113a56; 
-            box-shadow: 0 6px 12px rgba(26, 82, 118, 0.4); 
+            background: #0056b3; 
+            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4); 
             transform: translateY(-2px);
         }
         .btn-secondary { 
@@ -69,6 +70,7 @@
         .card { 
             background: var(--light-text); 
             border-radius: var(--border-radius-lg); 
+            border-top: 4px solid var(--primary-color);
             box-shadow: var(--shadow-lg); 
             padding: 30px; 
             margin-bottom: 25px; 
@@ -88,11 +90,12 @@
         /* ================================================================= */
         #login-view { 
             display: flex; justify-content: center; align-items: center; min-height: 100vh; 
-            background: linear-gradient(135deg, #1a5276 0%, #34495e 100%); 
+            background: linear-gradient(135deg, #f4f6f8 0%, #e9ecef 100%); 
         }
         #login-box { 
             padding: 50px; max-width: 400px; text-align: center; 
             background: #fff; border-radius: 15px;
+            border-top: 5px solid var(--primary-color);
         }
         
         #portal-view header { 
@@ -114,29 +117,28 @@
         
         /* Redesigned Navigation Bar */
         #portal-view nav { 
-            display: flex; flex-wrap: wrap; gap: 0; 
+            display: flex; flex-wrap: wrap; gap: 10px; 
             margin-bottom: 25px; 
-            background-color: var(--primary-color);
-            border-radius: var(--border-radius-sm);
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3);
         }
         #portal-view nav .btn { 
-            background: transparent;
-            color: var(--light-text);
-            border: none;
-            border-radius: 0;
-            flex-grow: 1;
-            padding: 15px 20px;
+            background: var(--light-text);
+            color: var(--primary-color);
+            border: 2px solid var(--mid-gray);
+            border-radius: 50px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-weight: 500;
+        }
+        #portal-view nav .btn:hover {
+            border-color: var(--primary-color);
+            background: #e6f2ff;
         }
         #portal-view nav .btn.active { 
-            background: var(--secondary-color); 
-            color: var(--dark-text);
-            box-shadow: none;
+            background: var(--primary-color);
+            color: var(--light-text);
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
         }
-        #portal-view nav .btn:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.1);
-        }
+        #portal-view nav .btn.hidden { display: none; }
 
         /* ================================================================= */
         /* [ 3.0 ] ORDER CREATION & DATA TABLES */
@@ -155,7 +157,14 @@
         }
 
         /* Order Summary Inputs */
-        #summary-items-list .summary-item { grid-template-columns: 1fr 60px 80px 30px; }
+        #summary-items-list .summary-item { 
+            display: grid; 
+            grid-template-columns: 1fr 60px 80px 30px; 
+            align-items: center; 
+            gap: 10px; 
+            padding: 10px 0; 
+            border-bottom: 1px dashed var(--mid-gray); 
+        }
         .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; }
         .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
         .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
@@ -164,6 +173,11 @@
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
         th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+
+        @media (max-width: 1000px) {
+            #order-creation-workflow { grid-template-columns: 1fr; }
+            #order-summary-card { position: static; }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
 </head>
@@ -230,7 +244,7 @@
                 <div class="card">
                     <h3>Customer Information</h3>
                     <select id="customer-dropdown"></select>
-                    <button id="new-customer-btn" class="btn" style="background-color: var(--mid-gray); color: var(--dark-text); margin-top: 10px;">
+                    <button id="new-customer-btn" class="btn" style="background-color: var(--mid-gray); color: var(--dark-text); margin-top: 10px; border-radius: var(--border-radius-sm);">
                         <i class="fa-solid fa-user-plus"></i> Create New Customer
                     </button>
                     <div id="new-customer-form" class="hidden" style="margin-top: 15px; background: var(--light-gray); padding: 15px; border-radius: var(--border-radius-sm);">
@@ -321,7 +335,7 @@
 // =================================================================
 
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx0TohufS3cbIw9GUDeiBgYsoUpYGVXEi0p2ew4d70hx2rZUV3f-iOOFR4mZ40nh2xl6w/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbya8C4wbhmyuhLgT9C9DrJ8QRC2kntGezG85FxaMFRyQQTkLoUukVx925TYwOMq9VtHZg/exec';
 
 // --- Global State Variables ---
 let products = [];
@@ -361,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =================================================================
-// [ 3.0 ] LOGIN, LOGOUT & DATA FETCHING
+// [ 3.0 ] LOGIN, LOGOUT & DATA FETCHING (PASSWORD & TARGET FIX)
 // =================================================================
 async function handleLogin() {
     const agentId = document.getElementById('agent-id-input').value.trim();
@@ -399,7 +413,8 @@ async function handleLogin() {
             document.getElementById('portal-view').classList.remove('hidden');
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
             
-            if (currentAgent.isAdmin) {
+            // FIX: Correctly check isAdmin status to show/hide Admin button
+            if (currentAgent.isAdmin === true) {
                 document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
             }
 
@@ -512,7 +527,10 @@ function refreshPageData() {
     refreshBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Refreshing...';
 
     // 1. Re-fetch base data (required for Target Bar)
-    postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: document.getElementById('agent-password-input').value })
+    // We must pass the current password to verifyAgent
+    const currentPassword = document.getElementById('agent-password-input').value;
+    
+    postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: currentPassword })
         .then(res => {
             if (res.success) {
                 currentAgent.target = parseFloat(res.target) || 0; 
@@ -725,12 +743,10 @@ async function renderAdminDashboard() {
 
         if (response.success && response.data.length > 0) {
             
-            const grandTotalSales = response.data.reduce((sum, a) => sum + a.totalSales, 0);
-            const grandTotalCC = response.data.reduce((sum, a) => sum + a.totalCC, 0);
+            // Use the pre-calculated grand totals from the server
+            totalSalesEl.textContent = `RM ${response.grandTotalSales.toFixed(2)}`;
+            totalCCEl.textContent = response.grandTotalCC.toFixed(3);
             let agentsAchieved = response.data.filter(a => a.targetAchieved >= 1).length;
-
-            totalSalesEl.textContent = `RM ${grandTotalSales.toFixed(2)}`;
-            totalCCEl.textContent = grandTotalCC.toFixed(3);
             agentsOnTargetEl.textContent = `${agentsAchieved} / ${response.data.length}`;
             
             const tableHtml = `
