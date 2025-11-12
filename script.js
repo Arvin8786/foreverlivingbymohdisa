@@ -1,11 +1,11 @@
 // =================================================================
-// E-Shop Frontend Script - v19.2 (CRITICAL URL FIX & NEW FEATURES)
+// E-Shop Frontend Script - v20.0 (FINAL - Theme, Login, Marketing)
 // =================================================================
 
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-// CRITICAL FIX: Updated to the new, correct deployment URL
+// CRITICAL FIX: Using the new, correct deployment URL
 const googleScriptURL = 'https://script.google.com/macros/s/AKfycbztbiAyMkIqqA409ineCiyCsbxJTYKy8FiEZA2JL81kJb314vnaISOa4vXVOQgHRJJGTQ/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
@@ -16,7 +16,7 @@ let cart = [];
 let chatSession = {};
 
 // ===========================================================
-// [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
+// [ 2.0 ] MAIN CONTROLLER & INITIALIZATION (FIXED)
 // ===========================================================
 document.addEventListener('DOMContentLoaded', () => {
     // --- Attach static listeners immediately ---
@@ -74,10 +74,9 @@ async function fetchData() {
         buildFabButtons();
         buildChatbotWidget();
         
-        // NEW: Build the welcome popup modal
         buildPopupModal(marketingData.PopupMessageText, marketingData.PopupImageURL);
 
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v19.2)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v20.0)`;
         
         // --- Attach listeners for DYNAMICALLY created elements ---
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
@@ -103,7 +102,7 @@ function renderStaticContent(content) {
 function renderMainContentShell() {
     const main = document.getElementById('main-content');
     main.innerHTML = `
-        <div id="homepage" class="tab-content">
+        <div id="homepage" class="tab-content active">
             <section id="homepage-hero" class="hero-section"></section>
             <section id="why-choose-us" class="dynamic-content-wrapper"></section>
             <section id="youtube-videos" class="dynamic-content-wrapper"></section>
@@ -608,16 +607,43 @@ async function postToRender(action, data) {
 // ===========================================================
 // [ 8.0 ] NEW: THEME, MARKETING & LOGIN MODAL LOGIC
 // ===========================================================
+
+/**
+ * Applies the active theme colors and triggers special effects.
+ */
 function applyTheme(theme) {
     if (!theme) return;
     const root = document.documentElement;
-    // Note: The theme logic in script.js expects a different object from what
-    // your 'Festivals' sheet provides. This code is from your v18.6 file.
-    // To make this work, your 'Festivals' sheet MUST have columns:
-    // primaryColor, secondaryColor, accentColor
-    if (theme.primaryColor) root.style.setProperty('--primary-color', theme.primaryColor);
-    if (theme.secondaryColor) root.style.setProperty('--secondary-color', theme.secondaryColor);
-    if (theme.accentColor) root.style.setProperty('--accent-color', theme.accentColor);
+
+    // Define theme colors based on research
+    const themes = {
+        'Christmas': { primary: '#d90429', secondary: '#FFD700', accent: '#004B23' },
+        'HariRaya': { primary: '#006400', secondary: '#f0e68c', accent: '#27ae60' },
+        'CNY': { primary: '#E00000', secondary: '#FFD700', accent: '#C04000' },
+        'Thaipusam': { primary: '#FF9933', secondary: '#4B0082', accent: '#F0E68C' },
+        'NationalDay': { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
+        'MalaysiaDay': { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
+        'MooncakeFestival': { primary: '#C04000', secondary: '#FFD700', accent: '#E00000' },
+        'Deepavali': { primary: '#FF8C00', secondary: '#FF00FF', accent: '#FFD700' },
+        'NewYear': { primary: '#111111', secondary: '#FFD700', accent: '#C0C0C0' },
+        'Valentines': { primary: '#D70040', secondary: '#FFC0CB', accent: '#C71585' },
+        'GrandOpening': { primary: '#1a5276', secondary: '#f39c12', accent: '#27ae60' }
+    };
+
+    const colors = themes[theme.ThemeName];
+
+    if (colors) {
+        root.style.setProperty('--primary-color', colors.primary);
+        root.style.setProperty('--secondary-color', colors.secondary);
+        root.style.setProperty('--accent-color', colors.accent);
+    }
+    
+    // Check for special effects
+    if (theme.ThemeName === 'Christmas') {
+        if (typeof startSnowing === 'function') {
+            startSnowing();
+        }
+    }
 }
 
 function applyMarketing(marketing, theme) {
