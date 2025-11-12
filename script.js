@@ -5,7 +5,6 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-// CRITICAL FIX: Using the new, correct deployment URL
 const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzZ2AxEH-DBV-5uP_hy_2kpH5DzYePyzc48FdueSire6A8Fk1l2ifL8DHGGgZj0v0bHTw/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
@@ -16,7 +15,7 @@ let cart = [];
 let chatSession = {};
 
 // ===========================================================
-// [ 2.0 ] MAIN CONTROLLER & INITIALIZATION (FIXED)
+// [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
 // ===========================================================
 document.addEventListener('DOMContentLoaded', () => {
     // --- Attach static listeners immediately ---
@@ -607,10 +606,6 @@ async function postToRender(action, data) {
 // ===========================================================
 // [ 8.0 ] NEW: THEME, MARKETING & LOGIN MODAL LOGIC
 // ===========================================================
-
-/**
- * Applies the active theme colors and triggers special effects.
- */
 function applyTheme(theme) {
     if (!theme) return;
     const root = document.documentElement;
