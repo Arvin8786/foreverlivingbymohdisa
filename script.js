@@ -5,7 +5,7 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxq7ocks7TKTw75P8u6b1ht9-GG7BaezWwLE_Ygcg9RU-Di4ZCeDt0zpAhASdUpHECK/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbz31J6t-LQo99MilrWjT5Q7gkY5JBZr4ZoekWZg2ghbMdB-lDcWE0TiwHwomop3mPm5qg/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
