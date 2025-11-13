@@ -222,6 +222,9 @@
     <header>
         <div id="header-content">
             <h2 id="agent-welcome-header"></h2>
+            
+            <p id="agent-details-display" style="font-size: 1.1rem; color: #555; font-weight: 500; margin-top: -10px; margin-bottom: 15px;"></p>
+
             <div id="target-bar-display"></div>
             <button id="refresh-data-btn" class="btn btn-secondary" style="margin-top: 10px; padding: 5px 10px;">
                 <i class="fa-solid fa-arrows-rotate"></i> Refresh Data
@@ -411,7 +414,11 @@ async function handleLogin() {
             
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
-            document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
+            
+            // --- 3. MODIFICATION: Set Name, ID, and Position ---
+            document.getElementById('agent-welcome-header').textContent = `${currentAgent.name} (${currentAgent.id})`;
+            document.getElementById('agent-details-display').textContent = response.position || 'Agent';
+            // ---------------------------------------------
             
             // FIX: Correctly check isAdmin status to show/hide Admin button
             if (currentAgent.isAdmin === true) {
