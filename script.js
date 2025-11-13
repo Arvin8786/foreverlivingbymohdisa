@@ -6,7 +6,7 @@
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
 // CRITICAL FIX: This URL must match your latest deployment
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzT72Oys3e1rc6tfSSEyldOXhU7JIp8mJ2819AOkWjFsqvfLKO4oJJsWvZPC4lTxfHdpw/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzKoFzqqE9Z3WWnFwFwodnpgd6zVAdanHAnfAI1KDkgm4D8-uCSqNh-HR-dCG1YFiMirQ/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
