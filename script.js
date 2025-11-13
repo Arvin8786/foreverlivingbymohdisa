@@ -5,6 +5,7 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
+// CRITICAL FIX: This URL must match your latest deployment
 const googleScriptURL = 'https://script.google.com/macros/s/AKfycbz31J6t-LQo99MilrWjT5Q7gkY5JBZr4ZoekWZg2ghbMdB-lDcWE0TiwHwomop3mPm5qg/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
@@ -36,6 +37,7 @@ async function fetchData() {
         const data = await response.json();
         if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
 
+        // --- NEW: Read the new data from the server ---
         const marketingData = data.marketingData || {};
         const activeTheme = data.activeTheme || null;
 
@@ -56,6 +58,7 @@ async function fetchData() {
             applyMarketing(marketingData, activeTheme);
         }
 
+        // --- Original v18.6 Logic ---
         products = data.products || [];
         allJobs = data.jobsListings || [];
         
@@ -63,7 +66,7 @@ async function fetchData() {
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
-        renderProducts(products, marketingData.ProductTagText); 
+        renderProducts(products, marketingData.ProductTagText); // Pass tag text
         renderAboutUs(data.aboutUsContent);
         renderJobs(allJobs);
         buildEnquiryForm();
@@ -73,6 +76,7 @@ async function fetchData() {
         buildFabButtons();
         buildChatbotWidget();
         
+        // NEW: Build the welcome popup modal
         buildPopupModal(marketingData.PopupMessageText, marketingData.PopupImageURL);
 
         document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v20.0)`;
@@ -635,6 +639,7 @@ function applyTheme(theme) {
     
     // Check for special effects
     if (theme.ThemeName === 'Christmas') {
+        // Check if the snow function exists (it's in index.html)
         if (typeof startSnowing === 'function') {
             startSnowing();
         }
