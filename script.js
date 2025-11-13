@@ -19,13 +19,33 @@ let chatSession = {};
 // [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
 // ===========================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Attach static listeners immediately ---
-    // These elements exist in index.html, so they can be attached now.
-    document.getElementById('nav-login-btn').addEventListener('click', () => toggleLoginModal(true));
-    document.getElementById('close-login-modal-btn').addEventListener('click', () => toggleLoginModal(false));
-    
-    document.getElementById('chat-send-btn').addEventListener('click', handleChatSubmit);
-    document.getElementById('chat-input').addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
+    // --- Attach static listeners safely ---
+    // This prevents the script from crashing if an element is not found in the HTML.
+    try {
+        const navLoginBtn = document.getElementById('nav-login-btn');
+        if (navLoginBtn) {
+            navLoginBtn.addEventListener('click', () => toggleLoginModal(true));
+        }
+
+        const closeLoginModalBtn = document.getElementById('close-login-modal-btn');
+        if (closeLoginModalBtn) {
+            closeLoginModalBtn.addEventListener('click', () => toggleLoginModal(false));
+        }
+        
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        if (chatSendBtn) {
+            chatSendBtn.addEventListener('click', handleChatSubmit);
+        }
+
+        const chatInput = document.getElementById('chat-input');
+        if (chatInput) {
+            chatInput.addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
+        }
+    } catch (error) {
+        console.error("A non-critical error occurred while attaching initial event listeners:", error);
+        // This catch block ensures that even if an unexpected error occurs here,
+        // the site will still attempt to load its main content.
+    }
 
     // Start fetching dynamic data
     fetchData();
