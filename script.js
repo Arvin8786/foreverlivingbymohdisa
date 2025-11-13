@@ -1,11 +1,11 @@
 // =================================================================
-// E-Shop Frontend Script - v20.0 (FINAL - Theme, Login, Marketing)
+// E-Shop Frontend Script - v20.1 (FINAL - Theme, Login, Marketing)
 // =================================================================
 
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-// CRITICAL FIX: This URL must match your latest deployment
+// CRITICAL FIX: Using your latest, correct deployment URL
 const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzKoFzqqE9Z3WWnFwFwodnpgd6zVAdanHAnfAI1KDkgm4D8-uCSqNh-HR-dCG1YFiMirQ/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
@@ -20,6 +20,7 @@ let chatSession = {};
 // ===========================================================
 document.addEventListener('DOMContentLoaded', () => {
     // --- Attach static listeners immediately ---
+    // These elements exist in index.html, so they can be attached now.
     document.getElementById('nav-login-btn').addEventListener('click', () => toggleLoginModal(true));
     document.getElementById('close-login-modal-btn').addEventListener('click', () => toggleLoginModal(false));
     
@@ -37,7 +38,6 @@ async function fetchData() {
         const data = await response.json();
         if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
 
-        // --- NEW: Read the new data from the server ---
         const marketingData = data.marketingData || {};
         const activeTheme = data.activeTheme || null;
 
@@ -58,7 +58,6 @@ async function fetchData() {
             applyMarketing(marketingData, activeTheme);
         }
 
-        // --- Original v18.6 Logic ---
         products = data.products || [];
         allJobs = data.jobsListings || [];
         
@@ -66,7 +65,7 @@ async function fetchData() {
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
-        renderProducts(products, marketingData.ProductTagText); // Pass tag text
+        renderProducts(products, marketingData.ProductTagText); 
         renderAboutUs(data.aboutUsContent);
         renderJobs(allJobs);
         buildEnquiryForm();
@@ -76,10 +75,9 @@ async function fetchData() {
         buildFabButtons();
         buildChatbotWidget();
         
-        // NEW: Build the welcome popup modal
         buildPopupModal(marketingData.PopupMessageText, marketingData.PopupImageURL);
 
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v20.0)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v20.1)`;
         
         // --- Attach listeners for DYNAMICALLY created elements ---
         document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
