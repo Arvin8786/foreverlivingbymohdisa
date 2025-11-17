@@ -50,7 +50,7 @@
         }
         .btn-primary { 
             background: var(--primary-color); color: var(--light-text); 
-            border-radius: 50px; /* Pill shape */
+            border-radius: 50px; 
             box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3);
         }
         .btn-primary:hover:not(:disabled) { 
@@ -91,6 +91,7 @@
         #login-box { 
             padding: 50px; max-width: 400px; text-align: center; 
             background: #fff; border-radius: 15px;
+            border-top: 5px solid var(--primary-color);
         }
         
         #portal-view header { 
@@ -107,10 +108,10 @@
             width: 100%; max-width: 450px; margin-top: 5px; height: 20px;
             background-color: var(--mid-gray); border-radius: 10px; overflow: hidden; position: relative;
         }
-        .target-progress { background: linear-gradient(90deg, #f39c12, #ffc107); } /* Gold progress bar */
+        .target-progress { background: linear-gradient(90deg, #f39c12, #ffc107); }
         .target-text { font-size: 0.8rem; line-height: 20px; color: #000; }
         
-        /* Redesigned Navigation Bar */
+        /* Navigation Bar */
         #portal-view nav { 
             display: flex; flex-wrap: wrap; gap: 0; 
             margin-bottom: 25px; 
@@ -137,22 +138,14 @@
         }
         #portal-view nav .btn.hidden { display: none; }
 
-
         /* [ 3.0 ] ORDER CREATION & DATA TABLES */
         #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
         
-        /* Product List Styling */
         #product-selection-list { max-height: 500px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
         .product-item-selectable { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid var(--mid-gray); cursor: pointer; transition: background 0.1s; }
         .product-item-selectable:hover { background: #f0f8ff; }
-        .product-item-selectable img { 
-            width: 50px; 
-            height: 50px; 
-            object-fit: contain; 
-            border-radius: 4px; 
-        }
-
-        /* Order Summary Inputs */
+        .product-item-selectable img { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; }
+        
         #summary-items-list .summary-item { 
             display: grid; 
             grid-template-columns: 1fr 60px 80px 30px; 
@@ -165,20 +158,23 @@
         .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
         .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
 
-        /* Data Tables */
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
         th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
 
-        /* [ 4.0 ] PROFILE GRID STYLES (NEW) */
+        /* [ 4.0 ] PROFILE GRID STYLES */
         .profile-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
             gap: 20px; 
         }
-        .profile-item {
+        .profile-section h4 {
+            color: var(--primary-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
             margin-bottom: 15px;
         }
+        .profile-item { margin-bottom: 15px; }
         .profile-item label { 
             font-weight: 600; 
             display: block; 
@@ -235,9 +231,7 @@
         <p style="color: var(--danger-color); font-weight: 600;">For security, you must change your default password immediately.</p>
         <input type="password" id="new-password-input" placeholder="New Password" required>
         <input type="password" id="confirm-password-input" placeholder="Confirm New Password" required>
-        <button id="change-password-btn" class="btn btn-primary" style="width:100%;">
-            Set New Password
-        </button>
+        <button id="change-password-btn" class="btn btn-primary" style="width:100%;">Set New Password</button>
         <p id="password-change-status" style="margin-top: 15px;"></p>
     </div>
 </div>
@@ -282,7 +276,6 @@
                         <textarea id="new-customer-address" placeholder="Customer Address" rows="3" required></textarea>
                     </div>
                 </div>
-
                 <div class="card">
                     <h3>Product Selection</h3>
                     <input type="text" id="product-order-search" placeholder="Search product name or SKU...">
@@ -337,19 +330,19 @@
         <p id="profile-status" style="text-align:right; font-size:0.9rem; margin-top:-10px;"></p>
         <div class="profile-grid">
             <div class="profile-section">
-                <h4 style="color:var(--primary-color); margin-bottom:15px;">Personal Info</h4>
-                <div class="profile-item"><label>Full Name</label><input id="prof-name" disabled></div>
-                <div class="profile-item"><label>Agent ID</label><input id="prof-id" disabled></div>
-                <div class="profile-item"><label>Position</label><input id="prof-pos" disabled></div>
+                <h4>Personal Information</h4>
+                <div class="profile-item"><label>Full Name</label><input type="text" id="prof-name" disabled></div>
+                <div class="profile-item"><label>Agent ID</label><input type="text" id="prof-id" disabled></div>
+                <div class="profile-item"><label>Position</label><input type="text" id="prof-pos" disabled></div>
             </div>
             <div class="profile-section">
-                <h4 style="color:var(--primary-color); margin-bottom:15px;">Work Info</h4>
-                <div class="profile-item"><label>Commission Rate</label><input id="prof-rate" disabled></div>
-                <div class="profile-item"><label>Monthly Target</label><input id="prof-target" disabled></div>
-                <div class="profile-item"><label>Reporting To</label><input id="prof-mgr" disabled></div>
+                <h4>Employment Details</h4>
+                <div class="profile-item"><label>Commission Rate</label><input type="text" id="prof-rate" disabled></div>
+                <div class="profile-item"><label>Monthly Target</label><input type="text" id="prof-target" disabled></div>
+                <div class="profile-item"><label>Reporting To (Manager)</label><input type="text" id="prof-mgr" disabled></div>
             </div>
             <div class="profile-section">
-                <h4 style="color:var(--primary-color); margin-bottom:15px;">Payment Details <span id="edit-badge" style="font-size:0.8em; color:var(--secondary-color); display:none;">(Editable)</span></h4>
+                <h4>Payment Information <span id="edit-badge" style="font-size:0.8em; color:var(--secondary-color); display:none;">(Editable)</span></h4>
                 <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bank" disabled></div>
                 <div class="profile-item"><label>Account Holder</label><input type="text" id="prof-holder" disabled></div>
                 <div class="profile-item"><label>Account Number</label><input type="text" id="prof-acc" disabled></div>
@@ -370,25 +363,12 @@
     <div id="admin-dashboard-view" class="view hidden card">
         <h2>Admin Dashboard: Performance Overview</h2>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
-            <div class="card" style="padding: 15px; border-top: 4px solid var(--primary-color);">
-                <h4 style="margin-bottom: 5px;">Total Sales (RM)</h4>
-                <p id="admin-total-sales" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">Loading...</p>
-            </div>
-            <div class="card" style="padding: 15px; border-top: 4px solid var(--success-color);">
-                <h4 style="margin-bottom: 5px;">Total CC</h4>
-                <p id="admin-total-cc" style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">Loading...</p>
-            </div>
-            <div class="card" style="padding: 15px; border-top: 4px solid var(--secondary-color);">
-                <h4 style="margin-bottom: 5px;">Agents On Target</h4>
-                <p id="admin-agents-on-target" style="font-size: 1.5rem; font-weight: 700; color: #f39c12;">Loading...</p>
-            </div>
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--primary-color);"><h4 style="margin-bottom: 5px;">Total Sales (RM)</h4><p id="admin-total-sales" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">Loading...</p></div>
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--success-color);"><h4 style="margin-bottom: 5px;">Total CC</h4><p id="admin-total-cc" style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">Loading...</p></div>
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--secondary-color);"><h4 style="margin-bottom: 5px;">Agents On Target</h4><p id="admin-agents-on-target" style="font-size: 1.5rem; font-weight: 700; color: #f39c12;">Loading...</p></div>
         </div>
-
         <h3>Agent Performance Chart</h3>
-        <div style="background: white; padding: 20px; border-radius: var(--border-radius-lg);">
-            <canvas id="performanceChart" height="100"></canvas>
-        </div>
-
+        <div style="background: white; padding: 20px; border-radius: var(--border-radius-lg);"><canvas id="performanceChart" height="100"></canvas></div>
         <h3 style="margin-top:30px;">Team Breakdown</h3>
         <div id="admin-data-table" style="margin-top: 20px;"></div>
     </div>
@@ -396,10 +376,10 @@
 
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE (Full Features)
+// AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE
 // =================================================================
 // CRITICAL: Ensure this URL matches your latest Code.gs deployment!
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIm-38dyJKGd_v1RRR9vHTTE35_4dQ2hrQcla2UyehtgQtMCNcKggjaK2KlL5EsBVMPg/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXqRwlUjpA14vRLltd5qiPmGADOFJTmQ-4lGEcLkW-YSBaWUtNIu7BVDmAaw1CUPWkJw/exec'; 
 
 // --- Global State Variables ---
 let products = [];
@@ -428,8 +408,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
     document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
-    
-    // NEW NAV LISTENERS
     document.getElementById('nav-profile-btn').addEventListener('click', () => showView('profile-view'));
     document.getElementById('nav-team-btn').addEventListener('click', () => showView('team-view'));
     document.getElementById('nav-admin-dashboard-btn').addEventListener('click', () => showView('admin-dashboard-view'));
@@ -519,7 +497,7 @@ async function handleLogin() {
     }
 }
 
-// NEW: Function to Render Profile Tab
+// NEW: Profile Render Function
 function renderProfileView() {
     // Static Info
     document.getElementById('prof-name').value = currentAgent.name;
@@ -602,40 +580,21 @@ async function handleChangePassword() {
     const statusEl = document.getElementById('password-change-status');
     const changeBtn = document.getElementById('change-password-btn');
 
-    if (newPassword.length < 6) {
-        statusEl.textContent = "Password must be at least 6 characters.";
-        statusEl.style.color = 'var(--danger-color)';
-        return;
-    }
-    if (newPassword !== confirmPassword) {
-        statusEl.textContent = "Passwords do not match.";
-        statusEl.style.color = 'var(--danger-color)';
-        return;
-    }
+    if (newPassword.length < 6) { statusEl.textContent = "Password must be at least 6 characters."; statusEl.style.color = 'var(--danger-color)'; return; }
+    if (newPassword !== confirmPassword) { statusEl.textContent = "Passwords do not match."; statusEl.style.color = 'var(--danger-color)'; return; }
 
-    changeBtn.disabled = true;
-    statusEl.textContent = "Updating password...";
-    statusEl.style.color = 'var(--dark-text)';
+    changeBtn.disabled = true; statusEl.textContent = "Updating password..."; statusEl.style.color = 'var(--dark-text)';
 
     try {
-        const response = await postToGoogleScript('updatePassword', { 
-            agentId: currentAgent.id,
-            newPassword: newPassword
-        });
-
+        const response = await postToGoogleScript('updatePassword', { agentId: currentAgent.id, newPassword: newPassword });
         if (response.success) {
             statusEl.textContent = "Success! Please log in again.";
             statusEl.style.color = 'var(--success-color)';
             setTimeout(() => { location.reload(); }, 3000); 
-        } else {
-            throw new Error(response.message || "Failed to save password.");
-        }
+        } else { throw new Error(response.message || "Failed to save password."); }
     } catch (error) {
-        statusEl.textContent = `Error: ${error.message}`;
-        statusEl.style.color = 'var(--danger-color)';
-    } finally {
-        changeBtn.disabled = false;
-    }
+        statusEl.textContent = `Error: ${error.message}`; statusEl.style.color = 'var(--danger-color)';
+    } finally { changeBtn.disabled = false; }
 }
 
 async function fetchPortalData() {
@@ -645,31 +604,14 @@ async function fetchPortalData() {
             products = response.products;
             customers = response.customers;
             shippingRules = (response.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend);
-            
             renderProductCatalog();
             renderProductSelectionList();
             renderCustomerDropdown();
-        } else {
-            throw new Error(response.message);
-        }
-    } catch (error) {
-        console.error('Failed to fetch portal data:', error);
-        alert('Could not load essential portal data. Please check F12 console for details.');
-    }
+        } else { throw new Error(response.message); }
+    } catch (error) { console.error(error); alert('Could not load data.'); }
 }
 
-function handleLogout() {
-    currentAgent = null;
-    products = [];
-    customers = [];
-    shippingRules = [];
-    currentOrder = { items: [] };
-    document.getElementById('login-view').classList.remove('hidden');
-    document.getElementById('portal-view').classList.add('hidden');
-    document.getElementById('agent-id-input').value = '';
-    document.getElementById('agent-password-input').value = ''; 
-    document.getElementById('login-status').textContent = '';
-}
+function handleLogout() { location.reload(); }
 
 function refreshPageData() {
     const activeViewElement = document.querySelector('#portal-view .view:not(.hidden)');
@@ -894,25 +836,16 @@ async function renderTeamView() {
 
 // UPDATED: Admin Dashboard with Grouping
 async function renderAdminDashboard() {
-    const dataContainer = document.getElementById('admin-data-container');
-    const totalSalesEl = document.getElementById('admin-total-sales');
-    const totalCCEl = document.getElementById('admin-total-cc');
-    const agentsOnTargetEl = document.getElementById('admin-agents-on-target');
     const dataTable = document.getElementById('admin-data-table');
-
-    dataTable.innerHTML = '<p style="text-align:center;">Loading Admin Data...</p>';
-    totalSalesEl.textContent = '...'; totalCCEl.textContent = '...'; agentsOnTargetEl.textContent = '...';
-
+    dataTable.innerHTML = '<p style="text-align:center;">Loading...</p>';
     try {
         const response = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
 
         if (response.success && response.data.length > 0) {
-            totalSalesEl.textContent = `RM ${response.grandTotalSales.toFixed(2)}`;
-            totalCCEl.textContent = response.grandTotalCC.toFixed(3);
-            let agentsAchieved = response.data.filter(a => a.targetAchieved >= 1).length;
-            agentsOnTargetEl.textContent = `${agentsAchieved} / ${response.data.length}`;
+            document.getElementById('admin-total-sales').textContent = `RM ${response.grandTotalSales.toFixed(2)}`;
+            document.getElementById('admin-total-cc').textContent = response.grandTotalCC.toFixed(3);
+            document.getElementById('admin-agents-on-target').textContent = `${response.data.filter(a => a.targetAchieved >= 1).length} / ${response.data.length}`;
             
-            // Grouping Logic
             const teams = {};
             const noManager = [];
             response.data.forEach(agent => {
