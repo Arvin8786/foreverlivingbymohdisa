@@ -16,10 +16,10 @@
         /* [ 1.0 ] CORE STYLES & VARIABLES */
         /* ================================================================= */
         :root {
-            --primary-color: #1a5276; 
-            --secondary-color: #f39c12; 
-            --success-color: #198754; 
-            --light-gray: #f4f6f8; 
+            --primary-color: #1a5276; /* Deep Navy */
+            --secondary-color: #f39c12; /* Gold Accent */
+            --success-color: #198754; /* Dark Green */
+            --light-gray: #f4f6f8; /* Softer Background */
             --mid-gray: #e9ecef; 
             --dark-text: #333; 
             --light-text: #fff;
@@ -31,64 +31,177 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0;}
         
-        body { font-family: var(--font-family); background: var(--light-gray); color: var(--dark-text); line-height: 1.5; }
+        body { 
+            font-family: var(--font-family); 
+            background: var(--light-gray); 
+            color: var(--dark-text); 
+            line-height: 1.5; 
+        }
         .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
         h1, h2, h3 { color: var(--dark-text); font-weight: 600; }
         h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
         
         /* Buttons */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
-        .btn-primary { background: var(--primary-color); color: var(--light-text); border-radius: 50px; box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3); }
-        .btn-primary:hover:not(:disabled) { background: #113a56; box-shadow: 0 6px 12px rgba(26, 82, 118, 0.4); transform: translateY(-2px); }
-        .btn-secondary { background: var(--mid-gray); color: var(--dark-text); border-radius: var(--border-radius-sm); }
+        .btn { 
+            display: inline-flex; align-items: center; justify-content: center; 
+            padding: 12px 25px; 
+            font-weight: 600; border: none; cursor: pointer; 
+            transition: all 0.2s ease; font-size: 1rem; gap: 8px; 
+        }
+        .btn-primary { 
+            background: var(--primary-color); color: var(--light-text); 
+            border-radius: 50px; /* Pill shape */
+            box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3);
+        }
+        .btn-primary:hover:not(:disabled) { 
+            background: #113a56; 
+            box-shadow: 0 6px 12px rgba(26, 82, 118, 0.4); 
+            transform: translateY(-2px);
+        }
+        .btn-secondary { 
+            background: var(--mid-gray); color: var(--dark-text); 
+            border-radius: var(--border-radius-sm); 
+        }
         .btn-secondary:hover:not(:disabled) { background: #d0d7dd; }
         .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; box-shadow: none; transform: none; }
         
-        /* Cards & Inputs */
-        .card { background: var(--light-text); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; }
-        .card h3 { border-bottom: 2px solid var(--mid-gray); padding-bottom: 10px; margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem; }
+        /* Cards & Form Elements */
+        .card { 
+            background: var(--light-text); 
+            border-radius: var(--border-radius-lg); 
+            box-shadow: var(--shadow-lg); 
+            padding: 30px; 
+            margin-bottom: 25px; 
+        }
+        .card h3 {
+            border-bottom: 2px solid var(--mid-gray);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="password"], select, textarea {
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem;
+        }
         .hidden { display: none !important; }
 
-        /* [ 2.0 ] LOGIN & HEADER */
-        #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1a5276 0%, #34495e 100%); }
-        #login-box { padding: 50px; max-width: 400px; text-align: center; background: #fff; border-radius: 15px; }
+        /* [ 2.0 ] LOGIN & HEADER STYLES */
+        #login-view { 
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; 
+            background: linear-gradient(135deg, #1a5276 0%, #34495e 100%); 
+        }
+        #login-box { 
+            padding: 50px; max-width: 400px; text-align: center; 
+            background: #fff; border-radius: 15px;
+        }
         
-        #portal-view header { padding: 15px 30px; display: flex; align-items: center; }
-        #header-content { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; margin-right: 20px; }
-        .target-bar-container { width: 100%; max-width: 450px; margin-top: 5px; height: 20px; background-color: var(--mid-gray); border-radius: 10px; overflow: hidden; position: relative; }
-        .target-progress { background: linear-gradient(90deg, #f39c12, #ffc107); }
+        #portal-view header { 
+            padding: 15px 30px; 
+            display: flex; 
+            align-items: center;
+        }
+        
+        /* Target Bar Specifics */
+        #header-content {
+            display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; margin-right: 20px;
+        }
+        .target-bar-container {
+            width: 100%; max-width: 450px; margin-top: 5px; height: 20px;
+            background-color: var(--mid-gray); border-radius: 10px; overflow: hidden; position: relative;
+        }
+        .target-progress { background: linear-gradient(90deg, #f39c12, #ffc107); } /* Gold progress bar */
         .target-text { font-size: 0.8rem; line-height: 20px; color: #000; }
         
-        /* Navigation */
-        #portal-view nav { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 25px; background-color: var(--primary-color); border-radius: var(--border-radius-sm); overflow: hidden; box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3); }
-        #portal-view nav .btn { background: transparent; color: var(--light-text); border: none; border-radius: 0; flex-grow: 1; padding: 15px 20px; }
-        #portal-view nav .btn.active { background: var(--secondary-color); color: var(--dark-text); box-shadow: none; }
-        #portal-view nav .btn:hover:not(.active) { background: rgba(255, 255, 255, 0.1); }
+        /* Redesigned Navigation Bar */
+        #portal-view nav { 
+            display: flex; flex-wrap: wrap; gap: 0; 
+            margin-bottom: 25px; 
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3);
+        }
+        #portal-view nav .btn { 
+            background: transparent;
+            color: var(--light-text);
+            border: none;
+            border-radius: 0;
+            flex-grow: 1;
+            padding: 15px 20px;
+        }
+        #portal-view nav .btn.active { 
+            background: var(--secondary-color); 
+            color: var(--dark-text);
+            box-shadow: none;
+        }
+        #portal-view nav .btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+        }
         #portal-view nav .btn.hidden { display: none; }
 
-        /* [ 3.0 ] DATA TABLES & FORMS */
+
+        /* [ 3.0 ] ORDER CREATION & DATA TABLES */
         #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
+        
+        /* Product List Styling */
         #product-selection-list { max-height: 500px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
         .product-item-selectable { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid var(--mid-gray); cursor: pointer; transition: background 0.1s; }
         .product-item-selectable:hover { background: #f0f8ff; }
-        .product-item-selectable img { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; }
-        
-        #summary-items-list .summary-item { display: grid; grid-template-columns: 1fr 60px 80px 30px; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--mid-gray); }
+        .product-item-selectable img { 
+            width: 50px; 
+            height: 50px; 
+            object-fit: contain; 
+            border-radius: 4px; 
+        }
+
+        /* Order Summary Inputs */
+        #summary-items-list .summary-item { 
+            display: grid; 
+            grid-template-columns: 1fr 60px 80px 30px; 
+            align-items: center; 
+            gap: 10px; 
+            padding: 10px 0; 
+            border-bottom: 1px dashed var(--mid-gray); 
+        }
         .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; }
         .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
         .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
 
+        /* Data Tables */
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
         th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
-        
+
         /* [ 4.0 ] PROFILE GRID STYLES (NEW) */
-        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .profile-item label { font-weight: 600; display: block; color: #666; margin-bottom: 2px; }
-        .profile-item input { background: #f9f9f9; width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
-        .profile-item input:disabled { background: #eee; color: #777; cursor: not-allowed; border: none; }
-        .profile-item input:enabled { background: #fff; border: 1px solid var(--primary-color); }
+        .profile-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+        }
+        .profile-item {
+            margin-bottom: 15px;
+        }
+        .profile-item label { 
+            font-weight: 600; 
+            display: block; 
+            color: #666; 
+            margin-bottom: 5px; 
+        }
+        .profile-item input { 
+            background: #f9f9f9; 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 6px; 
+        }
+        .profile-item input:disabled { 
+            background: #eee; 
+            color: #777; 
+            cursor: not-allowed; 
+            border: none; 
+        }
+        .profile-item input:enabled { 
+            background: #fff; 
+            border: 1px solid var(--primary-color); 
+        }
 
         @media (max-width: 1000px) {
             #order-creation-workflow { grid-template-columns: 1fr; }
@@ -107,7 +220,9 @@
         <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
             <input type="text" id="agent-id-input" placeholder="Agent ID" required>
             <input type="password" id="agent-password-input" placeholder="Password" required> 
-            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
             <p id="login-status"></p>
         </form>
     </div>
@@ -120,7 +235,9 @@
         <p style="color: var(--danger-color); font-weight: 600;">For security, you must change your default password immediately.</p>
         <input type="password" id="new-password-input" placeholder="New Password" required>
         <input type="password" id="confirm-password-input" placeholder="Confirm New Password" required>
-        <button id="change-password-btn" class="btn btn-primary" style="width:100%;">Set New Password</button>
+        <button id="change-password-btn" class="btn btn-primary" style="width:100%;">
+            Set New Password
+        </button>
         <p id="password-change-status" style="margin-top: 15px;"></p>
     </div>
 </div>
@@ -130,7 +247,7 @@
         <div id="header-content">
             <h2 id="agent-welcome-header"></h2>
             <p id="agent-details-display" style="font-size: 1.1rem; color: #555; font-weight: 500; margin-top: -10px; margin-bottom: 15px;"></p>
-            
+
             <div id="target-bar-display"></div>
             <button id="refresh-data-btn" class="btn btn-secondary" style="margin-top: 10px; padding: 5px 10px;">
                 <i class="fa-solid fa-arrows-rotate"></i> Refresh Data
@@ -147,7 +264,7 @@
         <button id="nav-profile-btn" class="btn"><i class="fa-solid fa-id-card"></i> My Profile</button>
         <button id="nav-team-btn" class="btn hidden"><i class="fa-solid fa-users"></i> My Team</button> 
         <button id="nav-admin-dashboard-btn" class="btn hidden"><i class="fa-solid fa-user-shield"></i> Admin Dashboard</button> 
-        </nav>
+    </nav>
 
     <div id="create-order-view" class="view">
         <div id="order-creation-workflow">
@@ -165,6 +282,7 @@
                         <textarea id="new-customer-address" placeholder="Customer Address" rows="3" required></textarea>
                     </div>
                 </div>
+
                 <div class="card">
                     <h3>Product Selection</h3>
                     <input type="text" id="product-order-search" placeholder="Search product name or SKU...">
@@ -194,7 +312,10 @@
 
     <div id="products-view" class="view hidden card">
         <h2>Product Catalog</h2>
-        <table><thead><tr><th>SKU</th><th>Name</th><th>RSP (RM)</th><th>CC</th></tr></thead><tbody id="product-catalog-table"></tbody></table>
+        <table>
+            <thead><tr><th>SKU</th><th>Name</th><th>RSP (RM)</th><th>CC</th></tr></thead>
+            <tbody id="product-catalog-table"></tbody>
+        </table>
     </div>
 
     <div id="my-orders-view" class="view hidden card">
@@ -204,7 +325,7 @@
     
     <div id="my-commission-view" class="view hidden card">
         <h2>My Commission Records</h2>
-        <p>Review your processed commission payouts and team overrides.</p>
+        <p>Review your processed commission and team override payouts.</p>
         <div id="my-commission-list"></div>
     </div>
 
@@ -216,22 +337,22 @@
         <p id="profile-status" style="text-align:right; font-size:0.9rem; margin-top:-10px;"></p>
         <div class="profile-grid">
             <div class="profile-section">
-                <h4>Personal Info</h4>
+                <h4 style="color:var(--primary-color); margin-bottom:15px;">Personal Info</h4>
                 <div class="profile-item"><label>Full Name</label><input id="prof-name" disabled></div>
                 <div class="profile-item"><label>Agent ID</label><input id="prof-id" disabled></div>
                 <div class="profile-item"><label>Position</label><input id="prof-pos" disabled></div>
             </div>
             <div class="profile-section">
-                <h4>Work Info</h4>
+                <h4 style="color:var(--primary-color); margin-bottom:15px;">Work Info</h4>
                 <div class="profile-item"><label>Commission Rate</label><input id="prof-rate" disabled></div>
                 <div class="profile-item"><label>Monthly Target</label><input id="prof-target" disabled></div>
-                <div class="profile-item"><label>Manager ID</label><input id="prof-mgr" disabled></div>
+                <div class="profile-item"><label>Reporting To</label><input id="prof-mgr" disabled></div>
             </div>
             <div class="profile-section">
-                <h4>Payment Details <span id="edit-badge" style="font-size:0.8em; color:var(--secondary-color); display:none;">(Editable)</span></h4>
-                <div class="profile-item"><label>Bank Name</label><input id="prof-bank" disabled></div>
-                <div class="profile-item"><label>Account Holder</label><input id="prof-holder" disabled></div>
-                <div class="profile-item"><label>Account Number</label><input id="prof-acc" disabled></div>
+                <h4 style="color:var(--primary-color); margin-bottom:15px;">Payment Details <span id="edit-badge" style="font-size:0.8em; color:var(--secondary-color); display:none;">(Editable)</span></h4>
+                <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bank" disabled></div>
+                <div class="profile-item"><label>Account Holder</label><input type="text" id="prof-holder" disabled></div>
+                <div class="profile-item"><label>Account Number</label><input type="text" id="prof-acc" disabled></div>
             </div>
         </div>
     </div>
@@ -249,12 +370,25 @@
     <div id="admin-dashboard-view" class="view hidden card">
         <h2>Admin Dashboard: Performance Overview</h2>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
-            <div class="card" style="padding: 15px; border-top: 4px solid var(--primary-color);"><h4 style="margin-bottom: 5px;">Total Sales (RM)</h4><p id="admin-total-sales" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">Loading...</p></div>
-            <div class="card" style="padding: 15px; border-top: 4px solid var(--success-color);"><h4 style="margin-bottom: 5px;">Total CC</h4><p id="admin-total-cc" style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">Loading...</p></div>
-            <div class="card" style="padding: 15px; border-top: 4px solid var(--secondary-color);"><h4 style="margin-bottom: 5px;">Agents On Target</h4><p id="admin-agents-on-target" style="font-size: 1.5rem; font-weight: 700; color: #f39c12;">Loading...</p></div>
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--primary-color);">
+                <h4 style="margin-bottom: 5px;">Total Sales (RM)</h4>
+                <p id="admin-total-sales" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">Loading...</p>
+            </div>
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--success-color);">
+                <h4 style="margin-bottom: 5px;">Total CC</h4>
+                <p id="admin-total-cc" style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">Loading...</p>
+            </div>
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--secondary-color);">
+                <h4 style="margin-bottom: 5px;">Agents On Target</h4>
+                <p id="admin-agents-on-target" style="font-size: 1.5rem; font-weight: 700; color: #f39c12;">Loading...</p>
+            </div>
         </div>
+
         <h3>Agent Performance Chart</h3>
-        <div style="background: white; padding: 20px; border-radius: var(--border-radius-lg);"><canvas id="performanceChart" height="100"></canvas></div>
+        <div style="background: white; padding: 20px; border-radius: var(--border-radius-lg);">
+            <canvas id="performanceChart" height="100"></canvas>
+        </div>
+
         <h3 style="margin-top:30px;">Team Breakdown</h3>
         <div id="admin-data-table" style="margin-top: 20px;"></div>
     </div>
@@ -262,23 +396,40 @@
 
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - FINAL COMPLETE (No Omissions)
+// AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE (Full Features)
 // =================================================================
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbycr_yrtuMOzcfE5ZVaevMNoycS9LqL7gmt37Biz7WPQLcVQkdHwktxJ0PVd09RuRBzfQ/exec';
+// CRITICAL: Ensure this URL matches your latest Code.gs deployment!
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIm-38dyJKGd_v1RRR9vHTTE35_4dQ2hrQcla2UyehtgQtMCNcKggjaK2KlL5EsBVMPg/exec';
 
-let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
-let currentProfile = {}, canEditProfile = false;
+// --- Global State Variables ---
+let products = [];
+let customers = [];
+let shippingRules = [];
+let currentAgent = null; 
+let currentOrder = { items: [] };
+let performanceChartInstance = null; 
+let currentProfile = {}; 
+let canEditProfile = false;
 
+// =================================================================
+// [ 2.0 ] INITIALIZATION & EVENT LISTENERS
+// =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('login-form').addEventListener('submit', (event) => { event.preventDefault(); handleLogin(); });
+    document.getElementById('login-form').addEventListener('submit', (event) => { 
+        event.preventDefault(); 
+        handleLogin(); 
+    });
+    
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
     document.getElementById('refresh-data-btn').addEventListener('click', refreshPageData);
 
+    // Navigation Listeners
     document.getElementById('nav-create-order-btn').addEventListener('click', () => showView('create-order-view'));
     document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
     document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
-    // NEW LISTENERS
+    
+    // NEW NAV LISTENERS
     document.getElementById('nav-profile-btn').addEventListener('click', () => showView('profile-view'));
     document.getElementById('nav-team-btn').addEventListener('click', () => showView('team-view'));
     document.getElementById('nav-admin-dashboard-btn').addEventListener('click', () => showView('admin-dashboard-view'));
@@ -290,14 +441,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('product-order-search').addEventListener('keyup', renderProductSelectionList);
 });
 
+// =================================================================
+// [ 3.0 ] LOGIN, LOGOUT & DATA FETCHING
+// =================================================================
 async function handleLogin() {
     const agentId = document.getElementById('agent-id-input').value.trim();
     const password = document.getElementById('agent-password-input').value; 
     const loginBtn = document.getElementById('login-btn');
     const loginStatus = document.getElementById('login-status');
     
-    if (!agentId || !password) { loginStatus.textContent = "ID and Password are required."; loginStatus.style.color = 'var(--danger-color)'; return; }
-    loginBtn.disabled = true; loginStatus.textContent = "Verifying..."; loginStatus.style.color = 'var(--dark-text)';
+    if (!agentId || !password) { 
+        loginStatus.textContent = "ID and Password are required."; 
+        loginStatus.style.color = 'var(--danger-color)'; 
+        return; 
+    }
+    loginBtn.disabled = true; 
+    loginStatus.textContent = "Verifying..."; 
+    loginStatus.style.color = 'var(--dark-text)';
 
     try {
         const response = await postToGoogleScript('verifyAgent', { agentId, password });
@@ -307,11 +467,12 @@ async function handleLogin() {
             currentAgent.currentSales = parseFloat(response.currentSales) || 0; 
             currentAgent.isAdmin = response.isAdmin || false;
             
-            // NEW: Store profile and manager status
+            // NEW: Capture new response data
             currentProfile = response.profile;
             currentAgent.isManager = response.isManager || false;
             canEditProfile = response.allowEdit || false;
             
+            // --- SECURITY CHECK ---
             if (response.mustChangePassword) {
                  document.getElementById('login-view').classList.add('hidden');
                  document.getElementById('password-change-view').classList.remove('hidden');
@@ -324,44 +485,54 @@ async function handleLogin() {
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
             
-            // NEW: Update Header Display
+            // NEW: Set Header Display with Name, ID, Position
             document.getElementById('agent-welcome-header').textContent = `${currentAgent.name} (${currentAgent.id})`;
             document.getElementById('agent-details-display').textContent = `${response.position} | ID: ${currentAgent.id}`;
             
-            // NEW: Show/Hide Buttons
-            if (currentAgent.isAdmin) document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
-            else document.getElementById('nav-admin-dashboard-btn').classList.add('hidden');
+            // FIX: Show/Hide Role Buttons
+            if (currentAgent.isAdmin) {
+                document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('nav-admin-dashboard-btn').classList.add('hidden');
+            }
             
-            if (currentAgent.isManager) document.getElementById('nav-team-btn').classList.remove('hidden');
-            else document.getElementById('nav-team-btn').classList.add('hidden');
+            if (currentAgent.isManager) {
+                document.getElementById('nav-team-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('nav-team-btn').classList.add('hidden');
+            }
 
-            // NEW: Initialize Profile Data
+            // Pre-fill Profile
             renderProfileView();
-
             renderTargetBar(); 
             showView('create-order-view'); 
         } else {
-            loginStatus.textContent = response.message;
+            loginStatus.textContent = response.message || "Login failed. Check credentials.";
             loginStatus.style.color = 'var(--danger-color)';
         }
     } catch (error) {
-        loginStatus.textContent = "Connection failed.";
+        loginStatus.textContent = "Connection failed. Please check internet.";
         loginStatus.style.color = 'var(--danger-color)';
+        console.error("Login failed:", error);
     } finally {
         loginBtn.disabled = false;
     }
 }
 
-// NEW: Profile Render Function
+// NEW: Function to Render Profile Tab
 function renderProfileView() {
+    // Static Info
     document.getElementById('prof-name').value = currentAgent.name;
     document.getElementById('prof-id').value = currentAgent.id;
-    // Parse position from header just in case
-    document.getElementById('prof-pos').value = document.getElementById('agent-details-display').textContent.split('|')[0].trim();
+    // Try to get position from header text, or fallback to profile object if available
+    const posText = document.getElementById('agent-details-display').textContent.split('|')[0].trim();
+    document.getElementById('prof-pos').value = posText;
+    
     document.getElementById('prof-rate').value = currentProfile.commissionRate;
     document.getElementById('prof-target').value = `RM ${currentProfile.target}`;
     document.getElementById('prof-mgr').value = currentProfile.managerId;
     
+    // Editable Info
     const bank = document.getElementById('prof-bank');
     const holder = document.getElementById('prof-holder');
     const acc = document.getElementById('prof-acc');
@@ -372,22 +543,29 @@ function renderProfileView() {
     holder.value = currentProfile.accHolder;
     acc.value = currentProfile.accNumber;
 
+    // Check Permission
     if(canEditProfile) {
-        bank.disabled = holder.disabled = acc.disabled = false;
+        bank.disabled = false;
+        holder.disabled = false;
+        acc.disabled = false;
         saveBtn.classList.remove('hidden');
         badge.style.display = 'inline';
     } else {
-        bank.disabled = holder.disabled = acc.disabled = true;
+        bank.disabled = true;
+        holder.disabled = true;
+        acc.disabled = true;
         saveBtn.classList.add('hidden');
         badge.style.display = 'none';
     }
 }
 
-// NEW: Save Profile Function
+// NEW: Function to Save Profile
 async function saveProfile() {
     const btn = document.getElementById('save-profile-btn');
     const status = document.getElementById('profile-status');
-    btn.textContent = "Saving..."; btn.disabled = true; status.textContent = "";
+    btn.textContent = "Saving...";
+    btn.disabled = true;
+    status.textContent = "";
     
     const payload = {
         agentId: currentAgent.id,
@@ -413,7 +591,8 @@ async function saveProfile() {
         status.style.color = 'red';
         status.textContent = "Error connecting to server.";
     } finally {
-        btn.textContent = "Save Changes"; btn.disabled = false;
+        btn.textContent = "Save Changes";
+        btn.disabled = false;
     }
 }
 
@@ -423,21 +602,40 @@ async function handleChangePassword() {
     const statusEl = document.getElementById('password-change-status');
     const changeBtn = document.getElementById('change-password-btn');
 
-    if (newPassword.length < 6) { statusEl.textContent = "Password must be at least 6 characters."; statusEl.style.color = 'var(--danger-color)'; return; }
-    if (newPassword !== confirmPassword) { statusEl.textContent = "Passwords do not match."; statusEl.style.color = 'var(--danger-color)'; return; }
+    if (newPassword.length < 6) {
+        statusEl.textContent = "Password must be at least 6 characters.";
+        statusEl.style.color = 'var(--danger-color)';
+        return;
+    }
+    if (newPassword !== confirmPassword) {
+        statusEl.textContent = "Passwords do not match.";
+        statusEl.style.color = 'var(--danger-color)';
+        return;
+    }
 
-    changeBtn.disabled = true; statusEl.textContent = "Updating password..."; statusEl.style.color = 'var(--dark-text)';
+    changeBtn.disabled = true;
+    statusEl.textContent = "Updating password...";
+    statusEl.style.color = 'var(--dark-text)';
 
     try {
-        const response = await postToGoogleScript('updatePassword', { agentId: currentAgent.id, newPassword: newPassword });
+        const response = await postToGoogleScript('updatePassword', { 
+            agentId: currentAgent.id,
+            newPassword: newPassword
+        });
+
         if (response.success) {
             statusEl.textContent = "Success! Please log in again.";
             statusEl.style.color = 'var(--success-color)';
             setTimeout(() => { location.reload(); }, 3000); 
-        } else { throw new Error(response.message || "Failed to save password."); }
+        } else {
+            throw new Error(response.message || "Failed to save password.");
+        }
     } catch (error) {
-        statusEl.textContent = `Error: ${error.message}`; statusEl.style.color = 'var(--danger-color)';
-    } finally { changeBtn.disabled = false; }
+        statusEl.textContent = `Error: ${error.message}`;
+        statusEl.style.color = 'var(--danger-color)';
+    } finally {
+        changeBtn.disabled = false;
+    }
 }
 
 async function fetchPortalData() {
@@ -447,33 +645,63 @@ async function fetchPortalData() {
             products = response.products;
             customers = response.customers;
             shippingRules = (response.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend);
+            
             renderProductCatalog();
             renderProductSelectionList();
             renderCustomerDropdown();
-        } else { throw new Error(response.message); }
-    } catch (error) { console.error(error); alert('Could not load data.'); }
+        } else {
+            throw new Error(response.message);
+        }
+    } catch (error) {
+        console.error('Failed to fetch portal data:', error);
+        alert('Could not load essential portal data. Please check F12 console for details.');
+    }
 }
 
-function handleLogout() { location.reload(); }
+function handleLogout() {
+    currentAgent = null;
+    products = [];
+    customers = [];
+    shippingRules = [];
+    currentOrder = { items: [] };
+    document.getElementById('login-view').classList.remove('hidden');
+    document.getElementById('portal-view').classList.add('hidden');
+    document.getElementById('agent-id-input').value = '';
+    document.getElementById('agent-password-input').value = ''; 
+    document.getElementById('login-status').textContent = '';
+}
 
 function refreshPageData() {
-    const activeView = document.querySelector('.view:not(.hidden)');
-    if(!activeView) return;
-    const btn = document.getElementById('refresh-data-btn');
-    btn.innerHTML = 'Refreshing...'; btn.disabled = true;
-    
-    const pwd = document.getElementById('agent-password-input').value;
-    postToGoogleScript('verifyAgent', {agentId:currentAgent.id, password:pwd}).then(res => {
-        if(res.success) {
-            currentAgent.currentSales = res.currentSales;
-            currentAgent.target = res.target;
-            renderTargetBar();
-            showView(activeView.id); // Reload current view data
-        }
-    }).finally(() => {
-        setTimeout(() => { btn.innerHTML = 'Refresh Data'; btn.disabled = false; }, 500);
-    });
+    const activeViewElement = document.querySelector('#portal-view .view:not(.hidden)');
+    if (!activeViewElement) return;
+    const activeViewId = activeViewElement.id;
+    const refreshBtn = document.getElementById('refresh-data-btn');
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Refreshing...';
+
+    const currentPassword = document.getElementById('agent-password-input').value;
+    postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: currentPassword })
+        .then(res => {
+            if (res.success) {
+                currentAgent.target = parseFloat(res.target) || 0; 
+                currentAgent.currentSales = parseFloat(res.currentSales) || 0; 
+                renderTargetBar();
+            }
+        })
+        .finally(() => {
+            if (activeViewId) {
+                showView(activeViewId); 
+            }
+            setTimeout(() => {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Refresh Data';
+            }, 1000);
+        });
 }
+
+// =================================================================
+// [ 4.0 ] UI RENDERING (Target Bar and Commissions)
+// =================================================================
 
 function showView(viewId) {
     document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
@@ -481,156 +709,282 @@ function showView(viewId) {
 
     const view = document.getElementById(viewId);
     const btn = document.getElementById(`nav-${viewId.replace('-view', '-btn')}`);
+    
     if(view) view.classList.remove('hidden');
     if(btn) btn.classList.add('active');
 
     if (viewId === 'my-orders-view') renderMyOrders();
     if (viewId === 'my-commission-view') renderMyCommission();
-    if (viewId === 'team-view') renderTeamView();
+    if (viewId === 'team-view') renderTeamView(); // NEW
     if (viewId === 'admin-dashboard-view') renderAdminDashboard();
-    if (viewId === 'profile-view') renderProfileView();
+    if (viewId === 'profile-view') renderProfileView(); // NEW
 }
 
 function renderTargetBar() {
     const container = document.getElementById('target-bar-display');
-    const pct = Math.min(100, currentAgent.target > 0 ? (currentAgent.currentSales / currentAgent.target) * 100 : 0);
+    const sales = currentAgent.currentSales;
+    const target = currentAgent.target;
+    const pct = Math.min(100, target > 0 ? (sales / target) * 100 : 0);
+
     container.innerHTML = `
-        <div style="font-size: 0.9rem; margin-bottom: 5px;">Target: **RM ${currentAgent.currentSales.toFixed(2)}** / RM ${currentAgent.target.toFixed(2)} (${pct.toFixed(1)}%)</div>
-        <div class="target-bar-container"><div class="target-progress" style="width: ${pct}%;"></div></div>`;
+        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+            Monthly Target: **RM ${sales.toFixed(2)}** / RM ${target.toFixed(2)}
+            (${pct.toFixed(1)}%)
+        </div>
+        <div class="target-bar-container">
+            <div class="target-text">
+                RM ${sales.toFixed(2)} / RM ${target.toFixed(2)}
+            </div>
+            <div class="target-progress" style="width: ${pct}%;"></div>
+        </div>
+    `;
 }
 
 function renderProductCatalog() { 
-    document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join('');
+    const container = document.getElementById('product-catalog-table');
+    container.innerHTML = products.map(p => `
+        <tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>
+    `).join('');
 }
 
 function renderProductSelectionList() { 
-    const term = document.getElementById('product-order-search').value.toLowerCase();
-    const filtered = products.filter(p => p.name.toLowerCase().includes(term) || String(p.id).toLowerCase().includes(term));
-    document.getElementById('product-selection-list').innerHTML = filtered.length ? filtered.map(p => `
+    const container = document.getElementById('product-selection-list');
+    const searchTerm = document.getElementById('product-order-search').value.toLowerCase();
+    const filteredProducts = products.filter(p => p.name.toLowerCase().includes(searchTerm) || String(p.id).toLowerCase().includes(searchTerm));
+
+    if (filteredProducts.length === 0) {
+        container.innerHTML = "<p style='padding: 15px; text-align: center;'>No products found.</p>";
+        return;
+    }
+    container.innerHTML = filteredProducts.map(p => `
         <div class="product-item-selectable" onclick="addProductToOrder(${p.id})">
-            <img src="${p.image || 'FL.jpg'}" onerror="this.style.display='none'">
-            <div><strong>${p.name} (${p.id})</strong><p style="font-size:0.85rem">RSP: RM ${p.rsp.toFixed(2)}</p></div>
-            <button class="btn btn-primary" style="pointer-events:none">Add</button>
-        </div>`).join('') : "<p style='padding:15px;text-align:center'>No products.</p>";
+            <img src="${p.image || 'FL.jpg'}" alt="${p.name}" onerror="this.style.display='none';">
+            <div>
+                <strong>${p.name} (${p.id})</strong>
+                <p style="font-size: 0.85rem; color: #6c757d;">RSP: RM ${p.rsp.toFixed(2)}</p>
+            </div>
+            <button class="btn btn-primary" style="pointer-events: none;">Add</button>
+        </div>
+    `).join('');
 }
 
 function renderCustomerDropdown() { 
     const select = document.getElementById('customer-dropdown');
-    select.innerHTML = `<option value="">-- Select Existing Customer --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join('');
+    select.innerHTML = `<option value="">-- Select Existing Customer --</option>`;
+    customers.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.pac;
+        option.textContent = `${c.name} (${c.phone || c.email})`;
+        select.appendChild(option);
+    });
 }
 
 function renderOrderSummary() { 
     const container = document.getElementById('summary-items-list');
-    if (currentOrder.items.length === 0) { container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products to begin.</p>"; } 
-    else {
+    if (currentOrder.items.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products to begin.</p>";
+    } else {
         container.innerHTML = currentOrder.items.map(item => {
             const isInvalid = item.customPrice < item.minPrice;
-            return `<div class="summary-item">
-                <div class="summary-item-info"><strong>${item.name}</strong><div class="price-error-message">${isInvalid ? `Min: RM ${item.minPrice.toFixed(2)}` : ''}</div></div>
-                <input type="number" value="${item.quantity}" onchange="updateQuantity(${item.id}, this.value)" style="width:60px">
-                <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice(${item.id}, this.value)" class="${isInvalid?'price-input-invalid':''}" style="width:80px">
-                <span onclick="removeItemFromOrder(${item.id})" style="cursor:pointer; color:var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
-            </div>`;
-        }).join('');
+            return `
+            <div class="summary-item" data-id="${item.id}">
+                <div class="summary-item-info">
+                    <strong>${item.name}</strong>
+                    <div class="price-error-message">${isInvalid ? `Min: RM ${item.minPrice.toFixed(2)}` : ''}</div>
+                </div>
+                <input type="number" value="${item.quantity}" onchange="updateQuantity(${item.id}, this.value)" title="Quantity" style="width: 60px;">
+                <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice(${item.id}, this.value)" class="${isInvalid ? 'price-input-invalid' : ''}" title="Custom Price" style="width: 80px;">
+                <span onclick="removeItemFromOrder(${item.id})" style="cursor:pointer; text-align:center; color: var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
+            </div>
+        `}).join('');
     }
     calculateTotals();
 }
 
 async function renderMyOrders() {
     const container = document.getElementById('my-orders-list');
-    container.innerHTML = '<p>Loading...</p>';
+    container.innerHTML = '<p>Loading orders...</p>';
     try {
-        const res = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
-        container.innerHTML = res.orders.length ? `<table><thead><tr><th>ID</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>${res.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>${o.customerName}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>`).join('')}</tbody></table>` : '<p>No orders found.</p>';
-    } catch(e) { container.innerHTML = '<p>Error loading orders.</p>'; }
+        const response = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
+        if (response.success && response.orders.length > 0) {
+            container.innerHTML = `
+                <table class="my-orders-table">
+                    <thead><tr><th>Invoice ID</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+                    <tbody>${response.orders.map(o => `
+                        <tr><td>${o.invoiceId}</td><td>${o.date}</td><td>${o.customerName}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>
+                    `).join('')}</tbody>
+                </table>`;
+        } else {
+            container.innerHTML = '<p>No past orders found.</p>';
+        }
+    } catch(e) { container.innerHTML = `<p style="color:var(--danger-color);">Could not load orders. Error: ${e.message}</p>`; }
 }
 
-// UPDATED: Render Commission with Override & Status
+// UPDATED: Shows Status and Overrides
 function renderMyCommission() {
     const container = document.getElementById('my-commission-list');
-    container.innerHTML = '<p>Loading...</p>';
-    postToGoogleScript('getAgentCommission', { agentId: currentAgent.id }).then(res => {
-        if (res.records.length) {
-            container.innerHTML = `<table><thead><tr><th>Invoice</th><th>Type</th><th>Sales (RM)</th><th>Rate</th><th>Earned (RM)</th><th>Status</th></tr></thead><tbody>
-            ${res.records.map(r => {
-                const isOverride = String(r.invoiceId).includes("(TEAM)");
-                return `<tr>
-                    <td>${r.invoiceId}</td>
-                    <td>${isOverride ? 'Team Override' : 'Personal Sale'}</td>
-                    <td>${isOverride ? '-' : r.salesAmount.toFixed(2)}</td>
-                    <td>${isOverride ? '-' : r.commissionRate + '%'}</td>
-                    <td><strong>${(isOverride ? r.overrideAmount : r.commissionAmount).toFixed(2)}</strong></td>
-                    <td>${r.status}</td>
-                </tr>`;
-            }).join('')}</tbody></table>`;
-        } else { container.innerHTML = '<p>No records found.</p>'; }
-    });
+    container.innerHTML = '<p>Loading records...</p>';
+    
+    postToGoogleScript('getAgentCommission', { agentId: currentAgent.id })
+        .then(response => {
+            if (response.success && response.records.length > 0) {
+                container.innerHTML = `
+                    <table class="commission-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice ID</th>
+                                <th>Type</th>
+                                <th>Sales (RM)</th>
+                                <th>Rate (%)</th>
+                                <th>Earned (RM)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>${response.records.map(r => {
+                            const isOverride = String(r.invoiceId).includes("(TEAM)");
+                            const type = isOverride ? "Team Override" : "Personal Sale";
+                            const earned = isOverride ? r.overrideAmount : r.commissionAmount;
+                            const sales = isOverride ? "-" : r.salesAmount.toFixed(2);
+                            const rate = isOverride ? "-" : r.commissionRate + "%";
+                            return `<tr>
+                                <td>${r.invoiceId}</td>
+                                <td>${type}</td>
+                                <td>${sales}</td>
+                                <td>${rate}</td>
+                                <td><strong>${earned.toFixed(2)}</strong></td>
+                                <td>${r.status}</td>
+                            </tr>`;
+                        }).join('')}
+                        </tbody>
+                    </table>`;
+            } else {
+                container.innerHTML = '<p>No commission records found.</p>';
+            }
+        })
+        .catch(e => {
+            container.innerHTML = `<p style="color:var(--danger-color);">Could not load records.</p>`; 
+        });
 }
 
-// NEW: Render My Team
+// NEW: Render My Team View
 async function renderTeamView() {
     const list = document.getElementById('subordinates-list');
     const overrideEl = document.getElementById('team-total-override');
-    list.innerHTML = '<li>Loading...</li>';
+    list.innerHTML = '<li>Loading team data...</li>';
+    
     try {
-        const res = await postToGoogleScript('getSubordinatesData', { agentId: currentAgent.id });
-        if (res.success) {
-            overrideEl.textContent = `RM ${res.totalOverride.toFixed(2)}`;
-            list.innerHTML = res.subordinates.length ? res.subordinates.map(s => `<li style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;"><span><strong>${s.name}</strong> (${s.id})</span><span style="color:var(--primary-color)">${s.position}</span></li>`).join('') : '<li>No subordinates found.</li>';
+        const response = await postToGoogleScript('getSubordinatesData', { agentId: currentAgent.id });
+        if (response.success) {
+            overrideEl.textContent = `RM ${response.totalOverride.toFixed(2)}`;
+            if(response.subordinates.length === 0) {
+                list.innerHTML = '<li>No direct subordinates found.</li>';
+            } else {
+                list.innerHTML = response.subordinates.map(sub => `
+                    <li style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${sub.name}</strong> <span style="color:#777; font-size:0.9em;">(${sub.id})</span>
+                            <div style="font-size:0.85em; color:var(--primary-color);">${sub.position}</div>
+                        </div>
+                    </li>
+                `).join('');
+            }
         }
     } catch (e) { list.innerHTML = 'Error loading team data.'; }
 }
 
-// UPDATED: Render Admin Dashboard (Grouped)
+// UPDATED: Admin Dashboard with Grouping
 async function renderAdminDashboard() {
-    const div = document.getElementById('admin-data-table');
-    div.innerHTML = '<p style="text-align:center;">Loading...</p>';
+    const dataContainer = document.getElementById('admin-data-container');
+    const totalSalesEl = document.getElementById('admin-total-sales');
+    const totalCCEl = document.getElementById('admin-total-cc');
+    const agentsOnTargetEl = document.getElementById('admin-agents-on-target');
+    const dataTable = document.getElementById('admin-data-table');
+
+    dataTable.innerHTML = '<p style="text-align:center;">Loading Admin Data...</p>';
+    totalSalesEl.textContent = '...'; totalCCEl.textContent = '...'; agentsOnTargetEl.textContent = '...';
+
     try {
-        const res = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
-        if (res.success && res.data.length) {
-            document.getElementById('admin-total-sales').textContent = `RM ${res.grandTotalSales.toFixed(2)}`;
-            document.getElementById('admin-total-cc').textContent = res.grandTotalCC.toFixed(3);
+        const response = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
+
+        if (response.success && response.data.length > 0) {
+            totalSalesEl.textContent = `RM ${response.grandTotalSales.toFixed(2)}`;
+            totalCCEl.textContent = response.grandTotalCC.toFixed(3);
+            let agentsAchieved = response.data.filter(a => a.targetAchieved >= 1).length;
+            agentsOnTargetEl.textContent = `${agentsAchieved} / ${response.data.length}`;
             
-            const teams = {}; const noMgr = [];
-            res.data.forEach(a => { (a.managerId && a.managerId !== "") ? (teams[a.managerId] = teams[a.managerId] || []).push(a) : noMgr.push(a); });
+            // Grouping Logic
+            const teams = {};
+            const noManager = [];
+            response.data.forEach(agent => {
+                if (agent.managerId && agent.managerId !== "") {
+                    if (!teams[agent.managerId]) teams[agent.managerId] = [];
+                    teams[agent.managerId].push(agent);
+                } else {
+                    noManager.push(agent);
+                }
+            });
 
             let html = '';
-            if (noMgr.length) html += `<h3>Independent Agents</h3>${buildAdminTable(noMgr)}`;
-            for (const [mgr, members] of Object.entries(teams)) {
-                html += `<h3 style="margin-top:30px; color:var(--primary-color); border-bottom:2px solid #eee;">Team: ${mgr}</h3>${buildAdminTable(members)}`;
+            if (noManager.length > 0) {
+                html += `<h3>Independent Agents</h3>${buildAdminTable(noManager)}`;
             }
-            div.innerHTML = html;
-            drawChart(res.data);
-        } else { div.innerHTML = '<p>No data.</p>'; }
-    } catch(e) { div.innerHTML = '<p>Error.</p>'; }
+            for (const [mgrId, members] of Object.entries(teams)) {
+                html += `<h3 style="margin-top:30px; color:var(--primary-color); border-bottom:2px solid #eee;">Team: ${mgrId}</h3>${buildAdminTable(members)}`;
+            }
+            dataTable.innerHTML = html;
+            drawPerformanceChart(response.data);
+        } else {
+            dataTable.innerHTML = `<p style="text-align:center;">No agent performance data available.</p>`;
+        }
+    } catch(e) {
+        dataTable.innerHTML = `<p style="color:var(--danger-color); text-align:center;">Error loading admin data.</p>`;
+    }
 }
 
 function buildAdminTable(agents) {
-    return `<table style="width:100%"><thead><tr><th>Name</th><th>Target</th><th>Sales</th><th>Achieved</th></tr></thead><tbody>${agents.map(a => `<tr><td>${a.name}</td><td>RM ${a.target.toFixed(2)}</td><td>RM ${a.totalSales.toFixed(2)}</td><td style="color:${a.targetAchieved>=1?'green':'red'}">${(a.targetAchieved*100).toFixed(1)}%</td></tr>`).join('')}</tbody></table>`;
+    return `<table style="width:100%;"><thead><tr><th>Name</th><th>Target</th><th>Sales</th><th>Achieved</th></tr></thead><tbody>
+    ${agents.map(a => {
+        const achieved = a.targetAchieved * 100;
+        return `<tr>
+            <td>${a.name}</td>
+            <td>${a.target.toFixed(2)}</td>
+            <td>${a.totalSales.toFixed(2)}</td>
+            <td style="color: ${achieved >= 100 ? 'var(--success-color)' : 'var(--danger-color)'}; font-weight: 600;">${achieved.toFixed(1)}%</td>
+        </tr>`;
+    }).join('')}</tbody></table>`;
 }
 
-function drawChart(data) {
+function drawPerformanceChart(data) {
     const ctx = document.getElementById('performanceChart');
     if (performanceChartInstance) performanceChartInstance.destroy();
     performanceChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: data.map(a => a.name),
-            datasets: [{ label: 'Sales (RM)', data: data.map(a => a.totalSales), backgroundColor: 'rgba(0,123,255,0.8)' }]
+            datasets: [{
+                label: 'Total Sales (RM)',
+                data: data.map(a => a.totalSales),
+                backgroundColor: 'rgba(0, 123, 255, 0.8)'
+            }]
         },
         options: { responsive: true }
     });
 }
 
+// =================================================================
+// [ 5.0 ] ORDER CREATION LOGIC 
+// =================================================================
 function startNewOrder() { 
     currentOrder = { items: [] };
     document.getElementById('customer-dropdown').value = '';
     document.getElementById('new-customer-form').classList.add('hidden');
     document.getElementById('customer-dropdown').disabled = false;
+    
     document.getElementById('new-customer-name').value = '';
     document.getElementById('new-customer-email').value = '';
     document.getElementById('new-customer-phone').value = '';
     document.getElementById('new-customer-address').value = '';
+
     document.getElementById('payment-proof').value = '';
     document.getElementById('submit-status').textContent = '';
     document.getElementById('submit-order-btn').disabled = false;
@@ -640,92 +994,212 @@ function handleNewCustomerToggle() {
     const form = document.getElementById('new-customer-form');
     const dropdown = document.getElementById('customer-dropdown');
     form.classList.toggle('hidden');
-    if (!form.classList.contains('hidden')) { dropdown.value = ''; dropdown.disabled = true; } 
-    else { dropdown.disabled = false; }
+    if (!form.classList.contains('hidden')) {
+        dropdown.value = '';
+        dropdown.disabled = true;
+    } else {
+        dropdown.disabled = false;
+    }
 }
 function handleCustomerSelection() {
-    if (document.getElementById('customer-dropdown').value) document.getElementById('new-customer-form').classList.add('hidden');
+    const dropdown = document.getElementById('customer-dropdown');
+    if (dropdown.value) {
+        document.getElementById('new-customer-form').classList.add('hidden');
+        dropdown.disabled = false;
+    }
 }
-function addProductToOrder(id) {
-    const p = products.find(x => x.id === id);
-    if (!p) return;
-    if (!currentOrder.items.some(i => i.id === id)) {
-        currentOrder.items.push({ id: p.id, name: p.name, quantity: 1, rsp: p.rsp, cc: p.cc, customPrice: p.rsp, minPrice: p.minPrice });
+function addProductToOrder(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    if (!currentOrder.items.some(item => item.id === productId)) {
+        currentOrder.items.push({
+            id: product.id,
+            name: product.name,
+            quantity: 1,
+            rsp: product.rsp,
+            cc: product.cc,
+            customPrice: product.rsp,
+            minPrice: product.minPrice 
+        });
     }
     renderOrderSummary();
 }
-function removeItemFromOrder(id) { currentOrder.items = currentOrder.items.filter(i => i.id !== id); renderOrderSummary(); }
-function updateQuantity(id, qty) { const i = currentOrder.items.find(x => x.id === id); if(i) i.quantity = parseInt(qty)||1; renderOrderSummary(); }
-function updatePrice(id, pr) { const i = currentOrder.items.find(x => x.id === id); if(i) i.customPrice = parseFloat(pr)||0; renderOrderSummary(); }
+function removeItemFromOrder(productId) {
+    currentOrder.items = currentOrder.items.filter(item => item.id !== productId);
+    renderOrderSummary();
+}
+function updateQuantity(productId, newQuantity) {
+    const item = currentOrder.items.find(i => i.id === productId);
+    const qty = parseInt(newQuantity, 10);
+    if (item && qty > 0) {
+        item.quantity = qty;
+    } else if (item) {
+        item.quantity = 1; 
+    }
+    renderOrderSummary();
+}
+function updatePrice(productId, newPrice) {
+    const item = currentOrder.items.find(i => i.id === productId);
+    const price = parseFloat(newPrice);
+    if (item && !isNaN(price)) {
+        item.customPrice = price;
+    }
+    renderOrderSummary();
+}
 function calculateTotals() {
-    const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-    const shipRule = shippingRules.find(r => sub >= r.minSpend);
-    const ship = shipRule ? shipRule.charge : 0;
-    document.getElementById('summary-subtotal').textContent = `RM ${sub.toFixed(2)}`;
-    document.getElementById('summary-shipping').textContent = `RM ${ship.toFixed(2)}`;
-    document.getElementById('summary-total').textContent = `RM ${(sub+ship).toFixed(2)}`;
+    const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
+    let shippingFee = 0;
+    const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
+    if (bestRule) shippingFee = bestRule.charge;
+    
+    const finalTotal = subtotal + shippingFee;
+
+    document.getElementById('summary-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
+    document.getElementById('summary-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `RM ${finalTotal.toFixed(2)}`;
 }
 async function submitOrder() {
-    const btn = document.getElementById('submit-order-btn');
-    const status = document.getElementById('submit-status');
-    if(btn.disabled) return;
-    btn.disabled = true; status.textContent = "Validating...";
+    const submitBtn = document.getElementById('submit-order-btn');
+    const statusEl = document.getElementById('submit-status');
     
-    if(!currentOrder.items.length) { status.textContent = "Add products first."; btn.disabled = false; return; }
-    if(currentOrder.items.some(i => i.customPrice < i.minPrice)) { status.textContent = "Price too low."; btn.disabled = false; return; }
-    
-    let cust;
-    const existPac = document.getElementById('customer-dropdown').value;
-    if(existPac) cust = customers.find(c => c.pac === existPac);
-    else {
-        cust = {
-            name: document.getElementById('new-customer-name').value,
-            email: document.getElementById('new-customer-email').value,
-            phone: document.getElementById('new-customer-phone').value,
-            address: document.getElementById('new-customer-address').value
-        };
-        if(!cust.name || !cust.phone) { status.textContent = "Customer details required."; btn.disabled = false; return; }
+    if (submitBtn.disabled) return;
+    submitBtn.disabled = true;
+    statusEl.textContent = "Validating order...";
+    statusEl.style.color = 'var(--dark-text)';
+
+    if (currentOrder.items.length === 0) {
+        statusEl.textContent = "Error: Please add at least one product.";
+        statusEl.style.color = 'var(--danger-color)';
+        submitBtn.disabled = false;
+        return;
+    }
+    if (currentOrder.items.some(item => item.customPrice < item.minPrice)) {
+        statusEl.textContent = "Error: One or more prices are below the allowed minimum.";
+        statusEl.style.color = 'var(--danger-color)';
+        submitBtn.disabled = false;
+        return;
     }
     
-    const file = document.getElementById('payment-proof').files[0];
-    if(!file) { status.textContent = "Payment proof required."; btn.disabled = false; return; }
-    
-    status.textContent = "Uploading...";
+    let customerInfo;
+    const existingCustomerPac = document.getElementById('customer-dropdown').value;
+    if (existingCustomerPac) {
+        customerInfo = customers.find(c => c.pac === existingCustomerPac);
+    } else {
+        customerInfo = {
+            name: document.getElementById('new-customer-name').value.trim(),
+            email: document.getElementById('new-customer-email').value.trim(),
+            phone: document.getElementById('new-customer-phone').value.trim(),
+            address: document.getElementById('new-customer-address').value.trim(),
+        };
+        if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) {
+            statusEl.textContent = "Error: Please fill in all new customer details.";
+            statusEl.style.color = 'var(--danger-color)';
+            submitBtn.disabled = false;
+            return;
+        }
+    }
+
+    const proofFile = document.getElementById('payment-proof').files[0];
+    if (!proofFile) {
+        statusEl.textContent = "Error: Payment proof is required.";
+        statusEl.style.color = 'var(--danger-color)';
+        submitBtn.disabled = false;
+        return;
+    }
+
+    statusEl.textContent = "Uploading proof and submitting...";
     try {
-        const base64 = await getBase64(file);
-        const subtotal = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-        const shipRule = shippingRules.find(r => subtotal >= r.minSpend);
+        const base64File = await getBase64(proofFile);
+        const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
+        let shippingFee = 0;
+        const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
+        if (bestRule) shippingFee = bestRule.charge;
         
         const payload = {
-            action: 'submitAgentOrder',
+            action: 'submitAgentOrder', 
             data: {
-                agent: currentAgent, customer: cust, items: currentOrder.items,
-                shippingFee: shipRule ? shipRule.charge : 0,
-                paymentProof: { file: base64.split(',')[1], mimeType: file.type }
+                agent: currentAgent,
+                customer: customerInfo,
+                items: currentOrder.items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.customPrice, cc: item.cc })),
+                shippingFee: shippingFee,
+                paymentProof: {
+                    file: base64File.split(',')[1],
+                    mimeType: proofFile.type,
+                }
             }
         };
+
+        const response = await postToGoogleScript(payload); 
         
-        const res = await postToGoogleScript(payload);
-        if(res.success) {
-            status.style.color = 'green'; status.textContent = "Success!";
-            setTimeout(startNewOrder, 2000);
-            // Refresh sales
-            postToGoogleScript('verifyAgent', {agentId:currentAgent.id, password:document.getElementById('agent-password-input').value})
-            .then(r => { if(r.success) { currentAgent.currentSales = r.currentSales; renderTargetBar(); }});
-        } else { throw new Error(res.message); }
-    } catch(e) { status.textContent = "Error: " + e.message; btn.disabled = false; }
+        if (response.success) {
+            statusEl.textContent = `Success! Invoice ID: ${response.invoiceId}`;
+            statusEl.style.color = 'var(--success-color)';
+            setTimeout(startNewOrder, 5000);
+            
+            // Refresh Target Bar after sale
+            postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: document.getElementById('agent-password-input').value }).then(res => {
+                 if(res.success) {
+                    currentAgent.currentSales = parseFloat(res.currentSales) || 0;
+                    renderTargetBar();
+                 }
+            });
+        } else {
+            throw new Error(response.message || "An unknown server error occurred.");
+        }
+
+    } catch (error) {
+        statusEl.textContent = `Error: ${error.message}`;
+        statusEl.style.color = 'var(--danger-color)';
+        submitBtn.disabled = false;
+    }
 }
 
+
+// =================================================================
+// [ 6.0 ] UTILITY FUNCTIONS 
+// =================================================================
 async function postToGoogleScript(actionOrPayload, data = {}) {
-    const payload = (typeof actionOrPayload === 'object' && actionOrPayload.action) ? actionOrPayload : { action: actionOrPayload, data: data };
+    const isPayloadObject = typeof actionOrPayload === 'object' && actionOrPayload !== null && actionOrPayload.action;
+    const payload = isPayloadObject 
+        ? actionOrPayload 
+        : { action: actionOrPayload, data: data };
+
     try {
-        const res = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-        return await res.json();
-    } catch (e) { throw e; }
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Network Response Not OK:', errorText);
+            throw new Error(`HTTP Error ${response.status}: Failed to reach server.`);
+        }
+        
+        const responseText = await response.text();
+        
+        try {
+            return JSON.parse(responseText);
+        } catch (e) {
+            console.error('Server Execution Error (Not JSON):', responseText);
+            throw new Error("Invalid server response format. (Did the GAS script crash?)");
+        }
+        
+    } catch (error) {
+        throw error;
+    }
 }
+
 function getBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
+        if (file.size > 5 * 1024 * 1024) { 
+            return reject(new Error("File size exceeds 5MB."));
+        }
         reader.readAsDataURL(file);
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
