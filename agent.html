@@ -166,14 +166,25 @@
         /* [ 4.0 ] PROFILE GRID STYLES */
         .profile-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 20px; 
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            gap: 30px; 
         }
         .profile-section h4 {
             color: var(--primary-color);
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
             margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .edit-badge {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            background-color: #fef5e7;
+            padding: 3px 8px;
+            border-radius: 12px;
         }
         .profile-item { margin-bottom: 15px; }
         .profile-item label { 
@@ -181,21 +192,22 @@
             display: block; 
             color: #666; 
             margin-bottom: 5px; 
+            font-size: 0.9rem;
         }
-        .profile-item input { 
+        .profile-item input, .profile-item textarea { 
             background: #f9f9f9; 
             width: 100%; 
             padding: 10px; 
-            border: 1px solid #ccc; 
+            border: 1px solid #ddd; 
             border-radius: 6px; 
         }
-        .profile-item input:disabled { 
+        .profile-item input:disabled, .profile-item textarea:disabled { 
             background: #eee; 
             color: #777; 
             cursor: not-allowed; 
-            border: none; 
+            border-color: #eee;
         }
-        .profile-item input:enabled { 
+        .profile-item input:enabled, .profile-item textarea:enabled { 
             background: #fff; 
             border: 1px solid var(--primary-color); 
         }
@@ -323,33 +335,54 @@
         <div id="my-commission-list"></div>
     </div>
 
+    <!-- START: NEW UPGRADED PROFILE HTML -->
     <div id="profile-view" class="view hidden card">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
             <h2>My Profile</h2>
-            <button id="save-profile-btn" class="btn btn-primary hidden" onclick="saveProfile()">Save Changes</button>
+            <button id="save-profile-btn" class="btn btn-primary hidden" onclick="saveProfile()">
+                <i class="fa-solid fa-save"></i> Save Changes
+            </button>
         </div>
-        <p id="profile-status" style="text-align:right; font-size:0.9rem; margin-top:-10px;"></p>
+        <p id="profile-status" style="text-align:right; font-size:0.9rem; margin-top:-10px; font-weight: 600;"></p>
+        
         <div class="profile-grid">
+            <!-- Personal & Contact Information -->
             <div class="profile-section">
-                <h4>Personal Information</h4>
-                <div class="profile-item"><label>Full Name</label><input type="text" id="prof-name" disabled></div>
-                <div class="profile-item"><label>Agent ID</label><input type="text" id="prof-id" disabled></div>
-                <div class="profile-item"><label>Position</label><input type="text" id="prof-pos" disabled></div>
+                <h4>
+                    Personal & Contact Info
+                    <span id="edit-badge-contact" class="edit-badge" style="display:none;">(Editable)</span>
+                </h4>
+                <div class="profile-item"><label>Full Name</label><input type="text" id="prof-employeeName" disabled></div>
+                <div class="profile-item"><label>Agent ID</label><input type="text" id="prof-agentID" disabled></div>
+                <div class="profile-item"><label>Phone Number</label><input type="tel" id="prof-employeePhone" disabled></div>
+                <div class="profile-item"><label>Email Address</label><input type="email" id="prof-employeeEmail" disabled></div>
+                <div class="profile-item"><label>Mailing Address</label><textarea id="prof-employeeAddress" rows="3" disabled style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit;"></textarea></div>
             </div>
+
+            <!-- Employment & Financial Details -->
             <div class="profile-section">
                 <h4>Employment Details</h4>
-                <div class="profile-item"><label>Commission Rate</label><input type="text" id="prof-rate" disabled></div>
+                <div class="profile-item"><label>Position</label><input type="text" id="prof-position" disabled></div>
+                <div class="profile-item"><label>Status</label><input type="text" id="prof-employeeStatus" disabled></div>
+                <div class="profile-item"><label>Agent Type</label><input type="text" id="prof-agentType" disabled></div>
+                <div class="profile-item"><label>Commission Rate</label><input type="text" id="prof-commissionRate" disabled></div>
                 <div class="profile-item"><label>Monthly Target</label><input type="text" id="prof-target" disabled></div>
-                <div class="profile-item"><label>Reporting To (Manager)</label><input type="text" id="prof-mgr" disabled></div>
+                <div class="profile-item"><label>Reporting Manager ID</label><input type="text" id="prof-managerID" disabled></div>
             </div>
+
+            <!-- Payment Information -->
             <div class="profile-section">
-                <h4>Payment Information <span id="edit-badge" style="font-size:0.8em; color:var(--secondary-color); display:none;">(Editable)</span></h4>
-                <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bank" disabled></div>
-                <div class="profile-item"><label>Account Holder</label><input type="text" id="prof-holder" disabled></div>
-                <div class="profile-item"><label>Account Number</label><input type="text" id="prof-acc" disabled></div>
+                <h4>
+                    Payment Information
+                    <span id="edit-badge-payment" class="edit-badge" style="display:none;">(Editable)</span>
+                </h4>
+                <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bankName" disabled></div>
+                <div class="profile-item"><label>Account Holder Name</label><input type="text" id="prof-accountHolderName" disabled></div>
+                <div class="profile-item"><label>Account Number</label><input type="text" id="prof-accountNumber" disabled></div>
             </div>
         </div>
     </div>
+    <!-- END: NEW UPGRADED PROFILE HTML -->
 
     <div id="team-view" class="view hidden card">
         <h2>My Team Performance</h2>
@@ -379,7 +412,7 @@
 // =================================================================
 // AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE
 // =================================================================
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqpKzShXKOyR7S7IKB4xxYFOWqpTr5cPJiL4_mwS8iwP0eDuOQApc0kiLds7s5a1JrKQ/exec'; 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBSAvFp0ly4fC0uuzqHjTR172tyV7sklI3PtAhfPPb9jhFepoS7mWnlJFRtlBeMJJiZg/exec'; 
 
 // --- Global State Variables ---
 let products = [];
@@ -444,11 +477,8 @@ async function handleLogin() {
             currentAgent.target = parseFloat(response.target) || 0; 
             currentAgent.currentSales = parseFloat(response.currentSales) || 0; 
             currentAgent.isAdmin = response.isAdmin || false;
+            currentAgent.password = password; // Store password for refresh
             
-            // FIX: Store password in session for refresh functionality
-            currentAgent.password = password;
-            
-            // FIX: Safely handle potentially missing profile data to prevent crashes
             currentProfile = response.profile || {};
             currentAgent.isManager = response.isManager || false;
             canEditProfile = response.allowEdit || false;
@@ -465,20 +495,14 @@ async function handleLogin() {
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
             
-            // FIX: Safely set header display with a fallback for position
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
             document.getElementById('agent-details-display').textContent = `${response.position || 'Agent'} | ID: ${currentAgent.id}`;
             
             if (currentAgent.isAdmin) {
                 document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
-            } else {
-                document.getElementById('nav-admin-dashboard-btn').classList.add('hidden');
             }
-            
             if (currentAgent.isManager) {
                 document.getElementById('nav-team-btn').classList.remove('hidden');
-            } else {
-                document.getElementById('nav-team-btn').classList.add('hidden');
             }
 
             renderProfileView();
@@ -497,75 +521,105 @@ async function handleLogin() {
     }
 }
 
+// START: NEW UPGRADED PROFILE JAVASCRIPT
+/**
+ * UPDATED: Renders the full agent profile and handles edit permissions.
+ */
 function renderProfileView() {
-    document.getElementById('prof-name').value = currentAgent.name || '';
-    document.getElementById('prof-id').value = currentAgent.id || '';
-    const posText = document.getElementById('agent-details-display').textContent.split('|')[0].trim();
-    document.getElementById('prof-pos').value = posText;
-    
-    document.getElementById('prof-rate').value = currentProfile.commissionRate || 'N/A';
+    // Populate all fields from the comprehensive currentProfile object
+    // Personal & Contact
+    document.getElementById('prof-agentID').value = currentProfile.agentID || '';
+    document.getElementById('prof-employeeName').value = currentProfile.employeeName || '';
+    document.getElementById('prof-employeePhone').value = currentProfile.employeePhone || '';
+    document.getElementById('prof-employeeEmail').value = currentProfile.employeeEmail || '';
+    document.getElementById('prof-employeeAddress').value = currentProfile.employeeAddress || '';
+
+    // Employment
+    document.getElementById('prof-position').value = currentProfile.position || '';
+    document.getElementById('prof-employeeStatus').value = currentProfile.employeeStatus || '';
+    document.getElementById('prof-agentType').value = currentProfile.agentType || '';
+    document.getElementById('prof-commissionRate').value = (currentProfile.commissionRate * 100).toFixed(2) + '%' || '0%';
     document.getElementById('prof-target').value = `RM ${currentProfile.target || '0.00'}`;
-    document.getElementById('prof-mgr').value = currentProfile.managerId || 'N/A';
+    document.getElementById('prof-managerID').value = currentProfile.managerID || 'None';
     
-    const bank = document.getElementById('prof-bank');
-    const holder = document.getElementById('prof-holder');
-    const acc = document.getElementById('prof-acc');
+    // Payment
+    document.getElementById('prof-bankName').value = currentProfile.bankName || '';
+    document.getElementById('prof-accountHolderName').value = currentProfile.accountHolderName || '';
+    document.getElementById('prof-accountNumber').value = currentProfile.accountNumber || '';
+
+    // Define which fields should become editable
+    const editableFields = [
+        document.getElementById('prof-employeePhone'),
+        document.getElementById('prof-employeeEmail'),
+        document.getElementById('prof-employeeAddress'),
+        document.getElementById('prof-bankName'),
+        document.getElementById('prof-accountHolderName'),
+        document.getElementById('prof-accountNumber')
+    ];
+
+    // Toggle edit state based on the 'canEditProfile' flag from the backend
     const saveBtn = document.getElementById('save-profile-btn');
-    const badge = document.getElementById('edit-badge');
+    const editBadges = document.querySelectorAll('.edit-badge');
 
-    bank.value = currentProfile.bankName || '';
-    holder.value = currentProfile.accHolder || '';
-    acc.value = currentProfile.accNumber || '';
-
-    if(canEditProfile) {
-        bank.disabled = false;
-        holder.disabled = false;
-        acc.disabled = false;
+    if (canEditProfile) {
+        editableFields.forEach(field => field.disabled = false);
         saveBtn.classList.remove('hidden');
-        badge.style.display = 'inline';
+        editBadges.forEach(badge => badge.style.display = 'inline');
     } else {
-        bank.disabled = true;
-        holder.disabled = true;
-        acc.disabled = true;
+        editableFields.forEach(field => field.disabled = true);
         saveBtn.classList.add('hidden');
-        badge.style.display = 'none';
+        editBadges.forEach(badge => badge.style.display = 'none');
     }
 }
 
+
+/**
+ * UPDATED: Gathers all editable fields and sends them to the backend to be saved.
+ */
 async function saveProfile() {
     const btn = document.getElementById('save-profile-btn');
     const status = document.getElementById('profile-status');
-    btn.textContent = "Saving...";
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
     btn.disabled = true;
     status.textContent = "";
     
+    // Collect data from all enabled fields
     const payload = {
         agentId: currentAgent.id,
-        bankName: document.getElementById('prof-bank').value,
-        accHolder: document.getElementById('prof-holder').value,
-        accNumber: document.getElementById('prof-acc').value
+        phone: document.getElementById('prof-employeePhone').value,
+        email: document.getElementById('prof-employeeEmail').value,
+        address: document.getElementById('prof-employeeAddress').value,
+        bankName: document.getElementById('prof-bankName').value,
+        accHolder: document.getElementById('prof-accountHolderName').value,
+        accNumber: document.getElementById('prof-accountNumber').value
     };
     
     try {
         const res = await postToGoogleScript('updateAgentProfile', payload);
         if(res.success) {
-            status.style.color = 'green';
+            status.style.color = 'var(--success-color)';
             status.textContent = res.message;
+            // Update local cache to reflect changes immediately
+            currentProfile.employeePhone = payload.phone;
+            currentProfile.employeeEmail = payload.email;
+            currentProfile.employeeAddress = payload.address;
             currentProfile.bankName = payload.bankName;
-            currentProfile.accHolder = payload.accHolder;
-            currentProfile.accNumber = payload.accNumber;
+            currentProfile.accountHolderName = payload.accHolder;
+            currentProfile.accountNumber = payload.accNumber;
         } else {
-            status.style.color = 'red';
-            status.textContent = res.message;
+            status.style.color = 'var(--danger-color)';
+            status.textContent = res.message || "An unknown error occurred.";
         }
     } catch(e) {
-        status.style.color = 'red';
-        status.textContent = "Error connecting to server.";
+        status.style.color = 'var(--danger-color)';
+        status.textContent = "Error: Could not connect to the server.";
     } finally {
-        btn.textContent = "Save Changes";
+        btn.innerHTML = '<i class="fa-solid fa-save"></i> Save Changes';
         btn.disabled = false;
+        setTimeout(() => { status.textContent = ""; }, 4000);
     }
 }
+// END: NEW UPGRADED PROFILE JAVASCRIPT
 
 async function handleChangePassword() {
     const newPassword = document.getElementById('new-password-input').value;
@@ -614,7 +668,6 @@ function refreshPageData() {
     refreshBtn.disabled = true;
     refreshBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Refreshing...';
 
-    // FIX: Use the stored password instead of reading from a hidden input field
     postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: currentAgent.password })
         .then(res => {
             if (res.success) {
@@ -625,7 +678,7 @@ function refreshPageData() {
         })
         .finally(() => {
             if (activeViewId) {
-                showView(activeViewId); 
+                showView(activeViewId, true); // Pass a flag to prevent re-fetching tab-specific data
             }
             setTimeout(() => {
                 refreshBtn.disabled = false;
@@ -637,7 +690,7 @@ function refreshPageData() {
 // =================================================================
 // [ 4.0 ] UI RENDERING
 // =================================================================
-function showView(viewId) {
+function showView(viewId, isRefresh = false) {
     document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
     document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
 
@@ -647,11 +700,14 @@ function showView(viewId) {
     if(view) view.classList.remove('hidden');
     if(btn) btn.classList.add('active');
 
-    if (viewId === 'my-orders-view') renderMyOrders();
-    if (viewId === 'my-commission-view') renderMyCommission();
-    if (viewId === 'team-view') renderTeamView();
-    if (viewId === 'admin-dashboard-view') renderAdminDashboard();
-    if (viewId === 'profile-view') renderProfileView();
+    // Only fetch data if it's not a simple refresh
+    if (!isRefresh) {
+        if (viewId === 'my-orders-view') renderMyOrders();
+        if (viewId === 'my-commission-view') renderMyCommission();
+        if (viewId === 'team-view') renderTeamView();
+        if (viewId === 'admin-dashboard-view') renderAdminDashboard();
+        if (viewId === 'profile-view') renderProfileView();
+    }
 }
 
 function renderTargetBar() {
@@ -695,8 +751,8 @@ function renderProductSelectionList() {
         return;
     }
     container.innerHTML = filteredProducts.map(p => `
-        <div class="product-item-selectable" onclick="addProductToOrder(${p.id})">
-            <img src="${p.image || 'FL.jpg'}" alt="${p.name}" onerror="this.style.display='none';">
+        <div class="product-item-selectable" onclick="addProductToOrder('${p.id}')">
+            <img src="${p.image || 'FL.jpg'}" alt="${p.name}" onerror="this.src='FL.jpg';">
             <div>
                 <strong>${p.name} (${p.id})</strong>
                 <p style="font-size: 0.85rem; color: #6c757d;">RSP: RM ${p.rsp.toFixed(2)}</p>
@@ -730,9 +786,9 @@ function renderOrderSummary() {
                     <strong>${item.name}</strong>
                     <div class="price-error-message">${isInvalid ? `Min: RM ${item.minPrice.toFixed(2)}` : ''}</div>
                 </div>
-                <input type="number" value="${item.quantity}" onchange="updateQuantity(${item.id}, this.value)" title="Quantity" style="width: 60px;">
-                <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice(${item.id}, this.value)" class="${isInvalid ? 'price-input-invalid' : ''}" title="Custom Price" style="width: 80px;">
-                <span onclick="removeItemFromOrder(${item.id})" style="cursor:pointer; text-align:center; color: var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
+                <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.id}', this.value)" title="Quantity" style="width: 60px;">
+                <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice('${item.id}', this.value)" class="${isInvalid ? 'price-input-invalid' : ''}" title="Custom Price" style="width: 80px;">
+                <span onclick="removeItemFromOrder('${item.id}')" style="cursor:pointer; text-align:center; color: var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
             </div>
         `}).join('');
     }
@@ -770,22 +826,25 @@ async function renderMyCommission() {
                     <thead>
                         <tr>
                             <th>Invoice ID</th>
+                            <th>Type</th>
                             <th>Sales (RM)</th>
-                            <th>Rate (%)</th>
-                            <th>Commission (RM)</th>
-                            <th>Incentive (RM)</th>
-                            <th>Final Amount (RM)</th>
+                            <th>Earned (RM)</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody>${response.records.map(r => `
-                        <tr>
+                    <tbody>${response.records.map(r => {
+                        const isOverride = r.overrideAmount > 0;
+                        const type = isOverride ? "Team Override" : "Personal Sale";
+                        const earned = isOverride ? r.overrideAmount : r.commissionAmount;
+                        const sales = isOverride ? "-" : r.salesAmount.toFixed(2);
+                        return `<tr>
                             <td>${r.invoiceId}</td>
-                            <td>${r.salesAmount.toFixed(2)}</td>
-                            <td>${r.commissionRate}%</td>
-                            <td>${r.commissionAmount.toFixed(2)}</td>
-                            <td>${r.incentive.toFixed(2)}</td>
-                            <td><strong>${r.finalAmount.toFixed(2)}</strong></td>
-                        </tr>`).join('')}
+                            <td>${type}</td>
+                            <td>${sales}</td>
+                            <td><strong>${earned.toFixed(2)}</strong></td>
+                            <td>${r.status}</td>
+                        </tr>`;
+                    }).join('')}
                     </tbody>
                 </table>`;
         } else {
@@ -898,12 +957,10 @@ function startNewOrder() {
     document.getElementById('customer-dropdown').value = '';
     document.getElementById('new-customer-form').classList.add('hidden');
     document.getElementById('customer-dropdown').disabled = false;
-    
     document.getElementById('new-customer-name').value = '';
     document.getElementById('new-customer-email').value = '';
     document.getElementById('new-customer-phone').value = '';
     document.getElementById('new-customer-address').value = '';
-
     document.getElementById('payment-proof').value = '';
     document.getElementById('submit-status').textContent = '';
     document.getElementById('submit-order-btn').disabled = false;
@@ -927,11 +984,12 @@ function handleCustomerSelection() {
         dropdown.disabled = false;
     }
 }
-function addProductToOrder(productId) {
-    const product = products.find(p => p.id === productId);
+function addProductToOrder(productIdStr) {
+    const productId = String(productIdStr); // Ensure productId is a string for consistent matching
+    const product = products.find(p => String(p.id) === productId);
     if (!product) return;
     
-    if (!currentOrder.items.some(item => item.id === productId)) {
+    if (!currentOrder.items.some(item => String(item.id) === productId)) {
         currentOrder.items.push({
             id: product.id,
             name: product.name,
@@ -944,12 +1002,14 @@ function addProductToOrder(productId) {
     }
     renderOrderSummary();
 }
-function removeItemFromOrder(productId) {
-    currentOrder.items = currentOrder.items.filter(item => item.id !== productId);
+function removeItemFromOrder(productIdStr) {
+    const productId = String(productIdStr);
+    currentOrder.items = currentOrder.items.filter(item => String(item.id) !== productId);
     renderOrderSummary();
 }
-function updateQuantity(productId, newQuantity) {
-    const item = currentOrder.items.find(i => i.id === productId);
+function updateQuantity(productIdStr, newQuantity) {
+    const productId = String(productIdStr);
+    const item = currentOrder.items.find(i => String(i.id) === productId);
     const qty = parseInt(newQuantity, 10);
     if (item && qty > 0) {
         item.quantity = qty;
@@ -958,8 +1018,9 @@ function updateQuantity(productId, newQuantity) {
     }
     renderOrderSummary();
 }
-function updatePrice(productId, newPrice) {
-    const item = currentOrder.items.find(i => i.id === productId);
+function updatePrice(productIdStr, newPrice) {
+    const productId = String(productIdStr);
+    const item = currentOrder.items.find(i => String(i.id) === productId);
     const price = parseFloat(newPrice);
     if (item && !isNaN(price)) {
         item.customPrice = price;
@@ -1036,20 +1097,17 @@ async function submitOrder() {
         if (bestRule) shippingFee = bestRule.charge;
         
         const payload = {
-            action: 'submitAgentOrder', 
-            data: {
-                agent: currentAgent,
-                customer: customerInfo,
-                items: currentOrder.items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.customPrice, cc: item.cc })),
-                shippingFee: shippingFee,
-                paymentProof: {
-                    file: base64File.split(',')[1],
-                    mimeType: proofFile.type,
-                }
+            agent: currentAgent,
+            customer: customerInfo,
+            items: currentOrder.items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.customPrice, cc: item.cc })),
+            shippingFee: shippingFee,
+            paymentProof: {
+                file: base64File.split(',')[1],
+                mimeType: proofFile.type,
             }
         };
 
-        const response = await postToGoogleScript(payload); 
+        const response = await postToGoogleScript('submitAgentOrder', payload); 
         
         if (response.success) {
             statusEl.textContent = `Success! Invoice ID: ${response.invoiceId}`;
@@ -1077,11 +1135,8 @@ async function submitOrder() {
 // =================================================================
 // [ 6.0 ] UTILITY FUNCTIONS 
 // =================================================================
-async function postToGoogleScript(actionOrPayload, data = {}) {
-    const isPayloadObject = typeof actionOrPayload === 'object' && actionOrPayload !== null && actionOrPayload.action;
-    const payload = isPayloadObject 
-        ? actionOrPayload 
-        : { action: actionOrPayload, data: data };
+async function postToGoogleScript(action, data = {}) {
+    const payload = { action, data };
 
     try {
         const response = await fetch(GOOGLE_SCRIPT_URL, {
