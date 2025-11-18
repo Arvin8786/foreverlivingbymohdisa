@@ -41,7 +41,7 @@
         h1, h2, h3 { color: var(--dark-text); font-weight: 600; }
         h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
         
-        /* Buttons */
+        /* Buttons & Toggles */
         .btn { 
             display: inline-flex; align-items: center; justify-content: center; 
             padding: 12px 25px; 
@@ -64,6 +64,12 @@
         }
         .btn-secondary:hover:not(:disabled) { background: #d0d7dd; }
         .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; box-shadow: none; transform: none; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(22px); }
         
         /* Cards & Form Elements */
         .card { 
@@ -78,7 +84,7 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="password"], select, textarea {
+        input, select, textarea {
             width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem;
         }
         .hidden { display: none !important; }
@@ -211,6 +217,20 @@
             background: #fff; 
             border: 1px solid var(--primary-color); 
         }
+        
+        /* [ 5.0 ] ADMIN HIERARCHY STYLES */
+        .hierarchy-list { list-style: none; padding-left: 0; }
+        .hierarchy-list ul { list-style: none; padding-left: 30px; border-left: 2px solid var(--mid-gray); }
+        .hierarchy-item { padding: 15px; border-radius: var(--border-radius-sm); background: #fff; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .hierarchy-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+        .hierarchy-header .agent-info { display: flex; align-items: center; gap: 15px; }
+        .hierarchy-header .agent-info i { font-size: 1.5rem; color: var(--primary-color); }
+        .hierarchy-header .agent-details { display: flex; flex-direction: column; }
+        .agent-name { font-weight: 600; font-size: 1.1rem; }
+        .agent-position { color: #555; font-size: 0.9rem; }
+        .agent-sales { font-weight: 600; color: var(--success-color); }
+        .toggle-icon { transition: transform 0.2s; }
+        .hierarchy-item.collapsed .toggle-icon { transform: rotate(-90deg); }
 
         @media (max-width: 1000px) {
             #order-creation-workflow { grid-template-columns: 1fr; }
@@ -220,6 +240,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
 </head>
 <body>
+
+<!-- ALL HTML FROM LOGIN TO OTHER VIEWS REMAINS THE SAME -->
 
 <div id="login-view">
     <div class="card" id="login-box">
@@ -394,25 +416,41 @@
         <ul id="subordinates-list" style="list-style:none; padding:0;">Loading...</ul>
     </div>
 
+    <!-- START: NEW UPGRADED ADMIN DASHBOARD HTML -->
     <div id="admin-dashboard-view" class="view hidden card">
-        <h2>Admin Dashboard: Performance Overview</h2>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
-            <div class="card" style="padding: 15px; border-top: 4px solid var(--primary-color);"><h4 style="margin-bottom: 5px;">Total Sales (RM)</h4><p id="admin-total-sales" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">Loading...</p></div>
-            <div class="card" style="padding: 15px; border-top: 4px solid var(--success-color);"><h4 style="margin-bottom: 5px;">Total CC</h4><p id="admin-total-cc" style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">Loading...</p></div>
-            <div class="card" style="padding: 15px; border-top: 4px solid var(--secondary-color);"><h4 style="margin-bottom: 5px;">Agents On Target</h4><p id="admin-agents-on-target" style="font-size: 1.5rem; font-weight: 700; color: #f39c12;">Loading...</p></div>
+        <h2>Admin Dashboard</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <!-- Left Column: Hierarchy -->
+            <div>
+                <h3>Team Hierarchy & Performance</h3>
+                <div id="admin-hierarchy-container" style="max-height: 600px; overflow-y: auto; padding: 10px; background: var(--light-gray); border-radius: var(--border-radius-sm);">
+                    <p>Loading team data...</p>
+                </div>
+            </div>
+            <!-- Right Column: Management Actions -->
+            <div>
+                <h3>Create New Employee</h3>
+                <div class="card" style="background: var(--light-gray);">
+                    <p id="create-user-status" style="font-weight: 600; text-align: center; margin-bottom: 15px;"></p>
+                    <div class="profile-item"><label for="new-agent-id">Agent ID</label><input type="text" id="new-agent-id"></div>
+                    <div class="profile-item"><label for="new-agent-name">Full Name</label><input type="text" id="new-agent-name"></div>
+                    <div class="profile-item"><label for="new-agent-position">Position</label><input type="text" id="new-agent-position" placeholder="e.g., Sales Agent"></div>
+                    <div class="profile-item"><label for="new-agent-manager">Reports To (Manager ID)</label><select id="new-agent-manager"></select></div>
+                    <div class="profile-item"><label for="new-agent-commission">Commission Rate (%)</label><input type="number" id="new-agent-commission" placeholder="e.g., 20 for 20%"></div>
+                    <div class="profile-item"><label for="new-agent-target">Monthly Target (RM)</label><input type="number" id="new-agent-target" placeholder="e.g., 5000"></div>
+                    <button class="btn btn-primary" onclick="createNewUser()" style="width: 100%;"><i class="fa-solid fa-user-plus"></i> Create Employee</button>
+                </div>
+            </div>
         </div>
-        <h3>Agent Performance Chart</h3>
-        <div style="background: white; padding: 20px; border-radius: var(--border-radius-lg);"><canvas id="performanceChart" height="100"></canvas></div>
-        <h3 style="margin-top:30px;">Team Breakdown</h3>
-        <div id="admin-data-table" style="margin-top: 20px;"></div>
     </div>
+    <!-- END: NEW UPGRADED ADMIN DASHBOARD HTML -->
 </div>
 
 <script>
 // =================================================================
 // AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE
 // =================================================================
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBSAvFp0ly4fC0uuzqHjTR172tyV7sklI3PtAhfPPb9jhFepoS7mWnlJFRtlBeMJJiZg/exec'; 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvtvKtiGHGyFEXmmzWtr2zDaIDRqbuNzEHZJfY_rzLBtvnGHvPQpfL_qyDwu020Vxu5A/exec'; 
 
 // --- Global State Variables ---
 let products = [];
@@ -737,7 +775,7 @@ function renderProductCatalog() {
         return;
     }
     container.innerHTML = products.map(p => `
-        <tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>
+        <tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc ? p.cc.toFixed(3) : '0.000'}</td></tr>
     `).join('');
 }
 
@@ -880,74 +918,127 @@ async function renderTeamView() {
     } catch (e) { list.innerHTML = 'Error loading team data.'; }
 }
 
+// START: NEW UPGRADED ADMIN DASHBOARD JAVASCRIPT
 async function renderAdminDashboard() {
-    const dataTable = document.getElementById('admin-data-table');
-    dataTable.innerHTML = '<p style="text-align:center;">Loading...</p>';
+    const container = document.getElementById('admin-hierarchy-container');
+    container.innerHTML = '<p>Loading admin data...</p>';
     try {
         const response = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
-
-        if (response.success && response.data.length > 0) {
-            document.getElementById('admin-total-sales').textContent = `RM ${response.grandTotalSales.toFixed(2)}`;
-            document.getElementById('admin-total-cc').textContent = response.grandTotalCC.toFixed(3);
-            document.getElementById('admin-agents-on-target').textContent = `${response.data.filter(a => a.targetAchieved >= 1).length} / ${response.data.length}`;
-            
-            const teams = {};
-            const noManager = [];
-            response.data.forEach(agent => {
-                if (agent.managerId && agent.managerId !== "") {
-                    if (!teams[agent.managerId]) teams[agent.managerId] = [];
-                    teams[agent.managerId].push(agent);
-                } else {
-                    noManager.push(agent);
-                }
+        if (response.success) {
+            // Populate manager dropdown in the 'Create Employee' form
+            const managerSelect = document.getElementById('new-agent-manager');
+            managerSelect.innerHTML = '<option value="">None (Top Level)</option>';
+            response.flatList.forEach(agent => {
+                managerSelect.innerHTML += `<option value="${agent.id}">${agent.name} (${agent.position})</option>`;
             });
 
-            let html = '';
-            if (noManager.length > 0) {
-                html += `<h3>Independent Agents</h3>${buildAdminTable(noManager)}`;
-            }
-            for (const [mgrId, members] of Object.entries(teams)) {
-                html += `<h3 style="margin-top:30px; color:var(--primary-color); border-bottom:2px solid #eee;">Team: ${mgrId}</h3>${buildAdminTable(members)}`;
-            }
-            dataTable.innerHTML = html;
-            drawPerformanceChart(response.data);
+            // Render the interactive hierarchy
+            container.innerHTML = '<ul class="hierarchy-list">' + renderHierarchy(response.hierarchy) + '</ul>';
         } else {
-            dataTable.innerHTML = `<p style="text-align:center;">No agent performance data available.</p>`;
+            container.innerHTML = `<p style="color: var(--danger-color);">${response.message}</p>`;
         }
-    } catch(e) {
-        dataTable.innerHTML = `<p style="color:var(--danger-color); text-align:center;">Error loading admin data.</p>`;
+    } catch (e) {
+        container.innerHTML = `<p style="color: var(--danger-color);">Failed to load admin data.</p>`;
     }
 }
 
-function buildAdminTable(agents) {
-    return `<table style="width:100%;"><thead><tr><th>Name</th><th>Target (RM)</th><th>Sales (RM)</th><th>Achieved</th></tr></thead><tbody>
-    ${agents.map(a => {
-        const achieved = a.targetAchieved * 100;
-        return `<tr>
-            <td>${a.name}</td>
-            <td>${a.target.toFixed(2)}</td>
-            <td>${a.totalSales.toFixed(2)}</td>
-            <td style="color: ${achieved >= 100 ? 'var(--success-color)' : 'var(--danger-color)'}; font-weight: 600;">${achieved.toFixed(1)}%</td>
-        </tr>`;
-    }).join('')}</tbody></table>`;
+function renderHierarchy(nodes) {
+    let html = '';
+    nodes.forEach(node => {
+        const hasSubordinates = node.subordinates && node.subordinates.length > 0;
+        const salesText = `RM ${node.totalSales.toFixed(2)} | ${(node.targetAchieved * 100).toFixed(1)}% Target`;
+        const statusColor = node.status === 'ACTIVE' ? 'var(--success-color)' : '#999';
+
+        html += `
+            <li class="hierarchy-item ${hasSubordinates ? 'collapsed' : ''}" id="node-${node.id}">
+                <div class="hierarchy-header" ${hasSubordinates ? `onclick="toggleNode('${node.id}')"` : ''}>
+                    <div class="agent-info">
+                        <i class="fa-solid fa-user-circle"></i>
+                        <div class="agent-details">
+                            <span class="agent-name">${node.name} <span style="font-size: 0.8em; color: ${statusColor};">(${node.status})</span></span>
+                            <span class="agent-position">${node.position} (${node.id})</span>
+                            <span class="agent-sales">${salesText}</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label class="switch" title="Admin Access">
+                            <input type="checkbox" ${node.isAdmin ? 'checked' : ''} onchange="updateAdminStatus('${node.id}', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <button class="btn btn-secondary" onclick="updateStatus('${node.id}', '${node.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'}')" style="padding: 5px 10px;">
+                            ${node.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
+                        </button>
+                        ${hasSubordinates ? '<i class="fa-solid fa-chevron-down toggle-icon"></i>' : ''}
+                    </div>
+                </div>
+        `;
+        if (hasSubordinates) {
+            html += `<div class="hierarchy-children" style="display: none; margin-top: 10px;">
+                        <ul>${renderHierarchy(node.subordinates)}</ul>
+                     </div>`;
+        }
+        html += `</li>`;
+    });
+    return html;
 }
 
-function drawPerformanceChart(data) {
-    const ctx = document.getElementById('performanceChart').getContext('2d');
-    if (performanceChartInstance) performanceChartInstance.destroy();
-    performanceChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: data.map(a => a.name),
-            datasets: [{
-                label: 'Total Sales (RM)',
-                data: data.map(a => a.totalSales),
-                backgroundColor: 'rgba(26, 82, 118, 0.8)'
-            }]
-        },
-        options: { responsive: true }
-    });
+function toggleNode(nodeId) {
+    const item = document.getElementById(`node-${nodeId}`);
+    const children = item.querySelector('.hierarchy-children');
+    if (item && children) {
+        item.classList.toggle('collapsed');
+        children.style.display = children.style.display === 'none' ? 'block' : 'none';
+    }
 }
+
+async function createNewUser() {
+    const statusEl = document.getElementById('create-user-status');
+    const payload = {
+        agentId: document.getElementById('new-agent-id').value,
+        name: document.getElementById('new-agent-name').value,
+        position: document.getElementById('new-agent-position').value,
+        managerId: document.getElementById('new-agent-manager').value,
+        commissionRate: document.getElementById('new-agent-commission').value,
+        target: document.getElementById('new-agent-target').value,
+    };
+
+    if (!payload.agentId || !payload.name) {
+        statusEl.textContent = 'Agent ID and Name are required.';
+        statusEl.style.color = 'var(--danger-color)';
+        return;
+    }
+
+    statusEl.textContent = 'Creating...';
+    statusEl.style.color = 'var(--dark-text)';
+
+    const response = await postToGoogleScript('createNewEmployee', payload);
+    if (response.success) {
+        statusEl.textContent = response.message;
+        statusEl.style.color = 'var(--success-color)';
+        document.getElementById('new-agent-id').value = '';
+        document.getElementById('new-agent-name').value = '';
+        document.getElementById('new-agent-position').value = '';
+        renderAdminDashboard(); // Refresh the hierarchy view
+    } else {
+        statusEl.textContent = response.message;
+        statusEl.style.color = 'var(--danger-color)';
+    }
+}
+
+async function updateStatus(agentId, newStatus) {
+    event.stopPropagation(); // Prevents the node from toggling when clicking the button
+    const isAdmin = document.querySelector(`#node-${agentId} input[type=checkbox]`).checked;
+    await postToGoogleScript('setEmployeeStatus', { agentId, status: newStatus, isAdmin });
+    renderAdminDashboard(); // Refresh view
+}
+
+async function updateAdminStatus(agentId, isAdmin) {
+    event.stopPropagation();
+    const currentStatus = document.querySelector(`#node-${agentId} .agent-name span`).textContent.replace(/[()]/g, '');
+    await postToGoogleScript('setEmployeeStatus', { agentId, status: currentStatus, isAdmin });
+    renderAdminDashboard(); // Refresh view
+}
+// END: NEW UPGRADED ADMIN DASHBOARD JAVASCRIPT
 
 // =================================================================
 // [ 5.0 ] ORDER CREATION LOGIC 
@@ -1030,8 +1121,10 @@ function updatePrice(productIdStr, newPrice) {
 function calculateTotals() {
     const subtotal = currentOrder.items.reduce((sum, item) => sum + (item.customPrice * item.quantity), 0);
     let shippingFee = 0;
-    const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
-    if (bestRule) shippingFee = bestRule.charge;
+    if (shippingRules && shippingRules.length > 0) {
+        const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
+        if (bestRule) shippingFee = bestRule.charge;
+    }
     
     const finalTotal = subtotal + shippingFee;
 
