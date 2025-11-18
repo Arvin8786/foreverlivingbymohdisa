@@ -108,8 +108,8 @@
             width: 100%; max-width: 450px; margin-top: 5px; height: 20px;
             background-color: var(--mid-gray); border-radius: 10px; overflow: hidden; position: relative;
         }
-        .target-progress { background: linear-gradient(90deg, #f39c12, #ffc107); }
-        .target-text { font-size: 0.8rem; line-height: 20px; color: #000; }
+        .target-progress { background: linear-gradient(90deg, #f39c12, #ffc107); height: 100%; }
+        .target-text { position: absolute; width: 100%; text-align: center; font-size: 0.8rem; line-height: 20px; color: #000; font-weight: 600; }
         
         /* Navigation Bar */
         #portal-view nav { 
@@ -156,7 +156,8 @@
         }
         .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; }
         .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
-        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; }
+        .summary-line { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; margin-top: 10px; }
 
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
@@ -378,8 +379,7 @@
 // =================================================================
 // AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE
 // =================================================================
-// CRITICAL: Ensure this URL matches your latest Code.gs deployment!
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzEOJ8KzZWAwF2JJwW_6YbR0s8ZeM1uA6zhOb7_SfcevLOSJce2Qau69nbqxWkoTeLoCw/exec'; 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqpKzShXKOyR7S7IKB4xxYFOWqpTr5cPJiL4_mwS8iwP0eDuOQApc0kiLds7s5a1JrKQ/exec'; 
 
 // --- Global State Variables ---
 let products = [];
@@ -445,12 +445,14 @@ async function handleLogin() {
             currentAgent.currentSales = parseFloat(response.currentSales) || 0; 
             currentAgent.isAdmin = response.isAdmin || false;
             
-            // NEW: Capture new response data
-            currentProfile = response.profile;
+            // FIX: Store password in session for refresh functionality
+            currentAgent.password = password;
+            
+            // FIX: Safely handle potentially missing profile data to prevent crashes
+            currentProfile = response.profile || {};
             currentAgent.isManager = response.isManager || false;
             canEditProfile = response.allowEdit || false;
             
-            // --- SECURITY CHECK ---
             if (response.mustChangePassword) {
                  document.getElementById('login-view').classList.add('hidden');
                  document.getElementById('password-change-view').classList.remove('hidden');
@@ -463,11 +465,10 @@ async function handleLogin() {
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
             
-            // NEW: Set Header Display with Name, ID, Position
-            document.getElementById('agent-welcome-header').textContent = `${currentAgent.name} (${currentAgent.id})`;
-            document.getElementById('agent-details-display').textContent = `${response.position} | ID: ${currentAgent.id}`;
+            // FIX: Safely set header display with a fallback for position
+            document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
+            document.getElementById('agent-details-display').textContent = `${response.position || 'Agent'} | ID: ${currentAgent.id}`;
             
-            // FIX: Show/Hide Role Buttons
             if (currentAgent.isAdmin) {
                 document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
             } else {
@@ -480,7 +481,6 @@ async function handleLogin() {
                 document.getElementById('nav-team-btn').classList.add('hidden');
             }
 
-            // Pre-fill Profile
             renderProfileView();
             renderTargetBar(); 
             showView('create-order-view'); 
@@ -497,31 +497,26 @@ async function handleLogin() {
     }
 }
 
-// NEW: Profile Render Function
 function renderProfileView() {
-    // Static Info
-    document.getElementById('prof-name').value = currentAgent.name;
-    document.getElementById('prof-id').value = currentAgent.id;
-    // Try to get position from header text, or fallback to profile object if available
+    document.getElementById('prof-name').value = currentAgent.name || '';
+    document.getElementById('prof-id').value = currentAgent.id || '';
     const posText = document.getElementById('agent-details-display').textContent.split('|')[0].trim();
     document.getElementById('prof-pos').value = posText;
     
-    document.getElementById('prof-rate').value = currentProfile.commissionRate;
-    document.getElementById('prof-target').value = `RM ${currentProfile.target}`;
-    document.getElementById('prof-mgr').value = currentProfile.managerId;
+    document.getElementById('prof-rate').value = currentProfile.commissionRate || 'N/A';
+    document.getElementById('prof-target').value = `RM ${currentProfile.target || '0.00'}`;
+    document.getElementById('prof-mgr').value = currentProfile.managerId || 'N/A';
     
-    // Editable Info
     const bank = document.getElementById('prof-bank');
     const holder = document.getElementById('prof-holder');
     const acc = document.getElementById('prof-acc');
     const saveBtn = document.getElementById('save-profile-btn');
     const badge = document.getElementById('edit-badge');
 
-    bank.value = currentProfile.bankName;
-    holder.value = currentProfile.accHolder;
-    acc.value = currentProfile.accNumber;
+    bank.value = currentProfile.bankName || '';
+    holder.value = currentProfile.accHolder || '';
+    acc.value = currentProfile.accNumber || '';
 
-    // Check Permission
     if(canEditProfile) {
         bank.disabled = false;
         holder.disabled = false;
@@ -537,7 +532,6 @@ function renderProfileView() {
     }
 }
 
-// NEW: Function to Save Profile
 async function saveProfile() {
     const btn = document.getElementById('save-profile-btn');
     const status = document.getElementById('profile-status');
@@ -557,7 +551,6 @@ async function saveProfile() {
         if(res.success) {
             status.style.color = 'green';
             status.textContent = res.message;
-            // Update local cache
             currentProfile.bankName = payload.bankName;
             currentProfile.accHolder = payload.accHolder;
             currentProfile.accNumber = payload.accNumber;
@@ -608,7 +601,7 @@ async function fetchPortalData() {
             renderProductSelectionList();
             renderCustomerDropdown();
         } else { throw new Error(response.message); }
-    } catch (error) { console.error(error); alert('Could not load data.'); }
+    } catch (error) { console.error(error); alert('Could not load portal data.'); }
 }
 
 function handleLogout() { location.reload(); }
@@ -621,8 +614,8 @@ function refreshPageData() {
     refreshBtn.disabled = true;
     refreshBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Refreshing...';
 
-    const currentPassword = document.getElementById('agent-password-input').value;
-    postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: currentPassword })
+    // FIX: Use the stored password instead of reading from a hidden input field
+    postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: currentAgent.password })
         .then(res => {
             if (res.success) {
                 currentAgent.target = parseFloat(res.target) || 0; 
@@ -642,9 +635,8 @@ function refreshPageData() {
 }
 
 // =================================================================
-// [ 4.0 ] UI RENDERING (Target Bar and Commissions)
+// [ 4.0 ] UI RENDERING
 // =================================================================
-
 function showView(viewId) {
     document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
     document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
@@ -657,9 +649,9 @@ function showView(viewId) {
 
     if (viewId === 'my-orders-view') renderMyOrders();
     if (viewId === 'my-commission-view') renderMyCommission();
-    if (viewId === 'team-view') renderTeamView(); // NEW
+    if (viewId === 'team-view') renderTeamView();
     if (viewId === 'admin-dashboard-view') renderAdminDashboard();
-    if (viewId === 'profile-view') renderProfileView(); // NEW
+    if (viewId === 'profile-view') renderProfileView();
 }
 
 function renderTargetBar() {
@@ -670,7 +662,7 @@ function renderTargetBar() {
 
     container.innerHTML = `
         <div style="font-size: 0.9rem; margin-bottom: 5px;">
-            Monthly Target: **RM ${sales.toFixed(2)}** / RM ${target.toFixed(2)}
+            Monthly Target: RM ${sales.toFixed(2)} / RM ${target.toFixed(2)}
             (${pct.toFixed(1)}%)
         </div>
         <div class="target-bar-container">
@@ -684,6 +676,10 @@ function renderTargetBar() {
 
 function renderProductCatalog() { 
     const container = document.getElementById('product-catalog-table');
+    if (!products || products.length === 0) {
+        container.innerHTML = '<tr><td colspan="4">No products found.</td></tr>';
+        return;
+    }
     container.innerHTML = products.map(p => `
         <tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>
     `).join('');
@@ -751,9 +747,9 @@ async function renderMyOrders() {
         if (response.success && response.orders.length > 0) {
             container.innerHTML = `
                 <table class="my-orders-table">
-                    <thead><tr><th>Invoice ID</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Invoice ID</th><th>Date</th><th>Customer</th><th>Total (RM)</th><th>Status</th></tr></thead>
                     <tbody>${response.orders.map(o => `
-                        <tr><td>${o.invoiceId}</td><td>${o.date}</td><td>${o.customerName}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>
+                        <tr><td>${o.invoiceId}</td><td>${o.date}</td><td>${o.customerName}</td><td>${o.total}</td><td>${o.status}</td></tr>
                     `).join('')}</tbody>
                 </table>`;
         } else {
@@ -762,53 +758,44 @@ async function renderMyOrders() {
     } catch(e) { container.innerHTML = `<p style="color:var(--danger-color);">Could not load orders. Error: ${e.message}</p>`; }
 }
 
-// UPDATED: Shows Status and Overrides
-function renderMyCommission() {
+async function renderMyCommission() {
     const container = document.getElementById('my-commission-list');
     container.innerHTML = '<p>Loading records...</p>';
     
-    postToGoogleScript('getAgentCommission', { agentId: currentAgent.id })
-        .then(response => {
-            if (response.success && response.records.length > 0) {
-                container.innerHTML = `
-                    <table class="commission-table">
-                        <thead>
-                            <tr>
-                                <th>Invoice ID</th>
-                                <th>Type</th>
-                                <th>Sales (RM)</th>
-                                <th>Rate (%)</th>
-                                <th>Earned (RM)</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>${response.records.map(r => {
-                            const isOverride = String(r.invoiceId).includes("(TEAM)");
-                            const type = isOverride ? "Team Override" : "Personal Sale";
-                            const earned = isOverride ? r.overrideAmount : r.commissionAmount;
-                            const sales = isOverride ? "-" : r.salesAmount.toFixed(2);
-                            const rate = isOverride ? "-" : r.commissionRate + "%";
-                            return `<tr>
-                                <td>${r.invoiceId}</td>
-                                <td>${type}</td>
-                                <td>${sales}</td>
-                                <td>${rate}</td>
-                                <td><strong>${earned.toFixed(2)}</strong></td>
-                                <td>${r.status}</td>
-                            </tr>`;
-                        }).join('')}
-                        </tbody>
-                    </table>`;
-            } else {
-                container.innerHTML = '<p>No commission records found.</p>';
-            }
-        })
-        .catch(e => {
-            container.innerHTML = `<p style="color:var(--danger-color);">Could not load records.</p>`; 
-        });
+    try {
+        const response = await postToGoogleScript('getAgentCommission', { agentId: currentAgent.id });
+        if (response.success && response.records.length > 0) {
+            container.innerHTML = `
+                <table class="commission-table">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Sales (RM)</th>
+                            <th>Rate (%)</th>
+                            <th>Commission (RM)</th>
+                            <th>Incentive (RM)</th>
+                            <th>Final Amount (RM)</th>
+                        </tr>
+                    </thead>
+                    <tbody>${response.records.map(r => `
+                        <tr>
+                            <td>${r.invoiceId}</td>
+                            <td>${r.salesAmount.toFixed(2)}</td>
+                            <td>${r.commissionRate}%</td>
+                            <td>${r.commissionAmount.toFixed(2)}</td>
+                            <td>${r.incentive.toFixed(2)}</td>
+                            <td><strong>${r.finalAmount.toFixed(2)}</strong></td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>`;
+        } else {
+            container.innerHTML = '<p>No commission records found.</p>';
+        }
+    } catch(e) {
+        container.innerHTML = `<p style="color:var(--danger-color);">Could not load records.</p>`; 
+    }
 }
 
-// NEW: Render My Team View
 async function renderTeamView() {
     const list = document.getElementById('subordinates-list');
     const overrideEl = document.getElementById('team-total-override');
@@ -834,7 +821,6 @@ async function renderTeamView() {
     } catch (e) { list.innerHTML = 'Error loading team data.'; }
 }
 
-// UPDATED: Admin Dashboard with Grouping
 async function renderAdminDashboard() {
     const dataTable = document.getElementById('admin-data-table');
     dataTable.innerHTML = '<p style="text-align:center;">Loading...</p>';
@@ -875,7 +861,7 @@ async function renderAdminDashboard() {
 }
 
 function buildAdminTable(agents) {
-    return `<table style="width:100%;"><thead><tr><th>Name</th><th>Target</th><th>Sales</th><th>Achieved</th></tr></thead><tbody>
+    return `<table style="width:100%;"><thead><tr><th>Name</th><th>Target (RM)</th><th>Sales (RM)</th><th>Achieved</th></tr></thead><tbody>
     ${agents.map(a => {
         const achieved = a.targetAchieved * 100;
         return `<tr>
@@ -888,7 +874,7 @@ function buildAdminTable(agents) {
 }
 
 function drawPerformanceChart(data) {
-    const ctx = document.getElementById('performanceChart');
+    const ctx = document.getElementById('performanceChart').getContext('2d');
     if (performanceChartInstance) performanceChartInstance.destroy();
     performanceChartInstance = new Chart(ctx, {
         type: 'bar',
@@ -897,7 +883,7 @@ function drawPerformanceChart(data) {
             datasets: [{
                 label: 'Total Sales (RM)',
                 data: data.map(a => a.totalSales),
-                backgroundColor: 'rgba(0, 123, 255, 0.8)'
+                backgroundColor: 'rgba(26, 82, 118, 0.8)'
             }]
         },
         options: { responsive: true }
@@ -1070,8 +1056,7 @@ async function submitOrder() {
             statusEl.style.color = 'var(--success-color)';
             setTimeout(startNewOrder, 5000);
             
-            // Refresh Target Bar after sale
-            postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: document.getElementById('agent-password-input').value }).then(res => {
+            postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: currentAgent.password }).then(res => {
                  if(res.success) {
                     currentAgent.currentSales = parseFloat(res.currentSales) || 0;
                     renderTargetBar();
@@ -1104,7 +1089,8 @@ async function postToGoogleScript(actionOrPayload, data = {}) {
             mode: 'cors',
             credentials: 'omit',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            redirect: 'follow'
         });
 
         if (!response.ok) {
@@ -1119,7 +1105,7 @@ async function postToGoogleScript(actionOrPayload, data = {}) {
             return JSON.parse(responseText);
         } catch (e) {
             console.error('Server Execution Error (Not JSON):', responseText);
-            throw new Error("Invalid server response format. (Did the GAS script crash?)");
+            throw new Error("Invalid server response format. (The script may have crashed or timed out).");
         }
         
     } catch (error) {
