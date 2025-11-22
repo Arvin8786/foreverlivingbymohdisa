@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Portal</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/jpeg" href="FL.jpg">
+    
+    <style>
+        /* All styles from agent.html are reused for a consistent look and feel */
+        :root {
+            --primary-color: #1a5276; --secondary-color: #f39c12; --success-color: #198754;
+            --light-gray: #f4f6f8; --mid-gray: #e9ecef; --dark-text: #333; --light-text: #fff;
+            --danger-color: #dc3545; --border-radius-lg: 12px; --border-radius-sm: 8px;
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08); --font-family: 'Poppins', sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0;}
+        body { font-family: var(--font-family); background: var(--light-gray); color: var(--dark-text); line-height: 1.5; }
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
+        h1, h2, h3 { color: var(--dark-text); font-weight: 600; }
+        h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
+        .btn { 
+            display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; 
+            font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; 
+        }
+        .btn-primary { background: var(--primary-color); color: var(--light-text); border-radius: 50px; box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3); }
+        .btn-primary:hover:not(:disabled) { background: #113a56; box-shadow: 0 6px 12px rgba(26, 82, 118, 0.4); transform: translateY(-2px); }
+        .btn-secondary { background: var(--mid-gray); color: var(--dark-text); border-radius: var(--border-radius-sm); }
+        .btn-secondary:hover:not(:disabled) { background: #d0d7dd; }
+        .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; box-shadow: none; transform: none; }
+        .card { background: var(--light-text); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; }
+        .card h3 { border-bottom: 2px solid var(--mid-gray); padding-bottom: 10px; margin-bottom: 20px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem; }
+        .hidden { display: none !important; }
+        #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1a5276 0%, #34495e 100%); }
+        #login-box { padding: 50px; max-width: 400px; text-align: center; background: #fff; border-radius: 15px; border-top: 5px solid var(--primary-color); }
+        #portal-view header { padding: 15px 30px; display: flex; align-items: center; justify-content: space-between; }
+        #portal-view nav { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 25px; background-color: var(--primary-color); border-radius: var(--border-radius-sm); overflow: hidden; box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3); }
+        #portal-view nav .btn { background: transparent; color: var(--light-text); border: none; border-radius: 0; flex-grow: 1; padding: 15px 20px; }
+        #portal-view nav .btn.active { background: var(--secondary-color); color: var(--dark-text); box-shadow: none; }
+        #portal-view nav .btn:hover:not(.active) { background: rgba(255, 255, 255, 0.1); }
+        #shop-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
+        #product-list { max-height: 800px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
+        .product-item { display: grid; grid-template-columns: 80px 1fr auto; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid var(--mid-gray); }
+        .product-item img { width: 70px; height: 70px; object-fit: contain; border-radius: 4px; }
+        .summary-item { display: grid; grid-template-columns: 1fr 60px 30px; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--mid-gray); }
+        .summary-line { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
+        .profile-item label { font-weight: 600; display: block; color: #666; margin-bottom: 5px; font-size: 0.9rem;}
+    </style>
+</head>
+<body>
+
+<div id="login-view">
+    <div class="card" id="login-box">
+        <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
+        <h1>Customer Portal</h1>
+        <p>Login to view your orders, points, and more.</p>
+        <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
+            <input type="email" id="customer-email-input" placeholder="Your Email" required>
+            <input type="password" id="customer-password-input" placeholder="Password" required> 
+            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
+            <p id="login-status"></p>
+        </form>
+    </div>
+</div>
+
+<div id="portal-view" class="container hidden">
+    <header>
+        <div>
+            <h2 id="customer-welcome-header"></h2>
+            <p id="customer-details-display" style="font-size: 1.1rem; color: #555; font-weight: 500; margin-top: -10px;"></p>
+        </div>
+        <button id="logout-btn" class="btn btn-primary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </header>
+
+    <nav>
+        <button id="nav-shop-btn" class="btn active"><i class="fa-solid fa-store"></i> Shop</button>
+        <button id="nav-my-orders-btn" class="btn"><i class="fa-solid fa-receipt"></i> My Orders</button>
+        <button id="nav-my-rewards-btn" class="btn"><i class="fa-solid fa-star"></i> My Rewards</button>
+        <button id="nav-my-profile-btn" class="btn"><i class="fa-solid fa-user-circle"></i> My Profile</button>
+    </nav>
+
+    <!-- START: CUSTOMER VIEWS -->
+    <div id="shop-view" class="view">
+        <div id="shop-workflow">
+            <div>
+                <div class="card">
+                    <h3>Our Products</h3>
+                    <input type="text" id="product-search" placeholder="Search for products...">
+                    <div id="product-list"></div>
+                </div>
+            </div>
+            <div id="cart-summary-card" class="card">
+                <h3>Your Cart</h3>
+                <div id="summary-items-list"></div>
+                <div class="summary-total">
+                    <div class="summary-line"><span>Subtotal:</span><span id="summary-subtotal">RM 0.00</span></div>
+                    <div class="summary-line"><span>Shipping:</span><span id="summary-shipping">RM 0.00</span></div>
+                    <div class="summary-line total"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
+                </div>
+                <div id="checkout-section" style="margin-top: 20px;">
+                    <button onclick="saveCart()" class="btn btn-secondary" style="width:100%; margin-bottom: 10px;"><i class="fa-solid fa-save"></i> Save Cart for Later</button>
+                    <button onclick="initiateCheckout()" class="btn btn-primary" style="width:100%;"><i class="fa-solid fa-check"></i> Proceed to Checkout</button>
+                    <p id="checkout-status" style="text-align: center; margin-top: 10px; font-weight: 600;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="my-orders-view" class="view hidden card">
+        <h2>My Order History</h2>
+        <div id="my-orders-list"></div>
+    </div>
+    
+    <div id="my-rewards-view" class="view hidden card">
+        <h2>My Rewards & Points</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div>
+                <h3>Available Rewards</h3>
+                <div id="rewards-list"></div>
+            </div>
+            <div>
+                <h3>Points Balance</h3>
+                <div class="card" style="background:var(--light-gray); text-align: center;">
+                    <p style="font-size: 3rem; font-weight: 700; color: var(--primary-color);" id="points-balance">0</p>
+                    <p style="font-weight: 600;">Points Available</p>
+                </div>
+                <h3>Points History</h3>
+                <div id="points-history-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="my-profile-view" class="view hidden card">
+        <h2>My Profile</h2>
+        <p>Update your contact and shipping information here.</p>
+        <div class="profile-grid">
+            <div class="profile-section">
+                <div class="profile-item"><label>Full Name</label><input type="text" id="prof-name"></div>
+                <div class="profile-item"><label>Email</label><input type="email" id="prof-email" disabled></div>
+                <div class="profile-item"><label>Phone Number (WhatsApp)</label><input type="tel" id="prof-phone"></div>
+                <div class="profile-item"><label>Shipping Address</label><textarea id="prof-address" rows="4"></textarea></div>
+            </div>
+        </div>
+        <button onclick="saveProfile()" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Changes</button>
+        <p id="profile-status" style="margin-top: 15px; font-weight: 600;"></p>
+    </div>
+    <!-- END: CUSTOMER VIEWS -->
+</div>
+
+<script>
+// =================================================================
+// CUSTOMER PORTAL SCRIPT
+// =================================================================
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxgtIUAZT4XOonxdLLCI0ftDpEIT84al5TsTBJ2mlbxzKu21cglHagAyFdafJP-VO8N2w/exec'; 
+
+// --- Global State Variables ---
+let products = [];
+let shippingRules = [];
+let currentCustomer = null; 
+let cart = [];
+
+// --- Initialization ---
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('login-form').addEventListener('submit', (e) => { e.preventDefault(); handleLogin(); });
+    document.getElementById('logout-btn').addEventListener('click', () => location.reload());
+    document.getElementById('nav-shop-btn').addEventListener('click', () => showView('shop-view'));
+    document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
+    document.getElementById('nav-my-rewards-btn').addEventListener('click', () => showView('my-rewards-view'));
+    document.getElementById('nav-my-profile-btn').addEventListener('click', () => showView('my-profile-view'));
+    document.getElementById('product-search').addEventListener('keyup', renderShopView);
+});
+
+// =================================================================
+// LOGIN & DATA FETCHING
+// =================================================================
+async function handleLogin() {
+    const email = document.getElementById('customer-email-input').value.trim();
+    const password = document.getElementById('customer-password-input').value;
+    const loginBtn = document.getElementById('login-btn');
+    const loginStatus = document.getElementById('login-status');
+    
+    if (!email || !password) { loginStatus.textContent = "Email and Password are required."; return; }
+    loginBtn.disabled = true; loginStatus.textContent = "Verifying...";
+    
+    try {
+        const response = await postToGoogleScript('verifyCustomer', { email, password });
+        if (response.success) {
+            currentCustomer = response.customer;
+            await fetchPortalData();
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('portal-view').classList.remove('hidden');
+            document.getElementById('customer-welcome-header').textContent = `Welcome, ${currentCustomer.customerName}`;
+            document.getElementById('customer-details-display').textContent = `PAC: ${currentCustomer.pac}`;
+            
+            // Check for a saved cart
+            if (response.savedCart && response.savedCart.length > 0) {
+                if (confirm("You have a saved cart. Would you like to load it?")) {
+                    cart = response.savedCart;
+                    renderCartSummary();
+                }
+            }
+            showView('shop-view'); 
+        } else {
+            loginStatus.textContent = response.message || "Login failed.";
+        }
+    } catch (error) {
+        loginStatus.textContent = "Connection failed. Please try again.";
+        console.error("Login error:", error);
+    } finally {
+        loginBtn.disabled = false;
+    }
+}
+
+async function fetchPortalData() {
+    try {
+        const response = await postToGoogleScript('getCustomerPortalData');
+        if (response.success) {
+            products = response.products;
+            shippingRules = (response.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend);
+            renderShopView();
+        } else { throw new Error(response.message); }
+    } catch (error) { console.error(error); alert('Could not load shop data.'); }
+}
+
+// =================================================================
+// UI RENDERING & VIEW MANAGEMENT
+// =================================================================
+function showView(viewId) {
+    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
+    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(viewId).classList.remove('hidden');
+    document.getElementById(`nav-${viewId.replace('-view', '-btn')}`).classList.add('active');
+
+    // Fetch data for specific views when they are opened
+    if (viewId === 'my-orders-view') renderMyOrders();
+    if (viewId === 'my-rewards-view') renderMyRewards();
+    if (viewId === 'my-profile-view') renderMyProfile();
+}
+
+function renderShopView() {
+    const container = document.getElementById('product-list');
+    const searchTerm = document.getElementById('product-search').value.toLowerCase();
+    const filtered = products.filter(p => p.name.toLowerCase().includes(searchTerm));
+
+    if (filtered.length === 0) {
+        container.innerHTML = "<p style='padding: 15px; text-align: center;'>No products found.</p>";
+        return;
+    }
+    container.innerHTML = filtered.map(p => `
+        <div class="product-item">
+            <img src="${p.image}" alt="${p.name}" onerror="this.src='FL.jpg';">
+            <div>
+                <strong>${p.name}</strong>
+                <p style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">RM ${p.price.toFixed(2)}</p>
+            </div>
+            <button class="btn btn-primary" onclick="addToCart('${p.id}')">Add</button>
+        </div>
+    `).join('');
+}
+
+async function renderMyOrders() {
+    const container = document.getElementById('my-orders-list');
+    container.innerHTML = '<p>Loading order history...</p>';
+    try {
+        const response = await postToGoogleScript('getCustomerOrders', { pac: currentCustomer.pac });
+        if (response.success && response.orders.length > 0) {
+            container.innerHTML = `<table><thead><tr><th>Invoice ID</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+                <tbody>${response.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>`).join('')}</tbody>
+            </table>`;
+        } else { container.innerHTML = '<p>You have no past orders.</p>'; }
+    } catch(e) { container.innerHTML = `<p style="color:var(--danger-color);">Could not load orders.</p>`; }
+}
+
+async function renderMyRewards() {
+    document.getElementById('points-balance').textContent = '...';
+    document.getElementById('rewards-list').innerHTML = '<p>Loading...</p>';
+    
+    // In a real scenario, these would be separate calls
+    document.getElementById('points-balance').textContent = currentCustomer.totalPoints || 0;
+    
+    // Mockup for reward list and history
+    document.getElementById('rewards-list').innerHTML = `<div class="card"><strong>Free Shipping Voucher</strong><p>1000 Points</p><button class="btn btn-primary" disabled>Redeem</button></div>`;
+    document.getElementById('points-history-list').innerHTML = `<p>Feature coming soon!</p>`;
+}
+
+function renderMyProfile() {
+    document.getElementById('prof-name').value = currentCustomer.customerName || '';
+    document.getElementById('prof-email').value = currentCustomer.customerEmail || '';
+    document.getElementById('prof-phone').value = currentCustomer.customerPhone || '';
+    document.getElementById('prof-address').value = currentCustomer.customerAddress || '';
+    document.getElementById('profile-status').textContent = '';
+}
+
+// =================================================================
+// CART & CHECKOUT LOGIC
+// =================================================================
+function addToCart(productIdStr) {
+    const productId = String(productIdStr);
+    const product = products.find(p => String(p.id) === productId);
+    if (!product) return;
+    
+    const existingItem = cart.find(item => String(item.id) === productId);
+    if (existingItem) {
+        existingItem.quantity++;
+    } else {
+        cart.push({ ...product, quantity: 1 });
+    }
+    renderCartSummary();
+}
+function removeItemFromCart(productIdStr) {
+    const productId = String(productIdStr);
+    cart = cart.filter(item => String(item.id) !== productId);
+    renderCartSummary();
+}
+function updateQuantity(productIdStr, newQuantity) {
+    const productId = String(productIdStr);
+    const item = cart.find(i => String(i.id) === productId);
+    const qty = parseInt(newQuantity, 10);
+    if (item) {
+        if (qty > 0) item.quantity = qty;
+        else removeItemFromCart(productId);
+    }
+    renderCartSummary();
+}
+
+function renderCartSummary() {
+    const container = document.getElementById('summary-items-list');
+    if (cart.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Your cart is empty.</p>";
+    } else {
+        container.innerHTML = cart.map(item => `
+            <div class="summary-item">
+                <div>
+                    <strong>${item.name}</strong>
+                    <p>RM ${item.price.toFixed(2)}</p>
+                </div>
+                <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.id}', this.value)" style="width: 60px; padding: 5px;">
+                <span onclick="removeItemFromCart('${item.id}')" style="cursor:pointer; text-align:center; color: var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
+            </div>
+        `).join('');
+    }
+    calculateTotals();
+}
+
+function calculateTotals() {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    let shippingFee = 0;
+    const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
+    if (bestRule) shippingFee = bestRule.charge;
+    const finalTotal = subtotal + shippingFee;
+
+    document.getElementById('summary-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
+    document.getElementById('summary-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `RM ${finalTotal.toFixed(2)}`;
+}
+
+async function saveCart() {
+    const response = await postToGoogleScript('saveCustomerCart', { pac: currentCustomer.pac, cart: cart });
+    alert(response.message);
+}
+
+async function initiateCheckout() {
+    if (cart.length === 0) { alert("Your cart is empty."); return; }
+    
+    const statusEl = document.getElementById('checkout-status');
+    statusEl.textContent = 'Processing...';
+
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    let shippingFee = 0;
+    const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
+    if (bestRule) shippingFee = bestRule.charge;
+    const totalAmount = subtotal + shippingFee;
+    
+    const payload = {
+        customerName: currentCustomer.customerName,
+        customerEmail: currentCustomer.customerEmail,
+        customerPhone: currentCustomer.customerPhone,
+        customerAddress: currentCustomer.customerAddress,
+        itemsPurchased: cart.map(item => `${item.id}x${item.quantity}`).join(', '),
+        totalAmount: totalAmount,
+        shippingFee: shippingFee,
+        cart: cart,
+    };
+
+    try {
+        const response = await postToGoogleScript('logInitialOrder', payload);
+        if (response.status === 'success') {
+            statusEl.textContent = "Order Placed!";
+            cart = [];
+            renderCartSummary();
+            alert("Your order has been placed successfully! We will contact you shortly to confirm payment.");
+            showView('my-orders-view');
+        } else { throw new Error(response.message); }
+    } catch (e) {
+        statusEl.textContent = "Checkout failed.";
+        alert(`Error: ${e.message}`);
+    }
+}
+
+async function saveProfile() {
+    const statusEl = document.getElementById('profile-status');
+    const payload = {
+        pac: currentCustomer.pac,
+        customerName: document.getElementById('prof-name').value,
+        customerPhone: document.getElementById('prof-phone').value,
+        customerAddress: document.getElementById('prof-address').value
+    };
+    statusEl.textContent = 'Saving...';
+    const response = await postToGoogleScript('updateCustomerProfile', payload);
+    if (response.success) {
+        statusEl.style.color = 'var(--success-color)';
+        // Update local state
+        currentCustomer.customerName = payload.customerName;
+        currentCustomer.customerPhone = payload.customerPhone;
+        currentCustomer.customerAddress = payload.customerAddress;
+    } else {
+        statusEl.style.color = 'var(--danger-color)';
+    }
+    statusEl.textContent = response.message;
+}
+
+// =================================================================
+// UTILITY FUNCTIONS 
+// =================================================================
+async function postToGoogleScript(action, data = {}) {
+    const payload = { action, data };
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST', mode: 'cors', credentials: 'omit',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+            body: JSON.stringify(payload), redirect: 'follow'
+        });
+        if (!response.ok) { throw new Error(`HTTP Error ${response.status}`); }
+        const responseText = await response.text();
+        try { return JSON.parse(responseText); } catch (e) { console.error("Invalid JSON response:", responseText); throw new Error("Invalid server response."); }
+    } catch (error) { throw error; }
+}
+</script>
+</body>
+</html>
