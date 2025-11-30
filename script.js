@@ -1,13 +1,11 @@
 // =================================================================
-// E-Shop Frontend Script - v28.0 (FINAL COMPLETE)
-// Features: Themes, Marketing, Maintenance, Login, Cart, Chatbot
+// E-Shop Frontend Script - v21.0 (with Customer Login Integration)
 // =================================================================
 
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-// CRITICAL FIX: Using your latest, correct deployment URL
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxgtIUAZT4XOonxdLLCI0ftDpEIT84al5TsTBJ2mlbxzKu21cglHagAyFdafJP-VO8N2w/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxatHBKuXn25P_Aiy5b9pEBiPtxqZW87D5456NUnLKwLedhvUXlmnaaAzq-WR01VmHW9A/exec'; // <-- PASTE YOUR NEW URL HERE
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
@@ -15,30 +13,37 @@ let products = [];
 let allJobs = [];
 let cart = [];
 let chatSession = {};
+let currentCustomer = null; // Holds logged-in customer data
 
 // ===========================================================
 // [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
 // ===========================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Attach New Static Listeners ---
-    const loginBtn = document.getElementById('nav-login-btn');
-    if(loginBtn) loginBtn.addEventListener('click', () => toggleLoginModal(true));
+    // --- Attach static listeners immediately ---
+    const navLoginBtn = document.getElementById('nav-login-btn');
+    if (navLoginBtn) navLoginBtn.addEventListener('click', () => toggleLoginModal(true));
     
-    const closeLoginBtn = document.getElementById('close-login-modal-btn');
-    if(closeLoginBtn) closeLoginBtn.addEventListener('click', () => toggleLoginModal(false));
+    const closeLoginModalBtn = document.getElementById('close-login-modal-btn');
+    if (closeLoginModalBtn) closeLoginModalBtn.addEventListener('click', () => toggleLoginModal(false));
 
-    const chatSend = document.getElementById('chat-send-btn');
-    if(chatSend) chatSend.addEventListener('click', handleChatSubmit);
+    // Add listener for the login form itself
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
     
+    // Chat listeners
+    const chatSendBtn = document.getElementById('chat-send-btn');
+    if (chatSendBtn) chatSendBtn.addEventListener('click', handleChatSubmit);
     const chatInput = document.getElementById('chat-input');
-    if(chatInput) chatInput.addEventListener('keyup', (e) => { if (e.key === "Enter") handleChatSubmit(); });
+    if (chatInput) chatInput.addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
 
-    // --- Standard Listeners (from your original code) ---
-    // Note: Some elements like forms are dynamic, so their listeners are attached in fetchData/render
-    // but we can try to attach static ones here if they exist in HTML source.
-    // Your original code had: document.addEventListener('DOMContentLoaded', fetchData);
-    // We are replacing that single call with this block to ensure everything initializes.
+    // Check for a logged-in session
+    const loggedInCustomer = sessionStorage.getItem('eshopCustomer');
+    if (loggedInCustomer) {
+        currentCustomer = JSON.parse(loggedInCustomer);
+        updateLoginStateUI();
+    }
 
+    // Start fetching dynamic data
     fetchData();
 });
 
@@ -47,90 +52,62 @@ async function fetchData() {
         const response = await fetch(googleScriptURL);
         if (!response.ok) throw new Error('Network response failed');
         const data = await response.json();
-        
         if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
 
-        // --- NEW: Maintenance Mode & Theme Logic ---
         const marketingData = data.marketingData || {};
         const activeTheme = data.activeTheme || null;
 
-        // 1. Maintenance Mode Check
         if (marketingData.MaintenanceMode === 'TRUE') {
             document.getElementById('store-wrapper').style.display = 'none';
             const overlay = document.getElementById('maintenance-overlay');
-            if(overlay) {
-                overlay.style.display = 'flex';
-                const msg = document.getElementById('maintenance-message');
-                if(msg) msg.textContent = marketingData.MaintenanceMessage || 'Site is down for maintenance.';
-            }
-            return; // Stop loading the rest of the site
+            overlay.style.display = 'flex';
+            document.getElementById('maintenance-message').textContent = marketingData.MaintenanceMessage || 'Site is down for maintenance.';
+            return;
         }
 
-        // 2. Apply Theme & Marketing Banners
-        if (activeTheme) {
-            applyTheme(activeTheme);
-        }
-        if (marketingData) {
-            applyMarketing(marketingData, activeTheme);
-        }
+        if (activeTheme) applyTheme(activeTheme);
+        if (marketingData) applyMarketing(marketingData, activeTheme);
 
-        // --- Standard Data Loading (Your Original Logic) ---
         products = data.products || [];
         allJobs = data.jobsListings || [];
         
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
-        // Updated to pass ProductTagText from Marketing sheet
         renderProducts(products, marketingData.ProductTagText); 
         renderAboutUs(data.aboutUsContent);
         renderJobs(allJobs);
-        
         buildEnquiryForm();
+        renderBusinessOpportunityPage();
+        renderMyAccountView(); // Build the My Account view structure
+        
         buildCartModal();
         buildJobApplicationModal();
         buildFabButtons();
         buildChatbotWidget();
-        
-        // NEW: Show Popup if configured
-        if (marketingData.PopupMessageText || marketingData.PopupImageURL) {
-            buildPopupModal(marketingData.PopupMessageText, marketingData.PopupImageURL);
-        }
+        buildPopupModal(marketingData.PopupMessageText, marketingData.PopupImageURL);
 
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v28.0)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v21.0)`;
         
-        // --- Attach Listeners for Dynamically Created Elements ---
-        const enqForm = document.getElementById('enquiry-form');
-        if(enqForm) enqForm.addEventListener('submit', handleEnquirySubmit);
-        
-        const jobForm = document.getElementById('job-application-form');
-        if(jobForm) jobForm.addEventListener('submit', handleJobApplicationSubmit);
+        document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
+        document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
+        document.getElementById('business-form').addEventListener('submit', handleBusinessSubmit);
 
         showTab('homepage');
 
     } catch (error) {
         console.error("Fatal Error fetching store data:", error);
-        const main = document.getElementById('main-content');
-        if(main) main.innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
+        document.getElementById('main-content').innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
     }
 }
 
 // ===========================================================
 // [ 3.0 ] UI & DYNAMIC CONTENT RENDERING
 // ===========================================================
-function renderStaticContent(content) {
-    if (!content) return;
-    document.getElementById('company-name-header').innerHTML = `${content.CompanyName || ''} <span class="by-line">${content.Owner} - ${content.Role}</span> <span class="slogan">${content.Slogan}</span>`;
-    document.getElementById('footer-text').textContent = content.Footer || `© ${new Date().getFullYear()} ${content.CompanyName}`;
-    
-    // Note: Banner logic moved to applyMarketing() to handle overrides properly
-    // But we keep this safe fallthrough just in case
-}
-
 function renderMainContentShell() {
     const main = document.getElementById('main-content');
     main.innerHTML = `
-        <div id="homepage" class="tab-content">
+        <div id="homepage" class="tab-content active">
             <section id="homepage-hero" class="hero-section"></section>
             <section id="why-choose-us" class="dynamic-content-wrapper"></section>
             <section id="youtube-videos" class="dynamic-content-wrapper"></section>
@@ -140,9 +117,16 @@ function renderMainContentShell() {
         <div id="products" class="tab-content"><div id="product-list-container"></div></div>
         <div id="about" class="tab-content"><section id="about-us-content" class="dynamic-content-wrapper"></section></div>
         <div id="jobs" class="tab-content"><section id="jobs-content" class="dynamic-content-wrapper"><h2>All Career Opportunities</h2><div id="job-listings-container"></div></section></div>
+        <div id="business" class="tab-content"><section id="business-opportunity-content" class="dynamic-content-wrapper"></section></div>
         <div id="enquiries" class="tab-content"><section id="enquiries-form-content" class="dynamic-content-wrapper"></section></div>
-        <div id="rewards" class="tab-content"><section class="dynamic-content-wrapper"><h2>Rewards</h2><p>This feature is coming soon!</p></section></div>
+        <div id="my-account" class="tab-content"><section id="my-account-content" class="dynamic-content-wrapper"></section></div>
     `;
+}
+
+function renderStaticContent(content) {
+    if (!content) return;
+    document.getElementById('company-name-header').innerHTML = `${content.CompanyName || ''} <span class="by-line">${content.Owner} - ${content.Role}</span> <span class="slogan">${content.Slogan}</span>`;
+    document.getElementById('footer-text').textContent = content.Footer || `© ${new Date().getFullYear()} ${content.CompanyName}`;
 }
 
 function renderHomepageContent(about, jobs, testimonies) {
@@ -193,7 +177,6 @@ function renderProducts(productsToRender, tagText) {
     const container = document.getElementById('product-list-container');
     if (!productsToRender || productsToRender.length === 0) { container.innerHTML = `<p>No products available.</p>`; return; }
     
-    // NEW: Add optional marketing tag
     const tagHtml = tagText ? `<div class="product-tag">${tagText}</div>` : '';
 
     container.innerHTML = `<div class="product-list">${productsToRender.map(p => `
@@ -223,14 +206,8 @@ function renderAboutUs(content) {
                 <div>${content.MoreDetails}</div>
             </div>
         </div>
-        <div class="about-section">
-            <h4>Our Mission</h4>
-            <p>${content.OurMission}</p>
-        </div>
-        <div class="about-section">
-            <h4>Our Vision</h4>
-            <p>${content.OurVision}</p>
-        </div>
+        <div class="about-section"><h4>Our Mission</h4><p>${content.OurMission}</p></div>
+        <div class="about-section"><h4>Our Vision</h4><p>${content.OurVision}</p></div>
         ${historySection}`;
 }
 
@@ -244,8 +221,6 @@ function renderJobs(jobs) {
                 <div class="job-details">
                     <div class="job-detail-item"><i class="fa-solid fa-location-dot"></i> <span>${job.location} | ${job.type}</span></div>
                     <div class="job-detail-item"><i class="fa-solid fa-money-bill-wave"></i> <span>${job.salary} RM</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-house-user"></i> <span>${job.accommodation}</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-calendar-days"></i> <span>${job.workDayPattern}</span></div>
                 </div>
                 <div class="job-description">${job.description}</div>
                 <button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button>
@@ -258,35 +233,36 @@ function buildEnquiryForm() {
     container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">Submit</button><p id="enquiry-status"></p></form>`;
 }
 
+function renderBusinessOpportunityPage() {
+    const container = document.getElementById('business-opportunity-content');
+    container.innerHTML = `<h2>Join Our Success: Become a Business Partner</h2><p class="slogan" style="text-align: center; margin-bottom: 40px;">Turn your passion for wellness into a rewarding business venture.</p><div class="why-choose-us-grid"><div><i class="fa-solid fa-star"></i><h3>High-Quality Products</h3><p>Promote a range of trusted, in-demand products that your customers will love and benefit from.</p></div><div><i class="fa-solid fa-sack-dollar"></i><h3>Flexible Earning Potential</h3><p>Enjoy an attractive commission structure with no limits. The more you share, the more you earn.</p></div><div><i class="fa-solid fa-users"></i><h3>Training & Support</h3><p>We provide you with the training, marketing materials, and community support you need to succeed.</p></div></div><div class="about-section" style="margin-top: 40px;"><h4>Your Journey Starts Here</h4><ol style="list-style-type: decimal; padding-left: 20px;"><li><strong>Express Your Interest:</strong> Fill out the simple form below.</li><li><strong>Personal Consultation:</strong> Our team will contact you to discuss the opportunity.</li><li><strong>Launch Your Business:</strong> Receive your starter kit, get access to our training, and start earning!</li></ol></div><hr style="margin: 40px 0;"><h3>Ready to Start Your Journey?</h3><form id="business-form" class="enquiry-form"><input type="text" id="business-name" placeholder="Your Full Name" required><input type="email" id="business-email" placeholder="Your Email Address" required><input type="tel" id="business-phone" placeholder="Your WhatsApp Number" required><textarea id="business-message" placeholder="Tell us why you are interested..." rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">I'm Interested!</button><p id="business-status"></p></form>`;
+}
+
 function buildCartModal() {
     const container = document.getElementById('cart-modal');
     container.innerHTML = `
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>Your Cart</h2>
-                <button class="close" onclick="toggleCart(true)">&times;</button>
-            </div>
+            <div class="modal-header"><h2>Your Cart</h2><button class="close" onclick="toggleCart(true)">&times;</button></div>
             <div class="modal-body" id="cart-items"><p>Your cart is empty.</p></div>
             <div id="cart-checkout-area">
                 <div class="modal-footer">
                     <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
                     <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
                 </div>
-                <div class="customer-info-form">
-                    <h3>Customer Info</h3>
-                    <input type="text" id="customer-name" placeholder="Full Name" required>
-                    <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
-                    <input type="email" id="customer-email" placeholder="Email (Optional)">
-                    <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
+                <div id="customer-info-form-container" class="customer-info-form"></div>
+                <div style="padding: 0 30px 20px;">
+                    <button class="btn btn-secondary" id="save-cart-btn" style="width: 100%; margin-bottom: 10px; display: none;" onclick="saveCart()">
+                        <i class="fa-solid fa-save"></i> Save Cart for Later
+                    </button>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="initiateCheckout()">Complete Order</button>
                 </div>
-                <div style="padding: 0 30px 20px;"><button class="btn btn-primary" style="width: 100%;" onclick="initiateCheckout()">Complete Order</button></div>
             </div>
         </div>`;
 }
 
 function buildJobApplicationModal() {
     const container = document.getElementById('job-application-modal');
-    container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleJobModal(false)">&times;</span><h2>Apply for <span id="job-modal-title"></span></h2><form id="job-application-form" class="enquiry-form"><input type="hidden" id="job-id-input"><input type="hidden" id="job-position-input"><input type="text" id="applicant-name" placeholder="Full Name" required><input type="email" id="applicant-email" placeholder="Email" required><input type="tel" id="applicant-phone" placeholder="Phone" required><input type="text" id="applicant-citizenship" placeholder="Citizenship" required><textarea id="applicant-message" placeholder="Tell us about yourself" rows="4"></textarea><label for="applicant-resume">Upload Resume (Mandatory)</label><input type="file" id="applicant-resume" required><button type="submit" class="btn btn-primary">Submit</button><p id="job-application-status"></p></form></div>`;
+    container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleJobModal(false)">&times;</span><h2>Apply for <span id="job-modal-title"></span></h2><form id="job-application-form" class="enquiry-form"><input type="hidden" id="job-id-input"><input type="hidden" id="job-position-input"><input type="text" id="applicant-name" placeholder="Full Name" required><input type="email" id="applicant-email" placeholder="Email" required><input type="tel" id="applicant-phone" placeholder="Phone" required><textarea id="applicant-message" placeholder="Tell us about yourself" rows="4"></textarea><label for="applicant-resume">Upload Resume</label><input type="file" id="applicant-resume" required><button type="submit" class="btn btn-primary">Submit</button><p id="job-application-status"></p></form></div>`;
 }
 
 function buildFabButtons() {
@@ -296,11 +272,59 @@ function buildFabButtons() {
 
 function buildChatbotWidget() {
     const container = document.getElementById('eshop-chat-widget');
-    container.innerHTML = `<div id="chat-header"><span>FL e-Shop Assistant</span><button id="close-chat-btn" onclick="toggleChatWidget(false)">&times;</button></div><div id="chat-body"></div><div id="chat-input-container"><input type="text" id="chat-input" placeholder="Type your message..."><button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button></div>`;
+    container.innerHTML = `<div id="chat-header"><span>E-Shop Assistant</span><button id="close-chat-btn" onclick="toggleChatWidget(false)">&times;</button></div><div id="chat-body"></div><div id="chat-input-container"><input type="text" id="chat-input" placeholder="Type your message..."><button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button></div>`;
 }
 
 // ===========================================================
-// [ 4.0 ] CART LOGIC
+// [ 3.5 ] NEW: CUSTOMER ACCOUNT RENDERING
+// ===========================================================
+
+function renderMyAccountView() {
+    const container = document.getElementById('my-account-content');
+    container.innerHTML = `
+        <h2>My Account</h2>
+        <nav class="sub-nav" style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button onclick="renderAccountSubView('orders', this)" class="btn btn-secondary active">Order History</button>
+            <button onclick="renderAccountSubView('profile', this)" class="btn btn-secondary">My Profile</button>
+        </nav>
+        <div id="account-sub-view-content" style="margin-top: 20px;"></div>
+    `;
+}
+
+async function renderAccountSubView(subView, btnElement) {
+    const container = document.getElementById('account-sub-view-content');
+    container.innerHTML = '<p>Loading...</p>';
+    document.querySelectorAll('#my-account-content .sub-nav button').forEach(btn => btn.classList.remove('active'));
+    btnElement.classList.add('active');
+
+    if (subView === 'orders') {
+        const response = await postDataToGScript({ action: 'getCustomerOrders', data: { pac: currentCustomer.pac } });
+        if (response.success && response.orders.length > 0) {
+            container.innerHTML = `<table>
+                <thead><tr><th>Invoice ID</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+                <tbody>${response.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>`).join('')}</tbody>
+            </table>`;
+        } else {
+            container.innerHTML = '<p>You have no past orders.</p>';
+        }
+    } else if (subView === 'profile') {
+        container.innerHTML = `
+            <h3>Update Your Details</h3>
+            <form id="customer-profile-form" class="enquiry-form">
+                <input type="text" id="prof-name" placeholder="Full Name" value="${currentCustomer.customerName || ''}" required>
+                <input type="email" id="prof-email" value="${currentCustomer.customerEmail || ''}" disabled>
+                <input type="tel" id="prof-phone" placeholder="WhatsApp Number" value="${currentCustomer.customerPhone || ''}" required>
+                <textarea id="prof-address" placeholder="Shipping Address" rows="4" required>${currentCustomer.customerAddress || ''}</textarea>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <p id="profile-status"></p>
+            </form>
+        `;
+        document.getElementById('customer-profile-form').addEventListener('submit', handleProfileUpdate);
+    }
+}
+
+// ===========================================================
+// [ 4.0 ] CART & CHECKOUT LOGIC (MODIFIED)
 // ===========================================================
 function addToCart(productId) {
     const product = products.find(p => p.id == productId);
@@ -308,7 +332,6 @@ function addToCart(productId) {
     if (existingItem) { existingItem.quantity++; } else { cart.push({ ...product, quantity: 1 }); }
     updateCartDisplay();
 }
-
 function increaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity++; } updateCartDisplay(); }
 function decreaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } } }
 function removeItemFromCart(productId) { cart = cart.filter(item => item.id != productId); updateCartDisplay(); }
@@ -349,62 +372,168 @@ function updateCartDisplay() {
 function toggleCart(hide = false) {
     const modal = document.getElementById('cart-modal');
     modal.style.display = hide ? 'none' : 'flex';
-    if (!hide) updateCartDisplay();
+    if (!hide) {
+        updateCartDisplay();
+        populateCustomerInfoForm();
+    }
 }
-
 async function initiateCheckout() {
-    const checkoutBtn = document.querySelector('#cart-checkout-area button');
-    checkoutBtn.disabled = true;
-    checkoutBtn.textContent = 'Processing...';
+    const checkoutBtn = document.querySelector('#cart-checkout-area button.btn-primary');
+    checkoutBtn.disabled = true; checkoutBtn.textContent = 'Processing...';
 
-    const name = document.getElementById('customer-name').value.trim();
-    const phone = document.getElementById('customer-phone').value.trim();
-    const address = document.getElementById('customer-address').value.trim();
-    const email = document.getElementById('customer-email').value.trim();
-
-    if (!name || !phone || !address) {
-        alert('Please fill in all required customer details: Name, Phone, and Address.');
-        checkoutBtn.disabled = false;
-        checkoutBtn.textContent = 'Complete Order';
-        return;
+    let checkoutData;
+    if (currentCustomer) {
+        checkoutData = {
+            customerName: currentCustomer.customerName, customerEmail: currentCustomer.customerEmail,
+            customerPhone: currentCustomer.customerPhone, customerAddress: currentCustomer.customerAddress,
+        };
+        if (!checkoutData.customerName || !checkoutData.customerPhone || !checkoutData.customerAddress) {
+            alert('Please complete your profile details in the "My Account" section before checking out.');
+            checkoutBtn.disabled = false; checkoutBtn.textContent = 'Complete Order';
+            return;
+        }
+    } else {
+        checkoutData = {
+            customerName: document.getElementById('customer-name').value.trim(),
+            customerEmail: document.getElementById('customer-email').value.trim(),
+            customerPhone: document.getElementById('customer-phone').value.trim(),
+            customerAddress: document.getElementById('customer-address').value.trim(),
+        };
+        if (!checkoutData.customerName || !checkoutData.customerPhone || !checkoutData.customerAddress) {
+            alert('Please fill in Name, Phone, and Address.');
+            checkoutBtn.disabled = false; checkoutBtn.textContent = 'Complete Order';
+            return;
+        }
     }
 
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingFee = 0.0; 
-    const totalAmount = subtotal + shippingFee;
-
-    const itemsPurchased = cart.map(item => `${item.id}x${item.quantity}`).join(', ');
-
-    const payload = {
-        action: 'logInitialOrder',
-        data: {
-            customerName: name,
-            customerPhone: phone,
-            customerEmail: email,
-            customerAddress: address,
-            itemsPurchased: itemsPurchased,
-            cart: cart, 
-            totalAmount: totalAmount,
-            shippingFee: shippingFee,
-            totalPointsForThisPurchase: 0 
-        }
-    };
+    const totalAmount = subtotal; // Assuming no shipping
+    const payload = { action: 'logInitialOrder', data: { ...checkoutData, itemsPurchased: cart.map(item => `${item.id}x${item.quantity}`).join(', '), cart, totalAmount, shippingFee: 0 } };
 
     try {
         await postDataToGScript(payload);
         alert('Your order has been placed successfully! We will contact you via WhatsApp shortly to confirm payment and shipping.');
-        
-        cart = []; 
-        toggleCart(true); 
-        updateCartDisplay(); 
-
+        cart = []; toggleCart(true); updateCartDisplay(); 
     } catch (error) {
         console.error('Checkout failed:', error);
-        alert('There was an error placing your order. Please try again or contact us directly.');
+        alert('There was an error placing your order. Please try again.');
     } finally {
-        checkoutBtn.disabled = false;
-        checkoutBtn.textContent = 'Complete Order';
+        checkoutBtn.disabled = false; checkoutBtn.textContent = 'Complete Order';
     }
+}
+
+// ===========================================================
+// [ 4.5 ] NEW: CUSTOMER LOGIN & SESSION LOGIC
+// ===========================================================
+async function handleLoginSubmit(event) {
+    event.preventDefault();
+    const email = document.getElementById('customer-email').value.trim();
+    const password = document.getElementById('customer-password').value;
+    const statusEl = document.getElementById('login-status');
+    if (!email || !password) { statusEl.textContent = 'Email and password are required.'; return; }
+    statusEl.textContent = 'Logging in...';
+
+    try {
+        const response = await postDataToGScript({ action: 'verifyCustomer', data: { email, password } });
+        if (response.success) {
+            currentCustomer = response.customer;
+            sessionStorage.setItem('eshopCustomer', JSON.stringify(currentCustomer));
+            toggleLoginModal(false);
+            updateLoginStateUI();
+
+            if (response.savedCart && response.savedCart.length > 0) {
+                if (confirm("You have a saved cart from a previous session. Would you like to load it?")) {
+                    cart = response.savedCart;
+                    updateCartDisplay();
+                }
+            }
+        } else { statusEl.textContent = response.message || 'Login failed.'; }
+    } catch (error) { statusEl.textContent = 'Connection error. Please try again.'; }
+}
+
+function handleLogout() {
+    if (cart.length > 0 && currentCustomer) {
+        if (confirm("Would you like to save your current cart before logging out?")) {
+            saveCart();
+        }
+    }
+    cart = [];
+    currentCustomer = null;
+    sessionStorage.removeItem('eshopCustomer');
+    updateLoginStateUI();
+    showTab('homepage');
+}
+
+function updateLoginStateUI() {
+    const navLoginBtn = document.getElementById('nav-login-btn');
+    const myAccountTab = document.querySelector('[onclick="showTab(\'my-account\')"]');
+    const saveCartBtn = document.getElementById('save-cart-btn');
+
+    if (currentCustomer) {
+        navLoginBtn.textContent = `Logout (${currentCustomer.customerName.split(' ')[0]})`;
+        navLoginBtn.onclick = handleLogout;
+        myAccountTab.style.display = 'list-item';
+        if (saveCartBtn) saveCartBtn.style.display = 'block';
+    } else {
+        navLoginBtn.textContent = 'Login / Register';
+        navLoginBtn.onclick = () => toggleLoginModal(true);
+        myAccountTab.style.display = 'none';
+        if (saveCartBtn) saveCartBtn.style.display = 'none';
+    }
+}
+
+function populateCustomerInfoForm() {
+    const container = document.getElementById('customer-info-form-container');
+    if (currentCustomer) {
+        container.innerHTML = `
+            <h3>Shipping To:</h3>
+            <p><strong>${currentCustomer.customerName || 'Update in Profile'}</strong></p>
+            <p>${currentCustomer.customerAddress || 'Please update your address in My Profile.'}</p>
+            <a onclick="showTab('my-account'); toggleCart(true);" style="cursor: pointer; color: var(--primary-color);">Edit Profile</a>
+        `;
+    } else {
+        container.innerHTML = `
+            <h3>Customer Info</h3>
+            <input type="text" id="customer-name" placeholder="Full Name" required>
+            <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
+            <input type="email" id="customer-email" placeholder="Email (For order updates)">
+            <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
+        `;
+    }
+}
+
+async function saveCart() {
+    if (!currentCustomer) return;
+    const btn = document.getElementById('save-cart-btn');
+    btn.textContent = 'Saving...'; btn.disabled = true;
+    const response = await postDataToGScript({ action: 'saveCustomerCart', data: { pac: currentCustomer.pac, cart: cart } });
+    alert(response.message);
+    btn.innerHTML = '<i class="fa-solid fa-save"></i> Save Cart for Later'; btn.disabled = false;
+}
+
+async function handleProfileUpdate(event) {
+    event.preventDefault();
+    const statusEl = document.getElementById('profile-status');
+    const payload = {
+        pac: currentCustomer.pac,
+        customerName: document.getElementById('prof-name').value,
+        customerPhone: document.getElementById('prof-phone').value,
+        customerAddress: document.getElementById('prof-address').value
+    };
+    statusEl.textContent = 'Saving...';
+    
+    const response = await postDataToGScript({ action: 'updateCustomerProfile', data: payload });
+    if (response.success) {
+        statusEl.style.color = 'green';
+        currentCustomer.customerName = payload.customerName;
+        currentCustomer.customerPhone = payload.customerPhone;
+        currentCustomer.customerAddress = payload.customerAddress;
+        sessionStorage.setItem('eshopCustomer', JSON.stringify(currentCustomer));
+        updateLoginStateUI(); // Update welcome message
+    } else {
+        statusEl.style.color = 'red';
+    }
+    statusEl.textContent = response.message;
 }
 
 // ===========================================================
@@ -422,7 +551,6 @@ function toggleJobModal(show = false, jobId = '', jobTitle = '') {
         document.getElementById('job-application-form').reset();
     }
 }
-
 async function handleEnquirySubmit(event) {
     event.preventDefault();
     const statusEl = document.getElementById('enquiry-status');
@@ -432,46 +560,34 @@ async function handleEnquirySubmit(event) {
         await postDataToGScript(payload);
         statusEl.textContent = 'Enquiry sent successfully!';
         event.target.reset();
-    } catch (error) {
-        statusEl.textContent = 'An error occurred.';
-    }
+    } catch (error) { statusEl.textContent = 'An error occurred.'; }
 }
-
 async function handleJobApplicationSubmit(event) {
     event.preventDefault();
     const statusEl = document.getElementById('job-application-status');
     const fileInput = document.getElementById('applicant-resume');
-    if (fileInput.files.length === 0) {
-        statusEl.textContent = 'Resume upload is mandatory.';
-        return;
-    }
+    if (fileInput.files.length === 0) { statusEl.textContent = 'Resume upload is mandatory.'; return; }
     statusEl.textContent = 'Submitting...';
     const file = fileInput.files[0];
     const base64File = await getBase64(file);
-    const payload = {
-        action: 'logJobApplication',
-        data: {
-            jobId: document.getElementById('job-id-input').value,
-            position: document.getElementById('job-position-input').value,
-            name: document.getElementById('applicant-name').value,
-            email: document.getElementById('applicant-email').value,
-            phone: document.getElementById('applicant-phone').value,
-            citizenship: document.getElementById('applicant-citizenship').value,
-            message: document.getElementById('applicant-message').value,
-            resumeFile: base64File.split(',')[1],
-            resumeMimeType: file.type,
-            resumeFileName: file.name
-        }
-    };
+    const payload = { action: 'logJobApplication', data: { jobId: document.getElementById('job-id-input').value, position: document.getElementById('job-position-input').value, name: document.getElementById('applicant-name').value, email: document.getElementById('applicant-email').value, phone: document.getElementById('applicant-phone').value, message: document.getElementById('applicant-message').value, resumeFile: base64File.split(',')[1], resumeMimeType: file.type, resumeFileName: file.name }};
     try {
         await postDataToGScript(payload);
         statusEl.textContent = 'Application submitted successfully!';
         setTimeout(() => { toggleJobModal(false); }, 3000);
-    } catch (error) {
-        statusEl.textContent = 'An error occurred.';
-    }
+    } catch (error) { statusEl.textContent = 'An error occurred.'; }
 }
-
+async function handleBusinessSubmit(event) {
+    event.preventDefault();
+    const statusEl = document.getElementById('business-status');
+    statusEl.textContent = 'Sending...';
+    try {
+        const payload = { action: 'logEnquiry', data: { name: document.getElementById('business-name').value, email: document.getElementById('business-email').value, phone: document.getElementById('business-phone').value, type: 'Business Opportunity Lead', message: document.getElementById('business-message').value } };
+        await postDataToGScript(payload);
+        statusEl.textContent = 'Thank you! We will contact you soon.';
+        event.target.reset();
+    } catch (error) { statusEl.textContent = 'An error occurred.'; }
+}
 function getBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -480,7 +596,6 @@ function getBase64(file) {
         reader.onerror = error => reject(error);
     });
 }
-
 // ===========================================================
 // [ 6.0 ] CHATBOT LOGIC
 // ===========================================================
@@ -605,35 +720,29 @@ async function handleMyAccountMenu(text) {
 function showTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
+    // If showing My Account, automatically click the first sub-view
+    if (tabId === 'my-account') {
+        const firstSubNavButton = document.querySelector('#my-account-content .sub-nav button');
+        if (firstSubNavButton) firstSubNavButton.click();
+    }
 }
-
 async function postDataToGScript(payload) {
     try {
-        await fetch(googleScriptURL, { method: 'POST', mode: 'no-cors', cache: 'no-cache', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), redirect: 'follow' });
-        return { status: 'success' };
+        const response = await fetch(googleScriptURL, { method: 'POST', mode: 'no-cors', cache: 'no-cache', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), redirect: 'follow' });
+        // Since it's no-cors, we can't read the response, so we just assume success if it doesn't throw.
+        return { success: true }; // Simplified for no-cors
     } catch (error) {
         console.error('Error posting to Google Script:', error);
         throw error;
     }
 }
-
-async function postToRender(action, data) {
-    try {
-        const response = await fetch(botServerURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, apiKey, data })
-        });
-        if (!response.ok) {
-            const err = await response.json();
-            throw new Error(err.message || 'Server error');
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('Error posting to Render:', error);
-        throw error;
-    }
+// This needs to be a standard fetch for API calls where we need a response
+async function postDataToGScriptWithResponse(payload) {
+    const response = await fetch(googleScriptURL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return response.json();
 }
+
 
 // ===========================================================
 // [ 8.0 ] NEW: THEME, MARKETING & LOGIN MODAL LOGIC
