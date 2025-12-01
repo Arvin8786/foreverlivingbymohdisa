@@ -1,592 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent Sales Portal</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/jpeg" href="FL.jpg">
+    
+    <style>
+        /* ================================================================= */
+        /* [ 1.0 ] CORE STYLES & VARIABLES */
+        /* ================================================================= */
+        :root {
+            --primary-color: #1a5276; 
+            --secondary-color: #f39c12; 
+            --success-color: #198754; 
+            --light-gray: #f4f6f8; 
+            --mid-gray: #e9ecef; 
+            --dark-text: #333; 
+            --light-text: #fff;
+            --danger-color: #dc3545;
+            --border-radius-lg: 12px;
+            --border-radius-sm: 8px;
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+            --font-family: 'Poppins', sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0;}
+        
+        body { font-family: var(--font-family); background: var(--light-gray); color: var(--dark-text); line-height: 1.5; }
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
+        h1, h2, h3 { color: var(--dark-text); font-weight: 600; }
+        h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
+        
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
+        .btn-primary { background: var(--primary-color); color: var(--light-text); border-radius: 50px; box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3); }
+        .btn-primary:hover:not(:disabled) { background: #113a56; box-shadow: 0 6px 12px rgba(26, 82, 118, 0.4); transform: translateY(-2px); }
+        .btn-secondary { background: var(--mid-gray); color: var(--dark-text); border-radius: var(--border-radius-sm); }
+        .btn-secondary:hover:not(:disabled) { background: #d0d7dd; }
+        .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; box-shadow: none; transform: none; }
+        
+        /* Cards & Form Elements */
+        .card { background: var(--light-text); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; }
+        .card h3 { border-bottom: 2px solid var(--mid-gray); padding-bottom: 10px; margin-bottom: 20px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem; }
+        .hidden { display: none !important; }
+
+        /* [ 2.0 ] LOGIN & HEADER STYLES */
+        #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1a5276 0%, #34495e 100%); }
+        #login-box { padding: 50px; max-width: 400px; text-align: center; background: #fff; border-radius: 15px; border-top: 5px solid var(--primary-color); }
+        
+        #portal-view header { padding: 15px 30px; display: flex; align-items: center; }
+        #header-content { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; margin-right: 20px; }
+        .target-bar-container { width: 100%; max-width: 450px; margin-top: 5px; height: 20px; background-color: var(--mid-gray); border-radius: 10px; overflow: hidden; position: relative; }
+        .target-progress { background: linear-gradient(90deg, #f39c12, #ffc107); height: 100%; }
+        .target-text { position: absolute; width: 100%; text-align: center; font-size: 0.8rem; line-height: 20px; color: #000; font-weight: 600; }
+        
+        /* Navigation Bar */
+        #portal-view nav { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 25px; background-color: var(--primary-color); border-radius: var(--border-radius-sm); overflow: hidden; box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3); }
+        #portal-view nav .btn { background: transparent; color: var(--light-text); border: none; border-radius: 0; flex-grow: 1; padding: 15px 20px; }
+        #portal-view nav .btn.active { background: var(--secondary-color); color: var(--dark-text); box-shadow: none; }
+        #portal-view nav .btn:hover:not(.active) { background: rgba(255, 255, 255, 0.1); }
+        #portal-view nav .btn.hidden { display: none; }
+
+        /* [ 3.0 ] ORDER CREATION & DATA TABLES */
+        #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
+        #product-selection-list { max-height: 500px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
+        .product-item-selectable { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid var(--mid-gray); cursor: pointer; transition: background 0.1s; }
+        .product-item-selectable:hover { background: #f0f8ff; }
+        .product-item-selectable img { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; }
+        
+        #summary-items-list .summary-item { display: grid; grid-template-columns: 1fr 60px 80px 30px; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--mid-gray); }
+        .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; }
+        .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
+        .summary-line { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; margin-top: 10px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+
+        /* [ 4.0 ] PROFILE GRID STYLES */
+        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .profile-section h4 { color: var(--primary-color); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .edit-badge { font-size: 0.8rem; font-weight: 600; color: var(--secondary-color); background-color: #fef5e7; padding: 3px 8px; border-radius: 12px; }
+        .profile-item { margin-bottom: 15px; }
+        .profile-item label { font-weight: 600; display: block; color: #666; margin-bottom: 2px; }
+        .profile-item input, .profile-item textarea { background: #f9f9f9; width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        .profile-item input:disabled, .profile-item textarea:disabled { background: #eee; color: #777; cursor: not-allowed; border-color: #eee; }
+        .profile-item input:enabled, .profile-item textarea:enabled { background: #fff; border: 1px solid var(--primary-color); }
+
+        @media (max-width: 1000px) {
+            #order-creation-workflow { grid-template-columns: 1fr; }
+            #order-summary-card { position: static; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
+</head>
+<body>
+
+<div id="login-view">
+    <div class="card" id="login-box">
+        <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
+        <h1>Agent Portal Login</h1>
+        <p>Enter your credentials to access the sales platform.</p>
+        <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
+            <input type="text" id="agent-id-input" placeholder="Agent ID" required>
+            <input type="password" id="agent-password-input" placeholder="Password" required> 
+            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
+            <p id="login-status"></p>
+        </form>
+    </div>
+</div>
+
+<div id="password-change-view" class="container hidden" style="min-height: 100vh;">
+    <div class="card" style="max-width: 400px; margin: 50px auto; text-align: center;">
+        <h2>Mandatory Password Change</h2>
+        <p id="change-view-agent-id" style="font-weight: 600;"></p>
+        <p style="color: var(--danger-color); font-weight: 600;">For security, you must change your default password immediately.</p>
+        <input type="password" id="new-password-input" placeholder="New Password" required>
+        <input type="password" id="confirm-password-input" placeholder="Confirm New Password" required>
+        <button id="change-password-btn" class="btn btn-primary" style="width:100%;">Set New Password</button>
+        <p id="password-change-status" style="margin-top: 15px;"></p>
+    </div>
+</div>
+
+<div id="portal-view" class="container hidden">
+    <header>
+        <div id="header-content">
+            <h2 id="agent-welcome-header"></h2>
+            <p id="agent-details-display" style="font-size: 1.1rem; color: #555; font-weight: 500; margin-top: -10px; margin-bottom: 15px;"></p>
+
+            <div id="target-bar-display"></div>
+            <button id="refresh-data-btn" class="btn btn-secondary" style="margin-top: 10px; padding: 5px 10px;">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh Data
+            </button>
+        </div>
+        <button id="logout-btn" class="btn btn-primary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </header>
+
+    <nav>
+        <button id="nav-create-order-btn" class="btn active"><i class="fa-solid fa-cart-plus"></i> New Order</button>
+        <button id="nav-products-btn" class="btn"><i class="fa-solid fa-boxes-stacked"></i> Products</button>
+        <button id="nav-my-orders-btn" class="btn"><i class="fa-solid fa-receipt"></i> My Orders</button>
+        <button id="nav-my-commission-btn" class="btn"><i class="fa-solid fa-wallet"></i> My Commission</button>
+        <button id="nav-profile-btn" class="btn"><i class="fa-solid fa-id-card"></i> My Profile</button>
+        <button id="nav-team-btn" class="btn hidden"><i class="fa-solid fa-users"></i> My Team</button> 
+        <button id="nav-admin-dashboard-btn" class="btn hidden"><i class="fa-solid fa-user-shield"></i> Admin Dashboard</button> 
+    </nav>
+
+    <div id="create-order-view" class="view">
+        <div id="order-creation-workflow">
+            <div>
+                <div class="card">
+                    <h3>Customer Information</h3>
+                    <select id="customer-dropdown"></select>
+                    <button id="new-customer-btn" class="btn" style="background-color: var(--mid-gray); color: var(--dark-text); margin-top: 10px; border-radius: var(--border-radius-sm);">
+                        <i class="fa-solid fa-user-plus"></i> Create New Customer
+                    </button>
+                    <div id="new-customer-form" class="hidden" style="margin-top: 15px; background: var(--light-gray); padding: 15px; border-radius: var(--border-radius-sm);">
+                        <input type="text" id="new-customer-name" placeholder="Customer Name" required>
+                        <input type="email" id="new-customer-email" placeholder="Customer Email" required>
+                        <input type="tel" id="new-customer-phone" placeholder="Customer Phone (WhatsApp)" required>
+                        <textarea id="new-customer-address" placeholder="Customer Address" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Product Selection</h3>
+                    <input type="text" id="product-order-search" placeholder="Search product name or SKU...">
+                    <div id="product-selection-list"></div>
+                </div>
+            </div>
+            <div id="order-summary-card" class="card">
+                <h3>Order Summary</h3>
+                <div id="summary-items-list"></div>
+                <div class="summary-total">
+                    <div class="summary-line"><span>Subtotal:</span><span id="summary-subtotal">RM 0.00</span></div>
+                    <div class="summary-line"><span>Shipping:</span><span id="summary-shipping">RM 0.00</span></div>
+                    <div class="summary-line total"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
+                </div>
+                <div id="finalize-order-section" style="margin-top: 30px;">
+                    <h3>Payment & Submit</h3>
+                    <label for="payment-proof">Upload Payment Proof (Required)</label>
+                    <input type="file" id="payment-proof" required>
+                    <button id="submit-order-btn" class="btn btn-primary" style="width:100%; margin-top: 15px;">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Order
+                    </button>
+                    <p id="submit-status" style="text-align: center; margin-top: 10px; font-weight: 600;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="products-view" class="view hidden card">
+        <h2>Product Catalog</h2>
+        <table>
+            <thead><tr><th>SKU</th><th>Name</th><th>RSP (RM)</th><th>CC</th></tr></thead>
+            <tbody id="product-catalog-table"></tbody>
+        </table>
+    </div>
+
+    <div id="my-orders-view" class="view hidden card">
+        <h2>My Past Orders</h2>
+        <div id="my-orders-list"></div>
+    </div>
+    
+    <div id="my-commission-view" class="view hidden card">
+        <h2>My Commission Records</h2>
+        <p>Review your processed commission payouts and team overrides.</p>
+        <div id="my-commission-list"></div>
+    </div>
+
+    <div id="profile-view" class="view hidden card">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
+            <h2>My Profile</h2>
+            <button id="save-profile-btn" class="btn btn-primary hidden" onclick="saveProfile()">Save Changes</button>
+        </div>
+        <p id="profile-status" style="text-align:right; font-size:0.9rem; margin-top:-10px;"></p>
+        <div class="profile-grid">
+            <div class="profile-section">
+                <h4>Personal & Contact Info <span id="edit-badge-contact" class="edit-badge" style="display:none;">(Editable)</span></h4>
+                <div class="profile-item"><label>Full Name</label><input type="text" id="prof-employeeName" disabled></div>
+                <div class="profile-item"><label>Agent ID</label><input type="text" id="prof-agentID" disabled></div>
+                <div class="profile-item"><label>Phone Number</label><input type="tel" id="prof-employeePhone" disabled></div>
+                <div class="profile-item"><label>Email Address</label><input type="email" id="prof-employeeEmail" disabled></div>
+                <div class="profile-item"><label>Mailing Address</label><textarea id="prof-employeeAddress" rows="3" disabled style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit;"></textarea></div>
+            </div>
+            <div class="profile-section">
+                <h4>Employment Details</h4>
+                <div class="profile-item"><label>Position</label><input type="text" id="prof-position" disabled></div>
+                <div class="profile-item"><label>Status</label><input type="text" id="prof-employeeStatus" disabled></div>
+                <div class="profile-item"><label>Agent Type</label><input type="text" id="prof-agentType" disabled></div>
+                <div class="profile-item"><label>Commission Rate</label><input type="text" id="prof-commissionRate" disabled></div>
+                <div class="profile-item"><label>Monthly Target</label><input type="text" id="prof-target" disabled></div>
+                <div class="profile-item"><label>Reporting To</label><input type="text" id="prof-managerID" disabled></div>
+            </div>
+            <div class="profile-section">
+                <h4>Payment Information <span id="edit-badge-payment" class="edit-badge" style="display:none;">(Editable)</span></h4>
+                <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bankName" disabled></div>
+                <div class="profile-item"><label>Account Holder Name</label><input type="text" id="prof-accountHolderName" disabled></div>
+                <div class="profile-item"><label>Account Number</label><input type="text" id="prof-accountNumber" disabled></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="team-view" class="view hidden card">
+        <h2>My Team Performance</h2>
+        <div class="card" style="background:#e8f5e9; border-top:4px solid #2e7d32; margin-bottom:20px;">
+            <h4>Total Override Income Earned</h4>
+            <p id="team-total-override" style="font-size:1.5rem; font-weight:700; color:#2e7d32;">Loading...</p>
+        </div>
+        <h3>Direct Subordinates</h3>
+        <ul id="subordinates-list" style="list-style:none; padding:0;">Loading...</ul>
+    </div>
+
+    <div id="admin-dashboard-view" class="view hidden card">
+        <h2>Admin Dashboard: Performance Overview</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--primary-color);"><h4 style="margin-bottom: 5px;">Total Sales (RM)</h4><p id="admin-total-sales" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">Loading...</p></div>
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--success-color);"><h4 style="margin-bottom: 5px;">Total CC</h4><p id="admin-total-cc" style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">Loading...</p></div>
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--secondary-color);"><h4 style="margin-bottom: 5px;">Agents On Target</h4><p id="admin-agents-on-target" style="font-size: 1.5rem; font-weight: 700; color: #f39c12;">Loading...</p></div>
+        </div>
+        <h3>Agent Performance Chart</h3>
+        <div style="background: white; padding: 20px; border-radius: var(--border-radius-lg);"><canvas id="performanceChart" height="100"></canvas></div>
+        <h3 style="margin-top:30px;">Team Breakdown</h3>
+        <div id="admin-data-table" style="margin-top: 20px;"></div>
+    </div>
+</div>
+
+<script>
 // =================================================================
-// E-Shop Frontend Script - v21.0 (with Customer Login Integration)
+// AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE
 // =================================================================
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx84SfcmMHmWLVq2PqZn9tuj_wr47UJDYk2ks2Juwd1tDjKZXv8nYaayYA6aSX1pgC17Q/exec'; // Update this URL
 
-// ===========================================================
-// [ 1.0 ] GLOBAL CONFIGURATION & STATE
-// ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxatHBKuXn25P_Aiy5b9pEBiPtxqZW87D5456NUnLKwLedhvUXlmnaaAzq-WR01VmHW9A/exec'; // <-- PASTE YOUR NEW URL HERE
-const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
-const apiKey = '9582967';
+let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
+let currentProfile = {}, canEditProfile = false;
 
-let products = [];
-let allJobs = [];
-let cart = [];
-let chatSession = {};
-let currentCustomer = null; // Holds logged-in customer data
-
-// ===========================================================
-// [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
-// ===========================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Attach static listeners immediately ---
-    const navLoginBtn = document.getElementById('nav-login-btn');
-    if (navLoginBtn) navLoginBtn.addEventListener('click', () => toggleLoginModal(true));
+    document.getElementById('login-form').addEventListener('submit', (event) => { event.preventDefault(); handleLogin(); });
+    document.getElementById('logout-btn').addEventListener('click', handleLogout);
+    document.getElementById('refresh-data-btn').addEventListener('click', refreshPageData);
+
+    document.getElementById('nav-create-order-btn').addEventListener('click', () => showView('create-order-view'));
+    document.getElementById('nav-products-btn').addEventListener('click', () => showView('products-view'));
+    document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
+    document.getElementById('nav-my-commission-btn').addEventListener('click', () => showView('my-commission-view'));
     
-    const closeLoginModalBtn = document.getElementById('close-login-modal-btn');
-    if (closeLoginModalBtn) closeLoginModalBtn.addEventListener('click', () => toggleLoginModal(false));
+    // NEW LISTENERS
+    document.getElementById('nav-profile-btn').addEventListener('click', () => showView('profile-view'));
+    document.getElementById('nav-team-btn').addEventListener('click', () => showView('team-view'));
+    document.getElementById('nav-admin-dashboard-btn').addEventListener('click', () => showView('admin-dashboard-view'));
 
-    // Add listener for the login form itself
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
-    
-    // Chat listeners
-    const chatSendBtn = document.getElementById('chat-send-btn');
-    if (chatSendBtn) chatSendBtn.addEventListener('click', handleChatSubmit);
-    const chatInput = document.getElementById('chat-input');
-    if (chatInput) chatInput.addEventListener('keyup', (event) => { if (event.key === "Enter") handleChatSubmit(); });
-
-    // Check for a logged-in session
-    const loggedInCustomer = sessionStorage.getItem('eshopCustomer');
-    if (loggedInCustomer) {
-        currentCustomer = JSON.parse(loggedInCustomer);
-        updateLoginStateUI();
-    }
-
-    // Start fetching dynamic data
-    fetchData();
+    document.getElementById('change-password-btn').addEventListener('click', handleChangePassword);
+    document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
+    document.getElementById('customer-dropdown').addEventListener('change', handleCustomerSelection);
+    document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
+    document.getElementById('product-order-search').addEventListener('keyup', renderProductSelectionList);
 });
 
-async function fetchData() {
-    try {
-        const response = await fetch(googleScriptURL);
-        if (!response.ok) throw new Error('Network response failed');
-        const data = await response.json();
-        if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
-
-        const marketingData = data.marketingData || {};
-        const activeTheme = data.activeTheme || null;
-
-        if (marketingData.MaintenanceMode === 'TRUE') {
-            document.getElementById('store-wrapper').style.display = 'none';
-            const overlay = document.getElementById('maintenance-overlay');
-            overlay.style.display = 'flex';
-            document.getElementById('maintenance-message').textContent = marketingData.MaintenanceMessage || 'Site is down for maintenance.';
-            return;
-        }
-
-        if (activeTheme) applyTheme(activeTheme);
-        if (marketingData) applyMarketing(marketingData, activeTheme);
-
-        products = data.products || [];
-        allJobs = data.jobsListings || [];
-        
-        renderMainContentShell();
-        renderStaticContent(data.aboutUsContent);
-        renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
-        renderProducts(products, marketingData.ProductTagText); 
-        renderAboutUs(data.aboutUsContent);
-        renderJobs(allJobs);
-        buildEnquiryForm();
-        renderBusinessOpportunityPage();
-        renderMyAccountView(); // Build the My Account view structure
-        
-        buildCartModal();
-        buildJobApplicationModal();
-        buildFabButtons();
-        buildChatbotWidget();
-        buildPopupModal(marketingData.PopupMessageText, marketingData.PopupImageURL);
-
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v21.0)`;
-        
-        document.getElementById('enquiry-form').addEventListener('submit', handleEnquirySubmit);
-        document.getElementById('job-application-form').addEventListener('submit', handleJobApplicationSubmit);
-        document.getElementById('business-form').addEventListener('submit', handleBusinessSubmit);
-
-        showTab('homepage');
-
-    } catch (error) {
-        console.error("Fatal Error fetching store data:", error);
-        document.getElementById('main-content').innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
-    }
-}
-
-// ===========================================================
-// [ 3.0 ] UI & DYNAMIC CONTENT RENDERING
-// ===========================================================
-function renderMainContentShell() {
-    const main = document.getElementById('main-content');
-    main.innerHTML = `
-        <div id="homepage" class="tab-content active">
-            <section id="homepage-hero" class="hero-section"></section>
-            <section id="why-choose-us" class="dynamic-content-wrapper"></section>
-            <section id="youtube-videos" class="dynamic-content-wrapper"></section>
-            <section id="homepage-testimonies" class="dynamic-content-wrapper"><h2>What Our Customers Say</h2><div id="testimonies-container"></div></section>
-            <section id="homepage-featured-jobs" class="dynamic-content-wrapper"><h2>Join Our Team</h2><div id="featured-jobs-container"></div><a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0; max-width: 300px;">View All Career Opportunities</a></section>
-        </div>
-        <div id="products" class="tab-content"><div id="product-list-container"></div></div>
-        <div id="about" class="tab-content"><section id="about-us-content" class="dynamic-content-wrapper"></section></div>
-        <div id="jobs" class="tab-content"><section id="jobs-content" class="dynamic-content-wrapper"><h2>All Career Opportunities</h2><div id="job-listings-container"></div></section></div>
-        <div id="business" class="tab-content"><section id="business-opportunity-content" class="dynamic-content-wrapper"></section></div>
-        <div id="enquiries" class="tab-content"><section id="enquiries-form-content" class="dynamic-content-wrapper"></section></div>
-        <div id="my-account" class="tab-content"><section id="my-account-content" class="dynamic-content-wrapper"></section></div>
-    `;
-}
-
-function renderStaticContent(content) {
-    if (!content) return;
-    document.getElementById('company-name-header').innerHTML = `${content.CompanyName || ''} <span class="by-line">${content.Owner} - ${content.Role}</span> <span class="slogan">${content.Slogan}</span>`;
-    document.getElementById('footer-text').textContent = content.Footer || `© ${new Date().getFullYear()} ${content.CompanyName}`;
-}
-
-function renderHomepageContent(about, jobs, testimonies) {
-    if (!about) return;
-    const heroContainer = document.getElementById('homepage-hero');
-    if (heroContainer) heroContainer.innerHTML = `<h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p>`;
+async function handleLogin() {
+    const agentId = document.getElementById('agent-id-input').value.trim();
+    const password = document.getElementById('agent-password-input').value; 
+    const loginBtn = document.getElementById('login-btn');
+    const loginStatus = document.getElementById('login-status');
     
-    const whyChooseUsContainer = document.getElementById('why-choose-us');
-    if (whyChooseUsContainer) whyChooseUsContainer.innerHTML = `<h2>${about.WhyChooseUs_Title}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div>`;
-        
-    const youtubeSection = document.getElementById('youtube-videos');
-    const videoUrls = about.YoutubeURL ? String(about.YoutubeURL).split(',').map(url => url.trim()) : [];
-    if (youtubeSection && videoUrls.length > 0 && videoUrls[0]) {
-        const videosHtml = videoUrls.map(url => {
-            try {
-                const videoId = new URL(url).searchParams.get('v');
-                if (videoId) return `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
-            } catch(e) { console.error("Invalid YouTube URL:", url); }
-            return '';
-        }).join('');
-        const youtubeTitle = about.YoutubeSection_Title || 'Learn More';
-        youtubeSection.innerHTML = `<h2>${youtubeTitle}</h2><div id="youtube-videos-container">${videosHtml}</div>`;
-    } else if(youtubeSection) {
-        youtubeSection.style.display = 'none';
-    }
-
-    const testimoniesContainer = document.getElementById('testimonies-container');
-    if (testimonies && testimonies.length > 0) {
-        testimoniesContainer.innerHTML = testimonies.map(t => {
-            let stars = '';
-            for (let i = 0; i < 5; i++) { stars += `<i class="fa-solid fa-star" style="color: ${i < t.Rating ? 'var(--secondary-color)' : '#ccc'}"></i>`; }
-            return `<div class="testimony-card"><div class="testimony-header"><h4>${t.ClientName}</h4><div class="testimony-rating">${stars}</div></div><p>"${t.Quote}"</p></div>`;
-        }).join('');
-    } else if (testimoniesContainer) {
-        document.getElementById('homepage-testimonies').style.display = 'none';
-    }
-
-    const featuredJobsContainer = document.getElementById('featured-jobs-container');
-    const featuredJobs = jobs ? jobs.filter(j => j.isFeatured) : [];
-    if (featuredJobsContainer && featuredJobs.length > 0) {
-        featuredJobsContainer.innerHTML = featuredJobs.map(job => `<div class="job-listing-summary"><h4>${job.position}</h4><p>${job.location} | ${job.type}</p></div>`).join('');
-    } else if (featuredJobsContainer) {
-        document.getElementById('homepage-featured-jobs').style.display = 'none';
-    }
-}
-
-function renderProducts(productsToRender, tagText) {
-    const container = document.getElementById('product-list-container');
-    if (!productsToRender || productsToRender.length === 0) { container.innerHTML = `<p>No products available.</p>`; return; }
-    
-    const tagHtml = tagText ? `<div class="product-tag">${tagText}</div>` : '';
-
-    container.innerHTML = `<div class="product-list">${productsToRender.map(p => `
-        <div class="product" style="position: relative;">
-            ${tagHtml}
-            <div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div>
-            <div class="product-info">
-                <h3>${p.name}</h3>
-                <div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div>
-                <div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div>
-                <div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div>
-                <div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div>
-            </div>
-        </div>`).join('')}</div>`;
-}
-
-function renderAboutUs(content) {
-    const container = document.getElementById('about-us-content');
-    if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
-    const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
-    container.innerHTML = `
-        <h2>About ${content.CompanyName}</h2>
-        <div class="owner-profile">
-            <img src="arvind.jpg" alt="${content.Owner}" class="owner-image" onerror="this.style.display='none'">
-            <div class="owner-details">
-                <h3>${content.Owner} - ${content.Role}</h3>
-                <div>${content.MoreDetails}</div>
-            </div>
-        </div>
-        <div class="about-section"><h4>Our Mission</h4><p>${content.OurMission}</p></div>
-        <div class="about-section"><h4>Our Vision</h4><p>${content.OurVision}</p></div>
-        ${historySection}`;
-}
-
-function renderJobs(jobs) {
-    const container = document.getElementById('job-listings-container');
-    if (!jobs || jobs.length === 0) { container.innerHTML = '<p>There are currently no open positions.</p>'; return; }
-    container.innerHTML = jobs.map(job => `
-        <div class="job-card">
-            <div class="job-header"><h3>${job.position}</h3></div>
-            <div class="job-body">
-                <div class="job-details">
-                    <div class="job-detail-item"><i class="fa-solid fa-location-dot"></i> <span>${job.location} | ${job.type}</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-money-bill-wave"></i> <span>${job.salary} RM</span></div>
-                </div>
-                <div class="job-description">${job.description}</div>
-                <button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button>
-            </div>
-        </div>`).join('');
-}
-
-function buildEnquiryForm() {
-    const container = document.getElementById('enquiries-form-content');
-    container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">Submit</button><p id="enquiry-status"></p></form>`;
-}
-
-function renderBusinessOpportunityPage() {
-    const container = document.getElementById('business-opportunity-content');
-    container.innerHTML = `<h2>Join Our Success: Become a Business Partner</h2><p class="slogan" style="text-align: center; margin-bottom: 40px;">Turn your passion for wellness into a rewarding business venture.</p><div class="why-choose-us-grid"><div><i class="fa-solid fa-star"></i><h3>High-Quality Products</h3><p>Promote a range of trusted, in-demand products that your customers will love and benefit from.</p></div><div><i class="fa-solid fa-sack-dollar"></i><h3>Flexible Earning Potential</h3><p>Enjoy an attractive commission structure with no limits. The more you share, the more you earn.</p></div><div><i class="fa-solid fa-users"></i><h3>Training & Support</h3><p>We provide you with the training, marketing materials, and community support you need to succeed.</p></div></div><div class="about-section" style="margin-top: 40px;"><h4>Your Journey Starts Here</h4><ol style="list-style-type: decimal; padding-left: 20px;"><li><strong>Express Your Interest:</strong> Fill out the simple form below.</li><li><strong>Personal Consultation:</strong> Our team will contact you to discuss the opportunity.</li><li><strong>Launch Your Business:</strong> Receive your starter kit, get access to our training, and start earning!</li></ol></div><hr style="margin: 40px 0;"><h3>Ready to Start Your Journey?</h3><form id="business-form" class="enquiry-form"><input type="text" id="business-name" placeholder="Your Full Name" required><input type="email" id="business-email" placeholder="Your Email Address" required><input type="tel" id="business-phone" placeholder="Your WhatsApp Number" required><textarea id="business-message" placeholder="Tell us why you are interested..." rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">I'm Interested!</button><p id="business-status"></p></form>`;
-}
-
-function buildCartModal() {
-    const container = document.getElementById('cart-modal');
-    container.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header"><h2>Your Cart</h2><button class="close" onclick="toggleCart(true)">&times;</button></div>
-            <div class="modal-body" id="cart-items"><p>Your cart is empty.</p></div>
-            <div id="cart-checkout-area">
-                <div class="modal-footer">
-                    <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
-                    <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
-                </div>
-                <div id="customer-info-form-container" class="customer-info-form"></div>
-                <div style="padding: 0 30px 20px;">
-                    <button class="btn btn-secondary" id="save-cart-btn" style="width: 100%; margin-bottom: 10px; display: none;" onclick="saveCart()">
-                        <i class="fa-solid fa-save"></i> Save Cart for Later
-                    </button>
-                    <button class="btn btn-primary" style="width: 100%;" onclick="initiateCheckout()">Complete Order</button>
-                </div>
-            </div>
-        </div>`;
-}
-
-function buildJobApplicationModal() {
-    const container = document.getElementById('job-application-modal');
-    container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleJobModal(false)">&times;</span><h2>Apply for <span id="job-modal-title"></span></h2><form id="job-application-form" class="enquiry-form"><input type="hidden" id="job-id-input"><input type="hidden" id="job-position-input"><input type="text" id="applicant-name" placeholder="Full Name" required><input type="email" id="applicant-email" placeholder="Email" required><input type="tel" id="applicant-phone" placeholder="Phone" required><textarea id="applicant-message" placeholder="Tell us about yourself" rows="4"></textarea><label for="applicant-resume">Upload Resume</label><input type="file" id="applicant-resume" required><button type="submit" class="btn btn-primary">Submit</button><p id="job-application-status"></p></form></div>`;
-}
-
-function buildFabButtons() {
-    const container = document.getElementById('fab-container');
-    container.innerHTML = `<div id="floating-cart" class="fab floating-cart-btn" onclick="toggleCart()"><i class="fa-solid fa-cart-shopping"></i><span id="cart-count">0</span></div><div class="fab chatbot-fab" onclick="toggleChatWidget(true)"><i class="fa-solid fa-robot"></i></div>`;
-}
-
-function buildChatbotWidget() {
-    const container = document.getElementById('eshop-chat-widget');
-    container.innerHTML = `<div id="chat-header"><span>E-Shop Assistant</span><button id="close-chat-btn" onclick="toggleChatWidget(false)">&times;</button></div><div id="chat-body"></div><div id="chat-input-container"><input type="text" id="chat-input" placeholder="Type your message..."><button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button></div>`;
-}
-
-// ===========================================================
-// [ 3.5 ] NEW: CUSTOMER ACCOUNT RENDERING
-// ===========================================================
-
-function renderMyAccountView() {
-    const container = document.getElementById('my-account-content');
-    container.innerHTML = `
-        <h2>My Account</h2>
-        <nav class="sub-nav" style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button onclick="renderAccountSubView('orders', this)" class="btn btn-secondary active">Order History</button>
-            <button onclick="renderAccountSubView('profile', this)" class="btn btn-secondary">My Profile</button>
-        </nav>
-        <div id="account-sub-view-content" style="margin-top: 20px;"></div>
-    `;
-}
-
-async function renderAccountSubView(subView, btnElement) {
-    const container = document.getElementById('account-sub-view-content');
-    container.innerHTML = '<p>Loading...</p>';
-    document.querySelectorAll('#my-account-content .sub-nav button').forEach(btn => btn.classList.remove('active'));
-    btnElement.classList.add('active');
-
-    if (subView === 'orders') {
-        const response = await postDataToGScript({ action: 'getCustomerOrders', data: { pac: currentCustomer.pac } });
-        if (response.success && response.orders.length > 0) {
-            container.innerHTML = `<table>
-                <thead><tr><th>Invoice ID</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
-                <tbody>${response.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>`).join('')}</tbody>
-            </table>`;
-        } else {
-            container.innerHTML = '<p>You have no past orders.</p>';
-        }
-    } else if (subView === 'profile') {
-        container.innerHTML = `
-            <h3>Update Your Details</h3>
-            <form id="customer-profile-form" class="enquiry-form">
-                <input type="text" id="prof-name" placeholder="Full Name" value="${currentCustomer.customerName || ''}" required>
-                <input type="email" id="prof-email" value="${currentCustomer.customerEmail || ''}" disabled>
-                <input type="tel" id="prof-phone" placeholder="WhatsApp Number" value="${currentCustomer.customerPhone || ''}" required>
-                <textarea id="prof-address" placeholder="Shipping Address" rows="4" required>${currentCustomer.customerAddress || ''}</textarea>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <p id="profile-status"></p>
-            </form>
-        `;
-        document.getElementById('customer-profile-form').addEventListener('submit', handleProfileUpdate);
-    }
-}
-
-// ===========================================================
-// [ 4.0 ] CART & CHECKOUT LOGIC (MODIFIED)
-// ===========================================================
-function addToCart(productId) {
-    const product = products.find(p => p.id == productId);
-    const existingItem = cart.find(item => item.id == productId);
-    if (existingItem) { existingItem.quantity++; } else { cart.push({ ...product, quantity: 1 }); }
-    updateCartDisplay();
-}
-function increaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity++; } updateCartDisplay(); }
-function decreaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } } }
-function removeItemFromCart(productId) { cart = cart.filter(item => item.id != productId); updateCartDisplay(); }
-
-function updateCartDisplay() {
-    const cartItemsContainer = document.getElementById('cart-items');
-    const checkoutArea = document.getElementById('cart-checkout-area');
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    document.getElementById('cart-count').textContent = totalItems;
-    
-    if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p style="text-align:center; padding: 20px 0;">Your cart is empty.</p>';
-        checkoutArea.style.display = 'none';
-        return;
-    }
-    
-    checkoutArea.style.display = 'block';
-    cartItemsContainer.innerHTML = cart.map(item => `
-        <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}" class="cart-item-image"/>
-            <div class="cart-item-details">
-                <strong>${item.name}</strong>
-                <div class="quantity-controls">
-                    <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
-                    <span>${item.quantity}</span>
-                    <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
-                </div>
-            </div>
-            <strong>RM ${(item.price * item.quantity).toFixed(2)}</strong>
-            <button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button>
-        </div>`).join('');
-        
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    document.getElementById('cart-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
-    document.getElementById('cart-total').textContent = `RM ${subtotal.toFixed(2)}`;
-}
-
-function toggleCart(hide = false) {
-    const modal = document.getElementById('cart-modal');
-    modal.style.display = hide ? 'none' : 'flex';
-    if (!hide) {
-        updateCartDisplay();
-        populateCustomerInfoForm();
-    }
-}
-async function initiateCheckout() {
-    const checkoutBtn = document.querySelector('#cart-checkout-area button.btn-primary');
-    checkoutBtn.disabled = true; checkoutBtn.textContent = 'Processing...';
-
-    let checkoutData;
-    if (currentCustomer) {
-        checkoutData = {
-            customerName: currentCustomer.customerName, customerEmail: currentCustomer.customerEmail,
-            customerPhone: currentCustomer.customerPhone, customerAddress: currentCustomer.customerAddress,
-        };
-        if (!checkoutData.customerName || !checkoutData.customerPhone || !checkoutData.customerAddress) {
-            alert('Please complete your profile details in the "My Account" section before checking out.');
-            checkoutBtn.disabled = false; checkoutBtn.textContent = 'Complete Order';
-            return;
-        }
-    } else {
-        checkoutData = {
-            customerName: document.getElementById('customer-name').value.trim(),
-            customerEmail: document.getElementById('customer-email').value.trim(),
-            customerPhone: document.getElementById('customer-phone').value.trim(),
-            customerAddress: document.getElementById('customer-address').value.trim(),
-        };
-        if (!checkoutData.customerName || !checkoutData.customerPhone || !checkoutData.customerAddress) {
-            alert('Please fill in Name, Phone, and Address.');
-            checkoutBtn.disabled = false; checkoutBtn.textContent = 'Complete Order';
-            return;
-        }
-    }
-
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const totalAmount = subtotal; // Assuming no shipping
-    const payload = { action: 'logInitialOrder', data: { ...checkoutData, itemsPurchased: cart.map(item => `${item.id}x${item.quantity}`).join(', '), cart, totalAmount, shippingFee: 0 } };
+    if (!agentId || !password) { loginStatus.textContent = "ID and Password are required."; loginStatus.style.color = 'var(--danger-color)'; return; }
+    loginBtn.disabled = true; loginStatus.textContent = "Verifying..."; loginStatus.style.color = 'var(--dark-text)';
 
     try {
-        await postDataToGScript(payload);
-        alert('Your order has been placed successfully! We will contact you via WhatsApp shortly to confirm payment and shipping.');
-        cart = []; toggleCart(true); updateCartDisplay(); 
-    } catch (error) {
-        console.error('Checkout failed:', error);
-        alert('There was an error placing your order. Please try again.');
-    } finally {
-        checkoutBtn.disabled = false; checkoutBtn.textContent = 'Complete Order';
-    }
-}
-
-// ===========================================================
-// [ 4.5 ] NEW: CUSTOMER LOGIN & SESSION LOGIC
-// ===========================================================
-async function handleLoginSubmit(event) {
-    event.preventDefault();
-    const email = document.getElementById('customer-email').value.trim();
-    const password = document.getElementById('customer-password').value;
-    const statusEl = document.getElementById('login-status');
-    if (!email || !password) { statusEl.textContent = 'Email and password are required.'; return; }
-    statusEl.textContent = 'Logging in...';
-
-    try {
-        const response = await postDataToGScript({ action: 'verifyCustomer', data: { email, password } });
+        const response = await postToGoogleScript('verifyAgent', { agentId, password });
         if (response.success) {
-            currentCustomer = response.customer;
-            sessionStorage.setItem('eshopCustomer', JSON.stringify(currentCustomer));
-            toggleLoginModal(false);
-            updateLoginStateUI();
-
-            if (response.savedCart && response.savedCart.length > 0) {
-                if (confirm("You have a saved cart from a previous session. Would you like to load it?")) {
-                    cart = response.savedCart;
-                    updateCartDisplay();
-                }
+            currentAgent = response.agent;
+            currentAgent.target = parseFloat(response.target) || 0; 
+            currentAgent.currentSales = parseFloat(response.currentSales) || 0; 
+            currentAgent.isAdmin = response.isAdmin || false;
+            
+            // NEW: Capture new response data
+            currentProfile = response.profile;
+            currentAgent.isManager = response.isManager || false;
+            canEditProfile = response.allowEdit || false;
+            
+            if (response.mustChangePassword) {
+                 document.getElementById('login-view').classList.add('hidden');
+                 document.getElementById('password-change-view').classList.remove('hidden');
+                 document.getElementById('change-view-agent-id').textContent = `Agent ID: ${agentId}`;
+                 return; 
             }
-        } else { statusEl.textContent = response.message || 'Login failed.'; }
-    } catch (error) { statusEl.textContent = 'Connection error. Please try again.'; }
-}
 
-function handleLogout() {
-    if (cart.length > 0 && currentCustomer) {
-        if (confirm("Would you like to save your current cart before logging out?")) {
-            saveCart();
+            await fetchPortalData();
+            
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('portal-view').classList.remove('hidden');
+            
+            // NEW: Update Header Display
+            document.getElementById('agent-welcome-header').textContent = `${currentAgent.name} (${currentAgent.id})`;
+            document.getElementById('agent-details-display').textContent = `${response.position} | ID: ${currentAgent.id}`;
+            
+            // FIX: Show/Hide Role Buttons
+            if (currentAgent.isAdmin) document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
+            else document.getElementById('nav-admin-dashboard-btn').classList.add('hidden');
+            
+            if (currentAgent.isManager) document.getElementById('nav-team-btn').classList.remove('hidden');
+            else document.getElementById('nav-team-btn').classList.add('hidden');
+
+            // NEW: Init Profile
+            renderProfileView();
+            renderTargetBar(); 
+            showView('create-order-view'); 
+        } else {
+            loginStatus.textContent = response.message;
+            loginStatus.style.color = 'var(--danger-color)';
         }
-    }
-    cart = [];
-    currentCustomer = null;
-    sessionStorage.removeItem('eshopCustomer');
-    updateLoginStateUI();
-    showTab('homepage');
-}
-
-function updateLoginStateUI() {
-    const navLoginBtn = document.getElementById('nav-login-btn');
-    const myAccountTab = document.querySelector('[onclick="showTab(\'my-account\')"]');
-    const saveCartBtn = document.getElementById('save-cart-btn');
-
-    if (currentCustomer) {
-        navLoginBtn.textContent = `Logout (${currentCustomer.customerName.split(' ')[0]})`;
-        navLoginBtn.onclick = handleLogout;
-        myAccountTab.style.display = 'list-item';
-        if (saveCartBtn) saveCartBtn.style.display = 'block';
-    } else {
-        navLoginBtn.textContent = 'Login / Register';
-        navLoginBtn.onclick = () => toggleLoginModal(true);
-        myAccountTab.style.display = 'none';
-        if (saveCartBtn) saveCartBtn.style.display = 'none';
+    } catch (error) {
+        loginStatus.textContent = "Connection failed.";
+        loginStatus.style.color = 'var(--danger-color)';
+    } finally {
+        loginBtn.disabled = false;
     }
 }
 
-function populateCustomerInfoForm() {
-    const container = document.getElementById('customer-info-form-container');
-    if (currentCustomer) {
-        container.innerHTML = `
-            <h3>Shipping To:</h3>
-            <p><strong>${currentCustomer.customerName || 'Update in Profile'}</strong></p>
-            <p>${currentCustomer.customerAddress || 'Please update your address in My Profile.'}</p>
-            <a onclick="showTab('my-account'); toggleCart(true);" style="cursor: pointer; color: var(--primary-color);">Edit Profile</a>
-        `;
-    } else {
-        container.innerHTML = `
-            <h3>Customer Info</h3>
-            <input type="text" id="customer-name" placeholder="Full Name" required>
-            <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
-            <input type="email" id="customer-email" placeholder="Email (For order updates)">
-            <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
-        `;
-    }
-}
-
-async function saveCart() {
-    if (!currentCustomer) return;
-    const btn = document.getElementById('save-cart-btn');
-    btn.textContent = 'Saving...'; btn.disabled = true;
-    const response = await postDataToGScript({ action: 'saveCustomerCart', data: { pac: currentCustomer.pac, cart: cart } });
-    alert(response.message);
-    btn.innerHTML = '<i class="fa-solid fa-save"></i> Save Cart for Later'; btn.disabled = false;
-}
-
-async function handleProfileUpdate(event) {
-    event.preventDefault();
-    const statusEl = document.getElementById('profile-status');
-    const payload = {
-        pac: currentCustomer.pac,
-        customerName: document.getElementById('prof-name').value,
-        customerPhone: document.getElementById('prof-phone').value,
-        customerAddress: document.getElementById('prof-address').value
-    };
-    statusEl.textContent = 'Saving...';
+// NEW: Profile Logic
+function renderProfileView() {
+    // Fill fields
+    document.getElementById('prof-agentID').value = currentProfile.agentID || '';
+    document.getElementById('prof-employeeName').value = currentProfile.employeeName || '';
+    document.getElementById('prof-employeePhone').value = currentProfile.employeePhone || '';
+    document.getElementById('prof-employeeEmail').value = currentProfile.employeeEmail || '';
+    document.getElementById('prof-employeeAddress').value = currentProfile.employeeAddress || '';
     
-    const response = await postDataToGScript({ action: 'updateCustomerProfile', data: payload });
-    if (response.success) {
-        statusEl.style.color = 'green';
-        currentCustomer.customerName = payload.customerName;
-        currentCustomer.customerPhone = payload.customerPhone;
-        currentCustomer.customerAddress = payload.customerAddress;
-        sessionStorage.setItem('eshopCustomer', JSON.stringify(currentCustomer));
-        updateLoginStateUI(); // Update welcome message
+    document.getElementById('prof-position').value = currentProfile.position || '';
+    document.getElementById('prof-employeeStatus').value = currentProfile.employeeStatus || '';
+    document.getElementById('prof-agentType').value = currentProfile.agentType || '';
+    document.getElementById('prof-commissionRate').value = currentProfile.commissionRate || '';
+    document.getElementById('prof-target').value = `RM ${currentProfile.target}`;
+    document.getElementById('prof-managerID').value = currentProfile.managerId || 'None';
+    
+    document.getElementById('prof-bankName').value = currentProfile.bankName;
+    document.getElementById('prof-accountHolderName').value = currentProfile.accHolder;
+    document.getElementById('prof-accountNumber').value = currentProfile.accNumber;
+
+    // Editable Fields List
+    const editable = [
+        document.getElementById('prof-employeePhone'),
+        document.getElementById('prof-employeeEmail'),
+        document.getElementById('prof-employeeAddress'),
+        document.getElementById('prof-bankName'), 
+        document.getElementById('prof-accountHolderName'), 
+        document.getElementById('prof-accountNumber')
+    ];
+    const saveBtn = document.getElementById('save-profile-btn');
+    const badges = document.querySelectorAll('.edit-badge');
+
+    if(canEditProfile) {
+        editable.forEach(el => el.disabled = false);
+        saveBtn.classList.remove('hidden');
+        badges.forEach(el => el.style.display = 'inline');
     } else {
-        statusEl.style.color = 'red';
+        editable.forEach(el => el.disabled = true);
+        saveBtn.classList.add('hidden');
+        badges.forEach(el => el.style.display = 'none');
     }
-    statusEl.textContent = response.message;
 }
 
-// ===========================================================
-// [ 5.0 ] FORMS LOGIC
-// ===========================================================
-function toggleJobModal(show = false, jobId = '', jobTitle = '') {
-    const modal = document.getElementById('job-application-modal');
-    if (show) {
-        document.getElementById('job-modal-title').textContent = jobTitle;
-        document.getElementById('job-id-input').value = jobId;
-        document.getElementById('job-position-input').value = jobTitle;
-        modal.style.display = 'flex';
-    } else {
-        modal.style.display = 'none';
-        document.getElementById('job-application-form').reset();
+async function saveProfile() {
+    const btn = document.getElementById('save-profile-btn');
+    const status = document.getElementById('profile-status');
+    btn.textContent = "Saving..."; btn.disabled = true; status.textContent = "";
+    
+    const payload = {
+        agentId: currentAgent.id,
+        phone: document.getElementById('prof-employeePhone').value,
+        email: document.getElementById('prof-employeeEmail').value,
+        address: document.getElementById('prof-employeeAddress').value,
+        bankName: document.getElementById('prof-bankName').value,
+        accHolder: document.getElementById('prof-accountHolderName').value,
+        accNumber: document.getElementById('prof-accountNumber').value
+    };
+    
+    try {
+        const res = await postToGoogleScript('updateAgentProfile', payload);
+        status.style.color = res.success ? 'green' : 'red';
+        status.textContent = res.message;
+        if(res.success) {
+            currentProfile.employeePhone = payload.phone;
+            currentProfile.employeeEmail = payload.email;
+            currentProfile.employeeAddress = payload.address;
+            currentProfile.bankName = payload.bankName;
+            currentProfile.accHolder = payload.accHolder;
+            currentProfile.accNumber = payload.accNumber;
+        }
+    } catch(e) { status.style.color = 'red'; status.textContent = "Error."; }
+    finally { btn.textContent = "Save Changes"; btn.disabled = false; }
+}
+
+async function handleChangePassword() {
+    const p1 = document.getElementById('new-password-input').value;
+    const p2 = document.getElementById('confirm-password-input').value;
+    if (p1.length < 6 || p1 !== p2) { alert("Password invalid."); return; }
+    await postToGoogleScript('updatePassword', { agentId: currentAgent.id, newPassword: p1 });
+    alert("Success! Please log in again."); location.reload();
+}
+
+function handleLogout() { location.reload(); }
+
+function refreshPageData() {
+    const active = document.querySelector('.view:not(.hidden)');
+    if(!active) return;
+    const btn = document.getElementById('refresh-data-btn');
+    btn.innerHTML = 'Refreshing...'; btn.disabled = true;
+    
+    postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: document.getElementById('agent-password-input').value })
+        .then(res => {
+            if (res.success) {
+                currentAgent.target = res.target; 
+                currentAgent.currentSales = res.currentSales; 
+                renderTargetBar();
+                showView(active.id, true);
+            }
+        })
+        .finally(() => {
+            setTimeout(() => { btn.disabled = false; btn.innerHTML = 'Refresh Data'; }, 1000);
+        });
+}
+
+function showView(viewId, isRefresh = false) {
+    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
+    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
+
+    const view = document.getElementById(viewId);
+    const btn = document.getElementById(`nav-${viewId.replace('-view', '-btn')}`);
+    
+    if(view) view.classList.remove('hidden');
+    if(btn) btn.classList.add('active');
+
+    if (!isRefresh) {
+        if (viewId === 'my-orders-view') renderMyOrders();
+        if (viewId === 'my-commission-view') renderMyCommission();
+        if (viewId === 'team-view') renderTeamView();
+        if (viewId === 'admin-dashboard-view') renderAdminDashboard();
+        if (viewId === 'profile-view') renderProfileView();
     }
 }
-async function handleEnquirySubmit(event) {
-    event.preventDefault();
-    const statusEl = document.getElementById('enquiry-status');
-    statusEl.textContent = 'Sending...';
-    try {
-        const payload = { action: 'logEnquiry', data: { name: document.getElementById('enquiry-name').value, email: document.getElementById('enquiry-email').value, phone: document.getElementById('enquiry-phone').value, type: document.getElementById('enquiry-type').value, message: document.getElementById('enquiry-message').value } };
-        await postDataToGScript(payload);
-        statusEl.textContent = 'Enquiry sent successfully!';
-        event.target.reset();
-    } catch (error) { statusEl.textContent = 'An error occurred.'; }
+
+function renderTargetBar() {
+    const container = document.getElementById('target-bar-display');
+    const pct = Math.min(100, currentAgent.target > 0 ? (currentAgent.currentSales / currentAgent.target) * 100 : 0);
+    container.innerHTML = `<div style="font-size: 0.9rem; margin-bottom: 5px;">Monthly Target: RM ${currentAgent.currentSales.toFixed(2)} / RM ${currentAgent.target.toFixed(2)} (${pct.toFixed(1)}%)</div><div class="target-bar-container"><div class="target-text">RM ${currentAgent.currentSales.toFixed(2)} / RM ${currentAgent.target.toFixed(2)}</div><div class="target-progress" style="width: ${pct}%;"></div></div>`;
 }
-async function handleJobApplicationSubmit(event) {
-    event.preventDefault();
-    const statusEl = document.getElementById('job-application-status');
-    const fileInput = document.getElementById('applicant-resume');
-    if (fileInput.files.length === 0) { statusEl.textContent = 'Resume upload is mandatory.'; return; }
-    statusEl.textContent = 'Submitting...';
-    const file = fileInput.files[0];
-    const base64File = await getBase64(file);
-    const payload = { action: 'logJobApplication', data: { jobId: document.getElementById('job-id-input').value, position: document.getElementById('job-position-input').value, name: document.getElementById('applicant-name').value, email: document.getElementById('applicant-email').value, phone: document.getElementById('applicant-phone').value, message: document.getElementById('applicant-message').value, resumeFile: base64File.split(',')[1], resumeMimeType: file.type, resumeFileName: file.name }};
-    try {
-        await postDataToGScript(payload);
-        statusEl.textContent = 'Application submitted successfully!';
-        setTimeout(() => { toggleJobModal(false); }, 3000);
-    } catch (error) { statusEl.textContent = 'An error occurred.'; }
+
+function renderProductCatalog() { 
+    document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join('');
 }
-async function handleBusinessSubmit(event) {
-    event.preventDefault();
-    const statusEl = document.getElementById('business-status');
-    statusEl.textContent = 'Sending...';
+
+function renderProductSelectionList() { 
+    const term = document.getElementById('product-order-search').value.toLowerCase();
+    const filtered = products.filter(p => p.name.toLowerCase().includes(term) || String(p.id).toLowerCase().includes(term));
+    document.getElementById('product-selection-list').innerHTML = filtered.length ? filtered.map(p => `
+        <div class="product-item-selectable" onclick="addProductToOrder('${p.id}')">
+            <img src="${p.image || 'FL.jpg'}" onerror="this.style.display='none'">
+            <div><strong>${p.name} (${p.id})</strong><p style="font-size:0.85rem">RSP: RM ${p.rsp.toFixed(2)}</p></div>
+            <button class="btn btn-primary" style="pointer-events:none">Add</button>
+        </div>`).join('') : "<p style='padding:15px;text-align:center'>No products.</p>";
+}
+
+function renderCustomerDropdown() { 
+    const select = document.getElementById('customer-dropdown');
+    select.innerHTML = `<option value="">-- Select Existing Customer --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join('');
+}
+
+function renderOrderSummary() { 
+    const container = document.getElementById('summary-items-list');
+    if (currentOrder.items.length === 0) { container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products to begin.</p>"; } 
+    else {
+        container.innerHTML = currentOrder.items.map(item => {
+            const isInvalid = item.customPrice < item.minPrice;
+            return `<div class="summary-item" data-id="${item.id}">
+                <div class="summary-item-info"><strong>${item.name}</strong><div class="price-error-message">${isInvalid ? `Min: RM ${item.minPrice.toFixed(2)}` : ''}</div></div>
+                <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.id}', this.value)" style="width:60px">
+                <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice('${item.id}', this.value)" class="${isInvalid?'price-input-invalid':''}" style="width:80px">
+                <span onclick="removeItemFromOrder('${item.id}')" style="cursor:pointer; color:var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
+            </div>`;
+        }).join('');
+    }
+    calculateTotals();
+}
+
+async function renderMyOrders() {
+    const container = document.getElementById('my-orders-list');
+    container.innerHTML = '<p>Loading...</p>';
     try {
-        const payload = { action: 'logEnquiry', data: { name: document.getElementById('business-name').value, email: document.getElementById('business-email').value, phone: document.getElementById('business-phone').value, type: 'Business Opportunity Lead', message: document.getElementById('business-message').value } };
-        await postDataToGScript(payload);
-        statusEl.textContent = 'Thank you! We will contact you soon.';
-        event.target.reset();
-    } catch (error) { statusEl.textContent = 'An error occurred.'; }
+        const res = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
+        container.innerHTML = res.orders.length ? `<table><thead><tr><th>ID</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>${res.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>${o.customerName}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>`).join('')}</tbody></table>` : '<p>No orders found.</p>';
+    } catch(e) { container.innerHTML = '<p>Error loading orders.</p>'; }
+}
+
+// UPDATED: Shows Status and Overrides
+function renderMyCommission() {
+    const container = document.getElementById('my-commission-list');
+    container.innerHTML = '<p>Loading...</p>';
+    postToGoogleScript('getAgentCommission', { agentId: currentAgent.id }).then(res => {
+        if (res.records.length) {
+            container.innerHTML = `<table><thead><tr><th>Invoice</th><th>Type</th><th>Sales (RM)</th><th>Earned (RM)</th><th>Status</th></tr></thead><tbody>
+            ${res.records.map(r => {
+                const isOverride = r.overrideAmount > 0;
+                const type = isOverride ? "Team Override" : "Direct Sale";
+                const earned = isOverride ? r.overrideAmount : r.commissionAmount;
+                const sales = isOverride ? "-" : r.salesAmount.toFixed(2);
+                return `<tr><td>${r.invoiceId}</td><td>${type}</td><td>${sales}</td><td><strong>${earned.toFixed(2)}</strong></td><td>${r.status}</td></tr>`;
+            }).join('')}</tbody></table>`;
+        } else { container.innerHTML = '<p>No records found.</p>'; }
+    });
+}
+
+// NEW: Render My Team View
+async function renderTeamView() {
+    const list = document.getElementById('subordinates-list');
+    const overrideEl = document.getElementById('team-total-override');
+    list.innerHTML = '<li>Loading...</li>';
+    try {
+        const res = await postToGoogleScript('getSubordinatesData', { agentId: currentAgent.id });
+        if(res.success) {
+            overrideEl.textContent = `RM ${res.totalOverride.toFixed(2)}`;
+            list.innerHTML = res.subordinates.length ? res.subordinates.map(s => `<li><strong>${s.name}</strong> (${s.id}) - <span style="color:var(--primary-color)">${s.position}</span></li>`).join('') : '<li>No direct subordinates found.</li>';
+        }
+    } catch(e) { list.innerHTML = 'Error.'; }
+}
+
+// UPDATED: Render Admin Dashboard (Grouped)
+async function renderAdminDashboard() {
+    const dataTable = document.getElementById('admin-data-table');
+    dataTable.innerHTML = '<p>Loading...</p>';
+    try {
+        const res = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
+        if (res.success && res.data.length > 0) {
+            document.getElementById('admin-total-sales').textContent = `RM ${res.grandTotalSales.toFixed(2)}`;
+            document.getElementById('admin-total-cc').textContent = res.grandTotalCC.toFixed(3);
+            document.getElementById('admin-agents-on-target').textContent = `${res.data.filter(a => a.targetAchieved >= 1).length} / ${res.data.length}`;
+            
+            const teams = {}; const noMgr = [];
+            res.data.forEach(a => { (a.managerId && a.managerId !== "") ? (teams[a.managerId] = teams[a.managerId] || []).push(a) : noMgr.push(a); });
+
+            let html = '';
+            if (noMgr.length) html += `<h3>Independent Agents</h3>${buildAdminTable(noMgr)}`;
+            for (const [mgr, members] of Object.entries(teams)) {
+                html += `<h3 style="margin-top:30px; color:var(--primary-color); border-bottom:2px solid #eee;">Team: ${mgr}</h3>${buildAdminTable(members)}`;
+            }
+            dataTable.innerHTML = html;
+            drawPerformanceChart(res.data);
+        } else { dataTable.innerHTML = '<p>No data.</p>'; }
+    } catch(e) { dataTable.innerHTML = '<p>Error.</p>'; }
+}
+
+function buildAdminTable(agents) {
+    return `<table style="width:100%"><thead><tr><th>Name</th><th>Target</th><th>Sales</th><th>Achieved</th></tr></thead><tbody>
+    ${agents.map(a => `<tr><td>${a.name}</td><td>RM ${a.target.toFixed(2)}</td><td>RM ${a.totalSales.toFixed(2)}</td><td style="color:${a.targetAchieved>=1?'green':'red'}">${(a.targetAchieved*100).toFixed(1)}%</td></tr>`).join('')}</tbody></table>`;
+}
+
+function drawPerformanceChart(data) {
+    const ctx = document.getElementById('performanceChart');
+    if (performanceChartInstance) performanceChartInstance.destroy();
+    performanceChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: data.map(a => a.name), datasets: [{ label: 'Sales (RM)', data: data.map(a => a.totalSales), backgroundColor: 'rgba(0,123,255,0.8)' }] },
+        options: { responsive: true }
+    });
+}
+
+function startNewOrder() { 
+    currentOrder = { items: [] };
+    document.getElementById('customer-dropdown').value = '';
+    document.getElementById('new-customer-form').classList.add('hidden');
+    document.getElementById('customer-dropdown').disabled = false;
+    document.getElementById('new-customer-name').value = '';
+    document.getElementById('new-customer-email').value = '';
+    document.getElementById('new-customer-phone').value = '';
+    document.getElementById('new-customer-address').value = '';
+    document.getElementById('payment-proof').value = '';
+    document.getElementById('submit-status').textContent = '';
+    document.getElementById('submit-order-btn').disabled = false;
+    renderOrderSummary();
+}
+function handleNewCustomerToggle() {
+    const form = document.getElementById('new-customer-form');
+    const dropdown = document.getElementById('customer-dropdown');
+    form.classList.toggle('hidden');
+    if (!form.classList.contains('hidden')) { dropdown.value = ''; dropdown.disabled = true; } else { dropdown.disabled = false; }
+}
+function handleCustomerSelection() {
+    if (document.getElementById('customer-dropdown').value) document.getElementById('new-customer-form').classList.add('hidden');
+}
+function addProductToOrder(productIdStr) {
+    const p = products.find(x => String(x.id) === String(productIdStr));
+    if (!p) return;
+    if (!currentOrder.items.some(i => String(i.id) === String(productIdStr))) {
+        currentOrder.items.push({ id: p.id, name: p.name, quantity: 1, rsp: p.rsp, cc: p.cc, customPrice: p.rsp, minPrice: p.minPrice });
+    }
+    renderOrderSummary();
+}
+function removeItemFromOrder(id) { currentOrder.items = currentOrder.items.filter(i => String(i.id) !== String(id)); renderOrderSummary(); }
+function updateQuantity(id, qty) { const i = currentOrder.items.find(x => String(x.id) === String(id)); if(i) i.quantity = parseInt(qty)||1; renderOrderSummary(); }
+function updatePrice(id, pr) { const i = currentOrder.items.find(x => String(x.id) === String(id)); if(i) i.customPrice = parseFloat(pr)||0; renderOrderSummary(); }
+function calculateTotals() {
+    const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
+    const shipRule = shippingRules.find(r => sub >= r.minSpend);
+    const ship = shipRule ? shipRule.charge : 0;
+    document.getElementById('summary-subtotal').textContent = `RM ${sub.toFixed(2)}`;
+    document.getElementById('summary-shipping').textContent = `RM ${ship.toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `RM ${(sub+ship).toFixed(2)}`;
+}
+async function submitOrder() {
+    const btn = document.getElementById('submit-order-btn');
+    const status = document.getElementById('submit-status');
+    if(btn.disabled) return;
+    btn.disabled = true; status.textContent = "Validating...";
+    
+    if(!currentOrder.items.length) { status.textContent = "Add products first."; btn.disabled = false; return; }
+    if(currentOrder.items.some(i => i.customPrice < i.minPrice)) { status.textContent = "Price too low."; btn.disabled = false; return; }
+    
+    let cust;
+    const existPac = document.getElementById('customer-dropdown').value;
+    if(existPac) cust = customers.find(c => c.pac === existPac);
+    else {
+        cust = { name: document.getElementById('new-customer-name').value, email: document.getElementById('new-customer-email').value, phone: document.getElementById('new-customer-phone').value, address: document.getElementById('new-customer-address').value };
+        if(!cust.name) { status.textContent = "Customer details required."; btn.disabled = false; return; }
+    }
+
+    const file = document.getElementById('payment-proof').files[0];
+    if(!file) { status.textContent = "Proof required."; btn.disabled = false; return; }
+    
+    status.textContent = "Uploading...";
+    try {
+        const base64 = await getBase64(file);
+        const subtotal = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
+        const shipRule = shippingRules.find(r => sub >= r.minSpend);
+        const payload = { action: 'submitAgentOrder', data: { agent: currentAgent, customer: cust, items: currentOrder.items, shippingFee: shipRule ? shipRule.charge : 0, paymentProof: { file: base64.split(',')[1], mimeType: file.type } } };
+        const res = await postToGoogleScript(payload);
+        if(res.success) {
+            status.style.color = 'green'; status.textContent = `Success! ID: ${res.invoiceId}`;
+            setTimeout(startNewOrder, 2000);
+        } else { throw new Error(res.message); }
+    } catch(e) { status.textContent = "Error: " + e.message; btn.disabled = false; }
+}
+
+async function postToGoogleScript(actionOrPayload, data = {}) {
+    const payload = (typeof actionOrPayload === 'object' && actionOrPayload.action) ? actionOrPayload : { action: actionOrPayload, data: data };
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+        return await res.json();
+    } catch (e) { throw e; }
 }
 function getBase64(file) {
     return new Promise((resolve, reject) => {
@@ -596,251 +704,6 @@ function getBase64(file) {
         reader.onerror = error => reject(error);
     });
 }
-// ===========================================================
-// [ 6.0 ] CHATBOT LOGIC
-// ===========================================================
-function toggleChatWidget(show) {
-    const chatWidget = document.getElementById('eshop-chat-widget');
-    const fabContainer = document.getElementById('fab-container');
-    if (show) {
-        chatWidget.classList.add('active');
-        fabContainer.style.right = '370px';
-        if (document.getElementById('chat-body').innerHTML.trim() === '') {
-            displayMainMenu();
-        }
-    } else {
-        chatWidget.classList.remove('active');
-        fabContainer.style.right = '20px';
-    }
-}
-
-function addChatMessage(sender, text, type = 'text') {
-    const chatBody = document.getElementById('chat-body');
-    const msg = document.createElement('div');
-    msg.classList.add('chat-message', sender === 'bot' ? 'bot-message' : 'user-message');
-    if (type === 'html') { msg.innerHTML = text; } else { msg.textContent = text; }
-    chatBody.appendChild(msg);
-    chatBody.scrollTop = chatBody.scrollHeight;
-    return msg;
-}
-
-function displayMainMenu() {
-    chatSession.state = 'main_menu';
-    const menu = `<strong>Welcome!</strong><br>1. My Account<br>2. Talk to a Human<br>Or ask a question.`;
-    addChatMessage('bot', menu, 'html');
-}
-
-async function handleChatSubmit() {
-    const input = document.getElementById('chat-input');
-    const text = input.value.trim();
-    if (!text) return;
-    addChatMessage('user', text);
-    input.value = '';
-    const thinkingMsg = addChatMessage('bot', '<i>Thinking...</i>', 'html');
-
-    if (chatSession.state === 'awaiting_identifier') { await startVerification(text); }
-    else if (chatSession.state === 'awaiting_code') { await submitVerificationCode(text); }
-    else if (chatSession.state === 'my_account_menu') { await handleMyAccountMenu(text); }
-    else { await handleMainMenu(text); }
-
-    thinkingMsg.remove();
-}
-
-async function handleMainMenu(text) {
-    if (text === '1') {
-        if (sessionStorage.getItem('eshop_session_token')) {
-            displayMyAccountMenu();
-        } else {
-            chatSession.state = 'awaiting_identifier';
-            addChatMessage('bot', 'Enter your PAC or Email to verify.');
-        }
-    } else if (text === '2') {
-        addChatMessage('bot', '<a href="https://wa.me/601111033154" target="_blank">Contact Admin</a>', 'html');
-    } else {
-        const response = await postToRender('getSmartAnswer', { question: text });
-        addChatMessage('bot', response.answer || 'Sorry, I had trouble finding an answer.');
-    }
-}
-
-async function startVerification(identifier) {
-    const result = await postToRender('issueChatVerificationCode', { identifier: identifier });
-    if (result.success) {
-        chatSession.state = 'awaiting_code';
-        chatSession.pac = result.pac;
-        addChatMessage('bot', 'A code has been sent to your WhatsApp. Please enter it here.');
-    } else {
-        addChatMessage('bot', `Verification failed: ${result.message}`);
-        chatSession.state = 'main_menu';
-    }
-}
-
-async function submitVerificationCode(code) {
-    const result = await postToRender('verifyChatCode', { pac: chatSession.pac, code: code });
-    if (result.success) {
-        sessionStorage.setItem('eshop_session_token', result.token);
-        addChatMessage('bot', 'Verified!');
-        displayMyAccountMenu();
-    } else {
-        addChatMessage('bot', `Verification failed: ${result.message}`);
-        chatSession.state = 'main_menu';
-    }
-}
-
-function displayMyAccountMenu() {
-    chatSession.state = 'my_account_menu';
-    addChatMessage('bot', '<strong>My Account</strong><br>1. View My Last 5 Orders<br>2. Check My Total Points<br>3. Back to Main Menu', 'html');
-}
-
-async function handleMyAccountMenu(text) {
-    let action = '';
-    if (text === '1') action = 'getPurchaseHistory';
-    else if (text === '2') action = 'getPointsHistory';
-    else if (text === '3') { displayMainMenu(); return; }
-    else { addChatMessage('bot', 'Invalid option.'); return; }
-
-    const token = sessionStorage.getItem('eshop_session_token');
-    const result = await postToRender(action, { token: token });
-    if(result.success) {
-        if(action === 'getPurchaseHistory') {
-            let historyText = "<strong>Your Last 5 Orders:</strong><br>";
-            if (result.history.length === 0) { historyText = 'You have no purchase history.'; }
-            else { result.history.forEach(order => { historyText += `<br><strong>ID:</strong> ${order.invoiceId}<br><strong>Date:</strong> ${order.date}<br><strong>Total:</strong> RM ${order.totalAmount}<br><strong>Status:</strong> ${order.status}`; }); }
-            addChatMessage('bot', historyText, 'html');
-        } else {
-            addChatMessage('bot', `Your total points: <strong>${result.currentBalance}</strong>`, 'html');
-        }
-    } else {
-        addChatMessage('bot', `Error: ${result.message}`);
-    }
-}
-
-// ===========================================================
-// [ 7.0 ] GLOBAL UTILITIES & API HELPERS
-// ===========================================================
-function showTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    // If showing My Account, automatically click the first sub-view
-    if (tabId === 'my-account') {
-        const firstSubNavButton = document.querySelector('#my-account-content .sub-nav button');
-        if (firstSubNavButton) firstSubNavButton.click();
-    }
-}
-async function postDataToGScript(payload) {
-    try {
-        const response = await fetch(googleScriptURL, { method: 'POST', mode: 'no-cors', cache: 'no-cache', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), redirect: 'follow' });
-        // Since it's no-cors, we can't read the response, so we just assume success if it doesn't throw.
-        return { success: true }; // Simplified for no-cors
-    } catch (error) {
-        console.error('Error posting to Google Script:', error);
-        throw error;
-    }
-}
-// This needs to be a standard fetch for API calls where we need a response
-async function postDataToGScriptWithResponse(payload) {
-    const response = await fetch(googleScriptURL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
-    if (!response.ok) throw new Error('Network response was not ok');
-    return response.json();
-}
-
-
-// ===========================================================
-// [ 8.0 ] NEW: THEME, MARKETING & LOGIN MODAL LOGIC
-// ===========================================================
-
-/**
- * Applies the active theme colors and triggers special effects.
- */
-function applyTheme(theme) {
-    if (!theme) return;
-    const root = document.documentElement;
-
-    // Define theme colors based on your requirements
-    const themes = {
-        'Christmas': { primary: '#d90429', secondary: '#FFD700', accent: '#004B23' },
-        'HariRaya': { primary: '#006400', secondary: '#f0e68c', accent: '#27ae60' },
-        'CNY': { primary: '#E00000', secondary: '#FFD700', accent: '#C04000' },
-        'Thaipusam': { primary: '#FF9933', secondary: '#4B0082', accent: '#F0E68C' },
-        'NationalDay': { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
-        'MalaysiaDay': { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
-        'MooncakeFestival': { primary: '#C04000', secondary: '#FFD700', accent: '#E00000' },
-        'Deepavali': { primary: '#FF8C00', secondary: '#FF00FF', accent: '#FFD700' },
-        'NewYear': { primary: '#111111', secondary: '#FFD700', accent: '#C0C0C0' },
-        'Valentines': { primary: '#D70040', secondary: '#FFC0CB', accent: '#C71585' },
-        'GrandOpening': { primary: '#1a5276', secondary: '#f39c12', accent: '#27ae60' }
-    };
-
-    const colors = themes[theme.ThemeName];
-
-    if (colors) {
-        root.style.setProperty('--primary-color', colors.primary);
-        root.style.setProperty('--secondary-color', colors.secondary);
-        root.style.setProperty('--accent-color', colors.accent);
-    }
-    
-    // Check for special effects
-    if (theme.ThemeName === 'Christmas') {
-        if (typeof startSnowing === 'function') {
-            startSnowing();
-        }
-    }
-}
-
-function applyMarketing(marketing, theme) {
-    // 1. Running Banner
-    const banner = document.getElementById('promo-running-banner');
-    // Marketing text overrides festival text
-    let bannerText = marketing.BannerText || (theme ? theme.WelcomeMessage : null);
-    
-    if (bannerText) {
-        document.getElementById('promo-banner-text').textContent = bannerText;
-        banner.style.display = 'block';
-    } else {
-        banner.style.display = 'none';
-    }
-}
-
-function buildPopupModal(message, imageUrl) {
-    if (!message && !imageUrl) return; // No popup to show
-
-    // Check if popup has been shown this session
-    if (sessionStorage.getItem('eshopPopupShown') === 'true') {
-        return;
-    }
-
-    const container = document.getElementById('popup-modal');
-    let modalHTML = '';
-
-    if (imageUrl) {
-        modalHTML = `
-        <div class="modal-content" style="max-width: 500px; padding: 0;">
-             <button class="close" style="position: absolute; top: 10px; right: 20px; font-size: 30px; background: white; border-radius: 50%; width: 40px; height: 40px; opacity: 0.8;" onclick="togglePopup(true)">&times;</button>
-             <img src="${imageUrl}" style="width: 100%; border-radius: var(--border-radius);">
-        </div>`;
-    } else {
-        modalHTML = `
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2>Welcome!</h2>
-                <button class="close" onclick="togglePopup(true)">&times;</button>
-            </div>
-            <div class="modal-body" style="padding: 30px; font-size: 1.1rem; text-align: center;">
-                ${message}
-            </div>
-        </div>`;
-    }
-    
-    container.innerHTML = modalHTML;
-    togglePopup(false); // Show the popup
-    sessionStorage.setItem('eshopPopupShown', 'true'); // Set session flag
-}
-
-function togglePopup(hide = false) {
-    const modal = document.getElementById('popup-modal');
-    modal.style.display = hide ? 'none' : 'flex';
-}
-
-function toggleLoginModal(show) {
-    const modal = document.getElementById('login-modal');
-    modal.style.display = show ? 'flex' : 'none';
-}
+</script>
+</body>
+</html>
