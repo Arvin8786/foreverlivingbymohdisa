@@ -1,10 +1,10 @@
 // =================================================================
-// E-Shop Frontend Script - v32.0 (Lead Capture & Dynamic Features)
+// E-Shop Frontend Script - v33.0 (Lead Capture Only)
 // =================================================================
 
 // [ 1.0 ] GLOBAL CONFIGURATION
 // CRITICAL: Update this URL to match your latest Code.gs deployment
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbx84SfcmMHmWLVq2PqZn9tuj_wr47UJDYk2ks2Juwd1tDjKZXv8nYaayYA6aSX1pgC17Q/exec'; 
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxfO-dgBDSFAAD4PUqLQDXEYxM5S-MAzEjfhVFo-7YstAYw6ShcnpeIxc81t4zr0s5mWA/exec'; 
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
@@ -15,7 +15,7 @@ let chatSession = {};
 
 // [ 2.0 ] INITIALIZATION
 document.addEventListener('DOMContentLoaded', () => {
-    // Login Modal Listeners
+    // Login Modal Listeners (For Agent Access)
     const loginBtn = document.getElementById('nav-login-btn');
     if(loginBtn) loginBtn.addEventListener('click', () => toggleLoginModal(true));
     
@@ -80,7 +80,7 @@ async function fetchData() {
         buildFabButtons();
         buildChatbotWidget();
 
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v32.0)`;
+        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v33.0)`;
 
         // Dynamic Listeners
         const enqForm = document.getElementById('enquiry-form');
@@ -258,6 +258,7 @@ function addToCart(id) {
     if (item) item.quantity++; else cart.push({ ...p, quantity: 1 });
     updateCartDisplay();
 }
+
 function increaseQuantity(id) { const item = cart.find(x => x.id == id); if(item) item.quantity++; updateCartDisplay(); }
 function decreaseQuantity(id) { const item = cart.find(x => x.id == id); if(item) { item.quantity--; if(item.quantity <= 0) removeItemFromCart(id); else updateCartDisplay(); } }
 function removeItemFromCart(id) { cart = cart.filter(x => x.id != id); updateCartDisplay(); }
@@ -273,6 +274,7 @@ function updateCartDisplay() {
         checkout.style.display = 'none';
         return;
     }
+    
     checkout.style.display = 'block';
     container.innerHTML = cart.map(i => `
         <div class="cart-item">
@@ -304,10 +306,8 @@ async function initiateCheckout() {
     if(!name || !phone || !address) { alert('Name, Phone and Address required.'); btn.disabled=false; btn.textContent='Complete Order'; return; }
 
     const sub = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-    // Shipping Logic: In pure lead mode, we send 0, or calculate if rules exist.
-    // Since doGet doesn't return shipping rules yet, we use 0 or update code.gs later.
-    // For now, we send 0 to indicate Lead.
-    
+    // Lead Capture Mode: Send Order with status "Open for Pickup"
+    // Shipping Fee sent as 0 initially; will be handled by Agent.
     const payload = {
         action: 'logInitialOrder',
         data: {
@@ -319,7 +319,7 @@ async function initiateCheckout() {
 
     try {
         await postDataToGScript(payload);
-        alert('Thank you for your order! Our sales consultant will be in touch shortly.');
+        alert('Thank you for your order! Our sales consultant will be in touch shortly to confirm.');
         cart = []; toggleCart(true); updateCartDisplay();
     } catch(e) { alert('Error placing order.'); }
     finally { btn.disabled = false; btn.textContent = 'Place Order'; }
@@ -374,7 +374,16 @@ async function handleJobApplicationSubmit(e) {
     } catch(err) { status.textContent = 'Error.'; }
 }
 
-// [ 6.0 ] CHATBOT
+function getBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+// [ 6.0 ] CHATBOT LOGIC
 function toggleChatWidget(show) {
     const w = document.getElementById('eshop-chat-widget');
     const f = document.getElementById('fab-container');
@@ -388,7 +397,7 @@ function addChatMessage(who, text, html) {
     if(html) d.innerHTML=text; else d.textContent=text;
     b.appendChild(d); b.scrollTop=b.scrollHeight;
 }
-function displayMainMenu() { chatSession.state = 'menu'; addChatMessage('bot', '<b>Welcome!</b><br>1. My Account<br>2. Contact Human', true); }
+function displayMainMenu() { chatSession.state = 'menu'; addChatMessage('bot', '<b>Welcome!</b><br>1. Track Order<br>2. Contact Human', true); }
 async function handleChatSubmit() {
     const i = document.getElementById('chat-input');
     const txt = i.value.trim();
@@ -396,15 +405,16 @@ async function handleChatSubmit() {
     addChatMessage('user', txt); i.value='';
     
     if(chatSession.state === 'menu') {
-        if(txt==='1') { chatSession.state = 'auth'; addChatMessage('bot', 'Enter PAC/Email:'); }
+        if(txt==='1') { chatSession.state = 'track'; addChatMessage('bot', 'Enter your Order ID to track status:'); }
         else if(txt==='2') addChatMessage('bot', '<a href="https://wa.me/601111033154">WhatsApp Us</a>', true);
         else {
              const res = await postToRender('getSmartAnswer', { question: txt });
              addChatMessage('bot', res.answer || "I don't know.");
         }
-    } else if (chatSession.state === 'auth') {
-        addChatMessage('bot', 'Functionality requires backend setup.');
-        chatSession.state = 'menu';
+    } else if (chatSession.state === 'track') {
+         // Basic tracking simulation - backend connection optional for V1
+         addChatMessage('bot', 'Please contact our agent for real-time status.');
+         chatSession.state = 'menu';
     }
 }
 
@@ -421,7 +431,6 @@ async function postToRender(act, data) {
     const res = await fetch(botServerURL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action:act, apiKey, data}) });
     return await res.json();
 }
-function getBase64(file) { return new Promise((res, rej) => { const r = new FileReader(); r.readAsDataURL(file); r.onload=()=>res(r.result); r.onerror=e=>rej(e); }); }
 
 // [ 8.0 ] THEME & MARKETING
 function applyTheme(theme) {
@@ -431,12 +440,18 @@ function applyTheme(theme) {
         'HariRaya': {p:'#006400', s:'#f0e68c', a:'#27ae60'},
         'CNY': {p:'#E00000', s:'#FFD700', a:'#C04000'},
         'Thaipusam': {p:'#FF9933', s:'#4B0082', a:'#F0E68C'},
-        'Deepavali': {p:'#FF8C00', s:'#FF00FF', a:'#FFD700'}
+        'Deepavali': {p:'#FF8C00', s:'#FF00FF', a:'#FFD700'},
+        'NationalDay': {p:'#000066', s:'#FFCC00', a:'#CC0000'},
+        'MalaysiaDay': {p:'#000066', s:'#FFCC00', a:'#CC0000'},
+        'MooncakeFestival': {p:'#1a237e', s:'#ffab00', a:'#ff6f00'},
+        'Valentines': {p:'#e91e63', s:'#ffc1e3', a:'#c2185b'},
+        'GrandOpening': {p:'#2c3e50', s:'#f39c12', a:'#27ae60'}
     };
     const c = themes[theme.ThemeName] || {p:'#1a5276', s:'#f39c12', a:'#27ae60'};
     root.style.setProperty('--primary-color', c.p);
     root.style.setProperty('--secondary-color', c.s);
     root.style.setProperty('--accent-color', c.a);
+    document.body.classList.add(`theme-${theme.ThemeName}`); // For animations in index.html
 
     if(theme.ThemeName === 'Christmas' && typeof startSnowing === 'function') startSnowing();
 }
