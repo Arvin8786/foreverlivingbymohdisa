@@ -7,196 +7,194 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <style>
-    /* [ 1.0 ] LUXURY VARIABLES */
     :root {
-        --primary-color: #0f3d2e; /* Emerald */
+        /* LUXURY EMERALD & GOLD PALETTE */
+        --primary-color: #0f3d2e;  /* Deep Emerald */
         --secondary-color: #d4af37; /* Satin Gold */
-        --bg-color: #f9f8f6; /* Alabaster */
-        --card-bg: #ffffff;
+        --accent-color: #14523d;    /* Lighter Emerald for gradients */
+        
+        --bg-color: #fcfcfc;       /* Clean White-ish Grey */
+        --card-bg: #ffffff;        /* Pure White */
         --text-color: #333333;
         --light-text: #ffffff;
         
-        --font-heading: 'Playfair Display', serif;
-        --font-body: 'Poppins', sans-serif;
+        --border-radius: 8px;      /* Uniform Radius */
+        --shadow: 0 4px 20px rgba(0,0,0,0.08); /* Elegant Shadow */
         
-        --shadow-soft: 0 10px 30px -10px rgba(0,0,0,0.05);
-        --shadow-hover: 0 20px 40px -5px rgba(0,0,0,0.15);
-        --transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        --font-heading: 'Playfair Display', serif; /* Luxury Font */
+        --font-body: 'Poppins', sans-serif;        /* Clean Font */
     }
-
-    /* Theme Overrides */
-    body.theme-Christmas { --primary-color: #6b1c23; --secondary-color: #c5a059; --bg-color: #fffaf0; } 
-    body.theme-CNY { --primary-color: #8a1c1c; --secondary-color: #e6b800; --bg-color: #fff8e1; }
-    body.theme-HariRaya { --primary-color: #004d40; --secondary-color: #cddc39; --bg-color: #f1f8e9; }
-    /* (Other themes handled by script.js logic) */
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
     
-    h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; }
-    .container { max-width: 1400px; margin: 0 auto; padding: 0 30px; }
+    /* Festival Overrides (Keep these working) */
+    body.theme-Christmas { --primary-color: #800000; --secondary-color: #d4af37; }
+    body.theme-CNY { --primary-color: #a80000; --secondary-color: #ffcc00; }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    
+    h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; letter-spacing: 0.5px; }
+    
+    /* Elegant Buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-weight: 600; border: 1px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; }
+    .btn:disabled { background-color: #ccc; border-color: #ccc; cursor: not-allowed; }
+    
+    .btn-primary { background: var(--primary-color); color: var(--light-text); border-color: var(--primary-color); }
+    .btn-primary:hover { background: var(--secondary-color); border-color: var(--secondary-color); color: #fff; }
+    
+    .btn-secondary { background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); }
+    .btn-secondary:hover { background: var(--primary-color); color: #fff; }
 
     /* [ 2.0 ] HEADER & NAV */
-    header { padding: 40px 0; text-align: center; background: transparent; }
-    .header-logo { width: 100px; height: 100px; object-fit: contain; margin-bottom: 15px; }
-    #company-name-header { font-size: 2.5rem; margin: 0; letter-spacing: -0.5px; }
-    .by-line { font-family: var(--font-body); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; color: var(--secondary-color); display: block; margin-top: 5px; }
+    header { background-color: #fff; padding: 25px 0; border-bottom: 1px solid #eee; }
+    .header-content { display: flex; align-items: center; justify-content: center; gap: 20px; }
+    .header-logo { width: 90px; height: 90px; object-fit: contain; }
     
-    nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.05); transition: top 0.3s; }
-    nav ul { display: flex; justify-content: center; list-style: none; padding: 0; margin: 0; flex-wrap: wrap; }
+    #company-name-header { margin: 0; font-size: 2.2rem; line-height: 1.2; }
+    .by-line { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; display: block; color: var(--secondary-color); text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; }
+    
+    /* Sticky Nav */
+    nav { background-color: var(--primary-color); position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    nav ul { display: flex; list-style: none; padding: 0; margin: 0; justify-content: center; flex-wrap: wrap; }
     nav a { 
-        display: block; padding: 20px 25px; 
-        text-decoration: none; color: var(--text-color); 
-        font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500;
-        transition: color 0.3s; border-bottom: 2px solid transparent;
+        color: rgba(255,255,255,0.9); text-decoration: none; 
+        font-weight: 500; padding: 18px 25px; cursor: pointer; 
+        text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;
+        transition: 0.3s;
     }
-    nav a:hover { color: var(--primary-color); border-bottom-color: var(--secondary-color); }
+    nav a:hover { background-color: rgba(255,255,255,0.1); color: var(--secondary-color); }
     
-    /* Agent Login Button (Direct Link) */
-    .nav-agent-btn { color: var(--secondary-color) !important; font-weight: 700; }
+    /* Agent Login Button - Gold Highlight */
+    .nav-agent-btn { background: var(--secondary-color); color: #fff !important; font-weight: 700; }
+    .nav-agent-btn:hover { background: #eebb44; color: #fff !important; }
 
-    /* [ 3.0 ] HERO & MODULES */
-    main { padding: 40px 0; min-height: 60vh; }
-    .tab-content { display: none; animation: fadeIn 0.8s ease; }
+    /* Running Banner */
+    #promo-running-banner { background: var(--secondary-color); color: #fff; padding: 8px 0; font-weight: 600; font-size: 0.85rem; letter-spacing: 1px; display: none; text-align: center; }
+
+    /* [ 3.0 ] MAIN CONTENT */
+    main { padding: 40px 0; min-height: 600px; }
+    .tab-content { display: none; animation: fadeIn 0.5s; }
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+    /* Hero Section */
     .hero-section { 
-        background: var(--primary-color); color: #fff; 
-        padding: 100px 20px; text-align: center; border-radius: 4px; 
-        margin-bottom: 50px; position: relative; overflow: hidden;
+        background: linear-gradient(135deg, var(--primary-color), #09251c); 
+        color: #fff; padding: 100px 20px; text-align: center; 
+        border-radius: var(--border-radius); margin-bottom: 40px; 
+        box-shadow: var(--shadow);
     }
-    .hero-section h2 { color: var(--secondary-color); font-size: 3.5rem; margin-bottom: 10px; }
-    .hero-section p { font-size: 1.2rem; opacity: 0.9; font-family: var(--font-heading); font-style: italic; }
-
-    /* [ 4.0 ] LUXURY PRODUCT GRID (The Update) */
+    .hero-section h2 { color: var(--secondary-color); font-size: 3rem; margin-bottom: 15px; }
+    
+    /* [ 4.0 ] PRODUCT GRID (THE FIX) */
     #product-list-container { margin-top: 20px; }
     .product-list { 
         display: grid; 
-        grid-template-columns: repeat(4, 1fr); /* 4 Per Row */
-        gap: 30px; 
+        grid-template-columns: repeat(4, 1fr); /* Forced 4 columns */
+        gap: 25px; 
     }
     
-    /* Product Card - Minimalist Default */
-    .product-card {
-        background: #fff;
-        height: 400px; /* Fixed uniform height */
-        position: relative;
-        border: 1px solid rgba(0,0,0,0.03);
+    /* Luxury Product Card */
+    .product { 
+        background: #fff; 
+        border-radius: var(--border-radius); 
+        box-shadow: var(--shadow); 
+        position: relative; 
+        overflow: hidden; 
+        height: 380px; /* Uniform Height */
+        transition: transform 0.3s;
         cursor: pointer;
-        overflow: hidden;
-        transition: var(--transition);
     }
-    .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-hover);
-    }
-    
-    /* Image Area */
-    .product-img-wrapper {
-        width: 100%; height: 100%;
-        padding: 40px;
-        display: flex; align-items: center; justify-content: center;
+    .product:hover { transform: translateY(-5px); }
+
+    .product-image-container { 
+        height: 100%; width: 100%; 
+        padding: 40px; 
+        display: flex; align-items: center; justify-content: center; 
         background: #fff;
-        transition: var(--transition);
     }
-    .product-card img {
-        max-width: 100%; max-height: 100%;
-        object-fit: contain;
-        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    .product img { 
+        max-width: 100%; max-height: 100%; 
+        object-fit: contain; 
+        transition: transform 0.5s; 
     }
     
-    /* The "Click for Info" Overlay */
+    /* Hover Overlay */
     .product-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(15, 61, 46, 0.85); /* Dark Emerald tint */
+        background: rgba(15, 61, 46, 0.9); /* Dark Emerald */
         display: flex; flex-direction: column; align-items: center; justify-content: center;
-        opacity: 0;
-        transition: opacity 0.4s ease;
+        opacity: 0; transition: opacity 0.3s;
+        text-align: center; padding: 20px;
     }
-    .product-overlay span {
-        color: var(--secondary-color);
-        font-family: var(--font-body);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        border: 1px solid var(--secondary-color);
-        padding: 10px 20px;
-        transform: translateY(20px);
-        transition: transform 0.4s ease;
-    }
+    .product:hover .product-overlay { opacity: 1; }
     
-    /* Hover States */
-    .product-card:hover .product-overlay { opacity: 1; }
-    .product-card:hover .product-overlay span { transform: translateY(0); }
-    .product-card:hover img { transform: scale(1.05); }
+    .product-overlay h3 { color: #fff; font-size: 1.2rem; margin-bottom: 5px; font-family: var(--font-body); }
+    .product-overlay .price { color: var(--secondary-color); font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; font-family: var(--font-heading); }
+    .product-overlay .click-info { 
+        color: #fff; border: 1px solid #fff; padding: 8px 20px; 
+        text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; border-radius: 50px; 
+    }
+    .product:hover .click-info { background: var(--secondary-color); border-color: var(--secondary-color); color: var(--primary-color); font-weight: 700; }
 
-    /* Minimal Title at Bottom (Optional, removed for pure clean look based on request, or keep minimal) */
-    /* User asked for "no more display of product information on default", so text is hidden until click */
+    /* [ 5.0 ] PRODUCT DETAIL MODAL (The Popup) */
+    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; }
     
-    /* [ 5.0 ] PRODUCT DETAIL MODAL */
-    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
-    
-    /* Split Layout Modal */
     .product-modal-content {
-        background: #fff; width: 90%; max-width: 900px; height: 80vh;
-        display: grid; grid-template-columns: 1fr 1.2fr;
-        border-radius: 2px; overflow: hidden;
-        box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        background: #fff; width: 900px; max-width: 90%; height: auto; max-height: 90vh;
+        display: grid; grid-template-columns: 1fr 1fr;
+        border-radius: var(--border-radius); overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         position: relative;
-        animation: slideUp 0.4s ease;
     }
-    @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     
-    .pm-image { background: #f4f4f4; display: flex; align-items: center; justify-content: center; padding: 40px; }
-    .pm-image img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+    .pm-image-col { background: #f8f8f8; display: flex; align-items: center; justify-content: center; padding: 40px; }
+    .pm-image-col img { max-width: 100%; max-height: 300px; object-fit: contain; mix-blend-mode: multiply; }
     
-    .pm-details { padding: 50px; overflow-y: auto; display: flex; flex-direction: column; }
-    .pm-close { position: absolute; top: 20px; right: 25px; font-size: 30px; cursor: pointer; color: #999; transition: 0.3s; z-index: 10; background: none; border: none; }
-    .pm-close:hover { color: var(--danger-color); transform: rotate(90deg); }
+    .pm-details-col { padding: 40px; overflow-y: auto; display: flex; flex-direction: column; }
+    .pm-close { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; background: none; border: none; color: #999; z-index: 10; }
     
-    .pm-title { font-size: 2.2rem; line-height: 1.2; margin-bottom: 10px; }
-    .pm-price { font-size: 1.8rem; color: var(--secondary-color); font-family: var(--font-heading); margin-bottom: 25px; font-weight: 700; }
+    .pm-title { font-size: 2rem; color: var(--primary-color); line-height: 1.2; margin-bottom: 10px; }
+    .pm-price { font-size: 1.8rem; color: var(--secondary-color); font-family: var(--font-heading); font-weight: 700; margin-bottom: 20px; }
     
-    .pm-section-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 10px; margin-top: 20px; font-weight: 600; }
-    .pm-text { font-size: 1rem; color: #555; line-height: 1.7; margin-bottom: 10px; }
+    .pm-section { margin-bottom: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+    .pm-label { font-size: 0.85rem; text-transform: uppercase; color: #999; letter-spacing: 1px; font-weight: 600; margin-bottom: 5px; }
+    .pm-text { font-size: 0.95rem; color: #555; }
     
-    .pm-add-btn {
-        margin-top: auto;
-        background: var(--primary-color); color: #fff;
-        padding: 18px; text-align: center; text-transform: uppercase; letter-spacing: 2px;
-        font-weight: 600; cursor: pointer; transition: 0.3s;
-        border: 1px solid var(--primary-color);
-    }
-    .pm-add-btn:hover { background: var(--secondary-color); border-color: var(--secondary-color); color: #000; }
+    .pm-add-btn { margin-top: auto; padding: 15px; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; }
 
-    /* [ 6.0 ] OTHER ELEMENTS (Cart, Maintenance, Etc.) */
-    #maintenance-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; background: var(--primary-color); color: white; flex-direction: column; justify-content: center; align-items: center; }
-    #promo-running-banner { background: var(--primary-color); color: var(--secondary-color); padding: 8px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; display: none; }
-
-    /* Responsive */
+    /* [ 6.0 ] CART & OTHER MODALS */
+    .modal-content { background: #fff; padding: 0; border-radius: var(--border-radius); width: 90%; max-width: 500px; display: flex; flex-direction: column; max-height: 90vh; }
+    .modal-header { padding: 20px; background: var(--primary-color); color: #fff; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { color: #fff; margin: 0; font-size: 1.4rem; }
+    .modal-header .close { color: var(--secondary-color); opacity: 1; }
+    .modal-body { padding: 20px; overflow-y: auto; }
+    
+    .cart-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #eee; }
+    .cart-item img { width: 60px; height: 60px; object-fit: contain; border: 1px solid #eee; border-radius: 4px; }
+    
+    /* Responsive Fixes */
     @media (max-width: 1024px) { .product-list { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 768px) { 
         .product-list { grid-template-columns: repeat(2, 1fr); } 
-        .product-modal-content { grid-template-columns: 1fr; height: 90vh; }
-        .pm-image { height: 300px; }
-        .container { padding: 0 15px; }
+        .product-modal-content { grid-template-columns: 1fr; overflow-y: auto; }
+        .pm-image-col { height: 250px; padding: 20px; }
+        nav ul { flex-direction: row; }
+        nav a { padding: 15px 10px; font-size: 0.75rem; }
     }
     @media (max-width: 480px) { .product-list { grid-template-columns: 1fr; } }
 </style>
 
 <div id="effect-container" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9998; overflow:hidden;"></div>
-
-<div id="maintenance-overlay">
-    <h1 style="color: #fff;">Store Unavailable</h1>
-    <p id="maintenance-message" style="margin-top:10px; opacity:0.8;"></p>
+<div id="maintenance-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:99999; background:var(--primary-color); color:white; flex-direction:column; justify-content:center; align-items:center;">
+    <h1>Store Unavailable</h1><p id="maintenance-message"></p>
 </div>
 
 <div id="store-wrapper">
@@ -204,7 +202,9 @@
     <div class="container">
       <div class="header-content">
         <img src="FL.jpg" alt="Logo" class="header-logo" onerror="this.style.display='none'">
-        <div id="company-name-header"></div>
+        <div style="text-align:center;">
+            <h1 id="company-name-header"></h1>
+        </div>
       </div>
     </div>
   </header>
@@ -229,7 +229,7 @@
   <footer>
       <div class="container">
         <p id="footer-text"></p>
-        <div style="font-size: 0.7rem; opacity: 0.5; margin-top: 20px;">Last updated: <span id="update-timestamp"></span></div>
+        <div style="font-size: 0.7rem; opacity: 0.6; margin-top: 15px;">Last updated: <span id="update-timestamp"></span></div>
       </div>
   </footer>
 </div>
@@ -237,21 +237,27 @@
 <div id="product-detail-modal" class="modal">
     <div class="product-modal-content">
         <button class="pm-close" onclick="closeProductModal()">&times;</button>
-        <div class="pm-image"><img id="pm-img" src=""></div>
-        <div class="pm-details">
+        <div class="pm-image-col"><img id="pm-img" src=""></div>
+        <div class="pm-details-col">
             <h2 id="pm-title" class="pm-title"></h2>
             <div id="pm-price" class="pm-price"></div>
             
-            <div class="pm-section-title">Description</div>
-            <div id="pm-desc" class="pm-text"></div>
+            <div class="pm-section">
+                <div class="pm-label">Description</div>
+                <div id="pm-desc" class="pm-text"></div>
+            </div>
             
-            <div class="pm-section-title">Benefits</div>
-            <div id="pm-ben" class="pm-text"></div>
+            <div class="pm-section">
+                <div class="pm-label">Benefits</div>
+                <div id="pm-ben" class="pm-text"></div>
+            </div>
             
-            <div class="pm-section-title">Usage</div>
-            <div id="pm-use" class="pm-text"></div>
+            <div class="pm-section">
+                <div class="pm-label">Usage</div>
+                <div id="pm-use" class="pm-text"></div>
+            </div>
             
-            <div id="pm-add-btn" class="pm-add-btn">Add to Cart</div>
+            <button id="pm-add-btn" class="btn btn-primary pm-add-btn">Add to Cart</button>
         </div>
     </div>
 </div>
@@ -272,7 +278,6 @@
         let sym='❄', col='#fff';
         if(document.body.className.includes('CNY')) { sym='🏮'; col='#d4af37'; }
         else if(document.body.className.includes('HariRaya')) { sym='✨'; col='#cddc39'; }
-        else if(document.body.className.includes('Valentines')) { sym='❤️'; col='#e91e63'; }
         
         effectInterval = setInterval(()=>{
             const p=document.createElement('div'); p.innerHTML=sym; p.style.position='absolute'; p.style.color=col;
