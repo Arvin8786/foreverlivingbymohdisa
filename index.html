@@ -7,185 +7,304 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <style>
     :root {
-        /* Default (Corporate) Theme */
-        --primary-color: #1a5276;
-        --secondary-color: #f39c12;
-        --accent-color: #27ae60;
-        --bg-color: #f4f6f8;
-        --text-color: #333;
-        --light-text: #fff;
-        --danger-color: #e74c3c;
-        --border-radius: 12px;
-        --shadow: 0 4px 15px rgba(0,0,0,.08);
-        --font-family: 'Poppins',sans-serif;
-        --header-bg: #ffffff;
+        /* LUXURY PALETTE: Emerald & Gold */
+        --primary-color: #0f3d2e; /* Deep Forest Green */
+        --secondary-color: #d4af37; /* Satin Gold */
+        --accent-color: #1a1a1a; /* Jet Black for text/contrast */
+        --bg-color: #f9f8f6; /* Warm Alabaster */
+        --card-bg: #ffffff;
+        --text-color: #333333;
+        --light-text: #ffffff;
+        --danger-color: #a83232; /* Muted Red */
+        
+        /* Design Tokens */
+        --border-radius: 4px; /* Sharp/Small radius = Elegant */
+        --shadow: 0 20px 40px -10px rgba(0,0,0,0.08); /* Soft, high-end shadow */
+        --font-heading: 'Playfair Display', serif;
+        --font-body: 'Poppins', sans-serif;
+        --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
     
-    /* [ 1.1 ] FESTIVAL THEMES (CSS Overrides) */
-    /* Christmas */
-    body.theme-Christmas { --primary-color: #d90429; --secondary-color: #FFD700; --accent-color: #2b9348; --bg-color: #f0f8ff; }
+    /* [ 1.1 ] FESTIVAL THEME OVERRIDES (Adapted for Luxury) */
+    body.theme-Christmas { --primary-color: #6b1c23; --secondary-color: #c5a059; --bg-color: #fdfbf7; } /* Wine Red & Gold */
+    body.theme-CNY { --primary-color: #8a1c1c; --secondary-color: #e6b800; --bg-color: #fff8e1; } /* Deep Red & Gold */
+    body.theme-HariRaya { --primary-color: #004d40; --secondary-color: #cddc39; --bg-color: #f1f8e9; } /* Deep Teal & Lime Gold */
     
-    /* Chinese New Year */
-    body.theme-CNY { --primary-color: #c70000; --secondary-color: #ffcc00; --accent-color: #ff9900; --bg-color: #fff5e6; }
-    
-    /* Hari Raya */
-    body.theme-HariRaya { --primary-color: #006400; --secondary-color: #ffd700; --accent-color: #32cd32; --bg-color: #f0fff0; }
-    
-    /* Deepavali */
-    body.theme-Deepavali { --primary-color: #4b0082; --secondary-color: #ff8c00; --accent-color: #ffd700; --bg-color: #fdf5e6; }
-    
-    /* Thaipusam */
-    body.theme-Thaipusam { --primary-color: #ff9933; --secondary-color: #ffff00; --accent-color: #d35400; --bg-color: #fffaf0; }
-    
-    /* Valentines */
-    body.theme-Valentines { --primary-color: #e91e63; --secondary-color: #ffc1e3; --accent-color: #c2185b; --bg-color: #fff0f5; }
-    
-    /* National Day / Malaysia Day */
-    body.theme-NationalDay, body.theme-MalaysiaDay { --primary-color: #003366; --secondary-color: #ffcc00; --accent-color: #cc0000; --bg-color: #f0f8ff; }
-    
-    /* Mooncake Festival */
-    body.theme-MooncakeFestival { --primary-color: #1a237e; --secondary-color: #ffab00; --accent-color: #ff6f00; --bg-color: #e8eaf6; }
-    
-    /* Grand Opening */
-    body.theme-GrandOpening { --primary-color: #2c3e50; --secondary-color: #e74c3c; --accent-color: #f1c40f; --bg-color: #ffffff; }
-
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; transition: background-color 0.5s ease; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    h1, h2, h3, h4 { color: var(--primary-color); font-weight: 600; }
     
-    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 12px 15px; border-radius: 50px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s ease; }
-    .btn:disabled { background-color: #ccc; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
-    .btn-primary { background: var(--primary-color); color: var(--light-text); }
-    .btn-primary:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-2px); }
-    .btn-secondary { background-color: var(--light-gray); color: var(--dark-text); border: 1px solid #ccc; }
-    
-    /* Header & Nav */
-    header { background-color: var(--header-bg); padding: 20px 0; text-align: center; border-bottom: 1px solid #e0e0e0; transition: background 0.3s; }
-    .header-content { display: flex; align-items: center; justify-content: center; gap: 20px; }
-    .header-logo { width: 80px; height: 80px; object-fit: contain; }
-    #company-name-header { margin: 0; font-size: 1.8rem; line-height: 1.2; font-weight: 600; }
-    #company-name-header .by-line { font-size: 1.1rem; font-weight: 500; display: block; }
-    #company-name-header .slogan { font-size: 0.9rem; color: #555; font-weight: 400; display: block; margin-top: 4px; }
-    
-    /* Banners */
-    #promo-running-banner { color: var(--light-text); padding: 10px 0; font-weight: 700; background-color: var(--accent-color); overflow: hidden; white-space: nowrap; display: none; }
-    #promo-running-banner .marquee-content { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; }
-    @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
-    
-    nav { background-color: var(--primary-color); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,.1); transition: background-color 0.5s; }
-    nav ul { display: flex; list-style: none; padding: 10px 0; margin: 0; justify-content: center; flex-wrap: wrap; }
-    nav a { color: var(--light-text); text-decoration: none; font-weight: 600; padding: 10px 20px; cursor: pointer; }
-    
-    /* Login Button Style */
-    .nav-login-btn { background-color: var(--secondary-color); color: var(--dark-text) !important; border-radius: 50px; padding: 5px 20px !important; margin: 5px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    .nav-login-btn:hover { background-color: #fff; }
+    body { 
+        font-family: var(--font-body); 
+        background-color: var(--bg-color); 
+        color: var(--text-color); 
+        line-height: 1.8; 
+        font-weight: 300;
+        transition: background-color 0.8s ease;
+    }
 
-    /* Main Content & Tabs */
-    main { padding: 2rem 0; }
-    .tab-content { display: none; } .tab-content.active { display: block; animation: fadeIn 0.5s; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    footer { background: var(--primary-color); color: var(--light-text); padding: 40px 20px; text-align: center; margin-top: 30px; transition: background-color 0.5s; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 
-    /* Maintenance Overlay */
-    #maintenance-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; background: rgba(26,82,118,0.98); color: white; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;}
-    #maintenance-overlay h1 { color: var(--light-text); }
+    /* Typography */
+    h1, h2, h3, h4 { 
+        font-family: var(--font-heading); 
+        color: var(--primary-color); 
+        font-weight: 700; 
+        letter-spacing: -0.02em;
+    }
+    h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 2rem; margin-bottom: 1.5rem; text-align: center; position: relative; padding-bottom: 15px; }
+    h2::after {
+        content: ''; display: block; width: 60px; height: 3px; background: var(--secondary-color);
+        margin: 15px auto 0;
+    }
+    
+    /* Elegant Buttons */
+    .btn { 
+        display: inline-flex; align-items: center; justify-content: center; 
+        width: 100%; padding: 14px 25px; 
+        border-radius: var(--border-radius); 
+        text-decoration: none; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;
+        border: 1px solid transparent; cursor: pointer; transition: var(--transition); 
+    }
+    .btn:disabled { background-color: #ccc; border-color: #ccc; cursor: not-allowed; }
+    
+    .btn-primary { 
+        background-color: var(--primary-color); 
+        color: var(--light-text); 
+        border-color: var(--primary-color);
+    }
+    .btn-primary:hover:not(:disabled) { 
+        background-color: var(--secondary-color); 
+        border-color: var(--secondary-color); 
+        color: #000;
+    }
+    
+    .btn-secondary { 
+        background-color: transparent; 
+        color: var(--primary-color); 
+        border-color: var(--primary-color);
+    }
+    .btn-secondary:hover:not(:disabled) { 
+        background-color: var(--primary-color); 
+        color: var(--light-text); 
+    }
+
+    /* Header */
+    header { 
+        background-color: var(--card-bg); 
+        padding: 30px 0; 
+        text-align: center; 
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .header-content { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .header-logo { width: 100px; height: 100px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); }
+    
+    #company-name-header { color: var(--primary-color); }
+    #company-name-header .by-line { 
+        font-family: var(--font-body); 
+        font-size: 0.9rem; 
+        text-transform: uppercase; 
+        letter-spacing: 2px; 
+        color: var(--secondary-color); 
+        display: block; margin-top: 5px;
+    }
+    #company-name-header .slogan { font-family: var(--font-heading); font-style: italic; font-size: 1.1rem; color: #666; display: block; margin-top: 5px; font-weight: 400;}
+    
+    /* Minimalist Nav */
+    nav { 
+        background-color: var(--card-bg); 
+        position: sticky; top: 0; z-index: 100; 
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    nav ul { display: flex; list-style: none; padding: 0; margin: 0; justify-content: center; flex-wrap: wrap; }
+    nav a { 
+        color: var(--text-color); 
+        text-decoration: none; 
+        font-weight: 500; 
+        font-size: 0.85rem; 
+        text-transform: uppercase; 
+        letter-spacing: 1px;
+        padding: 20px 25px; 
+        cursor: pointer; 
+        transition: color 0.3s;
+        border-bottom: 2px solid transparent;
+    }
+    nav a:hover { color: var(--primary-color); border-bottom-color: var(--secondary-color); }
+    
+    /* Gold Login Button */
+    .nav-login-btn { color: var(--secondary-color) !important; font-weight: 700; }
+
+    /* Running Banner */
+    #promo-running-banner { 
+        background-color: var(--primary-color); 
+        color: var(--secondary-color); 
+        padding: 8px 0; 
+        font-family: var(--font-body);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-align: center;
+        display: none;
+    }
 
     /* Dynamic Modules */
-    .hero-section { background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: var(--light-text); padding: 80px 20px; text-align: center; border-radius: var(--border-radius); margin-bottom: 30px; }
-    .hero-section h2 { color: var(--light-text); }
-    .dynamic-content-wrapper { background: var(--header-bg); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; }
-    .why-choose-us-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; margin-top: 2rem; }
-    .why-choose-us-grid i { font-size: 2.5rem; color: var(--accent-color); margin-bottom: 1rem; }
-    #youtube-videos-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
-    .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius); box-shadow: var(--shadow); }
-    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-    #testimonies-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-    .testimony-card { background: var(--light-gray); padding: 1.5rem; border-radius: var(--border-radius); text-align: center; }
-    .testimony-rating { color: var(--secondary-color); font-size: 1.2rem; }
+    .dynamic-content-wrapper { 
+        background: var(--card-bg); 
+        padding: 4rem; 
+        border-radius: var(--border-radius); 
+        box-shadow: var(--shadow); 
+        margin-bottom: 3rem; 
+        text-align: center;
+    }
     
-    /* About & Jobs */
-    .owner-profile { display: flex; flex-wrap: wrap; align-items: center; gap: 2rem; margin-bottom: 2rem;}
-    .owner-image { flex-shrink: 0; width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
-    .owner-details { flex: 1; }
-    .about-section { background: #fff; border-left: 5px solid var(--accent-color); padding: 20px; margin-top: 25px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
-    .job-card { background: #fff; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; overflow: hidden; transition: all 0.3s ease; }
-    .job-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-    .job-header { background: var(--primary-color); color: white; padding: 20px 25px; }
-    .job-header h3 { color: white; margin: 0; font-size: 1.4rem; }
-    .job-body { padding: 25px; }
-    .job-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
-    .job-detail-item { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; }
-    .job-detail-item i { color: var(--accent-color); font-size: 1.2rem; width: 20px; text-align: center; }
-    
-    /* Products */
-    .product-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
-    .product { background: #fff; border-radius: var(--border-radius); box-shadow: var(--shadow); display: flex; flex-direction: column; position: relative; transition: transform 0.2s; }
-    .product:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-    .product-image-container { height: 280px; padding: 15px; display: flex; align-items: center; justify-content: center; }
-    .product img { max-width: 100%; max-height: 100%; object-fit: contain; }
-    .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-    .product h3 { margin: 0 0 10px; font-size: 1.25rem; color: var(--primary-color); }
-    .product-actions { margin-top: auto; }
-    .new-price { font-weight: 700; font-size: 1.4rem; color: var(--primary-color); }
-    .product-tag { position: absolute; top: 15px; left: 15px; background-color: var(--accent-color); color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: 600; }
+    /* Hero */
+    .hero-section { 
+        background: var(--primary-color); 
+        color: var(--light-text); 
+        padding: 100px 20px; 
+        text-align: center; 
+        margin-bottom: 40px; 
+        position: relative;
+        overflow: hidden;
+    }
+    .hero-section::before {
+        content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle, transparent 20%, #000000 150%);
+        opacity: 0.4;
+    }
+    .hero-section h2 { color: var(--secondary-color); font-size: 3rem; margin-bottom: 1rem; z-index: 2; position: relative; }
+    .hero-section p { font-size: 1.2rem; color: #ddd; max-width: 600px; margin: 0 auto; z-index: 2; position: relative; }
 
+    /* Grid Systems */
+    .product-list, .why-choose-us-grid, #testimonies-container, #youtube-videos-container { 
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; 
+    }
+
+    /* Product Cards (Luxury) */
+    .product { 
+        background: var(--card-bg); 
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: var(--border-radius); 
+        transition: var(--transition); 
+        display: flex; flex-direction: column; 
+        position: relative;
+        overflow: hidden;
+    }
+    .product:hover { 
+        transform: translateY(-5px); 
+        box-shadow: var(--shadow); 
+        border-color: var(--secondary-color);
+    }
+    .product-image-container { 
+        height: 300px; padding: 40px; 
+        background-color: #fff; 
+        display: flex; align-items: center; justify-content: center; 
+    }
+    .product img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+    .product-info { padding: 25px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; }
+    .product h3 { font-size: 1.3rem; margin-bottom: 5px; color: var(--primary-color); }
+    .price-section { margin-bottom: 15px; }
+    .new-price { font-family: var(--font-heading); font-weight: 700; font-size: 1.5rem; color: var(--secondary-color); }
+    .product-tag { 
+        position: absolute; top: 10px; right: 10px; left: auto; /* Top Right */
+        background-color: var(--secondary-color); 
+        color: #000; 
+        padding: 4px 12px; 
+        font-size: 0.7rem; 
+        text-transform: uppercase; 
+        letter-spacing: 1px;
+        font-weight: 600; 
+    }
+    
+    /* Testimonies & Why Choose Us */
+    .why-choose-us-grid i { font-size: 2rem; color: var(--secondary-color); margin-bottom: 1.5rem; }
+    .testimony-card { 
+        background: #fff; padding: 2rem; 
+        border: 1px solid rgba(0,0,0,0.05); 
+        font-style: italic; font-family: var(--font-heading); font-size: 1.1rem;
+    }
+    .testimony-rating { color: var(--secondary-color); font-size: 0.9rem; margin-top: 10px; }
+
+    /* Owner Profile */
+    .owner-profile { display: flex; align-items: center; gap: 3rem; text-align: left; }
+    .owner-image { width: 250px; height: 250px; object-fit: cover; border-radius: 50%; border: 5px solid var(--secondary-color); }
+    .owner-details h3 { font-size: 2rem; color: var(--primary-color); margin-bottom: 1rem; }
+    
     /* Modals */
-    .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,.6); justify-content: center; align-items: center; }
-    .modal-content { background-color: #fefefe; padding: 0; border-radius: var(--border-radius); width: 90%; max-width: 650px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
-    .modal-header { padding: 20px 30px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-    .close { color: #aaa; background: none; border: none; font-size: 28px; font-weight: 700; cursor: pointer; }
-    .modal-body { padding: 10px 30px; overflow-y: auto; }
-    
-    /* Cart specific */
-    .cart-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #eee; }
-    .cart-item-image { width: 80px; height: 80px; object-fit: contain; background: #fff; padding: 5px; border-radius: 8px; border: 1px solid #eee; }
-    .quantity-controls { display:flex; align-items:center; gap:10px; margin-top:8px; }
-    .quantity-btn { width: 30px; height: 30px; background: var(--light-gray); border: 1px solid #ccc; border-radius: 50%; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-    .remove-item-btn { background: none; border: none; color: var(--danger-color); font-size: 1.2rem; cursor: pointer; }
-    .modal-footer { padding: 20px 30px; border-top: 1px solid #eee; background: var(--light-gray); }
-    .summary-line.total { font-weight: 700; font-size: 1.3rem; color: var(--primary-color); }
-    .customer-info-form { padding: 20px 30px; background: #fff; }
-    .customer-info-form input, .customer-info-form textarea { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; }
+    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 61, 46, 0.6); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
+    .modal-content { background-color: #fff; padding: 0; border-radius: var(--border-radius); width: 90%; max-width: 600px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+    .modal-header { padding: 25px; background: var(--primary-color); color: #fff; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { color: #fff; font-size: 1.5rem; margin: 0; border: none; text-align: left; }
+    .modal-header h2::after { display: none; }
+    .close { color: var(--secondary-color); background: none; border: none; font-size: 30px; font-weight: 300; cursor: pointer; }
+    .modal-body { padding: 30px; overflow-y: auto; }
 
-    /* Chatbot & Fab */
-    .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; gap: 15px; }
-    .fab { width: 60px; height: 60px; background-color: var(--primary-color); color: var(--light-text); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 4px 12px rgba(0,0,0,.25); cursor: pointer; position: relative; transition: background-color 0.3s; }
-    .fab:hover { transform: scale(1.05); }
-    #cart-count { position: absolute; top: -2px; right: -2px; background-color: var(--secondary-color); color: var(--dark-text); border-radius: 50%; padding: 3px 8px; font-size: .8rem; font-weight: 700; }
-    #eshop-chat-widget { position: fixed; bottom: 95px; right: 20px; width: 350px; height: 500px; background: #fff; border-radius: var(--border-radius); box-shadow: 0 5px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; visibility: hidden; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-in-out; z-index: 998; }
+    /* Cart Items */
+    .cart-item { display: flex; align-items: center; gap: 20px; padding: 20px 0; border-bottom: 1px solid #eee; }
+    .cart-item-image { width: 60px; height: 60px; object-fit: contain; border: 1px solid #eee; }
+    .quantity-controls { display:flex; align-items:center; gap:10px; margin-top:5px; }
+    .quantity-btn { width: 25px; height: 25px; background: transparent; border: 1px solid #ccc; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+    .modal-footer { padding: 25px; background: #f9f9f9; border-top: 1px solid #eee; }
+    .summary-line { display: flex; justify-content: space-between; padding: 5px 0; font-family: var(--font-body); }
+    .summary-line.total { font-family: var(--font-heading); font-size: 1.5rem; color: var(--primary-color); margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd; }
+
+    /* Forms */
+    input, select, textarea { 
+        width: 100%; padding: 15px; margin-bottom: 20px; 
+        border: 1px solid #ddd; border-radius: var(--border-radius); 
+        font-family: var(--font-body); font-size: 0.95rem; background: #fff;
+        transition: border-color 0.3s;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-color); }
+    
+    /* Chatbot & FAB */
+    .fab-container { position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; gap: 15px; }
+    .fab { 
+        width: 60px; height: 60px; 
+        background-color: var(--primary-color); color: var(--secondary-color); 
+        border-radius: 50%; 
+        display: flex; align-items: center; justify-content: center; 
+        font-size: 1.5rem; box-shadow: var(--shadow); 
+        cursor: pointer; transition: transform 0.3s; border: 2px solid var(--secondary-color);
+    }
+    .fab:hover { transform: scale(1.1); }
+    #cart-count { position: absolute; top: -5px; right: -5px; background-color: var(--secondary-color); color: #000; border-radius: 50%; padding: 4px 8px; font-size: 0.75rem; font-weight: 700; }
+    
+    #eshop-chat-widget { position: fixed; bottom: 100px; right: 30px; width: 380px; height: 550px; background: #fff; border-radius: var(--border-radius); box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; visibility: hidden; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-in-out; z-index: 998; border: 1px solid #eee; }
     #eshop-chat-widget.active { visibility: visible; opacity: 1; transform: translateY(0); }
-    #chat-header { background: var(--primary-color); color: var(--light-text); padding: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-    #chat-body { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-    .chat-message { max-width: 85%; padding: 10px 15px; border-radius: 18px; line-height: 1.5; }
-    .bot-message { background: var(--light-gray); color: var(--dark-text); border-radius: 18px 18px 18px 5px; align-self: flex-start; }
-    .user-message { background: var(--primary-color); color: var(--light-text); border-radius: 18px 18px 5px 18px; align-self: flex-end; }
-    #chat-input-container { display: flex; padding: 10px; border-top: 1px solid #eee; }
-    #chat-input { flex-grow: 1; border: 1px solid #ccc; border-radius: 20px; padding: 10px 15px; }
-    #chat-send-btn { background: none; border: none; font-size: 20px; color: var(--primary-color); cursor: pointer; padding: 0 10px; }
-
-    /* Enquiries Form */
-    .enquiry-form input, .enquiry-form textarea, .enquiry-form select { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
+    #chat-header { background: var(--primary-color); color: #fff; padding: 20px; font-family: var(--font-heading); letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+    #chat-body { flex-grow: 1; padding: 20px; background: #fafafa; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+    .chat-message { max-width: 80%; padding: 12px 16px; border-radius: 12px; font-size: 0.9rem; }
+    .bot-message { background: #fff; border: 1px solid #eee; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+    .user-message { background: var(--primary-color); color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
     
-    /* Login Modal Specific */
-    .login-option { border: 2px solid var(--mid-gray); border-radius: 8px; padding: 20px; margin-bottom: 20px; transition: all 0.2s ease; }
-    .login-option:hover { border-color: var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    /* Login Options */
+    .login-option { border: 1px solid #eee; padding: 25px; border-radius: var(--border-radius); margin-bottom: 20px; transition: 0.3s; }
+    .login-option:hover { border-color: var(--secondary-color); transform: translateY(-2px); }
+    .login-option h3 { font-size: 1.2rem; margin-bottom: 10px; }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .owner-profile { flex-direction: column; text-align: center; }
+        header .header-content { flex-direction: column; }
+        h1 { font-size: 2rem; }
+        .dynamic-content-wrapper { padding: 2rem 1.5rem; }
+    }
 </style>
 
 <div id="effect-container" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9998; overflow:hidden;"></div>
 
 <div id="maintenance-overlay">
-    <img src="FL.jpg" alt="Logo" style="width: 100px; height: 100px; margin-bottom: 20px;">
-    <h1>Under Maintenance</h1>
-    <p id="maintenance-message" style="font-size: 1.2rem; max-width: 500px;"></p>
+    <img src="FL.jpg" alt="Logo" style="width: 100px; height: 100px; margin-bottom: 20px; border-radius: 50%;">
+    <h1 style="color:#fff;">Temporarily Unavailable</h1>
+    <p id="maintenance-message" style="font-size: 1.2rem; max-width: 500px; color: #ddd;"></p>
 </div>
 
 <div id="store-wrapper">
@@ -193,29 +312,35 @@
     <div class="container">
       <div class="header-content">
         <img src="FL.jpg" alt="Business Logo" class="header-logo" onerror="this.style.display='none'">
-        <h1 id="company-name-header"></h1>
+        <div style="text-align:center;">
+            <h1 id="company-name-header"></h1>
+        </div>
       </div>
     </div>
   </header>
-  <div id="promo-running-banner"><div class="marquee-content" id="promo-banner-text"></div></div>
+  
   <nav>
     <div class="container">
       <ul id="main-nav">
-        <li><a onclick="showTab('homepage')">Homepage</a></li>
-        <li><a onclick="showTab('products')">Products</a></li>
-        <li><a onclick="showTab('about')">About Us</a></li>
+        <li><a onclick="showTab('homepage')">Home</a></li>
+        <li><a onclick="showTab('products')">Collection</a></li>
+        <li><a onclick="showTab('about')">Our Story</a></li>
         <li><a onclick="showTab('jobs')">Careers</a></li>
-        <li><a onclick="showTab('enquiries')">Contact Us</a></li>
+        <li><a onclick="showTab('enquiries')">Contact</a></li>
         <li><a onclick="showTab('rewards')">Rewards</a></li>
-        <li><a id="nav-login-btn" class="nav-login-btn"><i class="fa-solid fa-user" style="margin-right: 8px;"></i> Login</a></li>
+        <li><a id="nav-login-btn" class="nav-login-btn">Access Portal</a></li>
       </ul>
     </div>
   </nav>
+  
+  <div id="promo-running-banner"><div class="marquee-content" id="promo-banner-text"></div></div>
+
   <main id="main-content" class="container"></main>
+  
   <footer class="footer">
       <div class="container">
         <p id="footer-text"></p>
-        <div class="timestamp">Last updated: <span id="update-timestamp"></span></div>
+        <div class="timestamp" style="font-size: 0.75rem; opacity: 0.7; margin-top: 10px;">Last updated: <span id="update-timestamp"></span></div>
       </div>
   </footer>
 </div>
@@ -227,21 +352,21 @@
 <div id="popup-modal" class="modal"></div>
 
 <div id="login-modal" class="modal">
-    <div class="modal-content" style="max-width: 450px; text-align: center;">
+    <div class="modal-content" style="max-width: 500px; text-align: center;">
         <div class="modal-header">
-            <h2 style="margin: 0;">Login</h2>
-            <button id="close-login-modal-btn" class="close">&times;</button>
+            <h2 style="margin: 0 auto; border: none; padding: 0;">Welcome Back</h2>
+            <button id="close-login-modal-btn" class="close" style="color: #fff;">&times;</button>
         </div>
-        <div class="modal-body" style="padding: 30px;">
+        <div class="modal-body" style="padding: 40px;">
             <div class="login-option">
-                <h3>Customer Login</h3>
-                <p>Access your order history and manage your account.</p>
-                <button class="btn btn-secondary" disabled>Coming Soon</button>
+                <h3>Customer Account</h3>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Track orders and manage your wishlist.</p>
+                <button class="btn btn-secondary" disabled style="border: 1px solid #ccc;">Coming Soon</button>
             </div>
-            <div class="login-option">
-                <h3>Agent Portal Login</h3>
-                <p>Access the sales dashboard, manage orders, and track commissions.</p>
-                <a href="agent.html" target="_blank" class="btn btn-primary">Agent Login</a>
+            <div class="login-option" style="border-color: var(--primary-color); background-color: #fcfcfc;">
+                <h3 style="color: var(--primary-color);">Agent Portal</h3>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Manage sales, commissions, and your team.</p>
+                <a href="agent.html" target="_blank" class="btn btn-primary">Log In to Portal</a>
             </div>
         </div>
     </div>
@@ -251,30 +376,24 @@
 
 <script>
     let effectInterval;
-    
-    // This function is called by script.js -> applyTheme(theme)
     function startSnowing(themeType) { 
-        // Note: Kept function name 'startSnowing' for compatibility with your script.js, 
-        // but enhanced to support multiple types based on the theme name.
-        
         const container = document.getElementById('effect-container');
         if(!container) return;
         
         container.innerHTML = '';
         if(effectInterval) clearInterval(effectInterval);
         
-        // Determine the symbol and color based on the active class on body or theme name
         let symbol = '❄'; 
-        let color = '#fff';
+        let color = 'rgba(255,255,255,0.8)';
         const bodyClass = document.body.className;
 
-        if (bodyClass.includes('Christmas')) { symbol = '❄'; color = '#fff'; }
-        else if (bodyClass.includes('CNY')) { symbol = '🏮'; color = '#ffcc00'; }
-        else if (bodyClass.includes('HariRaya')) { symbol = '✨'; color = '#ffff00'; }
+        if (bodyClass.includes('Christmas')) { symbol = '❄'; }
+        else if (bodyClass.includes('CNY')) { symbol = '🏮'; color = '#d4af37'; }
+        else if (bodyClass.includes('HariRaya')) { symbol = '✨'; color = '#cddc39'; }
         else if (bodyClass.includes('Deepavali')) { symbol = '🪔'; color = '#ffa500'; }
-        else if (bodyClass.includes('Valentines')) { symbol = '❤️'; color = '#ff69b4'; }
-        else if (bodyClass.includes('National') || bodyClass.includes('Malaysia')) { symbol = '🌺'; color = '#ff0000'; }
-        else { return; } // No effect for other themes
+        else if (bodyClass.includes('Valentines')) { symbol = '❤️'; color = '#e91e63'; }
+        else if (bodyClass.includes('National') || bodyClass.includes('Malaysia')) { symbol = '🌺'; color = '#cc0000'; }
+        else { return; } 
 
         effectInterval = setInterval(() => {
             const particle = document.createElement('div');
@@ -282,13 +401,13 @@
             particle.style.position = 'absolute';
             particle.style.color = color;
             particle.style.left = Math.random() * 100 + 'vw';
-            particle.style.opacity = Math.random();
-            particle.style.fontSize = (Math.random() * 15 + 10) + 'px';
+            particle.style.opacity = Math.random() * 0.7;
+            particle.style.fontSize = (Math.random() * 20 + 10) + 'px';
             particle.style.top = '-30px';
             particle.style.pointerEvents = 'none';
+            particle.style.textShadow = '0 0 5px rgba(255,255,255,0.3)';
             
-            // Falling Animation
-            const duration = Math.random() * 3000 + 3000;
+            const duration = Math.random() * 5000 + 5000;
             particle.animate([
                 { transform: `translateY(0) rotate(0deg)` },
                 { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)` }
@@ -298,10 +417,8 @@
             }).onfinish = () => particle.remove();
             
             container.appendChild(particle);
-        }, 300); // Frequency of particles
+        }, 400); 
     }
-    
-    // Make function globally available
     window.startSnowing = startSnowing;
 </script>
 
