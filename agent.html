@@ -12,14 +12,25 @@
     <link rel="icon" type="image/jpeg" href="FL.jpg">
     
     <style>
-        /* [ 1.0 ] CORE STYLES */
+        /* ================================================================= */
+        /* [ 1.0 ] CORE STYLES & VARIABLES */
+        /* ================================================================= */
         :root {
-            --primary-color: #1a5276; --secondary-color: #f39c12; --success-color: #198754;
-            --light-gray: #f4f6f8; --mid-gray: #e9ecef; --dark-text: #333; --light-text: #fff; --danger-color: #dc3545;
-            --border-radius-lg: 12px; --border-radius-sm: 8px; --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+            --primary-color: #1a5276; 
+            --secondary-color: #f39c12; 
+            --success-color: #198754; 
+            --light-gray: #f4f6f8; 
+            --mid-gray: #e9ecef; 
+            --dark-text: #333; 
+            --light-text: #fff;
+            --danger-color: #dc3545;
+            --border-radius-lg: 12px;
+            --border-radius-sm: 8px;
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
             --font-family: 'Poppins', sans-serif;
         }
         * { box-sizing: border-box; margin: 0; padding: 0;}
+        
         body { font-family: var(--font-family); background: var(--light-gray); color: var(--dark-text); line-height: 1.5; }
         .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
         h1, h2, h3 { color: var(--dark-text); font-weight: 600; }
@@ -28,17 +39,18 @@
         /* Buttons */
         .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; }
         .btn-primary { background: var(--primary-color); color: var(--light-text); border-radius: 50px; box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3); }
-        .btn-primary:hover:not(:disabled) { background: #113a56; transform: translateY(-2px); }
+        .btn-primary:hover:not(:disabled) { background: #113a56; box-shadow: 0 6px 12px rgba(26, 82, 118, 0.4); transform: translateY(-2px); }
         .btn-secondary { background: var(--mid-gray); color: var(--dark-text); border-radius: var(--border-radius-sm); }
-        .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; transform: none; }
+        .btn-secondary:hover:not(:disabled) { background: #d0d7dd; }
+        .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; box-shadow: none; transform: none; }
         
-        /* Cards & Inputs */
+        /* Cards & Form Elements */
         .card { background: var(--light-text); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; }
         .card h3 { border-bottom: 2px solid var(--mid-gray); padding-bottom: 10px; margin-bottom: 20px; }
         input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem; }
         .hidden { display: none !important; }
 
-        /* [ 2.0 ] LOGIN & HEADER */
+        /* [ 2.0 ] LOGIN & HEADER STYLES */
         #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1a5276 0%, #34495e 100%); }
         #login-box { padding: 50px; max-width: 400px; text-align: center; background: #fff; border-radius: 15px; border-top: 5px solid var(--primary-color); }
         
@@ -48,49 +60,48 @@
         .target-progress { background: linear-gradient(90deg, #f39c12, #ffc107); height: 100%; }
         .target-text { position: absolute; width: 100%; text-align: center; font-size: 0.8rem; line-height: 20px; color: #000; font-weight: 600; }
         
-        /* Navigation */
+        /* Navigation Bar */
         #portal-view nav { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 25px; background-color: var(--primary-color); border-radius: var(--border-radius-sm); overflow: hidden; box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3); }
         #portal-view nav .btn { background: transparent; color: var(--light-text); border: none; border-radius: 0; flex-grow: 1; padding: 15px 20px; }
         #portal-view nav .btn.active { background: var(--secondary-color); color: var(--dark-text); box-shadow: none; }
         #portal-view nav .btn:hover:not(.active) { background: rgba(255, 255, 255, 0.1); }
         #portal-view nav .btn.hidden { display: none; }
 
-        /* [ 3.0 ] OPEN ORDERS STYLES (NEW) */
-        .open-order-card { 
-            background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.2s;
-        }
-        .open-order-card:hover { border-color: var(--primary-color); }
-        .admin-assign-box { 
-            margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; display: flex; gap: 5px; align-items: center; justify-content: flex-end;
-        }
-
-        /* [ 4.0 ] PROFILE GRID STYLES */
-        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .profile-section h4 { color: var(--primary-color); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .edit-badge { font-size: 0.8rem; font-weight: 600; color: var(--secondary-color); background-color: #fef5e7; padding: 3px 8px; border-radius: 12px; }
-        .profile-item label { font-weight: 600; display: block; color: #666; margin-bottom: 2px; }
-        .profile-item input { background: #f9f9f9; width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
-        .profile-item input:disabled { background: #eee; color: #777; cursor: not-allowed; border-color: #eee; }
-        .profile-item input:enabled { background: #fff; border: 1px solid var(--primary-color); }
-
-        /* [ 5.0 ] TABLE STYLES */
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
-
-        /* Order Workflow */
+        /* [ 3.0 ] ORDER CREATION & DATA TABLES */
         #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
         #product-selection-list { max-height: 500px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
         .product-item-selectable { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid var(--mid-gray); cursor: pointer; transition: background 0.1s; }
         .product-item-selectable:hover { background: #f0f8ff; }
         .product-item-selectable img { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; }
-        #summary-items-list .summary-item { display: grid; grid-template-columns: 1fr 60px 80px 30px; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--mid-gray); }
-        .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
         
+        #summary-items-list .summary-item { display: grid; grid-template-columns: 1fr 60px 80px 30px; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--mid-gray); }
+        .price-error-message { font-size: 0.75rem; color: var(--danger-color); font-weight: 500; }
+        .price-input-invalid { border: 2px solid var(--danger-color) !important; background: #fff5f5; }
+        .summary-line { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; margin-top: 10px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+
+        /* [ 4.0 ] PROFILE GRID STYLES */
+        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .profile-section h4 { color: var(--primary-color); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .edit-badge { font-size: 0.8rem; font-weight: 600; color: var(--secondary-color); background-color: #fef5e7; padding: 3px 8px; border-radius: 12px; }
+        .profile-item { margin-bottom: 15px; }
+        .profile-item label { font-weight: 600; display: block; color: #666; margin-bottom: 2px; }
+        .profile-item input { background: #f9f9f9; width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        .profile-item input:disabled { background: #eee; color: #777; cursor: not-allowed; border-color: #eee; }
+        .profile-item input:enabled { background: #fff; border: 1px solid var(--primary-color); }
+
+        /* [ 5.0 ] OPEN ORDERS STYLES */
+        .open-order-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.2s; }
+        .open-order-card:hover { border-color: var(--primary-color); }
+        .admin-assign-box { margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; display: flex; gap: 5px; align-items: center; justify-content: flex-end; }
+
         @media (max-width: 1000px) {
             #order-creation-workflow { grid-template-columns: 1fr; }
+            #order-summary-card { position: static; }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
@@ -104,8 +115,10 @@
         <p>Enter your credentials to access the sales platform.</p>
         <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
             <input type="text" id="agent-id-input" placeholder="Agent ID" required>
-            <input type="password" id="agent-password-input" placeholder="Password" required>
-            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">Login</button>
+            <input type="password" id="agent-password-input" placeholder="Password" required> 
+            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
             <p id="login-status"></p>
         </form>
     </div>
@@ -115,6 +128,7 @@
     <div class="card" style="max-width: 400px; margin: 50px auto; text-align: center;">
         <h2>Mandatory Password Change</h2>
         <p id="change-view-agent-id" style="font-weight: 600;"></p>
+        <p style="color: var(--danger-color); font-weight: 600;">For security, you must change your default password immediately.</p>
         <input type="password" id="new-password-input" placeholder="New Password" required>
         <input type="password" id="confirm-password-input" placeholder="Confirm New Password" required>
         <button id="change-password-btn" class="btn btn-primary" style="width:100%;">Set New Password</button>
@@ -128,9 +142,11 @@
             <h2 id="agent-welcome-header"></h2>
             <p id="agent-details-display" style="font-size: 1.1rem; color: #555; font-weight: 500; margin-top: -10px; margin-bottom: 15px;"></p>
             <div id="target-bar-display"></div>
-            <button id="refresh-data-btn" class="btn btn-secondary" style="margin-top: 10px; padding: 5px 10px;">Refresh Data</button>
+            <button id="refresh-data-btn" class="btn btn-secondary" style="margin-top: 10px; padding: 5px 10px;">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh Data
+            </button>
         </div>
-        <button id="logout-btn" class="btn btn-primary">Logout</button>
+        <button id="logout-btn" class="btn btn-primary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     </header>
 
     <nav>
@@ -149,7 +165,7 @@
             <h3>Open Leads Pool</h3>
             <button class="btn btn-secondary" onclick="renderOpenOrders()"><i class="fa-solid fa-rotate"></i> Refresh List</button>
         </div>
-        <p>Orders below are waiting to be picked up. Admins can assign orders manually.</p>
+        <p>Pick an order below to assign it to yourself. Admins can assign orders to specific agents.</p>
         <div id="open-orders-list" style="margin-top: 20px;">Loading...</div>
     </div>
 
@@ -159,7 +175,7 @@
                 <div class="card">
                     <h3>Customer Information</h3>
                     <select id="customer-dropdown"></select>
-                    <button id="new-customer-btn" class="btn" style="background-color: var(--mid-gray); color: var(--dark-text); margin-top: 10px; border-radius: var(--border-radius-sm);">Create New Customer</button>
+                    <button id="new-customer-btn" class="btn" style="background-color: var(--mid-gray); color: var(--dark-text); margin-top: 10px; border-radius: var(--border-radius-sm);"><i class="fa-solid fa-user-plus"></i> Create New Customer</button>
                     <div id="new-customer-form" class="hidden" style="margin-top: 15px; background: var(--light-gray); padding: 15px; border-radius: var(--border-radius-sm);">
                         <input type="text" id="new-customer-name" placeholder="Customer Name" required>
                         <input type="email" id="new-customer-email" placeholder="Customer Email" required>
@@ -185,7 +201,9 @@
                     <h3>Payment & Submit</h3>
                     <label for="payment-proof">Upload Payment Proof (Required)</label>
                     <input type="file" id="payment-proof" required>
-                    <button id="submit-order-btn" class="btn btn-primary" style="width:100%; margin-top: 15px;">Submit Order</button>
+                    <button id="submit-order-btn" class="btn btn-primary" style="width:100%; margin-top: 15px;">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Order
+                    </button>
                     <p id="submit-status" style="text-align: center; margin-top: 10px; font-weight: 600;"></p>
                 </div>
             </div>
@@ -204,15 +222,16 @@
     
     <div id="my-commission-view" class="view hidden card">
         <h2>My Commission Records</h2>
+        <p>Review your processed commission and team override payouts.</p>
         <div id="my-commission-list"></div>
     </div>
 
     <div id="profile-view" class="view hidden card">
-        <div style="display:flex; justify-content:space-between;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px;">
             <h2>My Profile</h2>
             <button id="save-profile-btn" class="btn btn-primary hidden" onclick="saveProfile()">Save Changes</button>
         </div>
-        <p id="profile-status" style="text-align:right; margin-top:-10px;"></p>
+        <p id="profile-status" style="text-align:right; font-size:0.9rem; margin-top:-10px; font-weight: 600;"></p>
         <div class="profile-grid">
             <div class="profile-section">
                 <h4>Personal Info</h4>
@@ -228,47 +247,50 @@
             </div>
             <div class="profile-section">
                 <h4>Payment Details <span id="edit-badge" class="edit-badge" style="display:none;">(Editable)</span></h4>
-                <div class="profile-item"><label>Bank Name</label><input id="prof-bank" disabled></div>
-                <div class="profile-item"><label>Acc Holder</label><input id="prof-holder" disabled></div>
-                <div class="profile-item"><label>Acc Number</label><input id="prof-acc" disabled></div>
+                <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bank" disabled></div>
+                <div class="profile-item"><label>Account Holder</label><input type="text" id="prof-holder" disabled></div>
+                <div class="profile-item"><label>Account Number</label><input type="text" id="prof-acc" disabled></div>
             </div>
         </div>
     </div>
 
     <div id="team-view" class="view hidden card">
         <h2>My Team Performance</h2>
-        <div class="card" style="background:#e8f5e9; border-top:4px solid #2e7d32;">
-            <h4>Total Override Earned</h4>
+        <div class="card" style="background:#e8f5e9; border-top:4px solid #2e7d32; margin-bottom:20px;">
+            <h4>Total Override Income Earned</h4>
             <p id="team-total-override" style="font-size:1.5rem; font-weight:700; color:#2e7d32;">Loading...</p>
         </div>
         <h3>Direct Subordinates</h3>
-        <ul id="subordinates-list">Loading...</ul>
+        <ul id="subordinates-list" style="list-style:none; padding:0;">Loading...</ul>
     </div>
 
     <div id="admin-dashboard-view" class="view hidden card">
         <h2>Admin Dashboard</h2>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-            <div class="card"><h4 style="margin-bottom:5px">Total Sales</h4><p id="admin-total-sales" style="font-size:1.5rem;">Loading...</p></div>
-            <div class="card"><h4 style="margin-bottom:5px">Total CC</h4><p id="admin-total-cc" style="font-size:1.5rem;">Loading...</p></div>
-            <div class="card"><h4 style="margin-bottom:5px">On Target</h4><p id="admin-agents-on-target" style="font-size:1.5rem;">Loading...</p></div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--primary-color);"><h4 style="margin-bottom: 5px;">Total Sales (RM)</h4><p id="admin-total-sales" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">Loading...</p></div>
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--success-color);"><h4 style="margin-bottom: 5px;">Total CC</h4><p id="admin-total-cc" style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">Loading...</p></div>
+            <div class="card" style="padding: 15px; border-top: 4px solid var(--secondary-color);"><h4 style="margin-bottom: 5px;">Agents On Target</h4><p id="admin-agents-on-target" style="font-size: 1.5rem; font-weight: 700; color: #f39c12;">Loading...</p></div>
         </div>
-        <h3>Performance Chart</h3>
-        <div style="background:white; padding:20px; border-radius:12px;"><canvas id="performanceChart" height="100"></canvas></div>
+        <h3>Agent Performance Chart</h3>
+        <div style="background: white; padding: 20px; border-radius: var(--border-radius-lg);"><canvas id="performanceChart" height="100"></canvas></div>
         <h3 style="margin-top:30px;">Team Breakdown</h3>
-        <div id="admin-data-table"></div>
+        <div id="admin-data-table" style="margin-top: 20px;"></div>
     </div>
 </div>
 
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - FINAL COMPLETE
+// AGENT PORTAL SCRIPT - FINAL DEFINITIVE CODE
 // =================================================================
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx84SfcmMHmWLVq2PqZn9tuj_wr47UJDYk2ks2Juwd1tDjKZXv8nYaayYA6aSX1pgC17Q/exec'; // <--- UPDATE THIS URL!!!
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfO-dgBDSFAAD4PUqLQDXEYxM5S-MAzEjfhVFo-7YstAYw6ShcnpeIxc81t4zr0s5mWA/exec'; // <--- UPDATE THIS URL!!!
 
+// --- Global State Variables ---
 let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
-let currentProfile = {}, canEditProfile = false;
-let allAgentsList = []; // For Admin dropdown
+let currentProfile = {}, canEditProfile = false, allAgentsList = [];
 
+// =================================================================
+// [ 2.0 ] INITIALIZATION & EVENT LISTENERS
+// =================================================================
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-form').addEventListener('submit', (event) => { event.preventDefault(); handleLogin(); });
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
@@ -289,77 +311,88 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('customer-dropdown').addEventListener('change', handleCustomerSelection);
     document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
     document.getElementById('product-order-search').addEventListener('keyup', renderProductSelectionList);
-    
-    // New: Save Profile Listener
     document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
 });
 
+// =================================================================
+// [ 3.0 ] LOGIN & DATA FETCHING
+// =================================================================
 async function handleLogin() {
-    const aid = document.getElementById('agent-id-input').value;
-    const pwd = document.getElementById('agent-password-input').value;
-    const btn = document.getElementById('login-btn');
-    const status = document.getElementById('login-status');
+    const agentId = document.getElementById('agent-id-input').value.trim();
+    const password = document.getElementById('agent-password-input').value; 
+    const loginBtn = document.getElementById('login-btn');
+    const loginStatus = document.getElementById('login-status');
     
-    btn.disabled = true; status.textContent = "Verifying...";
-    
-    try {
-        const res = await postToGoogleScript('verifyAgent', { agentId: aid, password: pwd });
-        if (res.success) {
-            currentAgent = res.agent;
-            currentAgent.target = res.target;
-            currentAgent.currentSales = res.currentSales;
-            currentAgent.isAdmin = res.isAdmin;
-            currentAgent.isManager = res.isManager;
-            currentProfile = res.profile;
-            canEditProfile = res.allowEdit;
+    if (!agentId || !password) { loginStatus.textContent = "ID and Password are required."; loginStatus.style.color = 'var(--danger-color)'; return; }
+    loginBtn.disabled = true; loginStatus.textContent = "Verifying..."; loginStatus.style.color = 'var(--dark-text)';
 
-            if (res.mustChangePassword) {
-                document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('password-change-view').classList.remove('hidden');
-                document.getElementById('change-view-agent-id').textContent = `Agent ID: ${aid}`;
-                return;
+    try {
+        const response = await postToGoogleScript('verifyAgent', { agentId, password });
+        if (response.success) {
+            currentAgent = response.agent;
+            currentAgent.target = parseFloat(response.target) || 0; 
+            currentAgent.currentSales = parseFloat(response.currentSales) || 0; 
+            currentAgent.isAdmin = response.isAdmin || false;
+            currentAgent.isManager = response.isManager || false;
+            
+            currentProfile = response.profile;
+            canEditProfile = response.allowEdit || false;
+            
+            if (response.mustChangePassword) {
+                 document.getElementById('login-view').classList.add('hidden');
+                 document.getElementById('password-change-view').classList.remove('hidden');
+                 document.getElementById('change-view-agent-id').textContent = `Agent ID: ${agentId}`;
+                 return; 
             }
 
             await fetchPortalData();
             
-            // If Admin, fetch agent list for assignment dropdowns
-            if (currentAgent.isAdmin) {
-                const agentListRes = await postToGoogleScript('getAllAgentsList', {agentId: currentAgent.id});
-                if(agentListRes.success) allAgentsList = agentListRes.list;
+            // Fetch Agent List if Admin (For Assignment)
+            if(currentAgent.isAdmin) {
+                const agentsRes = await postToGoogleScript('getAllAgentsList', {agentId: currentAgent.id});
+                if(agentsRes.success) allAgentsList = agentsRes.list;
             }
 
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
             
-            // Header
+            // Header Update
             document.getElementById('agent-welcome-header').textContent = `${currentAgent.name} (${currentAgent.id})`;
-            document.getElementById('agent-details-display').textContent = `${res.position} | ID: ${currentAgent.id}`;
+            document.getElementById('agent-details-display').textContent = `${response.position} | ID: ${currentAgent.id}`;
+            
+            // Nav Buttons Visibility
+            if (currentAgent.isAdmin) document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
+            else document.getElementById('nav-admin-dashboard-btn').classList.add('hidden');
+            
+            if (currentAgent.isManager) document.getElementById('nav-team-btn').classList.remove('hidden');
+            else document.getElementById('nav-team-btn').classList.add('hidden');
 
-            // Buttons
-            if(currentAgent.isAdmin) document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
-            if(currentAgent.isManager) document.getElementById('nav-team-btn').classList.remove('hidden');
-
-            renderTargetBar();
             renderProfileView();
-            showView('open-orders-view'); // Default to Open Orders
+            renderTargetBar(); 
+            
+            // Default View
+            showView('open-orders-view'); 
         } else {
-            status.textContent = res.message;
-            status.style.color = 'red';
+            loginStatus.textContent = response.message;
+            loginStatus.style.color = 'var(--danger-color)';
         }
-    } catch(e) { status.textContent = "Connection error."; }
-    finally { btn.disabled = false; }
+    } catch (error) {
+        loginStatus.textContent = "Connection failed.";
+        loginStatus.style.color = 'var(--danger-color)';
+    } finally {
+        loginBtn.disabled = false;
+    }
 }
 
-// --- NEW: OPEN ORDERS LOGIC ---
+// --- NEW: Open Orders Logic ---
 async function renderOpenOrders() {
     const list = document.getElementById('open-orders-list');
     list.innerHTML = '<p>Loading...</p>';
     try {
-        const res = await postToGoogleScript('getOpenOrders', {});
+        const res = await postToGoogleScript('getOpenOrders', {agentId: currentAgent.id});
         if (res.success && res.orders.length > 0) {
             list.innerHTML = res.orders.map(o => {
                 let adminControls = '';
-                // Admin dropdown logic
                 if(currentAgent.isAdmin && allAgentsList.length > 0) {
                     const options = allAgentsList.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
                     adminControls = `
@@ -367,7 +400,7 @@ async function renderOpenOrders() {
                         <small style="font-weight:600; color:var(--primary-color)">Admin Assign:</small>
                         <div class="admin-assign-wrapper">
                             <select id="assign-select-${o.invoiceId}"><option value="">Select Agent...</option>${options}</select>
-                            <button class="btn btn-secondary" style="padding:8px;" onclick="adminAssign('${o.invoiceId}')">Assign</button>
+                            <button class="btn btn-secondary" style="padding:8px;" onclick="adminAssignOrder('${o.invoiceId}')">Assign</button>
                         </div>
                     </div>`;
                 }
@@ -389,40 +422,39 @@ async function renderOpenOrders() {
         } else {
             list.innerHTML = '<p>No open orders available.</p>';
         }
-    } catch(e) { list.innerHTML = '<p>Error loading open orders.</p>'; }
+    } catch (e) { list.innerHTML = '<p>Error loading open orders.</p>'; }
 }
 
 async function pickOrder(invoiceId) {
-    if(!confirm("Pick this order?")) return;
+    if(!confirm("Confirm pick up this order?")) return;
     const res = await postToGoogleScript('pickOrder', { invoiceId: invoiceId, agentId: currentAgent.id, agentName: currentAgent.name });
     alert(res.message);
     if(res.success) { renderOpenOrders(); renderMyOrders(); }
 }
 
-async function adminAssign(invoiceId) {
-    const targetId = document.getElementById(`assign-select-${invoiceId}`).value;
-    if(!targetId) return alert("Please select an agent.");
-    // Find agent name for display
-    const targetName = allAgentsList.find(a => a.id == targetId)?.name || targetId;
+async function adminAssignOrder(invoiceId) {
+    const targetAgentId = document.getElementById(`assign-select-${invoiceId}`).value;
+    if(!targetAgentId) return alert("Please select an agent.");
     
+    const targetName = allAgentsList.find(a => a.id == targetAgentId)?.name || targetAgentId;
     const res = await postToGoogleScript('adminAssignOrder', { 
         invoiceId: invoiceId, 
-        targetAgentId: targetId,
-        targetAgentName: targetName // Pass name to backend
+        targetAgentId: targetAgentId,
+        targetAgentName: targetName 
     });
     alert(res.message);
     if(res.success) renderOpenOrders();
 }
 
-// --- EXISTING VIEW RENDERERS ---
+// --- Profile Logic ---
 function renderProfileView() {
     document.getElementById('prof-name').value = currentAgent.name;
     document.getElementById('prof-id').value = currentAgent.id;
-    const pos = document.getElementById('agent-details-display').textContent.split('|')[0].trim();
-    document.getElementById('prof-pos').value = pos;
+    document.getElementById('prof-pos').value = document.getElementById('agent-details-display').textContent.split('|')[0].trim();
     document.getElementById('prof-rate').value = currentProfile.commissionRate;
     document.getElementById('prof-target').value = `RM ${currentProfile.target}`;
     document.getElementById('prof-mgr').value = currentProfile.managerId;
+    
     document.getElementById('prof-bank').value = currentProfile.bankName;
     document.getElementById('prof-holder').value = currentProfile.accHolder;
     document.getElementById('prof-acc').value = currentProfile.accNumber;
@@ -453,10 +485,11 @@ async function saveProfile() {
         accHolder: document.getElementById('prof-holder').value,
         accNumber: document.getElementById('prof-acc').value
     };
+    
     try {
         const res = await postToGoogleScript('updateAgentProfile', payload);
-        status.textContent = res.message;
         status.style.color = res.success ? 'green' : 'red';
+        status.textContent = res.message;
         if(res.success) {
             currentProfile.bankName = payload.bankName;
             currentProfile.accHolder = payload.accHolder;
@@ -466,6 +499,7 @@ async function saveProfile() {
     finally { btn.textContent = "Save Changes"; btn.disabled = false; }
 }
 
+// --- Team & Admin Views ---
 async function renderTeamView() {
     const list = document.getElementById('subordinates-list');
     const overrideEl = document.getElementById('team-total-override');
@@ -476,12 +510,12 @@ async function renderTeamView() {
             overrideEl.textContent = `RM ${res.totalOverride.toFixed(2)}`;
             list.innerHTML = res.subordinates.length ? res.subordinates.map(s => `<li><strong>${s.name}</strong> (${s.id}) - <span style="color:var(--primary-color)">${s.position}</span></li>`).join('') : '<li>No direct subordinates found.</li>';
         }
-    } catch (e) { list.innerHTML = 'Error.'; }
+    } catch(e) { list.innerHTML = 'Error loading team.'; }
 }
 
 async function renderAdminDashboard() {
-    const div = document.getElementById('admin-data-table');
-    div.innerHTML = '<p style="text-align:center;">Loading...</p>';
+    const dataTable = document.getElementById('admin-data-table');
+    dataTable.innerHTML = '<p>Loading...</p>';
     try {
         const res = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
         if (res.success && res.data.length > 0) {
@@ -497,14 +531,15 @@ async function renderAdminDashboard() {
             for (const [mgr, members] of Object.entries(teams)) {
                 html += `<h3 style="margin-top:30px; color:var(--primary-color); border-bottom:2px solid #eee;">Team: ${mgr}</h3>${buildAdminTable(members)}`;
             }
-            div.innerHTML = html;
+            dataTable.innerHTML = html;
             drawPerformanceChart(res.data);
-        } else { div.innerHTML = '<p>No data.</p>'; }
-    } catch(e) { div.innerHTML = '<p>Error.</p>'; }
+        } else { dataTable.innerHTML = '<p>No data.</p>'; }
+    } catch(e) { dataTable.innerHTML = '<p>Error.</p>'; }
 }
 
 function buildAdminTable(agents) {
-    return `<table style="width:100%"><thead><tr><th>Name</th><th>Target</th><th>Sales</th><th>Achieved</th></tr></thead><tbody>${agents.map(a => `<tr><td>${a.name}</td><td>RM ${a.target.toFixed(2)}</td><td>RM ${a.totalSales.toFixed(2)}</td><td style="color:${a.targetAchieved>=1?'green':'red'}">${(a.targetAchieved*100).toFixed(1)}%</td></tr>`).join('')}</tbody></table>`;
+    return `<table style="width:100%"><thead><tr><th>Name</th><th>Target</th><th>Sales</th><th>Achieved</th></tr></thead><tbody>
+    ${agents.map(a => `<tr><td>${a.name}</td><td>RM ${a.target.toFixed(2)}</td><td>RM ${a.totalSales.toFixed(2)}</td><td style="color:${a.targetAchieved>=1?'green':'red'}">${(a.targetAchieved*100).toFixed(1)}%</td></tr>`).join('')}</tbody></table>`;
 }
 
 function drawPerformanceChart(data) {
@@ -517,7 +552,92 @@ function drawPerformanceChart(data) {
     });
 }
 
-// ... (Standard Order Functions kept) ...
+// --- Standard Functions (Password, Logout, Refresh) ---
+async function handleChangePassword() {
+    const p1 = document.getElementById('new-password-input').value;
+    const p2 = document.getElementById('confirm-password-input').value;
+    if (p1.length < 6 || p1 !== p2) { alert("Password invalid."); return; }
+    await postToGoogleScript('updatePassword', { agentId: currentAgent.id, newPassword: p1 });
+    alert("Success! Please log in again."); location.reload();
+}
+function handleLogout() { location.reload(); }
+function refreshPageData() {
+    const active = document.querySelector('.view:not(.hidden)');
+    if(!active) return;
+    const btn = document.getElementById('refresh-data-btn');
+    btn.innerHTML = 'Refreshing...'; btn.disabled = true;
+    postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: document.getElementById('agent-password-input').value })
+        .then(res => { if(res.success) { currentAgent.target = res.target; currentAgent.currentSales = res.currentSales; renderTargetBar(); showView(active.id, true); } })
+        .finally(() => { setTimeout(() => { btn.disabled = false; btn.innerHTML = 'Refresh Data'; }, 1000); });
+}
+
+// --- Navigation & UI ---
+function showView(viewId, isRefresh = false) {
+    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
+    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
+    const view = document.getElementById(viewId);
+    const btn = document.getElementById(`nav-${viewId.replace('-view', '-btn')}`);
+    if(view) view.classList.remove('hidden');
+    if(btn) btn.classList.add('active');
+
+    if (!isRefresh) {
+        if (viewId === 'open-orders-view') renderOpenOrders(); // NEW
+        if (viewId === 'my-orders-view') renderMyOrders();
+        if (viewId === 'my-commission-view') renderMyCommission();
+        if (viewId === 'team-view') renderTeamView();
+        if (viewId === 'admin-dashboard-view') renderAdminDashboard();
+        if (viewId === 'profile-view') renderProfileView();
+    }
+}
+
+async function fetchPortalData() {
+    try {
+        const res = await postToGoogleScript('getPortalData');
+        if (res.success) {
+            products = res.products;
+            customers = res.customers;
+            shippingRules = (res.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend);
+            renderProductCatalog();
+            renderProductSelectionList();
+            renderCustomerDropdown();
+        } else { throw new Error(res.message); }
+    } catch (error) { alert('Could not load data.'); }
+}
+
+// ... (Keep your existing order/product/commission render functions here) ...
+function renderProductCatalog() { 
+    document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join('');
+}
+function renderProductSelectionList() { 
+    const term = document.getElementById('product-order-search').value.toLowerCase();
+    const filtered = products.filter(p => p.name.toLowerCase().includes(term) || String(p.id).toLowerCase().includes(term));
+    document.getElementById('product-selection-list').innerHTML = filtered.length ? filtered.map(p => `
+        <div class="product-item-selectable" onclick="addProductToOrder('${p.id}')">
+            <img src="${p.image || 'FL.jpg'}" onerror="this.style.display='none'">
+            <div><strong>${p.name} (${p.id})</strong><p style="font-size:0.85rem">RSP: RM ${p.rsp.toFixed(2)}</p></div>
+            <button class="btn btn-primary" style="pointer-events:none">Add</button>
+        </div>`).join('') : "<p style='padding:15px;text-align:center'>No products.</p>";
+}
+function renderCustomerDropdown() { 
+    const select = document.getElementById('customer-dropdown');
+    select.innerHTML = `<option value="">-- Select Existing Customer --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join('');
+}
+function renderOrderSummary() { 
+    const container = document.getElementById('summary-items-list');
+    if (currentOrder.items.length === 0) { container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Add products to begin.</p>"; } 
+    else {
+        container.innerHTML = currentOrder.items.map(item => {
+            const isInvalid = item.customPrice < item.minPrice;
+            return `<div class="summary-item">
+                <div class="summary-item-info"><strong>${item.name}</strong><div class="price-error-message">${isInvalid ? `Min: RM ${item.minPrice.toFixed(2)}` : ''}</div></div>
+                <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.id}', this.value)" style="width:60px">
+                <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice('${item.id}', this.value)" class="${isInvalid?'price-input-invalid':''}" style="width:80px">
+                <span onclick="removeItemFromOrder('${item.id}')" style="cursor:pointer; color:var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
+            </div>`;
+        }).join('');
+    }
+    calculateTotals();
+}
 function startNewOrder() { 
     currentOrder = { items: [] };
     document.getElementById('customer-dropdown').value = '';
@@ -538,11 +658,13 @@ function handleNewCustomerToggle() {
     form.classList.toggle('hidden');
     if (!form.classList.contains('hidden')) { dropdown.value = ''; dropdown.disabled = true; } else { dropdown.disabled = false; }
 }
-function handleCustomerSelection() { if (document.getElementById('customer-dropdown').value) document.getElementById('new-customer-form').classList.add('hidden'); }
-function addProductToOrder(id) {
-    const p = products.find(x => String(x.id) === String(id));
+function handleCustomerSelection() {
+    if (document.getElementById('customer-dropdown').value) document.getElementById('new-customer-form').classList.add('hidden');
+}
+function addProductToOrder(productIdStr) {
+    const p = products.find(x => String(x.id) === String(productIdStr));
     if (!p) return;
-    if (!currentOrder.items.some(i => String(i.id) === String(id))) {
+    if (!currentOrder.items.some(i => String(i.id) === String(productIdStr))) {
         currentOrder.items.push({ id: p.id, name: p.name, quantity: 1, rsp: p.rsp, cc: p.cc, customPrice: p.rsp, minPrice: p.minPrice });
     }
     renderOrderSummary();
@@ -588,51 +710,13 @@ async function submitOrder() {
         if(res.success) {
             status.style.color = 'green'; status.textContent = `Success! ID: ${res.invoiceId}`;
             setTimeout(startNewOrder, 2000);
+            // Refresh sales
+            postToGoogleScript('verifyAgent', {agentId:currentAgent.id, password:document.getElementById('agent-password-input').value})
+            .then(r => { if(r.success) { currentAgent.currentSales = r.currentSales; renderTargetBar(); }});
         } else { throw new Error(res.message); }
     } catch(e) { status.textContent = "Error: " + e.message; btn.disabled = false; }
 }
 
-async function handleChangePassword() {
-    const p1 = document.getElementById('new-password-input').value;
-    const p2 = document.getElementById('confirm-password-input').value;
-    if (p1.length < 6 || p1 !== p2) { alert("Password invalid."); return; }
-    await postToGoogleScript('updatePassword', { agentId: currentAgent.id, newPassword: p1 });
-    alert("Success! Please log in again."); location.reload();
-}
-function handleLogout() { location.reload(); }
-function refreshPageData() {
-    const active = document.querySelector('.view:not(.hidden)');
-    if(!active) return;
-    const btn = document.getElementById('refresh-data-btn');
-    btn.innerHTML = 'Refreshing...'; btn.disabled = true;
-    postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: document.getElementById('agent-password-input').value })
-        .then(res => { if(res.success) { currentAgent.target = res.target; currentAgent.currentSales = res.currentSales; renderTargetBar(); showView(active.id, true); } })
-        .finally(() => { setTimeout(() => { btn.disabled = false; btn.innerHTML = 'Refresh Data'; }, 1000); });
-}
-function showView(viewId, isRefresh = false) {
-    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
-    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
-    const view = document.getElementById(viewId);
-    const btn = document.getElementById(`nav-${viewId.replace('-view', '-btn')}`);
-    if(view) view.classList.remove('hidden');
-    if(btn) btn.classList.add('active');
-
-    if (!isRefresh) {
-        if (viewId === 'open-orders-view') renderOpenOrders(); // NEW
-        if (viewId === 'my-orders-view') renderMyOrders();
-        if (viewId === 'my-commission-view') renderMyCommission();
-        if (viewId === 'team-view') renderTeamView();
-        if (viewId === 'admin-dashboard-view') renderAdminDashboard();
-        if (viewId === 'profile-view') renderProfileView();
-    }
-}
-async function fetchPortalData() {
-    try {
-        const res = await postToGoogleScript('getPortalData');
-        if (res.success) { products = res.products; customers = res.customers; shippingRules = (res.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend); renderProductCatalog(); renderProductSelectionList(); renderCustomerDropdown(); }
-        else { throw new Error(res.message); }
-    } catch (error) { alert('Could not load data.'); }
-}
 async function postToGoogleScript(actionOrPayload, data = {}) {
     const payload = (typeof actionOrPayload === 'object' && actionOrPayload.action) ? actionOrPayload : { action: actionOrPayload, data: data };
     try {
