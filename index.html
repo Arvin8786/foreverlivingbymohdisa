@@ -7,36 +7,34 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <style>
     /* =========================================================== */
-    /* [ 1.0 ] LUXURY THEME VARIABLES (UPDATED) */
+    /* [ 1.0 ] LUXURY VARIABLES */
     /* =========================================================== */
     :root {
-        /* Emerald & Gold Palette */
         --primary-color: #0f3d2e;      /* Deep Emerald */
         --secondary-color: #d4af37;    /* Satin Gold */
-        --accent-color: #14523d;       /* Slightly lighter Emerald */
+        --accent-color: #14523d;       /* Lighter Emerald */
         
         --bg-color: #fcfcfc;           /* Clean Off-White */
-        --light-gray: #f4f6f8;
-        --dark-text: #333333;
+        --card-bg: #ffffff;            /* Pure White */
+        --text-color: #333333;
         --light-text: #ffffff;
         --danger-color: #a83232;       /* Muted Red */
         
-        --border-radius: 4px;          /* Sharper corners for luxury feel */
-        --shadow: 0 10px 30px rgba(0,0,0,0.08);
+        --border-radius: 4px;          /* Sharp/Elegant */
+        --shadow: 0 10px 30px rgba(0,0,0,0.06);
         
-        /* Luxury Typography */
         --font-heading: 'Playfair Display', serif;
         --font-body: 'Poppins', sans-serif;
     }
     
-    /* Festival Overrides (Keep logic intact) */
+    /* Festival Overrides */
     body.theme-Christmas { --primary-color: #800000; --secondary-color: #d4af37; }
     body.theme-CNY { --primary-color: #a80000; --secondary-color: #ffcc00; }
     
@@ -45,26 +43,20 @@
     body { 
         font-family: var(--font-body); 
         background-color: var(--bg-color); 
-        color: var(--dark-text); 
+        color: var(--text-color); 
         line-height: 1.6; 
     }
     
     .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
     
-    /* Updated Typography */
-    h1, h2, h3, h4 { 
-        font-family: var(--font-heading); 
-        color: var(--primary-color); 
-        font-weight: 700; 
-        letter-spacing: 0.5px;
-    }
+    h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; }
     
-    /* Updated Buttons */
+    /* Buttons */
     .btn { 
         display: inline-flex; align-items: center; justify-content: center; 
-        width: 100%; padding: 12px 20px; 
+        width: 100%; padding: 14px 20px; 
         border-radius: 50px; 
-        text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;
+        text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;
         border: 1px solid transparent; cursor: pointer; transition: all 0.3s ease; 
     }
     .btn:disabled { background-color: #ccc; cursor: not-allowed; }
@@ -72,11 +64,9 @@
     .btn-primary { background: var(--primary-color); color: var(--light-text); border-color: var(--primary-color); }
     .btn-primary:hover:not(:disabled) { background: var(--secondary-color); border-color: var(--secondary-color); color: #000; }
     
-    .btn-secondary { background-color: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); }
+    .btn-secondary { background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); }
     .btn-secondary:hover:not(:disabled) { background: var(--primary-color); color: #fff; }
     
-    .loader { text-align: center; padding: 3rem; font-size: 1.2rem; color: var(--primary-color); }
-
     /* [ 2.0 ] HEADER & NAV */
     header { background-color: #fff; padding: 30px 0; text-align: center; border-bottom: 1px solid #eee; }
     .header-content { display: flex; align-items: center; justify-content: center; gap: 20px; }
@@ -100,7 +90,7 @@
     }
     nav a:hover { background-color: rgba(255,255,255,0.1); color: var(--secondary-color); }
     
-    /* Agent Login Button (Gold) */
+    /* Agent Login Button */
     .nav-login-btn { background-color: var(--secondary-color); color: #fff !important; border-radius: 50px; padding: 8px 20px !important; margin: 10px; font-weight: 700; }
     .nav-login-btn:hover { background-color: #fff; color: var(--secondary-color) !important; }
 
@@ -146,7 +136,7 @@
     .owner-profile { display: flex; flex-wrap: wrap; align-items: center; gap: 3rem; margin-bottom: 2rem;}
     .owner-image { flex-shrink: 0; width: 250px; height: 250px; border-radius: 50%; object-fit: cover; border: 5px solid var(--secondary-color); box-shadow: var(--shadow); }
     .owner-details { flex: 1; }
-    .about-section { background: #fff; border-left: 5px solid var(--secondary-color); padding: 25px; margin-top: 25px; border-radius: var(--border-radius); box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+    .about-section { background: #fff; border-left: 5px solid var(--secondary-color); padding: 25px; margin-top: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
     .about-section h4 { margin-bottom: 10px; color: var(--primary-color); }
     
     .job-card { background: #fff; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; overflow: hidden; transition: all 0.3s ease; border: 1px solid #eee; }
@@ -160,7 +150,7 @@
     .job-description { white-space: pre-wrap; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #eee; line-height: 1.8; }
     .job-card .btn { max-width: 200px; margin-top: 20px; }
 
-    /* [ 4.1 ] PRODUCT GRID (Clean & Elegant) */
+    /* [ 4.1 ] PRODUCT GRID */
     .product-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; }
     .product { 
         background: #fff; border-radius: var(--border-radius); 
@@ -186,7 +176,7 @@
         font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
     }
 
-    /* [ 5.1 ] CART & MODALS */
+    /* [ 5.1 ] LUXURY CART MODAL (UPDATED) */
     .fab-container { position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; gap: 15px; }
     .fab { 
         width: 65px; height: 65px; 
@@ -200,19 +190,49 @@
     
     .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 61, 46, 0.8); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
     .modal-content { background-color: #fff; padding: 0; border-radius: var(--border-radius); width: 90%; max-width: 600px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-    .modal-header { padding: 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); }
-    .modal-header h2 { margin: 0; font-size: 1.5rem; }
+    
+    /* Luxury Header for Cart */
+    .modal-header { 
+        padding: 25px; 
+        background: var(--bg-color); 
+        border-bottom: 1px solid #eee; 
+        display: flex; justify-content: space-between; align-items: center; 
+    }
+    .modal-header h2 { margin: 0; font-size: 1.8rem; color: var(--primary-color); font-family: var(--font-heading); }
     .close { color: #999; background: none; border: none; font-size: 30px; font-weight: 300; cursor: pointer; }
     .modal-body { padding: 30px; overflow-y: auto; }
     
     .cart-item { display: flex; align-items: center; gap: 20px; padding: 20px 0; border-bottom: 1px solid #eee; }
     .cart-item-image { width: 70px; height: 70px; object-fit: contain; background: #fff; padding: 5px; border-radius: 8px; border: 1px solid #eee; }
-    .cart-item-details { flex-grow: 1; }
+    .cart-item-details strong { font-family: var(--font-heading); font-size: 1.1rem; color: var(--primary-color); }
+    
     .quantity-controls { display:flex; align-items:center; gap:10px; margin-top:8px; }
     .quantity-btn { width: 30px; height: 30px; background: #fff; border: 1px solid #ccc; border-radius: 50%; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; }
     .remove-item-btn { background: none; border: none; color: var(--danger-color); font-size: 1.2rem; cursor: pointer; }
+    
     .modal-footer { padding: 30px; border-top: 1px solid #eee; background: var(--bg-color); }
-    .summary-line.total { font-family: var(--font-heading); font-size: 1.5rem; color: var(--primary-color); margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px; }
+    .summary-line { display: flex; justify-content: space-between; padding: 8px 0; font-size: 1rem; color: #555; }
+    .summary-line.total { font-family: var(--font-heading); font-size: 1.8rem; color: var(--primary-color); border-top: 1px solid #ddd; margin-top: 15px; padding-top: 15px; }
+
+    /* [ 5.2 ] LUXURY ENQUIRY FORM (UPDATED) */
+    /* Floating Line Style Inputs */
+    .enquiry-form { display: grid; gap: 25px; }
+    .enquiry-form input, .enquiry-form textarea, .enquiry-form select,
+    .customer-info-form input, .customer-info-form textarea { 
+        width: 100%; padding: 15px 0; 
+        margin-bottom: 10px; 
+        border: none;
+        border-bottom: 2px solid #eee; 
+        border-radius: 0; 
+        font-size: 1rem; 
+        background: transparent;
+        font-family: var(--font-body);
+        transition: border-color 0.3s;
+    }
+    .enquiry-form input:focus, .enquiry-form textarea:focus, .customer-info-form input:focus {
+        outline: none; border-color: var(--secondary-color);
+    }
+    .enquiry-form label, .customer-info-form h3 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; font-size: 1.2rem; margin-bottom: 20px; }
     
     /* Chatbot */
     #eshop-chat-widget { position: fixed; bottom: 110px; right: 30px; width: 380px; height: 550px; background: #fff; border-radius: var(--border-radius); box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; visibility: hidden; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-in-out; z-index: 998; border: 1px solid #eee; }
