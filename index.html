@@ -7,363 +7,305 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <style>
-    /* =========================================================== */
     /* [ 1.0 ] LUXURY VARIABLES */
-    /* =========================================================== */
     :root {
-        --primary-color: #0f3d2e;      /* Deep Emerald */
+        --primary-color: #0a291f;      /* Deep Regal Green */
         --secondary-color: #d4af37;    /* Satin Gold */
-        --accent-color: #14523d;       /* Lighter Emerald */
-        
-        --bg-color: #fcfcfc;           /* Clean Off-White */
-        --card-bg: #ffffff;            /* Pure White */
-        --text-color: #333333;
-        --light-text: #ffffff;
-        --danger-color: #a83232;       /* Muted Red */
-        
-        --border-radius: 4px;          /* Sharp/Elegant */
-        --shadow: 0 10px 30px rgba(0,0,0,0.06);
+        --bg-color: #fcfcfc;           /* Pearl White */
+        --card-bg: #ffffff;
+        --text-main: #333333;
+        --text-light: #777777;
+        --border-radius: 2px;          /* Sharp corners for luxury */
+        --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
         
         --font-heading: 'Playfair Display', serif;
-        --font-body: 'Poppins', sans-serif;
+        --font-body: 'Lato', sans-serif;
     }
     
-    /* Festival Overrides */
-    body.theme-Christmas { --primary-color: #800000; --secondary-color: #d4af37; }
-    body.theme-CNY { --primary-color: #a80000; --secondary-color: #ffcc00; }
+    /* Global Reset */
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+    body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--text-main); line-height: 1.7; }
+    a { text-decoration: none; transition: 0.3s; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
     
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body { 
-        font-family: var(--font-body); 
-        background-color: var(--bg-color); 
-        color: var(--text-color); 
-        line-height: 1.6; 
-    }
-    
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    
-    h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; }
+    /* Typography */
+    h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; letter-spacing: -0.5px; }
     
     /* Buttons */
     .btn { 
-        display: inline-flex; align-items: center; justify-content: center; 
-        width: 100%; padding: 14px 20px; 
-        border-radius: 50px; 
-        text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;
-        border: 1px solid transparent; cursor: pointer; transition: all 0.3s ease; 
+        display: inline-block; padding: 15px 30px; 
+        text-transform: uppercase; letter-spacing: 2px; font-size: 0.75rem; font-weight: 700;
+        border: 1px solid transparent; cursor: pointer; transition: 0.3s; text-align: center; width: 100%;
     }
-    .btn:disabled { background-color: #ccc; cursor: not-allowed; }
-    
-    .btn-primary { background: var(--primary-color); color: var(--light-text); border-color: var(--primary-color); }
+    .btn:disabled { background: #ccc; border-color: #ccc; cursor: not-allowed; }
+    .btn-primary { background: var(--primary-color); color: #fff; }
     .btn-primary:hover:not(:disabled) { background: var(--secondary-color); border-color: var(--secondary-color); color: #000; }
-    
-    .btn-secondary { background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); }
+    .btn-secondary { background: transparent; border-color: var(--primary-color); color: var(--primary-color); }
     .btn-secondary:hover:not(:disabled) { background: var(--primary-color); color: #fff; }
-    
+
     /* [ 2.0 ] HEADER & NAV */
-    header { background-color: #fff; padding: 30px 0; text-align: center; border-bottom: 1px solid #eee; }
-    .header-content { display: flex; align-items: center; justify-content: center; gap: 20px; }
-    .header-logo { width: 90px; height: 90px; object-fit: contain; }
+    header { padding: 40px 0; text-align: center; background: #fff; border-bottom: 1px solid #eee; }
+    .header-logo { width: 100px; height: 100px; object-fit: contain; margin-bottom: 15px; }
+    #company-name-header { font-size: 2.5rem; margin: 0; }
+    .by-line { font-family: var(--font-body); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; color: var(--secondary-color); margin-top: 5px; display: block; font-weight: 700; }
     
-    #company-name-header { margin: 0; font-size: 2.2rem; line-height: 1.2; }
-    #company-name-header .by-line { 
-        font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; 
-        display: block; color: var(--secondary-color); text-transform: uppercase; letter-spacing: 2px; margin-top: 5px;
-    }
-    #company-name-header .slogan { font-family: var(--font-heading); font-style: italic; font-size: 1rem; color: #666; display: block; margin-top: 5px; }
-    
-    /* Nav */
-    nav { background-color: var(--primary-color); position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    nav ul { display: flex; list-style: none; padding: 0; margin: 0; justify-content: center; flex-wrap: wrap; }
+    nav { background: #fff; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #eee; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+    nav ul { display: flex; justify-content: center; list-style: none; flex-wrap: wrap; }
     nav a { 
-        color: rgba(255,255,255,0.9); text-decoration: none; 
-        font-weight: 500; padding: 18px 25px; cursor: pointer; 
-        text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;
-        transition: 0.3s;
+        display: block; padding: 20px 25px; color: var(--text-main); 
+        text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;
+        border-bottom: 3px solid transparent;
     }
-    nav a:hover { background-color: rgba(255,255,255,0.1); color: var(--secondary-color); }
-    
-    /* Agent Login Button */
-    .nav-login-btn { background-color: var(--secondary-color); color: #fff !important; border-radius: 50px; padding: 8px 20px !important; margin: 10px; font-weight: 700; }
-    .nav-login-btn:hover { background-color: #fff; color: var(--secondary-color) !important; }
+    nav a:hover { color: var(--secondary-color); border-bottom-color: var(--secondary-color); }
+    .nav-agent-btn { color: var(--secondary-color) !important; font-weight: 700 !important; }
 
-    #promo-running-banner { background-color: var(--secondary-color); color: #fff; padding: 8px 0; font-weight: 700; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; display: none; text-align: center; }
-
-    /* [ 3.0 ] MAIN CONTENT */
-    main { padding: 40px 0; }
-    .tab-content { display: none; animation: fadeIn 0.5s; }
+    /* [ 3.0 ] MAIN CONTENT & PRODUCT GRID */
+    main { padding: 60px 0; min-height: 600px; }
+    .tab-content { display: none; animation: fadeUp 0.6s ease; }
     .tab-content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    
-    footer { background: var(--primary-color); color: #fff; padding: 50px 20px; text-align: center; margin-top: 50px; }
-    
-    #maintenance-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; background: var(--primary-color); color: white; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;}
-    #maintenance-overlay h1 { color: #fff; font-family: var(--font-heading); }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* [ 3.1 ] HOMEPAGE MODULES */
-    .hero-section { 
-        background: linear-gradient(135deg, var(--primary-color), #0a291f); 
-        color: #fff; padding: 100px 20px; text-align: center; 
-        border-radius: var(--border-radius); margin-bottom: 40px; 
-        box-shadow: var(--shadow);
+    #product-list-container { margin-top: 40px; }
+    .product-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+    .product-card {
+        background: #fff; height: 420px; border: 1px solid #eee; cursor: pointer; transition: 0.3s;
+        display: flex; flex-direction: column; position: relative; overflow: hidden;
     }
-    .hero-section h2 { color: var(--secondary-color); font-size: 3rem; margin-bottom: 10px; }
+    .product-card:hover { transform: translateY(-5px); border-color: var(--secondary-color); box-shadow: var(--shadow-soft); }
+    .product-img-wrapper { height: 75%; display: flex; align-items: center; justify-content: center; padding: 30px; }
+    .product-card img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+    .product-info-mini { height: 25%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 1px solid #f9f9f9; }
+    .product-title { font-family: var(--font-heading); font-size: 1.1rem; color: var(--primary-color); margin-bottom: 5px; text-align: center; padding: 0 10px; }
+    .product-tag { font-size: 0.8rem; color: #999; letter-spacing: 1px; }
     
-    .dynamic-content-wrapper { background: #fff; padding: 3rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; }
-    
-    .why-choose-us-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; margin-top: 2rem; }
-    .why-choose-us-grid i { font-size: 2.5rem; color: var(--secondary-color); margin-bottom: 1rem; }
-    
-    #youtube-videos-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
-    .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius); box-shadow: var(--shadow); }
-    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-    
-    #testimonies-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-    .testimony-card { background: var(--light-gray); padding: 2rem; border-radius: var(--border-radius); text-align: center; border: 1px solid #eee; }
-    .testimony-header { margin-bottom: 1rem; font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; }
-    .testimony-rating { color: var(--secondary-color); font-size: 1rem; margin-top: 5px; }
-    .job-listing-summary { padding: 1.5rem; border: 1px solid #eee; border-radius: var(--border-radius); transition: 0.3s; }
-    .job-listing-summary:hover { border-color: var(--secondary-color); }
+    .product-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(10, 41, 31, 0.9); display: flex; align-items: center; justify-content: center;
+        opacity: 0; transition: 0.3s;
+    }
+    .product-card:hover .product-overlay { opacity: 1; }
+    .click-info-btn { color: var(--secondary-color); border: 1px solid var(--secondary-color); padding: 12px 25px; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; font-weight: 700; }
 
-    /* [ 3.2 ] ABOUT & JOBS */
-    .owner-profile { display: flex; flex-wrap: wrap; align-items: center; gap: 3rem; margin-bottom: 2rem;}
-    .owner-image { flex-shrink: 0; width: 250px; height: 250px; border-radius: 50%; object-fit: cover; border: 5px solid var(--secondary-color); box-shadow: var(--shadow); }
-    .owner-details { flex: 1; }
-    .about-section { background: #fff; border-left: 5px solid var(--secondary-color); padding: 25px; margin-top: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-    .about-section h4 { margin-bottom: 10px; color: var(--primary-color); }
+    /* [ 4.0 ] LUXURY CART MODAL (FIXED) */
+    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; }
+    .modal-content { background: #fff; width: 500px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 50px rgba(0,0,0,0.2); border-radius: 2px; }
     
-    .job-card { background: #fff; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 2rem; overflow: hidden; transition: all 0.3s ease; border: 1px solid #eee; }
-    .job-card:hover { transform: translateY(-5px); border-color: var(--secondary-color); }
-    .job-header { background: var(--primary-color); color: white; padding: 20px 25px; }
-    .job-header h3 { color: var(--secondary-color); margin: 0; font-size: 1.4rem; }
-    .job-body { padding: 30px; }
-    .job-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
-    .job-detail-item { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; }
-    .job-detail-item i { color: var(--secondary-color); font-size: 1.2rem; width: 20px; text-align: center; }
-    .job-description { white-space: pre-wrap; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #eee; line-height: 1.8; }
-    .job-card .btn { max-width: 200px; margin-top: 20px; }
+    .modal-header { padding: 25px; background: #fff; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { margin: 0; font-size: 1.8rem; color: var(--primary-color); }
+    .close { font-size: 2rem; color: #999; cursor: pointer; background: none; border: none; line-height: 1; }
+    
+    .modal-body { padding: 25px; overflow-y: auto; }
+    
+    /* Uniform Cart Items */
+    .cart-item { display: grid; grid-template-columns: 60px 1fr auto; gap: 20px; align-items: center; padding: 20px 0; border-bottom: 1px solid #f5f5f5; }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-image { width: 60px; height: 60px; object-fit: contain; border: 1px solid #eee; padding: 2px; }
+    .cart-item-details strong { display: block; font-family: var(--font-heading); font-size: 1.1rem; color: var(--text-main); margin-bottom: 5px; }
+    
+    /* Quantity Controls */
+    .quantity-controls { display: flex; align-items: center; gap: 10px; }
+    .quantity-btn { width: 25px; height: 25px; border-radius: 50%; border: 1px solid #ddd; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #555; transition: 0.2s; }
+    .quantity-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+    
+    .cart-price-action { text-align: right; }
+    .cart-item-price { display: block; font-weight: 700; color: var(--primary-color); margin-bottom: 5px; }
+    .remove-item-btn { color: #999; cursor: pointer; font-size: 0.9rem; background: none; border: none; text-decoration: underline; }
+    .remove-item-btn:hover { color: var(--danger-color); }
 
-    /* [ 4.1 ] PRODUCT GRID */
-    .product-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; }
-    .product { 
-        background: #fff; border-radius: var(--border-radius); 
-        box-shadow: var(--shadow); display: flex; flex-direction: column; 
-        transition: transform 0.3s; border: 1px solid transparent;
-    }
-    .product:hover { transform: translateY(-5px); border-color: var(--secondary-color); }
-    
-    .product-image-container { height: 300px; padding: 30px; display: flex; align-items: center; justify-content: center; background: #fff; border-bottom: 1px solid #f5f5f5; }
-    .product img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
-    
-    .product-info { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
-    .product h3 { margin: 0 0 10px; font-size: 1.2rem; color: var(--primary-color); min-height: 3em; }
-    .product-actions { margin-top: auto; }
-    .price-section { margin-bottom: 15px; }
-    .new-price { font-family: var(--font-heading); font-weight: 700; font-size: 1.4rem; color: var(--secondary-color); }
-    .product .benefits, .product .consumption { font-size: 0.85rem; color: #666; margin: 10px 0; }
-    
-    .product-tag {
-        position: absolute; top: 15px; right: 15px; left: auto;
-        background-color: var(--secondary-color); color: #fff;
-        padding: 5px 12px; border-radius: 4px;
-        font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-    }
+    .modal-footer { padding: 25px; background: #fafafa; border-top: 1px solid #eee; }
+    .summary-line { display: flex; justify-content: space-between; font-size: 0.95rem; color: #666; margin-bottom: 5px; }
+    .summary-line.total { font-family: var(--font-heading); font-size: 1.5rem; color: var(--primary-color); font-weight: 700; border-top: 1px solid #ddd; padding-top: 15px; margin-top: 10px; }
 
-    /* [ 5.1 ] LUXURY CART MODAL (UPDATED) */
-    .fab-container { position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; gap: 15px; }
-    .fab { 
-        width: 65px; height: 65px; 
-        background-color: var(--primary-color); color: var(--secondary-color); 
-        border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-        font-size: 1.8rem; box-shadow: 0 5px 20px rgba(0,0,0,0.2); cursor: pointer; 
-        border: 2px solid var(--secondary-color); transition: 0.3s;
-    }
-    .fab:hover { transform: scale(1.1); }
-    #cart-count { position: absolute; top: -5px; right: -5px; background-color: var(--secondary-color); color: #fff; border-radius: 50%; padding: 4px 8px; font-size: 0.8rem; font-weight: 700; }
+    /* [ 5.0 ] LUXURY ENQUIRY FORM (FIXED) */
+    #enquiries-form-content { max-width: 700px; margin: 0 auto; padding: 0 20px; }
+    .enquiry-form { display: grid; gap: 30px; margin-top: 40px; }
     
-    .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 61, 46, 0.8); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
-    .modal-content { background-color: #fff; padding: 0; border-radius: var(--border-radius); width: 90%; max-width: 600px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-    
-    /* Luxury Header for Cart */
-    .modal-header { 
-        padding: 25px; 
-        background: var(--bg-color); 
-        border-bottom: 1px solid #eee; 
-        display: flex; justify-content: space-between; align-items: center; 
-    }
-    .modal-header h2 { margin: 0; font-size: 1.8rem; color: var(--primary-color); font-family: var(--font-heading); }
-    .close { color: #999; background: none; border: none; font-size: 30px; font-weight: 300; cursor: pointer; }
-    .modal-body { padding: 30px; overflow-y: auto; }
-    
-    .cart-item { display: flex; align-items: center; gap: 20px; padding: 20px 0; border-bottom: 1px solid #eee; }
-    .cart-item-image { width: 70px; height: 70px; object-fit: contain; background: #fff; padding: 5px; border-radius: 8px; border: 1px solid #eee; }
-    .cart-item-details strong { font-family: var(--font-heading); font-size: 1.1rem; color: var(--primary-color); }
-    
-    .quantity-controls { display:flex; align-items:center; gap:10px; margin-top:8px; }
-    .quantity-btn { width: 30px; height: 30px; background: #fff; border: 1px solid #ccc; border-radius: 50%; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-    .remove-item-btn { background: none; border: none; color: var(--danger-color); font-size: 1.2rem; cursor: pointer; }
-    
-    .modal-footer { padding: 30px; border-top: 1px solid #eee; background: var(--bg-color); }
-    .summary-line { display: flex; justify-content: space-between; padding: 8px 0; font-size: 1rem; color: #555; }
-    .summary-line.total { font-family: var(--font-heading); font-size: 1.8rem; color: var(--primary-color); border-top: 1px solid #ddd; margin-top: 15px; padding-top: 15px; }
-
-    /* [ 5.2 ] LUXURY ENQUIRY FORM (UPDATED) */
-    /* Floating Line Style Inputs */
-    .enquiry-form { display: grid; gap: 25px; }
-    .enquiry-form input, .enquiry-form textarea, .enquiry-form select,
-    .customer-info-form input, .customer-info-form textarea { 
-        width: 100%; padding: 15px 0; 
-        margin-bottom: 10px; 
-        border: none;
-        border-bottom: 2px solid #eee; 
-        border-radius: 0; 
-        font-size: 1rem; 
-        background: transparent;
+    /* Floating Inputs */
+    .form-group { position: relative; margin-bottom: 10px; }
+    .form-input {
+        width: 100%;
+        padding: 15px 0;
         font-family: var(--font-body);
+        font-size: 1rem;
+        color: var(--text-main);
+        border: none;
+        border-bottom: 1px solid #ccc;
+        background: transparent;
         transition: border-color 0.3s;
+        border-radius: 0;
     }
-    .enquiry-form input:focus, .enquiry-form textarea:focus, .customer-info-form input:focus {
-        outline: none; border-color: var(--secondary-color);
-    }
-    .enquiry-form label, .customer-info-form h3 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; font-size: 1.2rem; margin-bottom: 20px; }
+    .form-input:focus { border-bottom-color: var(--secondary-color); }
+    .form-input::placeholder { color: #aaa; font-weight: 300; }
     
-    /* Chatbot */
-    #eshop-chat-widget { position: fixed; bottom: 110px; right: 30px; width: 380px; height: 550px; background: #fff; border-radius: var(--border-radius); box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; visibility: hidden; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-in-out; z-index: 998; border: 1px solid #eee; }
-    #eshop-chat-widget.active { visibility: visible; opacity: 1; transform: translateY(0); }
-    #chat-header { background: var(--primary-color); color: #fff; padding: 20px; font-family: var(--font-heading); letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
-    #chat-body { flex-grow: 1; padding: 20px; background: #fafafa; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-    .chat-message { max-width: 85%; padding: 12px 16px; border-radius: 12px; font-size: 0.9rem; line-height: 1.5; }
-    .bot-message { background: #fff; border: 1px solid #eee; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
-    .user-message { background: var(--primary-color); color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
-    #chat-input-container { display: flex; padding: 15px; border-top: 1px solid #eee; background: #fff; }
-    #chat-input { flex-grow: 1; border: 1px solid #ddd; border-radius: 50px; padding: 12px 20px; background: #f9f9f9; }
-    #chat-send-btn { background: none; border: none; font-size: 20px; color: var(--primary-color); cursor: pointer; padding: 0 15px; }
+    /* Customer Info in Cart */
+    .customer-info-form { padding: 25px 0; border-top: 1px dashed #ddd; margin-top: 20px; }
+    .customer-info-form h3 { font-size: 1.2rem; margin-bottom: 20px; }
 
-    /* Login Modal */
-    #login-modal-content { max-width: 450px; text-align: center; border-top: 5px solid var(--secondary-color); }
-    .login-option { border: 1px solid #eee; border-radius: 8px; padding: 25px; margin-bottom: 20px; transition: all 0.2s ease; background: #fff; }
-    .login-option:hover { border-color: var(--secondary-color); transform: translateY(-2px); box-shadow: var(--shadow); }
-    .login-option h3 { font-size: 1.2rem; margin-bottom: 10px; font-family: var(--font-heading); }
+    /* [ 6.0 ] OTHER ELEMENTS */
+    .hero-section { background: var(--primary-color); color: #fff; padding: 100px 20px; text-align: center; margin-bottom: 50px; }
+    .hero-section h2 { color: var(--secondary-color); font-size: 3.5rem; margin-bottom: 15px; }
+    
+    /* Product Modal */
+    .product-modal-content { background: #fff; width: 1000px; max-width: 95%; height: 80vh; display: grid; grid-template-columns: 1fr 1fr; box-shadow: 0 50px 100px rgba(0,0,0,0.3); }
+    .pm-image-col { background: #fcfcfc; display: flex; align-items: center; justify-content: center; padding: 50px; }
+    .pm-image-col img { max-width: 100%; max-height: 80%; object-fit: contain; mix-blend-mode: multiply; }
+    .pm-details-col { padding: 50px; overflow-y: auto; }
+    .pm-title { font-size: 2.5rem; line-height: 1.1; margin-bottom: 10px; color: var(--primary-color); }
+    .pm-price { font-size: 1.8rem; color: var(--secondary-color); font-family: var(--font-heading); font-weight: 700; margin-bottom: 30px; }
+    .pm-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: #999; margin-bottom: 10px; font-weight: 700; }
+    .pm-text { font-size: 1rem; color: #555; margin-bottom: 30px; }
+
+    /* Chatbot & FAB */
+    .fab-container { position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; gap: 15px; }
+    .fab { width: 60px; height: 60px; background: var(--primary-color); color: var(--secondary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: var(--shadow-soft); cursor: pointer; border: 1px solid var(--secondary-color); }
+    #cart-count { position: absolute; top: -5px; right: -5px; background: var(--secondary-color); color: #fff; border-radius: 50%; padding: 4px 8px; font-size: 0.75rem; font-weight: 700; }
+    
+    #eshop-chat-widget { position: fixed; bottom: 110px; right: 30px; width: 360px; height: 500px; background: #fff; box-shadow: 0 20px 50px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; visibility: hidden; opacity: 0; transform: translateY(20px); transition: 0.3s; z-index: 998; border: 1px solid #eee; }
+    #eshop-chat-widget.active { visibility: visible; opacity: 1; transform: translateY(0); }
+    #chat-header { background: var(--primary-color); color: #fff; padding: 20px; font-family: var(--font-heading); display: flex; justify-content: space-between; align-items: center; }
+    #chat-body { flex-grow: 1; padding: 20px; background: #fafafa; overflow-y: auto; }
+    #chat-input-container { padding: 15px; background: #fff; border-top: 1px solid #eee; display: flex; }
+    #chat-input { flex-grow: 1; border: 1px solid #eee; padding: 10px 15px; background: #f9f9f9; font-family: var(--font-body); }
+
+    /* Maintenance */
+    #maintenance-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:99999; background:var(--primary-color); color:white; flex-direction:column; justify-content:center; align-items:center; }
+    #effect-container { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9998; overflow:hidden; }
+
+    /* Responsive */
+    @media (max-width: 1100px) { .product-list { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 768px) { 
+        .product-list { grid-template-columns: repeat(2, 1fr); } 
+        .product-modal-content { grid-template-columns: 1fr; } 
+        .pm-image-col { height: 250px; }
+        h1 { font-size: 2rem; }
+    }
+    @media (max-width: 480px) { .product-list { grid-template-columns: 1fr; } }
 </style>
 
-<div id="effect-container" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9998; overflow:hidden;"></div>
-
-<div id="maintenance-overlay">
-    <img src="FL.jpg" alt="Logo" style="width: 120px; height: 120px; margin-bottom: 20px; border-radius: 50%; border: 4px solid var(--secondary-color);">
-    <h1 style="color: #fff;">Temporarily Unavailable</h1>
-    <p id="maintenance-message" style="font-size: 1.2rem; max-width: 500px; color: #ddd;"></p>
-</div>
+<div id="effect-container"></div>
+<div id="maintenance-overlay"><h1>Store Temporarily Closed</h1><p id="maintenance-message"></p></div>
 
 <div id="store-wrapper">
   <header>
     <div class="container">
       <div class="header-content">
-        <img src="FL.jpg" alt="Business Logo" class="header-logo" onerror="this.style.display='none'">
-        <h1 id="company-name-header"></h1>
+        <img src="FL.jpg" alt="Logo" class="header-logo" onerror="this.style.display='none'">
+        <div style="text-align:center">
+            <h1 id="company-name-header"></h1>
+        </div>
       </div>
     </div>
   </header>
-  <div id="promo-running-banner"><div class="marquee-content" id="promo-banner-text"></div></div>
+  
   <nav>
     <div class="container">
-      <ul id="main-nav">
+      <ul>
         <li><a onclick="showTab('homepage')">Home</a></li>
         <li><a onclick="showTab('products')">Collection</a></li>
         <li><a onclick="showTab('about')">Our Story</a></li>
         <li><a onclick="showTab('jobs')">Careers</a></li>
         <li><a onclick="showTab('enquiries')">Contact</a></li>
-        <li><a onclick="showTab('rewards')">Rewards</a></li>
-        <li><a id="nav-login-btn" class="nav-login-btn"><i class="fa-solid fa-user-circle" style="margin-right: 8px;"></i> Agent Login</a></li>
+        <li><a href="agent.html" target="_blank" class="nav-agent-btn">Agent Login</a></li>
       </ul>
     </div>
   </nav>
+  
+  <div id="promo-running-banner"><div class="marquee-content" id="promo-banner-text"></div></div>
+
   <main id="main-content" class="container"></main>
-  <footer class="footer">
+  
+  <footer>
       <div class="container">
         <p id="footer-text"></p>
-        <div class="timestamp" style="font-size: 0.8rem; opacity: 0.6; margin-top: 15px;">Last updated: <span id="update-timestamp"></span></div>
+        <div style="font-size: 0.7rem; opacity: 0.5; margin-top: 20px; font-family: var(--font-body);">Last updated: <span id="update-timestamp"></span></div>
       </div>
   </footer>
 </div>
 
-<div id="cart-modal" class="modal"></div>
+<div id="product-detail-modal" class="modal">
+    <div class="product-modal-content">
+        <button class="pm-close" onclick="closeProductModal()">&times;</button>
+        <div class="pm-image-col"><img id="pm-img" src=""></div>
+        <div class="pm-details-col">
+            <h2 id="pm-title" class="pm-title"></h2>
+            <div id="pm-price" class="pm-price"></div>
+            
+            <div class="pm-section">
+                <span class="pm-label">Description</span>
+                <div id="pm-desc" class="pm-text"></div>
+            </div>
+            <div class="pm-section">
+                <span class="pm-label">Benefits</span>
+                <div id="pm-ben" class="pm-text"></div>
+            </div>
+            <div class="pm-section">
+                <span class="pm-label">Usage</span>
+                <div id="pm-use" class="pm-text"></div>
+            </div>
+            
+            <button id="pm-add-btn" class="pm-add-btn">Add to Bag</button>
+        </div>
+    </div>
+</div>
+
+<div id="cart-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Your Shopping Bag</h2>
+            <button class="close" onclick="toggleCart(true)">&times;</button>
+        </div>
+        <div class="modal-body" id="cart-items"><p style="text-align:center; padding:30px; color:#999;">Your bag is empty.</p></div>
+        <div id="cart-checkout-area">
+            <div class="modal-footer">
+                <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+                <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
+            </div>
+            <div class="customer-info-form">
+                <h3>Your Details</h3>
+                <input type="text" id="customer-name" class="form-input" placeholder="Full Name" required>
+                <input type="tel" id="customer-phone" class="form-input" placeholder="WhatsApp Number" required>
+                <input type="email" id="customer-email" class="form-input" placeholder="Email Address (Optional)">
+                <textarea id="customer-address" class="form-input" placeholder="Shipping Address" rows="2" required></textarea>
+            </div>
+            <div style="padding: 0 30px 30px;">
+                <button class="btn btn-primary" style="width: 100%;" onclick="initiateCheckout()">Place Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="job-application-modal" class="modal"></div>
 <div class="fab-container" id="fab-container"></div>
 <div id="eshop-chat-widget"></div>
 <div id="popup-modal" class="modal"></div>
 
-<div id="login-modal" class="modal">
-    <div class="modal-content" id="login-modal-content">
-        <div class="modal-header">
-            <h2 style="margin: 0;">Welcome Back</h2>
-            <button id="close-login-modal-btn" class="close">&times;</button>
-        </div>
-        <div class="modal-body" style="padding: 40px;">
-            <div class="login-option">
-                <h3>Customer Account</h3>
-                <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Track orders and manage your wishlist.</p>
-                <button class="btn btn-secondary" disabled style="border: 1px solid #ccc; color: #999;">Coming Soon</button>
-            </div>
-            <div class="login-option" style="border-color: var(--primary-color); background-color: #fcfcfc;">
-                <h3 style="color: var(--primary-color);">Agent Portal</h3>
-                <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Access dashboard, sales, and commission data.</p>
-                <a href="agent.html" target="_blank" class="btn btn-primary">Login to Portal</a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script src="script.js"></script>
 
 <script>
+    // Animation
     let effectInterval;
-    function startSnowing(themeType) { 
-        const container = document.getElementById('effect-container');
-        if(!container) return;
-        container.innerHTML = '';
+    function startSnowing(type) { 
+        const c = document.getElementById('effect-container'); if(!c)return; c.innerHTML='';
         if(effectInterval) clearInterval(effectInterval);
         
-        let symbol = '❄'; 
-        let color = '#fff';
-        const bodyClass = document.body.className;
-
-        if (bodyClass.includes('Christmas')) { symbol = '❄'; color = '#fff'; }
-        else if (bodyClass.includes('CNY')) { symbol = '🏮'; color = '#d4af37'; }
-        else if (bodyClass.includes('HariRaya')) { symbol = '✨'; color = '#cddc39'; }
-        else if (bodyClass.includes('Deepavali')) { symbol = '🪔'; color = '#ffa500'; }
-        else if (bodyClass.includes('Valentines')) { symbol = '❤️'; color = '#e91e63'; }
-        else if (bodyClass.includes('National') || bodyClass.includes('Malaysia')) { symbol = '🌺'; color = '#cc0000'; }
-        else { return; } 
-
-        effectInterval = setInterval(() => {
-            const particle = document.createElement('div');
-            particle.innerHTML = symbol;
-            particle.style.position = 'absolute';
-            particle.style.color = color;
-            particle.style.left = Math.random() * 100 + 'vw';
-            particle.style.opacity = Math.random();
-            particle.style.fontSize = (Math.random() * 15 + 10) + 'px';
-            particle.style.top = '-30px';
-            particle.style.pointerEvents = 'none';
-            
-            const duration = Math.random() * 3000 + 3000;
-            particle.animate([
-                { transform: `translateY(0) rotate(0deg)` },
-                { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)` }
-            ], {
-                duration: duration,
-                iterations: 1
-            }).onfinish = () => particle.remove();
-            
-            container.appendChild(particle);
-        }, 400); 
+        let sym='❄', col='rgba(255,255,255,0.4)';
+        const cls = document.body.className;
+        if(cls.includes('CNY')) { sym='🏮'; col='#d4af37'; }
+        else if(cls.includes('HariRaya')) { sym='✨'; col='#cddc39'; }
+        
+        effectInterval = setInterval(()=>{
+            const p=document.createElement('div'); p.innerHTML=sym; p.style.position='absolute'; p.style.color=col;
+            p.style.left=Math.random()*100+'vw'; p.style.top='-30px'; p.style.opacity=Math.random();
+            p.style.fontSize=(Math.random()*15+10)+'px';
+            p.animate([{transform:`translateY(0) rotate(0deg)`},{transform:`translateY(100vh) rotate(360deg)`}],{duration:Math.random()*5000+5000}).onfinish=()=>p.remove();
+            c.appendChild(p);
+        },400);
     }
     window.startSnowing = startSnowing;
 </script>
