@@ -270,7 +270,55 @@ function renderJobs(jobs) {
 
 function buildEnquiryForm() {
     const container = document.getElementById('enquiries-form-content');
-    container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">Submit</button><p id="enquiry-status"></p></form>`;
+    container.innerHTML = `
+        <div class="enquiry-layout">
+            <div class="contact-info-block">
+                <h3>Get In Touch</h3>
+                <p>We're here to help and answer any question you might have. We look forward to hearing from you.</p>
+                <div class="contact-detail">
+                    <i class="fa-solid fa-phone-volume"></i>
+                    <div>
+                        <strong>Phone</strong><br>
+                        <a href="tel:+60123456789">+60 12-345 6789</a>
+                    </div>
+                </div>
+                <div class="contact-detail">
+                    <i class="fa-solid fa-envelope"></i>
+                    <div>
+                        <strong>Email</strong><br>
+                        <a href="mailto:contact@example.com">contact@example.com</a>
+                    </div>
+                </div>
+                <div class="contact-detail">
+                    <i class="fa-solid fa-map-marker-alt"></i>
+                    <div>
+                        <strong>Address</strong><br>
+                        123 Luxury Lane, Kuala Lumpur
+                    </div>
+                </div>
+            </div>
+            <form id="enquiry-form">
+                <div class="form-group">
+                    <input type="text" id="enquiry-name" class="form-input" placeholder=" " required>
+                    <label for="enquiry-name" class="form-label">Full Name</label>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="enquiry-email" class="form-input" placeholder=" " required>
+                    <label for="enquiry-email" class="form-label">Email Address</label>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="enquiry-phone" class="form-input" placeholder=" " required>
+                    <label for="enquiry-phone" class="form-label">Phone Number</label>
+                </div>
+                <div class="form-group">
+                    <textarea id="enquiry-message" class="form-input" placeholder=" " rows="5" required></textarea>
+                    <label for="enquiry-message" class="form-label">Your Message</label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Send Message</button>
+                <p id="enquiry-status"></p>
+            </form>
+        </div>
+    `;
 }
 
 function buildCartModal() {
@@ -281,24 +329,30 @@ function buildCartModal() {
                 <h2>Your Cart</h2>
                 <button class="close" onclick="toggleCart(true)">&times;</button>
             </div>
-            <div class="modal-body" id="cart-items"><p>Your cart is empty.</p></div>
-            <div id="cart-checkout-area">
+            <div class="modal-body" id="cart-items-container">
+                <!-- Cart items or empty state will be rendered here by JS -->
+            </div>
+            <div id="cart-checkout-area" style="display: none;">
                 <div class="modal-footer">
-                    <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
-                    <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
+                    <div class="summary-line">
+                        <span>Subtotal</span>
+                        <span id="cart-subtotal">RM 0.00</span>
+                    </div>
+                    <div class="summary-line">
+                        <span>Shipping</span>
+                        <span id="cart-shipping">RM 0.00</span>
+                    </div>
+                    <div class="summary-line total">
+                        <span>Total</span>
+                        <span id="cart-total">RM 0.00</span>
+                    </div>
                 </div>
-                <div class="customer-info-form">
-                    <h3>Customer Info</h3>
-                    <input type="text" id="customer-name" placeholder="Full Name" required>
-                    <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
-                    <input type="email" id="customer-email" placeholder="Email (Optional)">
-                    <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
+                <div style="padding: 20px;">
+                    <button class="btn btn-primary" onclick="showCheckoutForm()">Proceed to Checkout</button>
                 </div>
-                <div style="padding: 0 30px 20px;"><button class="btn btn-primary" style="width: 100%;" onclick="initiateCheckout()">Place Order</button></div>
             </div>
         </div>`;
 }
-
 function buildJobApplicationModal() {
     const container = document.getElementById('job-application-modal');
     container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleJobModal(false)">&times;</span><h2>Apply for <span id="job-modal-title"></span></h2><form id="job-application-form" class="enquiry-form"><input type="hidden" id="job-id-input"><input type="hidden" id="job-position-input"><input type="text" id="applicant-name" placeholder="Full Name" required><input type="email" id="applicant-email" placeholder="Email" required><input type="tel" id="applicant-phone" placeholder="Phone" required><input type="text" id="applicant-citizenship" placeholder="Citizenship" required><textarea id="applicant-message" placeholder="Tell us about yourself" rows="4"></textarea><label for="applicant-resume">Upload Resume (Mandatory)</label><input type="file" id="applicant-resume" required><button type="submit" class="btn btn-primary">Submit</button><p id="job-application-status"></p></form></div>`;
@@ -354,13 +408,19 @@ function removeItemFromCart(productId) {
 }
 
 function updateCartDisplay() {
-    const cartItemsContainer = document.getElementById('cart-items');
+    const cartItemsContainer = document.getElementById('cart-items-container');
     const checkoutArea = document.getElementById('cart-checkout-area');
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     document.getElementById('cart-count').textContent = totalItems;
     
     if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p style="text-align:center; padding: 20px 0;">Your cart is empty.</p>';
+        cartItemsContainer.innerHTML = `
+            <div class="cart-empty-state">
+                <i class="fa-solid fa-shopping-bag"></i>
+                <h3>Your Cart is Empty</h3>
+                <p>Looks like you haven't added anything to your cart yet.</p>
+            </div>
+        `;
         checkoutArea.style.display = 'none';
         return;
     }
@@ -371,19 +431,33 @@ function updateCartDisplay() {
             <img src="${item.image}" alt="${item.name}" class="cart-item-image"/>
             <div class="cart-item-details">
                 <strong>${item.name}</strong>
+                <p class="cart-item-price">RM ${(item.price * item.quantity).toFixed(2)}</p>
                 <div class="quantity-controls">
                     <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
                     <span>${item.quantity}</span>
                     <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
                 </div>
             </div>
-            <strong>RM ${(item.price * item.quantity).toFixed(2)}</strong>
-            <button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button>
+            <button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-times"></i></button>
         </div>`).join('');
         
+    // Calculate and display totals INCLUDING shipping
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    let shippingFee = 0;
+    if (shippingRules && shippingRules.length > 0) {
+        const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
+        if (bestRule) {
+            shippingFee = bestRule.charge;
+        } else if (shippingRules.length > 0) {
+            // If no rule is met, assume the highest shipping cost applies (for subtotals less than the lowest minSpend)
+            shippingFee = shippingRules.reduce((max, rule) => rule.charge > max ? rule.charge : max, 0);
+        }
+    }
+    const total = subtotal + shippingFee;
+
     document.getElementById('cart-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
-    document.getElementById('cart-total').textContent = `RM ${subtotal.toFixed(2)}`;
+    document.getElementById('cart-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
+    document.getElementById('cart-total').textContent = `RM ${total.toFixed(2)}`;
 }
 
 function toggleCart(hide = false) {
