@@ -274,8 +274,8 @@ function buildEnquiryForm() {
             <div class="contact-info-block">
                 <h3>Get In Touch</h3>
                 <p>We're here to help and answer any question you might have.</p>
-                <div class="contact-detail"><i class="fa-solid fa-phone-volume"></i> <div><strong>Phone</strong><br><a href="tel:+60123456789">+60 12-345 6789</a></div></div>
-                <div class="contact-detail"><i class="fa-solid fa-envelope"></i> <div><strong>Email</strong><br><a href="mailto:contact@example.com">contact@example.com</a></div></div>
+                <div class="contact-detail"><i class="fa-solid fa-phone-volume"></i> <div><strong>Phone</strong><br><a href="tel:+60123456789">+601111033154</a></div></div>
+                <div class="contact-detail"><i class="fa-solid fa-envelope"></i> <div><strong>Email</strong><br><a href="mailto:contact@example.com">cs.foreverlivingbymuhdarvindisa@gmail.com</a></div></div>
             </div>
             <form id="enquiry-form" class="enquiry-form">
                 <div class="form-group"><input type="text" id="enquiry-name" class="form-input" placeholder=" " required><label class="form-label">Full Name</label></div>
