@@ -7,13 +7,12 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <style>
-    /* [ 1.0 ] LUXURY VARIABLES */
     :root {
         --primary-color: #0f3d2e;      /* Deep Emerald */
         --secondary-color: #d4af37;    /* Satin Gold */
@@ -25,13 +24,13 @@
         --light-text: #ffffff;
         --danger-color: #a83232;       /* Muted Red */
         
-        --border-radius: 4px;          /* Sharp/Elegant */
-        --shadow-soft: 0 10px 30px rgba(0,0,0,0.06);
+        --border-radius: 4px;          /* Sharp corners for luxury feel */
+        --shadow: 0 10px 30px rgba(0,0,0,0.08);
         
         --font-heading: 'Playfair Display', serif;
         --font-body: 'Poppins', sans-serif;
     }
-    
+
     /* Festival Overrides */
     body.theme-Christmas { --primary-color: #800000; --secondary-color: #d4af37; }
     body.theme-CNY { --primary-color: #a80000; --secondary-color: #ffcc00; }
@@ -47,7 +46,7 @@
     
     .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
     
-    h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; }
+    h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; letter-spacing: 0.5px; }
     
     /* Buttons */
     .btn { 
@@ -65,6 +64,8 @@
     .btn-secondary { background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); }
     .btn-secondary:hover:not(:disabled) { background: var(--primary-color); color: #fff; }
     
+    .loader { text-align: center; padding: 3rem; font-size: 1.2rem; color: var(--primary-color); }
+
     /* [ 2.0 ] HEADER & NAV */
     header { background-color: #fff; padding: 30px 0; text-align: center; border-bottom: 1px solid #eee; }
     .header-content { display: flex; align-items: center; justify-content: center; gap: 20px; }
@@ -88,7 +89,7 @@
     }
     nav a:hover { background-color: rgba(255,255,255,0.1); color: var(--secondary-color); }
     
-    /* Agent Login Button */
+    /* Agent Login Button (Gold) */
     .nav-login-btn { background-color: var(--secondary-color); color: #fff !important; border-radius: 50px; padding: 8px 20px !important; margin: 10px; font-weight: 700; }
     .nav-login-btn:hover { background-color: #fff; color: var(--secondary-color) !important; }
 
@@ -110,7 +111,7 @@
         background: linear-gradient(135deg, var(--primary-color), #0a291f); 
         color: #fff; padding: 100px 20px; text-align: center; 
         border-radius: var(--border-radius); margin-bottom: 40px; 
-        box-shadow: var(--shadow-soft);
+        box-shadow: var(--shadow);
     }
     .hero-section h2 { color: var(--secondary-color); font-size: 3rem; margin-bottom: 10px; }
     
@@ -124,7 +125,7 @@
     .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     
     #testimonies-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-    .testimony-card { background: var(--bg-color); padding: 2rem; border-radius: var(--border-radius); text-align: center; border: 1px solid #eee; }
+    .testimony-card { background: var(--light-gray); padding: 2rem; border-radius: var(--border-radius); text-align: center; border: 1px solid #eee; }
     .testimony-header { margin-bottom: 1rem; font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; }
     .testimony-rating { color: var(--secondary-color); font-size: 1rem; margin-top: 5px; }
     .job-listing-summary { padding: 1.5rem; border: 1px solid #eee; border-radius: var(--border-radius); transition: 0.3s; }
@@ -174,8 +175,19 @@
     .click-info-btn { color: var(--secondary-color); border: 1px solid var(--secondary-color); padding: 12px 25px; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; font-weight: 700; }
 
     /* [ 5.1 ] LUXURY CART MODAL */
+    .fab-container { position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; gap: 15px; }
+    .fab { 
+        width: 65px; height: 65px; 
+        background-color: var(--primary-color); color: var(--secondary-color); 
+        border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+        font-size: 1.8rem; box-shadow: 0 5px 20px rgba(0,0,0,0.2); cursor: pointer; 
+        border: 2px solid var(--secondary-color); transition: 0.3s;
+    }
+    .fab:hover { transform: scale(1.1); }
+    #cart-count { position: absolute; top: -5px; right: -5px; background-color: var(--secondary-color); color: #fff; border-radius: 50%; padding: 4px 8px; font-size: 0.8rem; font-weight: 700; }
+    
     .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; }
-    .modal-content { background: #fff; width: 500px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 50px rgba(0,0,0,0.2); border-radius: 2px; }
+    .modal-content { background: #fff; padding: 0; border-radius: var(--border-radius); width: 90%; max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px rgba(0,0,0,0.2); border-radius: 2px; }
     
     .modal-header { padding: 25px; background: #fff; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
     .modal-header h2 { margin: 0; font-size: 1.8rem; color: var(--primary-color); font-family: var(--font-heading); }
@@ -252,111 +264,123 @@
 </style>
 
 <div id="effect-container" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9998; overflow:hidden;"></div>
-
-<div id="maintenance-overlay">
-    <img src="FL.jpg" alt="Logo" style="width: 120px; height: 120px; margin-bottom: 20px; border-radius: 50%; border: 4px solid var(--secondary-color);">
-    <h1 style="color: #fff;">Temporarily Unavailable</h1>
-    <p id="maintenance-message" style="font-size: 1.2rem; max-width: 500px; color: #ddd;"></p>
-</div>
+<div id="maintenance-overlay"><h1>Temporarily Closed</h1><p id="maintenance-message"></p></div>
 
 <div id="store-wrapper">
   <header>
     <div class="container">
       <div class="header-content">
-        <img src="FL.jpg" alt="Business Logo" class="header-logo" onerror="this.style.display='none'">
+        <img src="FL.jpg" alt="Logo" class="header-logo" onerror="this.style.display='none'">
         <div style="text-align:center">
             <h1 id="company-name-header"></h1>
         </div>
       </div>
     </div>
   </header>
-  <div id="promo-running-banner"><div class="marquee-content" id="promo-banner-text"></div></div>
+  
   <nav>
     <div class="container">
-      <ul id="main-nav">
+      <ul>
         <li><a onclick="showTab('homepage')">Home</a></li>
         <li><a onclick="showTab('products')">Collection</a></li>
         <li><a onclick="showTab('about')">Our Story</a></li>
         <li><a onclick="showTab('jobs')">Careers</a></li>
-        <li><a onclick="showTab('enquiries')">Contact Us</a></li>
+        <li><a onclick="showTab('enquiries')">Contact</a></li>
         <li><a onclick="showTab('rewards')">Rewards</a></li>
-        <li><a id="nav-login-btn" class="nav-login-btn"><i class="fa-solid fa-user-circle" style="margin-right: 8px;"></i> Sales Agent Login</a></li>
+        <li><a href="agent.html" target="_blank" class="nav-agent-btn">Agent Login</a></li>
       </ul>
     </div>
   </nav>
+  
+  <div id="promo-running-banner"><div class="marquee-content" id="promo-banner-text"></div></div>
+
   <main id="main-content" class="container"></main>
-  <footer class="footer">
+  
+  <footer>
       <div class="container">
         <p id="footer-text"></p>
-        <div class="timestamp" style="font-size: 0.8rem; opacity: 0.6; margin-top: 15px;">Last updated: <span id="update-timestamp"></span></div>
+        <div style="font-size: 0.7rem; opacity: 0.6; margin-top: 20px; font-family: var(--font-body);">Last updated: <span id="update-timestamp"></span></div>
       </div>
   </footer>
 </div>
 
-<div id="cart-modal" class="modal"></div>
-<div id="job-application-modal" class="modal"></div>
-<div class="fab-container" id="fab-container"></div>
-<div id="popup-modal" class="modal"></div>
-
-<div id="login-modal" class="modal">
-    <div class="modal-content" id="login-modal-content">
-        <div class="modal-header">
-            <h2 style="margin: 0;">Welcome Back</h2>
-            <button id="close-login-modal-btn" class="close">&times;</button>
+<div id="product-detail-modal" class="modal">
+    <div class="product-modal-content">
+        <button class="pm-close" onclick="closeProductModal()">&times;</button>
+        <div class="pm-image-col"><img id="pm-img" src=""></div>
+        <div class="pm-details-col">
+            <h2 id="pm-title" class="pm-title"></h2>
+            <div id="pm-price" class="pm-price"></div>
+            
+            <div class="pm-section">
+                <div class="pm-label">Description</div>
+                <div id="pm-desc" class="pm-text"></div>
+            </div>
+            <div class="pm-section">
+                <div class="pm-label">Benefits</div>
+                <div id="pm-ben" class="pm-text"></div>
+            </div>
+            <div class="pm-section">
+                <div class="pm-label">Usage</div>
+                <div id="pm-use" class="pm-text"></div>
+            </div>
+            
+            <button id="pm-add-btn" class="pm-add-btn">Add to Cart</button>
         </div>
-        <div class="modal-body" style="padding: 40px;">
-            <div class="login-option" style="border-color: var(--primary-color); background-color: #fcfcfc;">
-                <h3 style="color: var(--primary-color);">Agent Portal</h3>
-                <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Access dashboard, sales, and commission data.</p>
-                <a href="agent.html" target="_blank" class="btn btn-primary">Login to Portal</a>
+    </div>
+</div>
+
+<div id="cart-modal" class="modal">
+    <div class="modal-content" style="width:500px; max-width:95%;">
+        <div class="modal-header" style="background:var(--bg-color); border-bottom:1px solid #eee;">
+            <h2 style="color:var(--primary-color); font-size:1.5rem;">Shopping Bag</h2>
+            <button class="close" onclick="toggleCart(true)" style="color:#999;">&times;</button>
+        </div>
+        <div class="modal-body" id="cart-items" style="padding:30px;"></div>
+        <div id="cart-checkout-area">
+            <div class="modal-footer" style="padding:30px; background:#fcfcfc; border-top:1px solid #eee;">
+                <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+                <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
+            </div>
+            <div class="customer-info-form" style="padding:30px; background:#fff;">
+                <h3>Your Details</h3>
+                <input type="text" id="customer-name" class="form-input" placeholder="Full Name" required>
+                <input type="tel" id="customer-phone" class="form-input" placeholder="WhatsApp Number" required>
+                <input type="email" id="customer-email" class="form-input" placeholder="Email Address (Optional)">
+                <textarea id="customer-address" class="form-input" placeholder="Shipping Address" rows="2" required></textarea>
+            </div>
+            <div style="padding: 0 30px 30px;">
+                <button class="btn btn-primary" style="width: 100%;" onclick="initiateCheckout()">Place Order</button>
             </div>
         </div>
     </div>
 </div>
 
+<div id="job-application-modal" class="modal"></div>
+<div class="fab-container" id="fab-container"></div>
+<div id="popup-modal" class="modal"></div>
+
 <script src="script.js"></script>
 
 <script>
+    // Animation
     let effectInterval;
-    function startSnowing(themeType) { 
-        const container = document.getElementById('effect-container');
-        if(!container) return;
-        container.innerHTML = '';
+    function startSnowing(type) { 
+        const c = document.getElementById('effect-container'); if(!c)return; c.innerHTML='';
         if(effectInterval) clearInterval(effectInterval);
         
-        let symbol = '❄'; let color = '#fff';
-        const bodyClass = document.body.className;
-
-        if (bodyClass.includes('Christmas')) { symbol = '❄'; color = '#fff'; }
-        else if (bodyClass.includes('CNY')) { symbol = '🏮'; color = '#d4af37'; }
-        else if (bodyClass.includes('HariRaya')) { symbol = '✨'; color = '#cddc39'; }
-        else if (bodyClass.includes('Deepavali')) { symbol = '🪔'; color = '#ffa500'; }
-        else if (bodyClass.includes('Valentines')) { symbol = '❤️'; color = '#e91e63'; }
-        else if (bodyClass.includes('National') || bodyClass.includes('Malaysia')) { symbol = '🌺'; color = '#cc0000'; }
-        else { return; } 
-
-        effectInterval = setInterval(() => {
-            const particle = document.createElement('div');
-            particle.innerHTML = symbol;
-            particle.style.position = 'absolute';
-            particle.style.color = color;
-            particle.style.left = Math.random() * 100 + 'vw';
-            particle.style.opacity = Math.random();
-            particle.style.fontSize = (Math.random() * 15 + 10) + 'px';
-            particle.style.top = '-30px';
-            particle.style.pointerEvents = 'none';
-            
-            const duration = Math.random() * 3000 + 3000;
-            particle.animate([
-                { transform: `translateY(0) rotate(0deg)` },
-                { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)` }
-            ], {
-                duration: duration,
-                iterations: 1
-            }).onfinish = () => particle.remove();
-            
-            container.appendChild(particle);
-        }, 400); 
+        let sym='❄', col='rgba(255,255,255,0.4)';
+        const cls = document.body.className;
+        if(cls.includes('CNY')) { sym='🏮'; col='#d4af37'; }
+        else if(cls.includes('HariRaya')) { sym='✨'; col='#cddc39'; }
+        
+        effectInterval = setInterval(()=>{
+            const p=document.createElement('div'); p.innerHTML=sym; p.style.position='absolute'; p.style.color=col;
+            p.style.left=Math.random()*100+'vw'; p.style.top='-30px'; p.style.opacity=Math.random();
+            p.style.fontSize=(Math.random()*15+10)+'px';
+            p.animate([{transform:`translateY(0) rotate(0deg)`},{transform:`translateY(100vh) rotate(360deg)`}],{duration:Math.random()*5000+5000}).onfinish=()=>p.remove();
+            c.appendChild(p);
+        },400);
     }
     window.startSnowing = startSnowing;
 </script>
