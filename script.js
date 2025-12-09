@@ -4,7 +4,7 @@
 
 // [ 1.0 ] GLOBAL CONFIGURATION
 // CRITICAL: Update this URL to match your latest Code.gs deployment
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxfO-dgBDSFAAD4PUqLQDXEYxM5S-MAzEjfhVFo-7YstAYw6ShcnpeIxc81t4zr0s5mWA/exec'; 
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxdJ2vGxgnSqVLusH1txOR8ZkhTEP_8brLSz2lXdBbleisT3c-nYyrudcGbYxnoRShFjg/exec'; 
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
