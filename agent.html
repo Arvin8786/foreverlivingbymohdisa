@@ -269,7 +269,7 @@
 
     <div id="team-view" class="view hidden card">
         <h3>Team Overview</h3>
-        <div style="background:#f9fcfb; border:1px solid var(--accent-color); padding:20px; border-radius:4px; margin-bottom:20px;">
+        <div style="background:#f9fcfb; border:1px solid #27ae60; padding:20px; border-radius:4px; margin-bottom:20px;">
             <span style="font-size:0.9rem; text-transform:uppercase; color:var(--primary-color);">Override Income</span>
             <div id="team-total-override" style="font-size:2rem; font-weight:700; color:var(--secondary-color);">Loading...</div>
         </div>
@@ -290,7 +290,7 @@
             </div>
             <div style="background:#fff; border:1px solid #eee; padding:20px;">
                 <label style="font-size:0.8rem; color:#999; text-transform:uppercase;">On Target</label>
-                <div id="admin-agents-on-target" style="font-size:1.5rem; font-weight:700; color:var(--accent-color);">...</div>
+                <div id="admin-agents-on-target" style="font-size:1.5rem; font-weight:700; color:#27ae60;">...</div>
             </div>
         </div>
         <canvas id="performanceChart" height="100"></canvas>
@@ -303,7 +303,7 @@
 // =================================================================
 // AGENT PORTAL SCRIPT - LUXURY EDITION (CORRECTED & COMPLETE)
 // =================================================================
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZdhS1V16Gut5yHA-y6Z0JU4Hrj4oHCwJhRrf4ul82GWP2q63qJGy4mopvOZzZtbl0JA/exec'; 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3Hp2US3goWnPnyvGGeu-qEyDHufcptXJcAehbFC0a94Z4godf734SOSJAZ1bGWqXC7g/exec'; // <-- PASTE YOUR NEW URL HERE
 
 let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
 let currentProfile = {}, canEditProfile = false, allAgentsList = [];
@@ -311,9 +311,6 @@ let currentProfile = {}, canEditProfile = false, allAgentsList = [];
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-form').addEventListener('submit', (event) => { event.preventDefault(); handleLogin(); });
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
-    
-    // Refresh button for Open Orders is handled by the button itself
-    // document.getElementById('refresh-data-btn').addEventListener('click', refreshPageData); 
 
     const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'team', 'admin-dashboard'];
     navs.forEach(n => {
@@ -379,7 +376,7 @@ async function handleLogin() {
             status.textContent = res.message;
             status.style.color = 'var(--danger-color)';
         }
-    } catch(e) { status.textContent = "Connection failed."; console.error(e); }
+    } catch(e) { status.textContent = e.message || "Connection failed."; console.error(e); }
     finally { btn.disabled = false; }
 }
 
@@ -438,7 +435,6 @@ async function adminAssignOrder(id) {
 }
 
 function renderProfileView() {
-    // Correctly map backend camelCase properties to frontend element IDs
     document.getElementById('prof-employeeName').value = currentProfile.employeeName || '';
     document.getElementById('prof-agentID').value = currentProfile.agentID || '';
     document.getElementById('prof-position').value = currentProfile.position || '';
@@ -552,6 +548,7 @@ function renderTargetBar() {
 function renderProductCatalog() { 
     document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join('');
 }
+
 function renderProductSelectionList() { 
     const term = document.getElementById('product-order-search').value.toLowerCase();
     const filtered = products.filter(p => p.name.toLowerCase().includes(term) || String(p.id).toLowerCase().includes(term));
@@ -562,9 +559,11 @@ function renderProductSelectionList() {
             <button class="btn btn-primary" style="margin-left:auto; padding:5px 10px; font-size:0.7rem;">ADD</button>
         </div>`).join('') : "<p>No products found.</p>";
 }
+
 function renderCustomerDropdown() { 
     document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing Customer --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join('');
 }
+
 function renderOrderSummary() { 
     const container = document.getElementById('summary-items-list');
     if (currentOrder.items.length === 0) { container.innerHTML = "<p style='text-align:center; padding:20px;'>Cart is empty.</p>"; } 
@@ -581,6 +580,7 @@ function renderOrderSummary() {
     }
     calculateTotals();
 }
+
 async function renderMyOrders() {
     const list = document.getElementById('my-orders-list');
     list.innerHTML = '<p>Loading...</p>';
@@ -589,6 +589,7 @@ async function renderMyOrders() {
         list.innerHTML = res.orders.length ? `<table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>${res.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>${o.customerName}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>`).join('')}</tbody></table>` : '<p>No orders assigned to you.</p>';
     } catch(e) { list.innerHTML = '<p style="color:red;">Error loading orders.</p>'; }
 }
+
 function renderMyCommission() {
     const list = document.getElementById('my-commission-list');
     list.innerHTML = '<p>Loading...</p>';
@@ -596,6 +597,7 @@ function renderMyCommission() {
         list.innerHTML = res.records.length ? `<table><thead><tr><th>Invoice</th><th>Type</th><th>Sales</th><th>Rate</th><th>Earned</th><th>Status</th></tr></thead><tbody>${res.records.map(r => `<tr><td>${r.invoiceId}</td><td>${r.overrideAmount>0?'Override':'Personal'}</td><td>${r.salesAmount.toFixed(2)}</td><td>${r.commissionRate}%</td><td><strong>${(r.overrideAmount||r.commissionAmount).toFixed(2)}</strong></td><td>${r.status}</td></tr>`).join('')}</tbody></table>` : '<p>No commission records found.</p>';
     });
 }
+
 function startNewOrder() { 
     currentOrder = { items: [] };
     document.getElementById('customer-dropdown').value = '';
@@ -610,29 +612,56 @@ function startNewOrder() {
     document.getElementById('submit-order-btn').disabled = false;
     renderOrderSummary();
 }
+
 function handleNewCustomerToggle() {
     const form = document.getElementById('new-customer-form');
     form.classList.toggle('hidden');
     document.getElementById('customer-dropdown').disabled = !form.classList.contains('hidden');
+    if (!form.classList.contains('hidden')) {
+        document.getElementById('customer-dropdown').value = '';
+    }
 }
-function handleCustomerSelection() { if (document.getElementById('customer-dropdown').value) { document.getElementById('new-customer-form').classList.add('hidden'); document.getElementById('customer-dropdown').disabled = false; } }
+
+function handleCustomerSelection() { 
+    if (document.getElementById('customer-dropdown').value) {
+        document.getElementById('new-customer-form').classList.add('hidden');
+        document.getElementById('customer-dropdown').disabled = false;
+    }
+}
+
 function addProductToOrder(id) {
     const p = products.find(x => String(x.id) === String(id));
     if (!p || currentOrder.items.some(i => String(i.id) === String(id))) return;
     currentOrder.items.push({ id: p.id, name: p.name, quantity: 1, rsp: p.rsp, cc: p.cc, customPrice: p.rsp, minPrice: p.minPrice });
     renderOrderSummary();
 }
-function removeItemFromOrder(id) { currentOrder.items = currentOrder.items.filter(i => String(i.id) !== String(id)); renderOrderSummary(); }
-function updateQuantity(id, qty) { const i = currentOrder.items.find(x => String(x.id) === String(id)); if(i) i.quantity = parseInt(qty)||1; renderOrderSummary(); }
-function updatePrice(id, pr) { const i = currentOrder.items.find(x => String(x.id) === String(id)); if(i) i.customPrice = parseFloat(pr)||0; renderOrderSummary(); }
+
+function removeItemFromOrder(id) { 
+    currentOrder.items = currentOrder.items.filter(i => String(i.id) !== String(id)); 
+    renderOrderSummary(); 
+}
+
+function updateQuantity(id, qty) { 
+    const i = currentOrder.items.find(x => String(x.id) === String(id)); 
+    if(i) i.quantity = parseInt(qty) || 1; 
+    renderOrderSummary(); 
+}
+
+function updatePrice(id, pr) { 
+    const i = currentOrder.items.find(x => String(x.id) === String(id)); 
+    if(i) i.customPrice = parseFloat(pr) || 0; 
+    renderOrderSummary(); 
+}
+
 function calculateTotals() {
     const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
     const bestRule = shippingRules.find(r => sub >= r.minSpend);
     const ship = bestRule ? bestRule.charge : (shippingRules.length > 0 ? shippingRules[shippingRules.length - 1].charge : 0);
     document.getElementById('summary-subtotal').textContent = `RM ${sub.toFixed(2)}`;
     document.getElementById('summary-shipping').textContent = `RM ${ship.toFixed(2)}`;
-    document.getElementById('summary-total').textContent = `RM ${(sub+ship).toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `RM ${(sub + ship).toFixed(2)}`;
 }
+
 async function submitOrder() {
     const btn = document.getElementById('submit-order-btn');
     if(btn.disabled) return;
@@ -642,7 +671,12 @@ async function submitOrder() {
     const existPac = document.getElementById('customer-dropdown').value;
     if(existPac) cust = customers.find(c => c.pac === existPac);
     else {
-        cust = { name: document.getElementById('new-customer-name').value, email: document.getElementById('new-customer-email').value, phone: document.getElementById('new-customer-phone').value, address: document.getElementById('new-customer-address').value };
+        cust = { 
+            name: document.getElementById('new-customer-name').value, 
+            email: document.getElementById('new-customer-email').value, 
+            phone: document.getElementById('new-customer-phone').value, 
+            address: document.getElementById('new-customer-address').value 
+        };
         if(!cust.name) { alert("Customer details required."); btn.disabled = false; return; }
     }
     
@@ -654,21 +688,49 @@ async function submitOrder() {
         const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
         const bestRule = shippingRules.find(r => sub >= r.minSpend);
         const ship = bestRule ? bestRule.charge : (shippingRules.length > 0 ? shippingRules[shippingRules.length - 1].charge : 0);
-        const payload = { agent: currentAgent, customer: cust, items: currentOrder.items, shippingFee: ship, paymentProof: { file: base64.split(',')[1], mimeType: file.type } };
+        const payload = { 
+            agent: currentAgent, 
+            customer: cust, 
+            items: currentOrder.items, 
+            shippingFee: ship, 
+            paymentProof: { file: base64.split(',')[1], mimeType: file.type } 
+        };
         const res = await postToGoogleScript('submitAgentOrder', payload);
-        if(res.success) { alert(`Success! ID: ${res.invoiceId}`); setTimeout(startNewOrder, 2000); }
-        else { alert(res.message); }
-    } catch(e) { alert("Error submitting order."); console.error(e); }
-    finally { btn.disabled = false; }
+        if(res.success) { 
+            alert(`Success! ID: ${res.invoiceId}`); 
+            setTimeout(startNewOrder, 2000); 
+        } else { alert(res.message); }
+    } catch(e) { 
+        alert("Error submitting order."); 
+        console.error(e); 
+    } finally { btn.disabled = false; }
 }
+
 async function handleChangePassword() {
     const p1 = document.getElementById('new-password-input').value;
     const p2 = document.getElementById('confirm-password-input').value;
     if (p1.length < 6 || p1 !== p2) { alert("Password invalid or passwords do not match."); return; }
     await postToGoogleScript('updatePassword', { agentId: currentAgent.id, newPassword: p1 });
-    alert("Success! Please log in again."); location.reload();
+    alert("Success! Please log in again."); 
+    location.reload();
 }
+
 function handleLogout() { location.reload(); }
+
+async function fetchPortalData() {
+    try {
+        const res = await postToGoogleScript('getPortalData');
+        if (res.success) { 
+            products = res.products; 
+            customers = res.customers; 
+            shippingRules = (res.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend); 
+            renderProductCatalog(); 
+            renderProductSelectionList(); 
+            renderCustomerDropdown(); 
+        }
+        else { throw new Error(res.message); }
+    } catch (error) { alert('Could not load portal data.'); }
+}
 
 async function postToGoogleScript(action, data = {}) {
     const payload = { action, data };
@@ -680,16 +742,27 @@ async function postToGoogleScript(action, data = {}) {
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload) 
         });
+
         if (!res.ok) {
-            console.error("Fetch error:", res.statusText);
-            throw new Error(`Server error: ${res.status}`);
+            const errorText = await res.text();
+            console.error("Server returned an error:", res.status, errorText);
+            throw new Error(`Server error (${res.status}). Check console for details.`);
         }
-        return await res.json();
+        
+        const responseText = await res.text();
+        try {
+            return JSON.parse(responseText);
+        } catch (e) {
+            console.error("Failed to parse JSON from server:", responseText);
+            throw new Error("Invalid response from server. The backend script may have crashed.");
+        }
+
     } catch (e) { 
-        console.error("Post to GS failed:", e);
+        console.error("Post to Google Script failed:", e);
         throw e; 
     }
 }
+
 function getBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
