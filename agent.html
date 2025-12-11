@@ -361,7 +361,7 @@ async function handleLogin() {
             
             if(currentAgent.isAdmin) {
                 const adminData = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
-                if(adminData.success) allAgentsList = adminData.flatList;
+                if(adminData.success) allAgentsList = adminData.flatList || [];
             }
 
             document.getElementById('login-view').classList.add('hidden');
@@ -374,7 +374,7 @@ async function handleLogin() {
             if(currentAgent.isManager) document.getElementById('nav-team-btn').classList.remove('hidden');
 
             renderTargetBar();
-            renderProfileView();
+            renderProfile();
             showView('open-orders-view'); 
         } else {
             status.textContent = res.message;
@@ -432,7 +432,7 @@ async function adminAssignOrder(id) {
     alert(res.message); if(res.success) renderOpenOrders();
 }
 
-function renderProfileView() {
+function renderProfile() {
     document.getElementById('prof-employeeName').value = currentProfile.employeeName || '';
     document.getElementById('prof-agentID').value = currentProfile.agentID || '';
     document.getElementById('prof-position').value = currentProfile.position || '';
@@ -480,7 +480,7 @@ async function saveProfile() {
     finally { btn.textContent = "Save Changes"; btn.disabled = false; }
 }
 
-async function renderTeamView() {
+async function renderTeam() {
     const list = document.getElementById('subordinates-list');
     const overrideEl = document.getElementById('team-total-override');
     list.innerHTML = '<li>Loading...</li>';
@@ -541,7 +541,7 @@ function renderTargetBar() {
     document.getElementById('target-bar-display').innerHTML = `<div style="font-size:0.8rem; color:#666;">Target: RM ${currentAgent.currentSales.toFixed(2)} / ${currentAgent.target.toFixed(2)} (${pct.toFixed(1)}%)</div><div class="target-bar-container"><div class="target-progress" style="width:${pct}%"></div></div>`;
 }
 
-function renderProductCatalog() { 
+function renderProducts() { 
     document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join('');
 }
 function renderProductSelectionList() { 
@@ -587,7 +587,7 @@ function renderMyCommission() {
         list.innerHTML = res.records.length ? `<table><thead><tr><th>Invoice</th><th>Type</th><th>Sales</th><th>Rate</th><th>Earned</th><th>Status</th></tr></thead><tbody>${res.records.map(r => `<tr><td>${r.invoiceId}</td><td>${r.overrideAmount>0?'Override':'Personal'}</td><td>${r.salesAmount.toFixed(2)}</td><td>${r.commissionRate}%</td><td><strong>${(r.overrideAmount||r.commissionAmount).toFixed(2)}</strong></td><td>${r.status}</td></tr>`).join('')}</tbody></table>` : '<p>No commission records found.</p>';
     });
 }
-function startNewOrder() { 
+function renderCreateOrder() { 
     currentOrder = { items: [] };
     document.getElementById('customer-dropdown').value = '';
     document.getElementById('new-customer-form').classList.add('hidden');
@@ -645,7 +645,7 @@ async function submitOrder() {
         const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
         const payload = { agent: currentAgent, customer: cust, items: currentOrder.items, shippingFee: ship, paymentProof: { file: base64.split(',')[1], mimeType: file.type } };
         const res = await postToGoogleScript('submitAgentOrder', payload);
-        if(res.success) { alert(`Success! ID: ${res.invoiceId}`); setTimeout(startNewOrder, 2000); }
+        if(res.success) { alert(`Success! ID: ${res.invoiceId}`); setTimeout(renderCreateOrder, 2000); }
         else { alert(res.message); }
     } catch(e) { alert("Error."); }
     finally { btn.disabled = false; }
@@ -669,7 +669,7 @@ async function fetchPortalData() {
             products = res.products; 
             customers = res.customers; 
             shippingRules = (res.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend); 
-            renderProductCatalog(); 
+            renderProducts(); 
             renderProductSelectionList(); 
             renderCustomerDropdown(); 
         }
