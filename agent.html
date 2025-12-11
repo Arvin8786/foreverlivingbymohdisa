@@ -269,7 +269,7 @@
 
     <div id="team-view" class="view hidden card">
         <h3>Team Overview</h3>
-        <div style="background:#f9fcfb; border:1px solid #27ae60; padding:20px; border-radius:4px; margin-bottom:20px;">
+        <div style="background:#f9fcfb; border:1px solid var(--accent-color); padding:20px; border-radius:4px; margin-bottom:20px;">
             <span style="font-size:0.9rem; text-transform:uppercase; color:var(--primary-color);">Override Income</span>
             <div id="team-total-override" style="font-size:2rem; font-weight:700; color:var(--secondary-color);">Loading...</div>
         </div>
@@ -290,7 +290,7 @@
             </div>
             <div style="background:#fff; border:1px solid #eee; padding:20px;">
                 <label style="font-size:0.8rem; color:#999; text-transform:uppercase;">On Target</label>
-                <div id="admin-agents-on-target" style="font-size:1.5rem; font-weight:700; color:#27ae60;">...</div>
+                <div id="admin-agents-on-target" style="font-size:1.5rem; font-weight:700; color:var(--accent-color);">...</div>
             </div>
         </div>
         <canvas id="performanceChart" height="100"></canvas>
@@ -303,7 +303,7 @@
 // =================================================================
 // AGENT PORTAL SCRIPT - LUXURY EDITION (CORRECTED & COMPLETE)
 // =================================================================
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3Hp2US3goWnPnyvGGeu-qEyDHufcptXJcAehbFC0a94Z4godf734SOSJAZ1bGWqXC7g/exec'; // <-- PASTE YOUR NEW URL HERE
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3Hp2US3goWnPnyvGGeu-qEyDHufcptXJcAehbFC0a94Z4godf734SOSJAZ1bGWqXC7g/exec'; // <-- PASTE YOUR NEW URL
 
 let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
 let currentProfile = {}, canEditProfile = false, allAgentsList = [];
@@ -719,7 +719,7 @@ function handleLogout() { location.reload(); }
 
 async function fetchPortalData() {
     try {
-        const res = await postToGoogleScript('getPortalData');
+        const res = await postToGoogleScript('getPortalData', {}); // Pass empty data object
         if (res.success) { 
             products = res.products; 
             customers = res.customers; 
@@ -742,13 +742,11 @@ async function postToGoogleScript(action, data = {}) {
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload) 
         });
-
         if (!res.ok) {
             const errorText = await res.text();
             console.error("Server returned an error:", res.status, errorText);
             throw new Error(`Server error (${res.status}). Check console for details.`);
         }
-        
         const responseText = await res.text();
         try {
             return JSON.parse(responseText);
@@ -756,7 +754,6 @@ async function postToGoogleScript(action, data = {}) {
             console.error("Failed to parse JSON from server:", responseText);
             throw new Error("Invalid response from server. The backend script may have crashed.");
         }
-
     } catch (e) { 
         console.error("Post to Google Script failed:", e);
         throw e; 
