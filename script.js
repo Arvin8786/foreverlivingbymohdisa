@@ -7,7 +7,7 @@
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
 // CRITICAL FIX: Using your latest, correct deployment URL
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbw_NT4FOkoYx0XIXhiag8AjYeT8BoWypxnnQHd6_23WO6Mn0o7IJ9rg9upDeR3Z0GixoA/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwgbm0F9tCktQCeLJyrY1qZb3aU9NA8iP-T1FjCnRl2erH1y9Qo6tr4uKAPiFtyXSOU1w/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
@@ -734,4 +734,48 @@ function togglePopup(hide = false) {
 function toggleLoginModal(show) {
     const modal = document.getElementById('login-modal');
     modal.style.display = show ? 'flex' : 'none';
+}
+// [ Helper Function ] Calculate Monthly Sales for Agent Dashboard
+function calculateMonthlySales() {
+    // 1. Get orders from LocalStorage
+    const orders = JSON.parse(localStorage.getItem('orders_DATA')) || [];
+    
+    // 2. Get current month and year
+    const now = new Date();
+    const currentMonth = now.getMonth(); // 0-11
+    const currentYear = now.getFullYear();
+    
+    let totalSales = 0;
+    let count = 0;
+
+    // 3. Loop through orders and sum up only this month's orders
+    orders.forEach(order => {
+        // Use timestamp or date property
+        const orderDate = new Date(order.timestamp || order.date);
+        
+        // Check if the order belongs to the current month and year
+        if (orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear) {
+            // Ensure total is a number (handle string 'RM 50.00' or number 50.00)
+            let orderAmount = parseFloat(order.total);
+            if (!isNaN(orderAmount)) {
+                totalSales += orderAmount;
+                count++;
+            }
+        }
+    });
+
+    // 4. Update the Dashboard Display
+    // This looks for an element with id="monthly-sales" and "monthly-orders-count"
+    const salesDisplay = document.getElementById('monthly-sales');
+    const countDisplay = document.getElementById('monthly-orders-count');
+    
+    if (salesDisplay) {
+        salesDisplay.innerText = 'RM ' + totalSales.toFixed(2);
+    }
+    
+    if (countDisplay) {
+        countDisplay.innerText = count;
+    }
+    
+    return totalSales;
 }
