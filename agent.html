@@ -12,18 +12,23 @@
     <link rel="icon" type="image/jpeg" href="FL.jpg">
     
     <style>
-        /* [ 1.0 ] LUXURY VARIABLES */
+        /* =========================================================== */
+        /* [ 1.0 ] LUXURY VARIABLES (MATCHING INDEX.HTML) */
+        /* =========================================================== */
         :root {
-            --primary-color: #0a291f;      /* Deep Emerald */
+            --primary-color: #0a291f;      /* Deep Regal Green */
             --secondary-color: #d4af37;    /* Satin Gold */
+            --accent-color: #14523d;       /* Lighter Emerald */
+            
             --bg-color: #fcfcfc;           /* Pearl White */
-            --card-bg: #ffffff;
+            --card-bg: #ffffff;            /* Pure White */
             --text-main: #333333;
             --text-light: #777777;
             --danger-color: #a83232;
             
-            --border-radius: 2px;          /* Sharp corners */
+            --border-radius: 2px;          /* Sharp corners for luxury */
             --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
+            --shadow-hover: 0 20px 40px rgba(0,0,0,0.1);
             
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Lato', sans-serif;
@@ -55,7 +60,7 @@
 
         /* Inputs */
         input, select, textarea { 
-            width: 100%; padding: 12px 0; margin-bottom: 20px; border: none;
+            width: 100%; padding: 12px 10px; margin-bottom: 20px; border: none;
             border-bottom: 2px solid #ccc; background: transparent; font-size: 1rem;
             font-family: var(--font-body); transition: 0.3s; border-radius: 0;
         }
@@ -68,8 +73,8 @@
         #login-box { width: 450px; text-align: center; border-top: 5px solid var(--secondary-color); }
         
         header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #eee; margin-bottom: 30px; }
-        #agent-welcome-header { margin: 0; font-size: 2rem; }
-        #agent-details-display { font-size: 0.9rem; color: var(--secondary-color); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        #agent-welcome-header { margin: 0; font-size: 1.8rem; }
+        #agent-details-display { font-size: 0.8rem; color: var(--secondary-color); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
         /* Target Bar */
         .target-bar-container { width: 100%; height: 6px; background: #eee; border-radius: 3px; margin-top: 10px; overflow: hidden; }
@@ -88,13 +93,30 @@
             padding: 20px; border: 1px solid #eee; margin-bottom: 15px; 
             background: #fff; transition: 0.3s;
         }
-        .open-order-card:hover { border-color: var(--secondary-color); box-shadow: var(--shadow-soft); }
-        .open-order-info strong { color: var(--primary-color); font-family: var(--font-heading); font-size: 1.2rem; }
+        .open-order-card:hover { border-color: var(--secondary-color); box-shadow: var(--shadow-hover); }
+        .open-order-info strong { color: var(--primary-color); font-family: var(--font-heading); font-size: 1.1rem; }
         
         .admin-assign-box { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
         .admin-assign-box select { margin-bottom: 0; padding: 8px; font-size: 0.8rem; border: 1px solid #ddd; }
 
-        /* [ 4.0 ] CREATE ORDER */
+        /* [ 4.0 ] TABLES (Luxury) */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        thead { background: var(--primary-color); color: #fff; }
+        th { padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; color: #555; }
+        tr:hover { background: #f9f9f9; }
+        td strong { color: var(--primary-color); }
+
+        /* [ 5.0 ] PROFILE & CREATE ORDER */
+        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .profile-section h4 { 
+            font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; 
+            color: var(--primary-color); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; 
+        }
+        .profile-item label { font-size: 0.75rem; text-transform: uppercase; color: #999; font-weight: 700; display: block; margin-bottom: 5px; }
+        .profile-item input { background: #fff; color: var(--text-main); font-weight: 600; padding: 10px; border: 1px solid #eee; }
+        .profile-item input:disabled { color: #888; background: #f9f9f9; }
+
         #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; }
         .product-item-selectable { 
             display: flex; align-items: center; gap: 15px; padding: 15px; 
@@ -102,21 +124,6 @@
         }
         .product-item-selectable:hover { background: #f9f9f9; }
         .product-item-selectable img { width: 50px; height: 50px; object-fit: contain; }
-        
-        /* [ 5.0 ] PROFILE & TABLES */
-        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .profile-section h4 { 
-            font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; 
-            color: var(--primary-color); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; 
-        }
-        .profile-item label { font-size: 0.75rem; text-transform: uppercase; color: #999; font-weight: 700; display: block; margin-bottom: 5px; }
-        .profile-item input { background: #fff; color: var(--text-main); font-weight: 600; }
-        .profile-item input:disabled { color: #888; border-bottom: 1px solid #eee; }
-
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px; background: var(--primary-color); color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
-        tr:hover { background: #fcfcfc; }
 
         @media (max-width: 1000px) {
             #order-creation-workflow { grid-template-columns: 1fr; }
@@ -131,7 +138,7 @@
         <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
         <h1>Agent Portal</h1>
         <p>Sign in to manage your sales and team.</p>
-        <form id="login-form">
+        <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
             <input type="text" id="agent-id-input" placeholder="Agent ID" required>
             <input type="password" id="agent-password-input" placeholder="Password" required>
             <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">Login</button>
@@ -160,6 +167,7 @@
             <div id="target-bar-display" style="margin-top: 10px;"></div>
         </div>
         <div style="text-align: right;">
+            <button id="refresh-data-btn" class="btn btn-secondary" style="margin-bottom: 10px;">Refresh Data</button>
             <button id="logout-btn" class="btn btn-primary">Logout</button>
         </div>
     </header>
@@ -242,27 +250,27 @@
     <div id="profile-view" class="view hidden card">
         <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
             <h3>My Profile</h3>
-            <button id="save-profile-btn" class="btn btn-primary hidden">Save Changes</button>
+            <button id="save-profile-btn" class="btn btn-primary hidden" onclick="saveProfile()">Save Changes</button>
         </div>
-        <p id="profile-status" style="text-align:right; color:var(--success-color); font-weight:700;"></p>
+        <p id="profile-status" style="text-align:right; color:var(--accent-color); font-weight:700;"></p>
         <div class="profile-grid">
             <div class="profile-section">
                 <h4>Identity</h4>
-                <div class="profile-item"><label>Full Name</label><input id="prof-employeeName" disabled></div>
-                <div class="profile-item"><label>Agent ID</label><input id="prof-agentID" disabled></div>
-                <div class="profile-item"><label>Position</label><input id="prof-position" disabled></div>
+                <div class="profile-item"><label>Full Name</label><input id="prof-name" disabled></div>
+                <div class="profile-item"><label>Agent ID</label><input id="prof-id" disabled></div>
+                <div class="profile-item"><label>Position</label><input id="prof-pos" disabled></div>
             </div>
             <div class="profile-section">
                 <h4>Performance</h4>
-                <div class="profile-item"><label>Commission Rate</label><input id="prof-commissionRate" disabled></div>
+                <div class="profile-item"><label>Commission Rate</label><input id="prof-rate" disabled></div>
                 <div class="profile-item"><label>Monthly Target</label><input id="prof-target" disabled></div>
-                <div class="profile-item"><label>Manager</label><input id="prof-managerID" disabled></div>
+                <div class="profile-item"><label>Manager</label><input id="prof-mgr" disabled></div>
             </div>
             <div class="profile-section">
                 <h4>Banking <span id="edit-badge" style="font-size:0.7rem; color:var(--secondary-color); display:none;">(EDITABLE)</span></h4>
-                <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bankName" disabled></div>
-                <div class="profile-item"><label>Account Holder</label><input type="text" id="prof-accountHolderName" disabled></div>
-                <div class="profile-item"><label>Account Number</label><input type="text" id="prof-accountNumber" disabled></div>
+                <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bank" disabled></div>
+                <div class="profile-item"><label>Account Holder</label><input type="text" id="prof-holder" disabled></div>
+                <div class="profile-item"><label>Account Number</label><input type="text" id="prof-acc" disabled></div>
             </div>
         </div>
     </div>
@@ -280,17 +288,17 @@
     <div id="admin-dashboard-view" class="view hidden card">
         <h3>Admin Dashboard</h3>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom:30px;">
-            <div style="background:#fff; border:1px solid #eee; padding:20px;">
-                <label style="font-size:0.8rem; color:#999; text-transform:uppercase;">Total Sales</label>
-                <div id="admin-total-sales" style="font-size:1.5rem; font-weight:700; color:var(--primary-color);">...</div>
+            <div style="background:#fcfcfc; border:1px solid #eee; padding:20px; text-align:center;">
+                <label style="font-size:0.8rem; color:#999; text-transform:uppercase; letter-spacing:1px;">Total Sales</label>
+                <div id="admin-total-sales" style="font-size:1.8rem; font-weight:700; color:var(--primary-color);">...</div>
             </div>
-            <div style="background:#fff; border:1px solid #eee; padding:20px;">
-                <label style="font-size:0.8rem; color:#999; text-transform:uppercase;">Total CC</label>
-                <div id="admin-total-cc" style="font-size:1.5rem; font-weight:700; color:var(--secondary-color);">...</div>
+            <div style="background:#fcfcfc; border:1px solid #eee; padding:20px; text-align:center;">
+                <label style="font-size:0.8rem; color:#999; text-transform:uppercase; letter-spacing:1px;">Total CC</label>
+                <div id="admin-total-cc" style="font-size:1.8rem; font-weight:700; color:var(--secondary-color);">...</div>
             </div>
-            <div style="background:#fff; border:1px solid #eee; padding:20px;">
-                <label style="font-size:0.8rem; color:#999; text-transform:uppercase;">On Target</label>
-                <div id="admin-agents-on-target" style="font-size:1.5rem; font-weight:700; color:var(--accent-color);">...</div>
+            <div style="background:#fcfcfc; border:1px solid #eee; padding:20px; text-align:center;">
+                <label style="font-size:0.8rem; color:#999; text-transform:uppercase; letter-spacing:1px;">On Target</label>
+                <div id="admin-agents-on-target" style="font-size:1.8rem; font-weight:700; color:var(--accent-color);">...</div>
             </div>
         </div>
         <canvas id="performanceChart" height="100"></canvas>
@@ -301,9 +309,9 @@
 
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - LUXURY EDITION (CORRECTED & COMPLETE)
+// AGENT PORTAL SCRIPT - LUXURY EDITION (FINAL)
 // =================================================================
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyH089SEREu2vJPzNmybbVcMroShRjvsobUIjDq8_vujGpoPg6d9PqpR4rL7xHzjKyilA/exec'; // <-- PASTE YOUR NEW URL
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyH089SEREu2vJPzNmybbVcMroShRjvsobUIjDq8_vujGpoPg6d9PqpR4rL7xHzjKyilA/exec'; // <--- PASTE HERE
 
 let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
 let currentProfile = {}, canEditProfile = false, allAgentsList = [];
@@ -311,6 +319,7 @@ let currentProfile = {}, canEditProfile = false, allAgentsList = [];
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-form').addEventListener('submit', (event) => { event.preventDefault(); handleLogin(); });
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
+    document.getElementById('refresh-data-btn').addEventListener('click', refreshPageData);
 
     const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'team', 'admin-dashboard'];
     navs.forEach(n => {
@@ -327,37 +336,37 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function handleLogin() {
-    const agentId = document.getElementById('agent-id-input').value.trim();
-    const password = document.getElementById('agent-password-input').value; 
+    const aid = document.getElementById('agent-id-input').value.trim();
+    const pwd = document.getElementById('agent-password-input').value;
     const btn = document.getElementById('login-btn');
     const status = document.getElementById('login-status');
     
     btn.disabled = true; status.textContent = "Verifying..."; status.style.color = "var(--text-main)";
 
     try {
-        const res = await postToGoogleScript('verifyAgent', { agentId, password });
+        const res = await postToGoogleScript('verifyAgent', { agentId: aid, password: pwd });
         if (res.success) {
             currentAgent = res.agent;
             currentAgent.target = res.target;
             currentAgent.currentSales = res.currentSales;
             currentAgent.isAdmin = res.isAdmin;
             currentAgent.isManager = res.isManager;
-            currentAgent.password = password;
+            currentAgent.password = pwd; // Store for refresh
             currentProfile = res.profile;
             canEditProfile = res.allowEdit;
 
             if (res.mustChangePassword) {
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('password-change-view').classList.remove('hidden');
-                document.getElementById('change-view-agent-id').textContent = `Agent ID: ${agentId}`;
+                document.getElementById('change-view-agent-id').textContent = `Agent ID: ${aid}`;
                 return;
             }
 
             await fetchPortalData();
             
             if(currentAgent.isAdmin) {
-                const adminData = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
-                if(adminData.success) allAgentsList = adminData.flatList;
+                const adminData = await postToGoogleScript('getAllAgentsList', {agentId: currentAgent.id});
+                if(adminData.success) allAgentsList = adminData.list;
             }
 
             document.getElementById('login-view').classList.add('hidden');
@@ -380,12 +389,27 @@ async function handleLogin() {
     finally { btn.disabled = false; }
 }
 
+function showView(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+    document.querySelectorAll('nav .btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(viewId).classList.remove('hidden');
+    document.getElementById(`nav-${viewId.replace('-view','-btn')}`).classList.add('active');
+
+    // FORCE RENDER ON VIEW SWITCH
+    if(viewId === 'open-orders-view') renderOpenOrders();
+    if(viewId === 'my-orders-view') renderMyOrders();
+    if(viewId === 'my-commission-view') renderMyCommission();
+    if(viewId === 'team-view') renderTeamView();
+    if(viewId === 'admin-dashboard-view') renderAdminDashboard();
+    if(viewId === 'profile-view') renderProfileView();
+}
+
 async function renderOpenOrders() {
     const list = document.getElementById('open-orders-list');
     list.innerHTML = '<p>Loading...</p>';
     try {
         const res = await postToGoogleScript('getOpenOrders', {agentId: currentAgent.id});
-        if (res.success && res.orders.length > 0) {
+        if (res.success && res.orders && res.orders.length > 0) {
             list.innerHTML = res.orders.map(o => {
                 let adminControls = '';
                 if(currentAgent.isAdmin && allAgentsList && allAgentsList.length > 0) {
@@ -410,7 +434,7 @@ async function renderOpenOrders() {
                     </div>
                 </div>`;
             }).join('');
-        } else { list.innerHTML = '<p>No open orders.</p>'; }
+        } else { list.innerHTML = '<p>No open orders available.</p>'; }
     } catch(e) { list.innerHTML = '<p style="color:red">Error loading orders.</p>'; }
 }
 
@@ -419,7 +443,7 @@ async function pickOrder(id) {
     try {
         const res = await postToGoogleScript('pickOrder', { invoiceId: id, agentId: currentAgent.id, agentName: currentAgent.name });
         alert(res.message); 
-        if(res.success) { renderOpenOrders(); }
+        if(res.success) { renderOpenOrders(); renderMyOrders(); }
     } catch (e) { alert("An error occurred.") }
 }
 
@@ -434,63 +458,39 @@ async function adminAssignOrder(id) {
     } catch (e) { alert("An error occurred.") }
 }
 
-function renderProfileView() {
-    document.getElementById('prof-employeeName').value = currentProfile.employeeName || '';
-    document.getElementById('prof-agentID').value = currentProfile.agentID || '';
-    document.getElementById('prof-position').value = currentProfile.position || '';
-    document.getElementById('prof-commissionRate').value = currentProfile.commissionRate ? `${(currentProfile.commissionRate * 100).toFixed(2)}%` : '0.00%';
-    document.getElementById('prof-target').value = `RM ${currentProfile.target || '0.00'}`;
-    document.getElementById('prof-managerID').value = currentProfile.managerID || 'None';
-    document.getElementById('prof-bankName').value = currentProfile.bankName || '';
-    document.getElementById('prof-accountHolderName').value = currentProfile.accountHolderName || '';
-    document.getElementById('prof-accountNumber').value = currentProfile.accountNumber || '';
-
-    const editable = [document.getElementById('prof-bankName'), document.getElementById('prof-accountHolderName'), document.getElementById('prof-accountNumber')];
-    const btn = document.getElementById('save-profile-btn');
-    const badge = document.getElementById('edit-badge');
-
-    if(canEditProfile) {
-        editable.forEach(el => el.disabled = false);
-        btn.classList.remove('hidden'); 
-        if(badge) badge.style.display = 'inline';
-    } else {
-        editable.forEach(el => el.disabled = true);
-        btn.classList.add('hidden'); 
-        if(badge) badge.style.display = 'none';
-    }
+async function renderMyOrders() {
+    const list = document.getElementById('my-orders-list');
+    list.innerHTML = '<p>Loading...</p>';
+    try {
+        const res = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
+        if (res.success && res.orders && res.orders.length > 0) {
+            list.innerHTML = `<table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>${res.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>${o.customerName}</td><td>RM ${o.total}</td><td><span style="font-weight:700; color:var(--primary-color)">${o.status}</span></td></tr>`).join('')}</tbody></table>`;
+        } else {
+            list.innerHTML = '<p>No orders found.</p>';
+        }
+    } catch(e) { list.innerHTML = '<p style="color:red;">Error loading orders.</p>'; }
 }
 
-async function saveProfile() {
-    const btn = document.getElementById('save-profile-btn');
-    btn.textContent = "Saving..."; btn.disabled = true;
-    
-    const payload = {
-        agentId: currentAgent.id, 
-        bankName: document.getElementById('prof-bankName').value,
-        accountHolderName: document.getElementById('prof-accountHolderName').value, 
-        accountNumber: document.getElementById('prof-accountNumber').value
-    };
-    try {
-        const res = await postToGoogleScript('updateAgentProfile', payload);
-        alert(res.message);
-        if(res.success) {
-            currentProfile.bankName = payload.bankName;
-            currentProfile.accountHolderName = payload.accountHolderName;
-            currentProfile.accountNumber = payload.accountNumber;
+function renderMyCommission() {
+    const list = document.getElementById('my-commission-list');
+    list.innerHTML = '<p>Loading...</p>';
+    postToGoogleScript('getAgentCommission', { agentId: currentAgent.id }).then(res => {
+        if (res.success && res.records && res.records.length > 0) {
+            list.innerHTML = `<table><thead><tr><th>Invoice</th><th>Type</th><th>Sales</th><th>Rate</th><th>Earned</th><th>Status</th></tr></thead><tbody>${res.records.map(r => `<tr><td>${r.invoiceId}</td><td>${r.overrideAmount>0?'Override':'Personal'}</td><td>${r.salesAmount.toFixed(2)}</td><td>${r.commissionRate}%</td><td><strong>${(r.overrideAmount||r.commissionAmount).toFixed(2)}</strong></td><td>${r.status}</td></tr>`).join('')}</tbody></table>`;
+        } else {
+            list.innerHTML = '<p>No commission records found.</p>';
         }
-    } catch(e) { alert("An error occurred."); }
-    finally { btn.textContent = "Save Changes"; btn.disabled = false; }
+    }).catch(e => list.innerHTML = '<p style="color:red;">Error loading commissions.</p>');
 }
 
 async function renderTeamView() {
     const list = document.getElementById('subordinates-list');
-    const overrideEl = document.getElementById('team-total-override');
     list.innerHTML = '<li>Loading...</li>';
     try {
         const res = await postToGoogleScript('getSubordinatesData', { agentId: currentAgent.id });
         if(res.success) {
-            overrideEl.textContent = `RM ${res.totalOverride.toFixed(2)}`;
-            list.innerHTML = res.subordinates.length ? res.subordinates.map(s => `<li>${s.name} (${s.id}) - ${s.position}</li>`).join('') : '<li>No subordinates found.</li>';
+            document.getElementById('team-total-override').textContent = `RM ${res.totalOverride.toFixed(2)}`;
+            list.innerHTML = res.subordinates.length ? res.subordinates.map(s => `<li>${s.name} (${s.id}) - ${s.position}</li>`).join('') : '<li>No direct subordinates found.</li>';
         }
     } catch(e) { list.innerHTML = '<p style="color:red;">Error loading team data.</p>'; }
 }
@@ -500,7 +500,7 @@ async function renderAdminDashboard() {
     div.innerHTML = '<p>Loading...</p>';
     try {
         const res = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
-        if (res.success && res.data.length > 0) {
+        if (res.success && res.data && res.data.length > 0) {
             document.getElementById('admin-total-sales').textContent = `RM ${res.grandTotalSales.toFixed(2)}`;
             document.getElementById('admin-total-cc').textContent = res.grandTotalCC.toFixed(3);
             document.getElementById('admin-agents-on-target').textContent = `${res.data.filter(a => a.targetAchieved >= 1).length} / ${res.data.length}`;
@@ -510,7 +510,9 @@ async function renderAdminDashboard() {
             
             let html = '';
             if (noMgr.length) html += `<h4>Independent / Top Level</h4>${buildAdminTable(noMgr)}`;
-            for (const [mgr, members] of Object.entries(teams)) { html += `<h4 style="margin-top:20px;">Team: ${mgr}</h4>${buildAdminTable(members)}`; }
+            for (const [mgr, members] of Object.entries(teams)) {
+                html += `<h4 style="margin-top:20px;">Team: ${mgr}</h4>${buildAdminTable(members)}`;
+            }
             div.innerHTML = html;
             
             if(performanceChartInstance) performanceChartInstance.destroy();
@@ -520,7 +522,7 @@ async function renderAdminDashboard() {
                 data: { labels: res.data.map(a => a.name), datasets: [{ label: 'Sales (RM)', data: res.data.map(a => a.totalSales), backgroundColor: '#0f3d2e' }] },
                 options: { responsive: true }
             });
-        } else { div.innerHTML = '<p>No data.</p>'; }
+        } else { div.innerHTML = '<p>No data. Ensure dashboard cache is updated.</p>'; }
     } catch(e) { div.innerHTML = '<p style="color:red;">Error loading admin data.</p>'; }
 }
 
@@ -528,183 +530,9 @@ function buildAdminTable(agents) {
     return `<table><thead><tr><th>Name</th><th>Target</th><th>Sales</th><th>%</th></tr></thead><tbody>${agents.map(a => `<tr><td>${a.name}</td><td>RM ${a.target.toFixed(2)}</td><td>RM ${a.totalSales.toFixed(2)}</td><td style="color:${a.targetAchieved>=1?'green':'red'}">${(a.targetAchieved*100).toFixed(0)}%</td></tr>`).join('')}</tbody></table>`;
 }
 
-function showView(viewId) {
-    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-    document.querySelectorAll('nav .btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(viewId).classList.remove('hidden');
-    document.getElementById(`nav-${viewId.replace('-view','-btn')}`).classList.add('active');
-    
-    const renderFunctionName = 'render' + viewId.replace(/-(\w)/g, (g) => g[1].toUpperCase()).replace('view', '').replace(/^./, (c) => c.toUpperCase());
-    if (window[renderFunctionName]) {
-        window[renderFunctionName]();
-    }
-}
-
-function renderTargetBar() {
-    const pct = Math.min(100, currentAgent.target > 0 ? (currentAgent.currentSales / currentAgent.target) * 100 : 0);
-    document.getElementById('target-bar-display').innerHTML = `<div style="font-size:0.8rem; color:#666;">Target: RM ${currentAgent.currentSales.toFixed(2)} / ${currentAgent.target.toFixed(2)} (${pct.toFixed(1)}%)</div><div class="target-bar-container"><div class="target-progress" style="width:${pct}%"></div></div>`;
-}
-
-function renderProductCatalog() { 
-    document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join('');
-}
-
-function renderProductSelectionList() { 
-    const term = document.getElementById('product-order-search').value.toLowerCase();
-    const filtered = products.filter(p => p.name.toLowerCase().includes(term) || String(p.id).toLowerCase().includes(term));
-    document.getElementById('product-selection-list').innerHTML = filtered.length ? filtered.map(p => `
-        <div class="product-item-selectable" onclick="addProductToOrder('${p.id}')">
-            <img src="${p.image || 'FL.jpg'}" onerror="this.style.display='none'">
-            <div><strong>${p.name} (${p.id})</strong><p style="font-size:0.8rem">RSP: RM ${p.rsp.toFixed(2)}</p></div>
-            <button class="btn btn-primary" style="margin-left:auto; padding:5px 10px; font-size:0.7rem;">ADD</button>
-        </div>`).join('') : "<p>No products found.</p>";
-}
-
-function renderCustomerDropdown() { 
-    document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing Customer --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join('');
-}
-
-function renderOrderSummary() { 
-    const container = document.getElementById('summary-items-list');
-    if (currentOrder.items.length === 0) { container.innerHTML = "<p style='text-align:center; padding:20px;'>Cart is empty.</p>"; } 
-    else {
-        container.innerHTML = currentOrder.items.map(item => `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed #eee;">
-                <div><strong>${item.name}</strong><br><small style="color:var(--danger-color);">${item.customPrice < item.minPrice ? 'Price too low' : ''}</small></div>
-                <div style="display:flex; gap:5px;">
-                    <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.id}', this.value)" style="width:50px; text-align:center;">
-                    <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice('${item.id}', this.value)" style="width:70px; text-align:center;">
-                    <button onclick="removeItemFromOrder('${item.id}')" style="background:none; border:none; color:red; cursor:pointer;">&times;</button>
-                </div>
-            </div>`).join('');
-    }
-    calculateTotals();
-}
-
-async function renderMyOrders() {
-    const list = document.getElementById('my-orders-list');
-    list.innerHTML = '<p>Loading...</p>';
-    try {
-        const res = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
-        list.innerHTML = res.orders.length ? `<table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>${res.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>${o.customerName}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>`).join('')}</tbody></table>` : '<p>No orders assigned to you.</p>';
-    } catch(e) { list.innerHTML = '<p style="color:red;">Error loading orders.</p>'; }
-}
-
-function renderMyCommission() {
-    const list = document.getElementById('my-commission-list');
-    list.innerHTML = '<p>Loading...</p>';
-    postToGoogleScript('getAgentCommission', { agentId: currentAgent.id }).then(res => {
-        list.innerHTML = res.records.length ? `<table><thead><tr><th>Invoice</th><th>Type</th><th>Sales</th><th>Rate</th><th>Earned</th><th>Status</th></tr></thead><tbody>${res.records.map(r => `<tr><td>${r.invoiceId}</td><td>${r.overrideAmount>0?'Override':'Personal'}</td><td>${r.salesAmount.toFixed(2)}</td><td>${r.commissionRate}%</td><td><strong>${(r.overrideAmount||r.commissionAmount).toFixed(2)}</strong></td><td>${r.status}</td></tr>`).join('')}</tbody></table>` : '<p>No commission records found.</p>';
-    });
-}
-
-function startNewOrder() { 
-    currentOrder = { items: [] };
-    document.getElementById('customer-dropdown').value = '';
-    document.getElementById('new-customer-form').classList.add('hidden');
-    document.getElementById('customer-dropdown').disabled = false;
-    document.getElementById('new-customer-name').value = '';
-    document.getElementById('new-customer-email').value = '';
-    document.getElementById('new-customer-phone').value = '';
-    document.getElementById('new-customer-address').value = '';
-    document.getElementById('payment-proof').value = '';
-    document.getElementById('submit-status').textContent = '';
-    document.getElementById('submit-order-btn').disabled = false;
-    renderOrderSummary();
-}
-
-function handleNewCustomerToggle() {
-    const form = document.getElementById('new-customer-form');
-    form.classList.toggle('hidden');
-    document.getElementById('customer-dropdown').disabled = !form.classList.contains('hidden');
-    if (!form.classList.contains('hidden')) {
-        document.getElementById('customer-dropdown').value = '';
-    }
-}
-
-function handleCustomerSelection() { 
-    if (document.getElementById('customer-dropdown').value) {
-        document.getElementById('new-customer-form').classList.add('hidden');
-        document.getElementById('customer-dropdown').disabled = false;
-    }
-}
-
-function addProductToOrder(id) {
-    const p = products.find(x => String(x.id) === String(id));
-    if (!p || currentOrder.items.some(i => String(i.id) === String(id))) return;
-    currentOrder.items.push({ id: p.id, name: p.name, quantity: 1, rsp: p.rsp, cc: p.cc, customPrice: p.rsp, minPrice: p.minPrice });
-    renderOrderSummary();
-}
-
-function removeItemFromOrder(id) { 
-    currentOrder.items = currentOrder.items.filter(i => String(i.id) !== String(id)); 
-    renderOrderSummary(); 
-}
-
-function updateQuantity(id, qty) { 
-    const i = currentOrder.items.find(x => String(x.id) === String(id)); 
-    if(i) i.quantity = parseInt(qty) || 1; 
-    renderOrderSummary(); 
-}
-
-function updatePrice(id, pr) { 
-    const i = currentOrder.items.find(x => String(x.id) === String(id)); 
-    if(i) i.customPrice = parseFloat(pr) || 0; 
-    renderOrderSummary(); 
-}
-
-function calculateTotals() {
-    const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-    const bestRule = shippingRules.find(r => sub >= r.minSpend);
-    const ship = bestRule ? bestRule.charge : (shippingRules.length > 0 ? shippingRules[shippingRules.length - 1].charge : 0);
-    document.getElementById('summary-subtotal').textContent = `RM ${sub.toFixed(2)}`;
-    document.getElementById('summary-shipping').textContent = `RM ${ship.toFixed(2)}`;
-    document.getElementById('summary-total').textContent = `RM ${(sub + ship).toFixed(2)}`;
-}
-
-async function submitOrder() {
-    const btn = document.getElementById('submit-order-btn');
-    if(btn.disabled) return;
-    btn.disabled = true;
-    
-    let cust;
-    const existPac = document.getElementById('customer-dropdown').value;
-    if(existPac) cust = customers.find(c => c.pac === existPac);
-    else {
-        cust = { 
-            name: document.getElementById('new-customer-name').value, 
-            email: document.getElementById('new-customer-email').value, 
-            phone: document.getElementById('new-customer-phone').value, 
-            address: document.getElementById('new-customer-address').value 
-        };
-        if(!cust.name) { alert("Customer details required."); btn.disabled = false; return; }
-    }
-    
-    const file = document.getElementById('payment-proof').files[0];
-    if(!file) { alert("Proof required."); btn.disabled = false; return; }
-    
-    try {
-        const base64 = await getBase64(file);
-        const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-        const bestRule = shippingRules.find(r => sub >= r.minSpend);
-        const ship = bestRule ? bestRule.charge : (shippingRules.length > 0 ? shippingRules[shippingRules.length - 1].charge : 0);
-        const payload = { 
-            agent: currentAgent, 
-            customer: cust, 
-            items: currentOrder.items, 
-            shippingFee: ship, 
-            paymentProof: { file: base64.split(',')[1], mimeType: file.type } 
-        };
-        const res = await postToGoogleScript('submitAgentOrder', payload);
-        if(res.success) { 
-            alert(`Success! ID: ${res.invoiceId}`); 
-            setTimeout(startNewOrder, 2000); 
-        } else { alert(res.message); }
-    } catch(e) { 
-        alert("Error submitting order."); 
-        console.error(e); 
-    } finally { btn.disabled = false; }
-}
+// ... (KEEP OTHER FUNCTIONS: renderProfileView, saveProfile, order functions, etc.) ...
+// Ensure you keep renderProfileView and saveProfile from previous block as they were correct.
+// Also keep startNewOrder, submitOrder, etc.
 
 async function handleChangePassword() {
     const p1 = document.getElementById('new-password-input').value;
@@ -717,9 +545,19 @@ async function handleChangePassword() {
 
 function handleLogout() { location.reload(); }
 
+function refreshPageData() {
+    const active = document.querySelector('.view:not(.hidden)');
+    if(!active) return;
+    const btn = document.getElementById('refresh-data-btn');
+    btn.innerHTML = 'Refreshing...'; btn.disabled = true;
+    postToGoogleScript('verifyAgent', { agentId: currentAgent.id, password: currentAgent.password })
+        .then(res => { if(res.success) { currentAgent.target = res.target; currentAgent.currentSales = res.currentSales; renderTargetBar(); showView(active.id); } })
+        .finally(() => { setTimeout(() => { btn.disabled = false; btn.innerHTML = 'Refresh Data'; }, 1000); });
+}
+
 async function fetchPortalData() {
     try {
-        const res = await postToGoogleScript('getPortalData', {}); // Pass empty data object
+        const res = await postToGoogleScript('getPortalData', {}); 
         if (res.success) { 
             products = res.products; 
             customers = res.customers; 
@@ -744,22 +582,17 @@ async function postToGoogleScript(action, data = {}) {
         });
         if (!res.ok) {
             const errorText = await res.text();
-            console.error("Server returned an error:", res.status, errorText);
-            throw new Error(`Server error (${res.status}). Check console for details.`);
+            throw new Error(`Server error (${res.status}).`);
         }
         const responseText = await res.text();
-        try {
-            return JSON.parse(responseText);
-        } catch (e) {
-            console.error("Failed to parse JSON from server:", responseText);
-            throw new Error("Invalid response from server. The backend script may have crashed.");
-        }
+        return JSON.parse(responseText);
     } catch (e) { 
-        console.error("Post to Google Script failed:", e);
+        console.error("Post failed:", e);
         throw e; 
     }
 }
 
+// Helper Functions
 function getBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -767,6 +600,127 @@ function getBase64(file) {
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
     });
+}
+function renderProductCatalog() { 
+    document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join('');
+}
+function renderProductSelectionList() { 
+    const term = document.getElementById('product-order-search').value.toLowerCase();
+    const filtered = products.filter(p => p.name.toLowerCase().includes(term) || String(p.id).toLowerCase().includes(term));
+    document.getElementById('product-selection-list').innerHTML = filtered.length ? filtered.map(p => `
+        <div class="product-item-selectable" onclick="addProductToOrder('${p.id}')">
+            <img src="${p.image || 'FL.jpg'}" onerror="this.style.display='none'">
+            <div><strong>${p.name} (${p.id})</strong><p style="font-size:0.8rem">RSP: RM ${p.rsp.toFixed(2)}</p></div>
+            <button class="btn btn-primary" style="margin-left:auto; padding:5px 10px; font-size:0.7rem;">ADD</button>
+        </div>`).join('') : "<p>No products.</p>";
+}
+function renderCustomerDropdown() { 
+    document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing Customer --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join('');
+}
+function renderOrderSummary() { 
+    const container = document.getElementById('summary-items-list');
+    if (currentOrder.items.length === 0) { container.innerHTML = "<p style='text-align:center; padding:20px;'>Cart is empty.</p>"; } 
+    else {
+        container.innerHTML = currentOrder.items.map(item => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed #eee;">
+                <div><strong>${item.name}</strong><br><small style="color:var(--danger-color);">${item.customPrice < item.minPrice ? 'Price too low' : ''}</small></div>
+                <div style="display:flex; gap:5px;">
+                    <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.id}', this.value)" style="width:50px; text-align:center;">
+                    <input type="number" value="${item.customPrice}" onchange="updatePrice('${item.id}', this.value)" style="width:70px; text-align:center;">
+                    <button onclick="removeItemFromOrder('${item.id}')" style="background:none; border:none; color:red; cursor:pointer;">&times;</button>
+                </div>
+            </div>`).join('');
+    }
+    calculateTotals();
+}
+function handleNewCustomerToggle() {
+    const form = document.getElementById('new-customer-form');
+    form.classList.toggle('hidden');
+    document.getElementById('customer-dropdown').disabled = !form.classList.contains('hidden');
+    if (!form.classList.contains('hidden')) { document.getElementById('customer-dropdown').value = ''; }
+}
+function handleCustomerSelection() { 
+    if (document.getElementById('customer-dropdown').value) {
+        document.getElementById('new-customer-form').classList.add('hidden');
+        document.getElementById('customer-dropdown').disabled = false;
+    }
+}
+function addProductToOrder(id) {
+    const p = products.find(x => String(x.id) === String(id));
+    if (!p || currentOrder.items.some(i => String(i.id) === String(id))) return;
+    currentOrder.items.push({ id: p.id, name: p.name, quantity: 1, rsp: p.rsp, cc: p.cc, customPrice: p.rsp, minPrice: p.minPrice });
+    renderOrderSummary();
+}
+function removeItemFromOrder(id) { currentOrder.items = currentOrder.items.filter(i => String(i.id) !== String(id)); renderOrderSummary(); }
+function updateQuantity(id, qty) { const i = currentOrder.items.find(x => String(x.id) === String(id)); if(i) i.quantity = parseInt(qty) || 1; renderOrderSummary(); }
+function updatePrice(id, pr) { const i = currentOrder.items.find(x => String(x.id) === String(id)); if(i) i.customPrice = parseFloat(pr) || 0; renderOrderSummary(); }
+function calculateTotals() {
+    const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
+    const bestRule = shippingRules.find(r => sub >= r.minSpend);
+    const ship = bestRule ? bestRule.charge : (shippingRules.length > 0 ? shippingRules[shippingRules.length - 1].charge : 0);
+    document.getElementById('summary-subtotal').textContent = `RM ${sub.toFixed(2)}`;
+    document.getElementById('summary-shipping').textContent = `RM ${ship.toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `RM ${(sub + ship).toFixed(2)}`;
+}
+async function submitOrder() {
+    const btn = document.getElementById('submit-order-btn');
+    if(btn.disabled) return;
+    btn.disabled = true;
+    let cust;
+    const existPac = document.getElementById('customer-dropdown').value;
+    if(existPac) cust = customers.find(c => c.pac === existPac);
+    else {
+        cust = { name: document.getElementById('new-customer-name').value, email: document.getElementById('new-customer-email').value, phone: document.getElementById('new-customer-phone').value, address: document.getElementById('new-customer-address').value };
+        if(!cust.name) { alert("Customer details required."); btn.disabled = false; return; }
+    }
+    const file = document.getElementById('payment-proof').files[0];
+    if(!file) { alert("Proof required."); btn.disabled = false; return; }
+    try {
+        const base64 = await getBase64(file);
+        const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
+        const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
+        const payload = { action: 'submitAgentOrder', data: { agent: currentAgent, customer: cust, items: currentOrder.items, shippingFee: ship, paymentProof: { file: base64.split(',')[1], mimeType: file.type } } };
+        const res = await postToGoogleScript('submitAgentOrder', payload.data); 
+        if(res.success) { alert(`Success! ID: ${res.invoiceId}`); setTimeout(startNewOrder, 2000); } else { alert(res.message); }
+    } catch(e) { alert("Error submitting order."); console.error(e); } finally { btn.disabled = false; }
+}
+function renderProfileView() {
+    document.getElementById('prof-name').value = currentAgent.name;
+    document.getElementById('prof-id').value = currentAgent.id;
+    document.getElementById('prof-pos').value = document.getElementById('agent-details-display').textContent.split('|')[0].trim();
+    document.getElementById('prof-rate').value = currentProfile.commissionRate;
+    document.getElementById('prof-target').value = `RM ${currentProfile.target}`;
+    document.getElementById('prof-mgr').value = currentProfile.managerId;
+    
+    document.getElementById('prof-bank').value = currentProfile.bankName;
+    document.getElementById('prof-holder').value = currentProfile.accountHolderName;
+    document.getElementById('prof-acc').value = currentProfile.accountNumber;
+
+    const editable = [document.getElementById('prof-bank'), document.getElementById('prof-holder'), document.getElementById('prof-acc')];
+    const btn = document.getElementById('save-profile-btn');
+    const badge = document.getElementById('edit-badge');
+
+    if(canEditProfile) {
+        editable.forEach(el => el.disabled = false);
+        btn.classList.remove('hidden'); badge.style.display = 'inline';
+    } else {
+        editable.forEach(el => el.disabled = true);
+        btn.classList.add('hidden'); badge.style.display = 'none';
+    }
+}
+async function saveProfile() {
+    const btn = document.getElementById('save-profile-btn');
+    btn.textContent = "Saving..."; btn.disabled = true;
+    const payload = {
+        agentId: currentAgent.id, bankName: document.getElementById('prof-bank').value,
+        accHolder: document.getElementById('prof-holder').value, accNumber: document.getElementById('prof-acc').value
+    };
+    try {
+        const res = await postToGoogleScript('updateAgentProfile', payload);
+        alert(res.message);
+        if(res.success) Object.assign(currentProfile, payload);
+    } catch(e) { alert("Error."); }
+    finally { btn.textContent = "Save Changes"; btn.disabled = false; }
 }
 </script>
 </body>
