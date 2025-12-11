@@ -14,15 +14,15 @@
     <style>
         /* [ 1.0 ] LUXURY VARIABLES */
         :root {
-            --primary-color: #0a291f;      /* Deep Regal Green */
+            --primary-color: #0a291f;      /* Deep Emerald */
             --secondary-color: #d4af37;    /* Satin Gold */
             --bg-color: #fcfcfc;           /* Pearl White */
-            --card-bg: #ffffff;            /* Pure White */
+            --card-bg: #ffffff;
             --text-main: #333333;
             --text-light: #777777;
             --danger-color: #a83232;
             
-            --border-radius: 2px;
+            --border-radius: 2px;          /* Sharp corners */
             --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
             
             --font-heading: 'Playfair Display', serif;
@@ -31,7 +31,7 @@
         
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
-        .container { max-width: 1400px; margin: 30px auto; padding: 0 30px; }
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 30px; }
         
         h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; }
         
@@ -136,7 +136,7 @@
         <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
         <h1>Agent Portal</h1>
         <p>Sign in to manage your sales and team.</p>
-        <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
+        <form id="login-form">
             <input type="text" id="agent-id-input" placeholder="Agent ID" required>
             <input type="password" id="agent-password-input" placeholder="Password" required>
             <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">Login</button>
@@ -165,7 +165,6 @@
             <div id="target-bar-display" style="margin-top: 10px;"></div>
         </div>
         <div style="text-align: right;">
-            <button id="refresh-data-btn" class="btn btn-secondary" style="margin-bottom: 10px;">Refresh Data</button>
             <button id="logout-btn" class="btn btn-primary">Logout</button>
         </div>
     </header>
@@ -249,27 +248,27 @@
     <div id="profile-view" class="view hidden card">
         <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
             <h3>My Profile</h3>
-            <button id="save-profile-btn" class="btn btn-primary hidden" onclick="saveProfile()">Save Changes</button>
+            <button id="save-profile-btn" class="btn btn-primary hidden">Save Changes</button>
         </div>
-        <p id="profile-status" style="text-align:right; color:var(--accent-color); font-weight:700;"></p>
+        <p id="profile-status" style="text-align:right; color:var(--success-color); font-weight:700;"></p>
         <div class="profile-grid">
             <div class="profile-section">
                 <h4>Identity</h4>
-                <div class="profile-item"><label>Full Name</label><input id="prof-name" disabled></div>
-                <div class="profile-item"><label>Agent ID</label><input id="prof-id" disabled></div>
-                <div class="profile-item"><label>Position</label><input id="prof-pos" disabled></div>
+                <div class="profile-item"><label>Full Name</label><input id="prof-employeeName" disabled></div>
+                <div class="profile-item"><label>Agent ID</label><input id="prof-agentID" disabled></div>
+                <div class="profile-item"><label>Position</label><input id="prof-position" disabled></div>
             </div>
             <div class="profile-section">
                 <h4>Performance</h4>
-                <div class="profile-item"><label>Commission Rate</label><input id="prof-rate" disabled></div>
+                <div class="profile-item"><label>Commission Rate</label><input id="prof-commissionRate" disabled></div>
                 <div class="profile-item"><label>Monthly Target</label><input id="prof-target" disabled></div>
-                <div class="profile-item"><label>Manager</label><input id="prof-mgr" disabled></div>
+                <div class="profile-item"><label>Manager</label><input id="prof-managerID" disabled></div>
             </div>
             <div class="profile-section">
                 <h4>Banking <span id="edit-badge" style="font-size:0.7rem; color:var(--secondary-color); display:none;">(EDITABLE)</span></h4>
-                <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bank" disabled></div>
-                <div class="profile-item"><label>Account Holder</label><input type="text" id="prof-holder" disabled></div>
-                <div class="profile-item"><label>Account Number</label><input type="text" id="prof-acc" disabled></div>
+                <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bankName" disabled></div>
+                <div class="profile-item"><label>Account Holder</label><input type="text" id="prof-accountHolderName" disabled></div>
+                <div class="profile-item"><label>Account Number</label><input type="text" id="prof-accountNumber" disabled></div>
             </div>
         </div>
     </div>
@@ -333,7 +332,7 @@
                     
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                          <input type="number" id="emp-basic" placeholder="Basic Pay">
-                         <input type="number" id="emp-comm" placeholder="Comm Rate (0.15)" step="0.01">
+                         <input type="number" id="emp-comm" placeholder="Comm Rate (e.g. 0.15 for 15%)" step="0.01">
                     </div>
                     
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
@@ -356,9 +355,9 @@
 
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - V41.0 (COMPLETE)
+// AGENT PORTAL SCRIPT - V41.0 (FINAL & FULLY CORRECTED)
 // =================================================================
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgbm0F9tCktQCeLJyrY1qZb3aU9NA8iP-T1FjCnRl2erH1y9Qo6tr4uKAPiFtyXSOU1w/exec'; // UPDATE THIS!
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgbm0F9tCktQCeLJyrY1qZb3aU9NA8iP-T1FjCnRl2erH1y9Qo6tr4uKAPiFtyXSOU1w/exec'; 
 
 let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
 let currentProfile = {}, canEditProfile = false, allAgentsList = [];
@@ -366,7 +365,6 @@ let currentProfile = {}, canEditProfile = false, allAgentsList = [];
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-form').addEventListener('submit', (event) => { event.preventDefault(); handleLogin(); });
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
-    document.getElementById('refresh-data-btn').addEventListener('click', refreshPageData);
 
     const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'team', 'admin-dashboard', 'manage-employees'];
     navs.forEach(n => {
@@ -381,43 +379,42 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('product-order-search').addEventListener('keyup', renderProductSelectionList);
     document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
     
-    // Employee Management Listeners
     document.getElementById('employee-form').addEventListener('submit', handleEmployeeSubmit);
     document.getElementById('emp-clear-btn').addEventListener('click', clearEmployeeForm);
 });
 
 async function handleLogin() {
-    const aid = document.getElementById('agent-id-input').value.trim();
-    const pwd = document.getElementById('agent-password-input').value;
+    const agentId = document.getElementById('agent-id-input').value.trim();
+    const password = document.getElementById('agent-password-input').value; 
     const btn = document.getElementById('login-btn');
     const status = document.getElementById('login-status');
     
     btn.disabled = true; status.textContent = "Verifying..."; 
 
     try {
-        const res = await postToGoogleScript('verifyAgent', { agentId: aid, password: pwd });
+        const res = await postToGoogleScript('verifyAgent', { agentId, password });
         if (res.success) {
             currentAgent = res.agent;
             currentAgent.target = res.target;
             currentAgent.currentSales = res.currentSales;
             currentAgent.isAdmin = res.isAdmin;
             currentAgent.isManager = res.isManager;
-            currentAgent.password = pwd; 
+            currentAgent.password = password; 
             currentProfile = res.profile;
             canEditProfile = res.allowEdit;
 
             if (res.mustChangePassword) {
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('password-change-view').classList.remove('hidden');
-                document.getElementById('change-view-agent-id').textContent = `Agent ID: ${aid}`;
+                document.getElementById('change-view-agent-id').textContent = `Agent ID: ${agentId}`;
                 return;
             }
 
             await fetchPortalData();
             
             if(currentAgent.isAdmin) {
-                const adminData = await postToGoogleScript('getAllAgentsList', {agentId: currentAgent.id});
-                if(adminData.success) allAgentsList = adminData.list;
+                const adminData = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
+                if(adminData.success) allAgentsList = adminData.flatList;
             }
 
             document.getElementById('login-view').classList.add('hidden');
@@ -428,7 +425,7 @@ async function handleLogin() {
 
             if(currentAgent.isAdmin) {
                 document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
-                document.getElementById('nav-manage-employees-btn').classList.remove('hidden'); // Show Employee Tab
+                document.getElementById('nav-manage-employees-btn').classList.remove('hidden');
             }
             if(currentAgent.isManager) document.getElementById('nav-team-btn').classList.remove('hidden');
 
@@ -439,7 +436,7 @@ async function handleLogin() {
             status.textContent = res.message;
             status.style.color = 'var(--danger-color)';
         }
-    } catch(e) { status.textContent = "Connection failed."; console.error(e); }
+    } catch(e) { status.textContent = e.message || "Connection failed."; console.error(e); }
     finally { btn.disabled = false; }
 }
 
@@ -447,29 +444,25 @@ function showView(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
     document.querySelectorAll('nav .btn').forEach(b => b.classList.remove('active'));
     document.getElementById(viewId).classList.remove('hidden');
-    document.getElementById(`nav-${viewId.replace('-view','-btn')}`).classList.add('active');
-
-    // Force Render Logic
-    if(viewId === 'open-orders-view') renderOpenOrders();
-    if(viewId === 'my-orders-view') renderMyOrders();
-    if(viewId === 'my-commission-view') renderMyCommission();
-    if(viewId === 'team-view') renderTeamView();
-    if(viewId === 'admin-dashboard-view') renderAdminDashboard();
-    if(viewId === 'profile-view') renderProfileView();
-    if(viewId === 'manage-employees-view') renderEmployeeList();
+    const navBtn = document.getElementById(`nav-${viewId.replace('-view','-btn')}`);
+    if (navBtn) navBtn.classList.add('active');
+    
+    const renderFunctionName = 'render' + viewId.replace(/-(\w)/g, (g) => g[1].toUpperCase()).replace('view', '').replace(/^./, (c) => c.toUpperCase());
+    if (window[renderFunctionName]) {
+        window[renderFunctionName]();
+    }
 }
 
 async function renderOpenOrders() {
     const list = document.getElementById('open-orders-list');
     list.innerHTML = '<p>Loading...</p>';
     try {
-        const res = await postToGoogleScript('getOpenOrders', {agentId: currentAgent.id});
+        const res = await postToGoogleScript('getOpenOrders', {});
         if (res.success && res.orders && res.orders.length > 0) {
             list.innerHTML = res.orders.map(o => {
-                let details = `<div id="details-${o.invoiceId}" class="hidden" style="margin-top:10px; font-size:0.8rem; background:#f9f9f9; padding:10px;">${o.items}</div>`;
-                
+                const itemsHtml = (o.cart || []).map(item => `<li>${item.quantity}x ${item.name}</li>`).join('');
                 let adminControls = '';
-                if(currentAgent.isAdmin && allAgentsList.length > 0) {
+                if(currentAgent.isAdmin && allAgentsList && allAgentsList.length > 0) {
                     const options = allAgentsList.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
                     adminControls = `
                     <div class="admin-assign-box">
@@ -480,20 +473,17 @@ async function renderOpenOrders() {
                 }
 
                 return `
-                <div class="open-order-card" style="display:block;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div class="open-order-info">
-                            <strong>${o.invoiceId}</strong> <span style="font-size:0.8rem; color:#999;">${o.date}</span><br>
-                            ${o.customerName}<br>
-                            RM ${o.total}
-                            <span style="text-decoration:underline; cursor:pointer; font-size:0.8rem; color:var(--primary-color); margin-left:10px;" onclick="document.getElementById('details-${o.invoiceId}').classList.toggle('hidden')">View Items</span>
-                        </div>
-                        <div style="text-align:right;">
-                            <button class="btn btn-primary" onclick="pickOrder('${o.invoiceId}')">Pick Order</button>
-                        </div>
+                <div class="open-order-card">
+                    <div class="open-order-info">
+                        <strong>${o.invoiceId}</strong> <span style="font-size:0.8rem; color:#999;">${o.date}</span>
+                        <p style="margin: 5px 0;"><strong>Customer:</strong> ${o.customerName}</p>
+                        <ul style="padding-left: 20px; margin: 5px 0; font-size: 0.9rem;">${itemsHtml}</ul>
+                        <strong>Total: RM ${o.total}</strong>
                     </div>
-                    ${details}
-                    ${adminControls}
+                    <div style="text-align:right;">
+                        <button class="btn btn-primary" onclick="pickOrder('${o.invoiceId}')">Pick Order</button>
+                        ${adminControls}
+                    </div>
                 </div>`;
             }).join('');
         } else { list.innerHTML = '<p>No open orders available.</p>'; }
@@ -505,7 +495,7 @@ async function pickOrder(id) {
     try {
         const res = await postToGoogleScript('pickOrder', { invoiceId: id, agentId: currentAgent.id, agentName: currentAgent.name });
         alert(res.message); 
-        if(res.success) { renderOpenOrders(); renderMyOrders(); }
+        if(res.success) { renderOpenOrders(); }
     } catch (e) { alert("An error occurred.") }
 }
 
@@ -520,154 +510,105 @@ async function adminAssignOrder(id) {
     } catch (e) { alert("An error occurred.") }
 }
 
-// --- Order Creation (Price Logic) ---
-function updatePrice(id, pr) { 
-    const i = currentOrder.items.find(x => String(x.id) === String(id)); 
-    if(i) {
-        i.customPrice = parseFloat(pr) || 0;
-        // Validation: 25% Discount Limit
-        const minPrice = i.rsp * 0.75;
-        const warningEl = document.getElementById(`price-warning-${id}`);
-        const inputEl = document.getElementById(`price-input-${id}`);
-        
-        if (i.customPrice < minPrice) {
-             if(warningEl) warningEl.textContent = `Min allowed: RM ${minPrice.toFixed(2)}`;
-             if(inputEl) inputEl.style.color = "red";
-             document.getElementById('submit-order-btn').disabled = true;
-        } else {
-             if(warningEl) warningEl.textContent = "";
-             if(inputEl) inputEl.style.color = "black";
-             document.getElementById('submit-order-btn').disabled = false;
-        }
-    }
-    renderOrderSummary(); // Re-render to update totals, but careful not to lose focus (simplified logic here)
-}
-
-function renderOrderSummary() { 
-    const container = document.getElementById('summary-items-list');
-    if (currentOrder.items.length === 0) { container.innerHTML = "<p style='text-align:center; padding:20px;'>Cart is empty.</p>"; } 
-    else {
-        // Note: Using onchange instead of oninput to avoid re-rendering while typing
-        container.innerHTML = currentOrder.items.map(item => {
-            const minPrice = item.rsp * 0.75;
-            const isLow = item.customPrice < minPrice;
-            return `
-            <div style="padding:10px 0; border-bottom:1px dashed #eee;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div><strong>${item.name}</strong></div>
-                    <div style="display:flex; gap:5px;">
-                        <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.id}', this.value)" style="width:50px; text-align:center;">
-                        <input id="price-input-${item.id}" type="number" step="0.01" value="${item.customPrice}" onchange="updatePrice('${item.id}', this.value)" style="width:80px; text-align:center; ${isLow?'color:red':''}">
-                        <button onclick="removeItemFromOrder('${item.id}')" style="background:none; border:none; color:red; cursor:pointer;">&times;</button>
-                    </div>
-                </div>
-                <div id="price-warning-${item.id}" style="color:red; font-size:0.75rem; text-align:right;">${isLow ? `Min allowed: RM ${minPrice.toFixed(2)}` : ''}</div>
-            </div>`;
-        }).join('');
-    }
-    calculateTotals();
-    // Re-check validity for button state
-    const invalid = currentOrder.items.some(i => i.customPrice < (i.rsp * 0.75));
-    document.getElementById('submit-order-btn').disabled = invalid;
-}
-
-// --- Employee Management ---
-async function renderEmployeeList() {
-    const list = document.getElementById('employee-list-container');
-    list.innerHTML = 'Loading...';
-    try {
-        const res = await postToGoogleScript('getAllEmployeesFull', {agentId: currentAgent.id});
-        if(res.success) {
-            list.innerHTML = `<table style="font-size:0.8rem;"><thead><tr><th>ID</th><th>Name</th><th>Role</th><th>Action</th></tr></thead><tbody>
-            ${res.employees.map(e => `<tr><td>${e.AgentID}</td><td>${e.EmployeeName}</td><td>${e.Position}</td><td><button class="btn btn-secondary" style="padding:2px 5px; font-size:0.6rem;" onclick='editEmployee(${JSON.stringify(e)})'>Edit</button></td></tr>`).join('')}
-            </tbody></table>`;
-        }
-    } catch(e) { list.innerHTML = "Error loading."; }
-}
-
-function editEmployee(e) {
-    document.getElementById('emp-form-title').textContent = "Edit Employee: " + e.AgentID;
-    document.getElementById('emp-agentid').value = e.AgentID;
-    document.getElementById('emp-agentid').disabled = true; // Cannot change ID
-    document.getElementById('emp-name').value = e.EmployeeName;
-    document.getElementById('emp-email').value = e.EmployeeEmail;
-    document.getElementById('emp-phone').value = e.EmployeePhone;
-    document.getElementById('emp-address').value = e.EmployeeAddress;
-    document.getElementById('emp-position').value = e.Position;
-    document.getElementById('emp-status').value = e.EmployeeStatus;
-    document.getElementById('emp-basic').value = e.BasicPay;
-    document.getElementById('emp-comm').value = e.CommissionRate;
-    document.getElementById('emp-target').value = e.Target;
-    document.getElementById('emp-manager').value = e.ManagerID;
-    document.getElementById('emp-isadmin').value = e.IsAdmin;
-    document.getElementById('emp-save-btn').textContent = "Update Employee";
-}
-
-function clearEmployeeForm() {
-    document.getElementById('employee-form').reset();
-    document.getElementById('emp-form-title').textContent = "Create New Employee";
-    document.getElementById('emp-agentid').disabled = false;
-    document.getElementById('emp-save-btn').textContent = "Create Employee";
-}
-
-async function handleEmployeeSubmit(e) {
-    e.preventDefault();
-    const isEdit = document.getElementById('emp-agentid').disabled;
-    const data = {
-        AgentID: document.getElementById('emp-agentid').value,
-        EmployeeName: document.getElementById('emp-name').value,
-        EmployeeEmail: document.getElementById('emp-email').value,
-        EmployeePhone: document.getElementById('emp-phone').value,
-        EmployeeAddress: document.getElementById('emp-address').value,
-        Position: document.getElementById('emp-position').value,
-        EmployeeStatus: document.getElementById('emp-status').value,
-        BasicPay: document.getElementById('emp-basic').value,
-        CommissionRate: document.getElementById('emp-comm').value,
-        Target: document.getElementById('emp-target').value,
-        ManagerID: document.getElementById('emp-manager').value,
-        IsAdmin: document.getElementById('emp-isadmin').value,
-        agentId: currentAgent.id // Requestor ID
-    };
-    
-    const action = isEdit ? 'updateEmployeeFull' : 'createEmployee';
-    const btn = document.getElementById('emp-save-btn');
-    btn.textContent = "Processing..."; btn.disabled = true;
-    
-    try {
-        const res = await postToGoogleScript(action, data);
-        alert(res.message);
-        if(res.success) { clearEmployeeForm(); renderEmployeeList(); }
-    } catch(err) { alert("Error saving employee."); }
-    finally { btn.disabled = false; btn.textContent = isEdit ? "Update Employee" : "Create Employee"; }
-}
-
-// ... (Existing Render Functions: renderMyOrders, renderMyCommission, renderTeamView, renderAdminDashboard - kept same as before but ensured calls are correct) ...
-// (I am including the full block below to ensure no omission)
-
 async function renderMyOrders() {
     const list = document.getElementById('my-orders-list');
+    list.innerHTML = '<p>Loading...</p>';
     try {
         const res = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
-        list.innerHTML = res.orders.length ? `<table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>${res.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>${o.customerName}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>`).join('')}</tbody></table>` : '<p>No orders.</p>';
-    } catch(e) { list.innerHTML = '<p>Error.</p>'; }
+        if(res.success && res.orders.length > 0) {
+            list.innerHTML = `<table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th><th>Action</th></tr></thead><tbody>${res.orders.map(o => {
+                const unassignButton = (o.status === 'Pending Verification') 
+                    ? `<button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.7rem;" onclick="unassignOrder('${o.invoiceId}')">Unassign</button>`
+                    : '';
+                return `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>${o.customerName}</td><td>RM ${o.total}</td><td>${o.status}</td><td>${unassignButton}</td></tr>`;
+            }).join('')}</tbody></table>`;
+        } else {
+            list.innerHTML = '<p>You have no assigned orders.</p>';
+        }
+    } catch(e) { list.innerHTML = '<p style="color:red;">Error loading your orders.</p>'; }
 }
 
-function renderMyCommission() {
+async function unassignOrder(invoiceId) {
+    if (!confirm(`Are you sure you want to unassign order ${invoiceId}? It will become available for all agents again.`)) return;
+    try {
+        const response = await postToGoogleScript('unassignOrder', { agentId: currentAgent.id, invoiceId });
+        alert(response.message);
+        if (response.success) {
+            renderMyOrders(); // Refresh your list of assigned orders
+        }
+    } catch (e) {
+        alert("An error occurred while unassigning the order.");
+    }
+}
+
+
+async function renderMyCommission() {
     const list = document.getElementById('my-commission-list');
-    postToGoogleScript('getAgentCommission', { agentId: currentAgent.id }).then(res => {
-        list.innerHTML = res.records.length ? `<table><thead><tr><th>Invoice</th><th>Type</th><th>Sales</th><th>Rate</th><th>Earned</th><th>Status</th></tr></thead><tbody>${res.records.map(r => `<tr><td>${r.invoiceId}</td><td>${r.overrideAmount>0?'Override':'Personal'}</td><td>${r.salesAmount.toFixed(2)}</td><td>${r.commissionRate}%</td><td><strong>${(r.overrideAmount||r.commissionAmount).toFixed(2)}</strong></td><td>${r.status}</td></tr>`).join('')}</tbody></table>` : '<p>No records.</p>';
-    });
+    list.innerHTML = '<p>Loading...</p>';
+    try {
+        const res = await postToGoogleScript('getAgentCommission', { agentId: currentAgent.id });
+        if (res.success && res.records.length > 0) {
+            list.innerHTML = `<table><thead><tr><th>Invoice</th><th>Type</th><th>Sales (RM)</th><th>Earned (RM)</th><th>Status</th></tr></thead><tbody>${res.records.map(r => {
+                const type = r.overrideAmount > 0 ? 'Override' : 'Personal';
+                const earned = r.overrideAmount > 0 ? r.overrideAmount : r.commissionAmount;
+                const sales = r.overrideAmount > 0 ? '-' : r.salesAmount.toFixed(2);
+                return `<tr><td>${r.invoiceId}</td><td>${type}</td><td>${sales}</td><td><strong>${earned.toFixed(2)}</strong></td><td>${r.status}</td></tr>`;
+            }).join('')}</tbody></table>`;
+        } else {
+            list.innerHTML = '<p>No commission records found.</p>';
+        }
+    } catch(e) { list.innerHTML = '<p style="color:red;">Error loading commission data.</p>'; }
+}
+
+function renderProfileView() {
+    document.getElementById('prof-employeeName').value = currentProfile.employeeName || '';
+    document.getElementById('prof-agentID').value = currentProfile.agentID || '';
+    document.getElementById('prof-position').value = currentProfile.position || '';
+    document.getElementById('prof-commissionRate').value = currentProfile.commissionRate ? `${(currentProfile.commissionRate * 100).toFixed(2)}%` : '0.00%';
+    document.getElementById('prof-target').value = `RM ${currentProfile.target || '0.00'}`;
+    document.getElementById('prof-managerID').value = currentProfile.managerID || 'None';
+    document.getElementById('prof-bankName').value = currentProfile.bankName || '';
+    document.getElementById('prof-accountHolderName').value = currentProfile.accountHolderName || '';
+    document.getElementById('prof-accountNumber').value = currentProfile.accountNumber || '';
+    const editable = [document.getElementById('prof-bankName'), document.getElementById('prof-accountHolderName'), document.getElementById('prof-accountNumber')];
+    const btn = document.getElementById('save-profile-btn');
+    const badge = document.getElementById('edit-badge');
+    if(canEditProfile) { editable.forEach(el => el.disabled = false); btn.classList.remove('hidden'); if(badge) badge.style.display = 'inline'; } 
+    else { editable.forEach(el => el.disabled = true); btn.classList.add('hidden'); if(badge) badge.style.display = 'none'; }
+}
+
+async function saveProfile() {
+    const btn = document.getElementById('save-profile-btn');
+    btn.textContent = "Saving..."; btn.disabled = true;
+    const payload = {
+        agentId: currentAgent.id, 
+        bankName: document.getElementById('prof-bankName').value,
+        accountHolderName: document.getElementById('prof-accountHolderName').value, 
+        accountNumber: document.getElementById('prof-accountNumber').value
+    };
+    try {
+        const res = await postToGoogleScript('updateAgentProfile', payload);
+        alert(res.message);
+        if(res.success) {
+            currentProfile.bankName = payload.bankName;
+            currentProfile.accountHolderName = payload.accountHolderName;
+            currentProfile.accountNumber = payload.accountNumber;
+        }
+    } catch(e) { alert("An error occurred."); }
+    finally { btn.textContent = "Save Changes"; btn.disabled = false; }
 }
 
 async function renderTeamView() {
     const list = document.getElementById('subordinates-list');
+    const overrideEl = document.getElementById('team-total-override');
+    list.innerHTML = '<li>Loading...</li>';
     try {
         const res = await postToGoogleScript('getSubordinatesData', { agentId: currentAgent.id });
         if(res.success) {
-            document.getElementById('team-total-override').textContent = `RM ${res.totalOverride.toFixed(2)}`;
+            overrideEl.textContent = `RM ${res.totalOverride.toFixed(2)}`;
             list.innerHTML = res.subordinates.length ? res.subordinates.map(s => `<li>${s.name} (${s.id}) - ${s.position}</li>`).join('') : '<li>No subordinates found.</li>';
         }
-    } catch(e) { list.innerHTML = '<p>Error.</p>'; }
+    } catch(e) { list.innerHTML = '<p style="color:red;">Error loading team data.</p>'; }
 }
 
 async function renderAdminDashboard() {
@@ -679,17 +620,12 @@ async function renderAdminDashboard() {
             document.getElementById('admin-total-sales').textContent = `RM ${res.grandTotalSales.toFixed(2)}`;
             document.getElementById('admin-total-cc').textContent = res.grandTotalCC.toFixed(3);
             document.getElementById('admin-agents-on-target').textContent = `${res.data.filter(a => a.targetAchieved >= 1).length} / ${res.data.length}`;
-            
             const teams = {}; const noMgr = [];
             res.data.forEach(a => { (a.managerId && a.managerId !== "") ? (teams[a.managerId] = teams[a.managerId] || []).push(a) : noMgr.push(a); });
-            
             let html = '';
             if (noMgr.length) html += `<h4>Independent / Top Level</h4>${buildAdminTable(noMgr)}`;
-            for (const [mgr, members] of Object.entries(teams)) {
-                html += `<h4>Team: ${mgr}</h4>${buildAdminTable(members)}`;
-            }
+            for (const [mgr, members] of Object.entries(teams)) { html += `<h4 style="margin-top:20px;">Team: ${mgr}</h4>${buildAdminTable(members)}`; }
             div.innerHTML = html;
-            
             if(performanceChartInstance) performanceChartInstance.destroy();
             const chartCtx = document.getElementById('performanceChart').getContext('2d');
             performanceChartInstance = new Chart(chartCtx, {
@@ -697,7 +633,7 @@ async function renderAdminDashboard() {
                 data: { labels: res.data.map(a => a.name), datasets: [{ label: 'Sales (RM)', data: res.data.map(a => a.totalSales), backgroundColor: '#0f3d2e' }] },
                 options: { responsive: true }
             });
-        } else { div.innerHTML = '<p>No data. Ensure dashboard cache is updated.</p>'; }
+        } else { div.innerHTML = '<p>No data.</p>'; }
     } catch(e) { div.innerHTML = '<p style="color:red;">Error loading admin data.</p>'; }
 }
 
@@ -705,38 +641,111 @@ function buildAdminTable(agents) {
     return `<table><thead><tr><th>Name</th><th>Target</th><th>Sales</th><th>%</th></tr></thead><tbody>${agents.map(a => `<tr><td>${a.name}</td><td>RM ${a.target.toFixed(2)}</td><td>RM ${a.totalSales.toFixed(2)}</td><td style="color:${a.targetAchieved>=1?'green':'red'}">${(a.targetAchieved*100).toFixed(0)}%</td></tr>`).join('')}</tbody></table>`;
 }
 
-// ... (Helper Functions: Standard Order Handling) ...
+function renderTargetBar() {
+    const pct = Math.min(100, currentAgent.target > 0 ? (currentAgent.currentSales / currentAgent.target) * 100 : 0);
+    document.getElementById('target-bar-display').innerHTML = `<div style="font-size:0.8rem; color:#666;">Target: RM ${currentAgent.currentSales.toFixed(2)} / ${currentAgent.target.toFixed(2)} (${pct.toFixed(1)}%)</div><div class="target-bar-container"><div class="target-progress" style="width:${pct}%"></div></div>`;
+}
+
+function renderProductCatalog() { 
+    document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join('');
+}
+
+function renderProductSelectionList() { 
+    const term = document.getElementById('product-order-search').value.toLowerCase();
+    const filtered = products.filter(p => p.name.toLowerCase().includes(term) || String(p.id).toLowerCase().includes(term));
+    document.getElementById('product-selection-list').innerHTML = filtered.length ? filtered.map(p => `
+        <div class="product-item-selectable" onclick="addProductToOrder('${p.id}')">
+            <img src="${p.image || 'FL.jpg'}" onerror="this.style.display='none'">
+            <div><strong>${p.name} (${p.id})</strong><p style="font-size:0.8rem">RSP: RM ${p.rsp.toFixed(2)}</p></div>
+            <button class="btn btn-primary" style="margin-left:auto; padding:5px 10px; font-size:0.7rem;">ADD</button>
+        </div>`).join('') : "<p>No products.</p>";
+}
+
+function renderCustomerDropdown() { 
+    document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing Customer --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join('');
+}
+
+function renderOrderSummary() { 
+    const container = document.getElementById('summary-items-list');
+    if (currentOrder.items.length === 0) { container.innerHTML = "<p style='text-align:center; padding:20px;'>Cart is empty.</p>"; } 
+    else {
+        container.innerHTML = currentOrder.items.map(item => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed #eee;">
+                <div><strong>${item.name}</strong><br><small class="price-warning">${item.customPrice < item.minPrice ? `Min Price: RM ${item.minPrice.toFixed(2)}` : ''}</small></div>
+                <div style="display:flex; gap:5px;">
+                    <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.id}', this.value)" style="width:50px; text-align:center;">
+                    <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice('${item.id}', this.value)" style="width:70px; text-align:center;">
+                    <button onclick="removeItemFromOrder('${item.id}')" style="background:none; border:none; color:red; cursor:pointer;">&times;</button>
+                </div>
+            </div>`).join('');
+    }
+    calculateTotals();
+}
+
 function startNewOrder() { 
     currentOrder = { items: [] };
     document.getElementById('customer-dropdown').value = '';
     document.getElementById('new-customer-form').classList.add('hidden');
+    document.getElementById('customer-dropdown').disabled = false;
     document.getElementById('new-customer-name').value = '';
+    document.getElementById('new-customer-email').value = '';
+    document.getElementById('new-customer-phone').value = '';
+    document.getElementById('new-customer-address').value = '';
     document.getElementById('payment-proof').value = '';
     document.getElementById('submit-status').textContent = '';
     document.getElementById('submit-order-btn').disabled = false;
     renderOrderSummary();
 }
+
 function handleNewCustomerToggle() {
     const form = document.getElementById('new-customer-form');
     form.classList.toggle('hidden');
     document.getElementById('customer-dropdown').disabled = !form.classList.contains('hidden');
+    if (!form.classList.contains('hidden')) {
+        document.getElementById('customer-dropdown').value = '';
+    }
 }
-function handleCustomerSelection() { if (document.getElementById('customer-dropdown').value) document.getElementById('new-customer-form').classList.add('hidden'); }
+
+function handleCustomerSelection() { 
+    if (document.getElementById('customer-dropdown').value) {
+        document.getElementById('new-customer-form').classList.add('hidden');
+        document.getElementById('customer-dropdown').disabled = false;
+    }
+}
+
 function addProductToOrder(id) {
     const p = products.find(x => String(x.id) === String(id));
     if (!p || currentOrder.items.some(i => String(i.id) === String(id))) return;
     currentOrder.items.push({ id: p.id, name: p.name, quantity: 1, rsp: p.rsp, cc: p.cc, customPrice: p.rsp, minPrice: p.minPrice });
     renderOrderSummary();
 }
-function removeItemFromOrder(id) { currentOrder.items = currentOrder.items.filter(i => String(i.id) !== String(id)); renderOrderSummary(); }
-function updateQuantity(id, qty) { const i = currentOrder.items.find(x => String(x.id) === String(id)); if(i) i.quantity = parseInt(qty)||1; renderOrderSummary(); }
+
+function removeItemFromOrder(id) { 
+    currentOrder.items = currentOrder.items.filter(i => String(i.id) !== String(id)); 
+    renderOrderSummary(); 
+}
+
+function updateQuantity(id, qty) { 
+    const i = currentOrder.items.find(x => String(x.id) === String(id)); 
+    if(i) i.quantity = parseInt(qty) || 1; 
+    renderOrderSummary(); 
+}
+
+function updatePrice(id, pr) { 
+    const i = currentOrder.items.find(x => String(x.id) === String(id)); 
+    if(i) i.customPrice = parseFloat(pr) || 0; 
+    renderOrderSummary(); 
+}
+
 function calculateTotals() {
     const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-    const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
+    const bestRule = shippingRules.find(r => sub >= r.minSpend);
+    const ship = bestRule ? bestRule.charge : (shippingRules.length > 0 ? shippingRules.reduce((max, rule) => rule.charge > max ? rule.charge : max, 0) : 0);
     document.getElementById('summary-subtotal').textContent = `RM ${sub.toFixed(2)}`;
     document.getElementById('summary-shipping').textContent = `RM ${ship.toFixed(2)}`;
-    document.getElementById('summary-total').textContent = `RM ${(sub+ship).toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `RM ${(sub + ship).toFixed(2)}`;
 }
+
 async function submitOrder() {
     const btn = document.getElementById('submit-order-btn');
     if(btn.disabled) return;
@@ -746,7 +755,12 @@ async function submitOrder() {
     const existPac = document.getElementById('customer-dropdown').value;
     if(existPac) cust = customers.find(c => c.pac === existPac);
     else {
-        cust = { name: document.getElementById('new-customer-name').value, email: document.getElementById('new-customer-email').value, phone: document.getElementById('new-customer-phone').value, address: document.getElementById('new-customer-address').value };
+        cust = { 
+            name: document.getElementById('new-customer-name').value, 
+            email: document.getElementById('new-customer-email').value, 
+            phone: document.getElementById('new-customer-phone').value, 
+            address: document.getElementById('new-customer-address').value 
+        };
         if(!cust.name) { alert("Customer details required."); btn.disabled = false; return; }
     }
     
@@ -756,31 +770,37 @@ async function submitOrder() {
     try {
         const base64 = await getBase64(file);
         const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-        const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
-        // Fix: Ensure payload structure matches backend expectation
+        const bestRule = shippingRules.find(r => sub >= r.minSpend);
+        const ship = bestRule ? bestRule.charge : (shippingRules.length > 0 ? shippingRules.reduce((max, rule) => rule.charge > max ? rule.charge : max, 0) : 0);
         const payload = { 
-            action: 'submitAgentOrder', 
-            data: { agent: currentAgent, customer: cust, items: currentOrder.items, shippingFee: ship, paymentProof: { file: base64.split(',')[1], mimeType: file.type } } 
+            agent: currentAgent, 
+            customer: cust, 
+            items: currentOrder.items, 
+            shippingFee: ship, 
+            paymentProof: { file: base64.split(',')[1], mimeType: file.type } 
         };
-        const res = await postToGoogleScript('submitAgentOrder', payload.data);
-        if(res.success) { alert(`Success! ID: ${res.invoiceId}`); setTimeout(startNewOrder, 2000); }
-        else { alert(res.message); }
-    } catch(e) { alert("Error submitting order."); console.error(e); }
-    finally { btn.disabled = false; }
+        const res = await postToGoogleScript('submitAgentOrder', payload);
+        if(res.success) { 
+            alert(`Success! ID: ${res.invoiceId}`); 
+            setTimeout(startNewOrder, 2000); 
+        } else { alert(res.message); }
+    } catch(e) { 
+        alert("Error submitting order."); 
+        console.error(e); 
+    } finally { btn.disabled = false; }
 }
 
 async function handleChangePassword() {
     const p1 = document.getElementById('new-password-input').value;
     const p2 = document.getElementById('confirm-password-input').value;
-    if (p1.length < 6 || p1 !== p2) { alert("Password invalid."); return; }
+    if (p1.length < 6 || p1 !== p2) { alert("Password invalid or passwords do not match."); return; }
     await postToGoogleScript('updatePassword', { agentId: currentAgent.id, newPassword: p1 });
-    alert("Success! Login again."); location.reload();
+    alert("Success! Please log in again."); 
+    location.reload();
 }
+
 function handleLogout() { location.reload(); }
-function refreshPageData() {
-    const active = document.querySelector('.view:not(.hidden)');
-    if(active) showView(active.id, true);
-}
+
 async function fetchPortalData() {
     try {
         const res = await postToGoogleScript('getPortalData', {}); 
@@ -792,24 +812,10 @@ async function fetchPortalData() {
             renderProductSelectionList(); 
             renderCustomerDropdown(); 
         }
-    } catch (error) { alert('Could not load data.'); }
+        else { throw new Error(res.message); }
+    } catch (error) { alert('Could not load portal data.'); }
 }
-function renderProductCatalog() { 
-    document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join('');
-}
-function renderProductSelectionList() { 
-    const term = document.getElementById('product-order-search').value.toLowerCase();
-    const filtered = products.filter(p => p.name.toLowerCase().includes(term) || String(p.id).toLowerCase().includes(term));
-    document.getElementById('product-selection-list').innerHTML = filtered.length ? filtered.map(p => `
-        <div class="product-item-selectable" onclick="addProductToOrder('${p.id}')">
-            <img src="${p.image || 'FL.jpg'}" onerror="this.style.display='none'">
-            <div><strong>${p.name} (${p.id})</strong><p style="font-size:0.8rem">RSP: RM ${p.rsp.toFixed(2)}</p></div>
-            <button class="btn btn-primary" style="margin-left:auto; padding:5px 10px; font-size:0.7rem;">ADD</button>
-        </div>`).join('') : "<p>No products.</p>";
-}
-function renderCustomerDropdown() { 
-    document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing Customer --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join('');
-}
+
 async function postToGoogleScript(action, data = {}) {
     const payload = { action, data };
     try {
@@ -820,13 +826,24 @@ async function postToGoogleScript(action, data = {}) {
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload) 
         });
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error("Server returned an error:", res.status, errorText);
+            throw new Error(`Server error (${res.status}). Check console for details.`);
+        }
         const responseText = await res.text();
-        return JSON.parse(responseText);
+        try {
+            return JSON.parse(responseText);
+        } catch (e) {
+            console.error("Failed to parse JSON from server:", responseText);
+            throw new Error("Invalid response from server. The backend script may have crashed.");
+        }
     } catch (e) { 
-        console.error("Post failed:", e);
+        console.error("Post to Google Script failed:", e);
         throw e; 
     }
 }
+
 function getBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -834,74 +851,6 @@ function getBase64(file) {
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
     });
-}
-function renderProfileView() {
-    document.getElementById('prof-name').value = currentAgent.name;
-    document.getElementById('prof-id').value = currentAgent.id;
-    document.getElementById('prof-pos').value = document.getElementById('agent-details-display').textContent.split('|')[0].trim();
-    document.getElementById('prof-rate').value = currentProfile.commissionRate;
-    document.getElementById('prof-target').value = `RM ${currentProfile.target}`;
-    document.getElementById('prof-mgr').value = currentProfile.managerId;
-    document.getElementById('prof-bank').value = currentProfile.bankName;
-    document.getElementById('prof-holder').value = currentProfile.accountHolderName;
-    document.getElementById('prof-acc').value = currentProfile.accountNumber;
-    const editable = [document.getElementById('prof-bank'), document.getElementById('prof-holder'), document.getElementById('prof-acc')];
-    const btn = document.getElementById('save-profile-btn');
-    const badge = document.getElementById('edit-badge');
-    if(canEditProfile) { editable.forEach(el => el.disabled = false); btn.classList.remove('hidden'); badge.style.display = 'inline'; } 
-    else { editable.forEach(el => el.disabled = true); btn.classList.add('hidden'); badge.style.display = 'none'; }
-}
-async function saveProfile() {
-    const btn = document.getElementById('save-profile-btn');
-    btn.textContent = "Saving..."; btn.disabled = true;
-    const payload = { agentId: currentAgent.id, bankName: document.getElementById('prof-bank').value, accHolder: document.getElementById('prof-holder').value, accNumber: document.getElementById('prof-acc').value };
-    try { const res = await postToGoogleScript('updateAgentProfile', payload); alert(res.message); if(res.success) Object.assign(currentProfile, payload); } 
-    catch(e) { alert("Error."); } finally { btn.textContent = "Save Changes"; btn.disabled = false; }
-
-    // [ Helper Function ] Calculate Monthly Sales for Agent Dashboard
-function calculateMonthlySales() {
-    // 1. Get orders from LocalStorage
-    const orders = JSON.parse(localStorage.getItem('orders_DATA')) || [];
-    
-    // 2. Get current month and year
-    const now = new Date();
-    const currentMonth = now.getMonth(); // 0-11
-    const currentYear = now.getFullYear();
-    
-    let totalSales = 0;
-    let count = 0;
-
-    // 3. Loop through orders and sum up only this month's orders
-    orders.forEach(order => {
-        // Use timestamp or date property
-        const orderDate = new Date(order.timestamp || order.date);
-        
-        // Check if the order belongs to the current month and year
-        if (orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear) {
-            // Ensure total is a number (handle string 'RM 50.00' or number 50.00)
-            let orderAmount = parseFloat(order.total);
-            if (!isNaN(orderAmount)) {
-                totalSales += orderAmount;
-                count++;
-            }
-        }
-    });
-
-    // 4. Update the Dashboard Display
-    // This looks for an element with id="monthly-sales" and "monthly-orders-count"
-    const salesDisplay = document.getElementById('monthly-sales');
-    const countDisplay = document.getElementById('monthly-orders-count');
-    
-    if (salesDisplay) {
-        salesDisplay.innerText = 'RM ' + totalSales.toFixed(2);
-    }
-    
-    if (countDisplay) {
-        countDisplay.innerText = count;
-    }
-    
-    return totalSales;
-}
 }
 </script>
 </body>
