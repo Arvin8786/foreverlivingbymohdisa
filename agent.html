@@ -160,7 +160,6 @@
             <div id="target-bar-display" style="margin-top: 10px;"></div>
         </div>
         <div style="text-align: right;">
-            <button id="refresh-data-btn" class="btn btn-secondary" style="margin-bottom: 10px;">Refresh Data</button>
             <button id="logout-btn" class="btn btn-primary">Logout</button>
         </div>
     </header>
@@ -302,7 +301,7 @@
 
 <script>
 // =================================================================
-// AGENT PORTAL SCRIPT - LUXURY EDITION (CORRECTED)
+// AGENT PORTAL SCRIPT - LUXURY EDITION (CORRECTED & COMPLETE)
 // =================================================================
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZdhS1V16Gut5yHA-y6Z0JU4Hrj4oHCwJhRrf4ul82GWP2q63qJGy4mopvOZzZtbl0JA/exec'; 
 
@@ -312,9 +311,9 @@ let currentProfile = {}, canEditProfile = false, allAgentsList = [];
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-form').addEventListener('submit', (event) => { event.preventDefault(); handleLogin(); });
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
-    // REMOVED: Event listener for the non-existent refresh button
+    
+    // Refresh button for Open Orders is handled by the button itself
     // document.getElementById('refresh-data-btn').addEventListener('click', refreshPageData); 
-    // This button will be handled differently.
 
     const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'team', 'admin-dashboard'];
     navs.forEach(n => {
@@ -346,7 +345,7 @@ async function handleLogin() {
             currentAgent.currentSales = res.currentSales;
             currentAgent.isAdmin = res.isAdmin;
             currentAgent.isManager = res.isManager;
-            currentAgent.password = password; // Store password
+            currentAgent.password = password;
             currentProfile = res.profile;
             canEditProfile = res.allowEdit;
 
@@ -380,7 +379,7 @@ async function handleLogin() {
             status.textContent = res.message;
             status.style.color = 'var(--danger-color)';
         }
-    } catch(e) { status.textContent = "Connection failed."; }
+    } catch(e) { status.textContent = "Connection failed."; console.error(e); }
     finally { btn.disabled = false; }
 }
 
@@ -392,7 +391,7 @@ async function renderOpenOrders() {
         if (res.success && res.orders.length > 0) {
             list.innerHTML = res.orders.map(o => {
                 let adminControls = '';
-                if(currentAgent.isAdmin && allAgentsList.length > 0) {
+                if(currentAgent.isAdmin && allAgentsList && allAgentsList.length > 0) {
                     const options = allAgentsList.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
                     adminControls = `
                     <div class="admin-assign-box">
@@ -415,24 +414,31 @@ async function renderOpenOrders() {
                 </div>`;
             }).join('');
         } else { list.innerHTML = '<p>No open orders.</p>'; }
-    } catch(e) { list.innerHTML = '<p>Error loading orders.</p>'; }
+    } catch(e) { list.innerHTML = '<p style="color:red">Error loading orders.</p>'; }
 }
 
 async function pickOrder(id) {
     if(!confirm("Pick this order?")) return;
-    const res = await postToGoogleScript('pickOrder', { invoiceId: id, agentId: currentAgent.id, agentName: currentAgent.name });
-    alert(res.message); if(res.success) { renderOpenOrders(); }
+    try {
+        const res = await postToGoogleScript('pickOrder', { invoiceId: id, agentId: currentAgent.id, agentName: currentAgent.name });
+        alert(res.message); 
+        if(res.success) { renderOpenOrders(); }
+    } catch (e) { alert("An error occurred.") }
 }
 
 async function adminAssignOrder(id) {
     const tid = document.getElementById(`assign-select-${id}`).value;
     if(!tid) return alert("Select an agent.");
     const tname = allAgentsList.find(a => a.id == tid)?.name || tid;
-    const res = await postToGoogleScript('adminAssignOrder', { invoiceId: id, targetAgentId: tid, targetAgentName: tname });
-    alert(res.message); if(res.success) renderOpenOrders();
+    try {
+        const res = await postToGoogleScript('adminAssignOrder', { invoiceId: id, targetAgentId: tid, targetAgentName: tname });
+        alert(res.message); 
+        if(res.success) renderOpenOrders();
+    } catch (e) { alert("An error occurred.") }
 }
 
 function renderProfileView() {
+    // Correctly map backend camelCase properties to frontend element IDs
     document.getElementById('prof-employeeName').value = currentProfile.employeeName || '';
     document.getElementById('prof-agentID').value = currentProfile.agentID || '';
     document.getElementById('prof-position').value = currentProfile.position || '';
@@ -508,11 +514,12 @@ async function renderAdminDashboard() {
             
             let html = '';
             if (noMgr.length) html += `<h4>Independent / Top Level</h4>${buildAdminTable(noMgr)}`;
-            for (const [mgr, members] of Object.entries(teams)) { html += `<h4>Team: ${mgr}</h4>${buildAdminTable(members)}`; }
+            for (const [mgr, members] of Object.entries(teams)) { html += `<h4 style="margin-top:20px;">Team: ${mgr}</h4>${buildAdminTable(members)}`; }
             div.innerHTML = html;
             
             if(performanceChartInstance) performanceChartInstance.destroy();
-            performanceChartInstance = new Chart(document.getElementById('performanceChart'), {
+            const chartCtx = document.getElementById('performanceChart').getContext('2d');
+            performanceChartInstance = new Chart(chartCtx, {
                 type: 'bar',
                 data: { labels: res.data.map(a => a.name), datasets: [{ label: 'Sales (RM)', data: res.data.map(a => a.totalSales), backgroundColor: '#0f3d2e' }] },
                 options: { responsive: true }
@@ -531,9 +538,10 @@ function showView(viewId) {
     document.getElementById(viewId).classList.remove('hidden');
     document.getElementById(`nav-${viewId.replace('-view','-btn')}`).classList.add('active');
     
-    const viewName = viewId.replace('-view', '').replace(/-(\w)/g, (g) => g[1].toUpperCase());
-    const renderFunc = window[`render${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`];
-    if(typeof renderFunc === 'function') renderFunc();
+    const renderFunctionName = 'render' + viewId.replace(/-(\w)/g, (g) => g[1].toUpperCase()).replace('view', '').replace(/^./, (c) => c.toUpperCase());
+    if (window[renderFunctionName]) {
+        window[renderFunctionName]();
+    }
 }
 
 function renderTargetBar() {
@@ -552,7 +560,7 @@ function renderProductSelectionList() {
             <img src="${p.image || 'FL.jpg'}" onerror="this.style.display='none'">
             <div><strong>${p.name} (${p.id})</strong><p style="font-size:0.8rem">RSP: RM ${p.rsp.toFixed(2)}</p></div>
             <button class="btn btn-primary" style="margin-left:auto; padding:5px 10px; font-size:0.7rem;">ADD</button>
-        </div>`).join('') : "<p>No products.</p>";
+        </div>`).join('') : "<p>No products found.</p>";
 }
 function renderCustomerDropdown() { 
     document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing Customer --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join('');
@@ -566,7 +574,7 @@ function renderOrderSummary() {
                 <div><strong>${item.name}</strong><br><small style="color:var(--danger-color);">${item.customPrice < item.minPrice ? 'Price too low' : ''}</small></div>
                 <div style="display:flex; gap:5px;">
                     <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.id}', this.value)" style="width:50px; text-align:center;">
-                    <input type="number" value="${item.customPrice}" onchange="updatePrice('${item.id}', this.value)" style="width:70px; text-align:center;">
+                    <input type="number" step="0.01" value="${item.customPrice.toFixed(2)}" onchange="updatePrice('${item.id}', this.value)" style="width:70px; text-align:center;">
                     <button onclick="removeItemFromOrder('${item.id}')" style="background:none; border:none; color:red; cursor:pointer;">&times;</button>
                 </div>
             </div>`).join('');
@@ -575,10 +583,11 @@ function renderOrderSummary() {
 }
 async function renderMyOrders() {
     const list = document.getElementById('my-orders-list');
+    list.innerHTML = '<p>Loading...</p>';
     try {
         const res = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
         list.innerHTML = res.orders.length ? `<table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>${res.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>${o.customerName}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>`).join('')}</tbody></table>` : '<p>No orders assigned to you.</p>';
-    } catch(e) { list.innerHTML = '<p>Error loading your orders.</p>'; }
+    } catch(e) { list.innerHTML = '<p style="color:red;">Error loading orders.</p>'; }
 }
 function renderMyCommission() {
     const list = document.getElementById('my-commission-list');
@@ -618,7 +627,8 @@ function updateQuantity(id, qty) { const i = currentOrder.items.find(x => String
 function updatePrice(id, pr) { const i = currentOrder.items.find(x => String(x.id) === String(id)); if(i) i.customPrice = parseFloat(pr)||0; renderOrderSummary(); }
 function calculateTotals() {
     const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-    const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
+    const bestRule = shippingRules.find(r => sub >= r.minSpend);
+    const ship = bestRule ? bestRule.charge : (shippingRules.length > 0 ? shippingRules[shippingRules.length - 1].charge : 0);
     document.getElementById('summary-subtotal').textContent = `RM ${sub.toFixed(2)}`;
     document.getElementById('summary-shipping').textContent = `RM ${ship.toFixed(2)}`;
     document.getElementById('summary-total').textContent = `RM ${(sub+ship).toFixed(2)}`;
@@ -642,40 +652,24 @@ async function submitOrder() {
     try {
         const base64 = await getBase64(file);
         const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-        const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
+        const bestRule = shippingRules.find(r => sub >= r.minSpend);
+        const ship = bestRule ? bestRule.charge : (shippingRules.length > 0 ? shippingRules[shippingRules.length - 1].charge : 0);
         const payload = { agent: currentAgent, customer: cust, items: currentOrder.items, shippingFee: ship, paymentProof: { file: base64.split(',')[1], mimeType: file.type } };
         const res = await postToGoogleScript('submitAgentOrder', payload);
         if(res.success) { alert(`Success! ID: ${res.invoiceId}`); setTimeout(startNewOrder, 2000); }
         else { alert(res.message); }
-    } catch(e) { alert("Error."); }
+    } catch(e) { alert("Error submitting order."); console.error(e); }
     finally { btn.disabled = false; }
 }
 async function handleChangePassword() {
     const p1 = document.getElementById('new-password-input').value;
     const p2 = document.getElementById('confirm-password-input').value;
-    if (p1.length < 6 || p1 !== p2) { alert("Password invalid."); return; }
+    if (p1.length < 6 || p1 !== p2) { alert("Password invalid or passwords do not match."); return; }
     await postToGoogleScript('updatePassword', { agentId: currentAgent.id, newPassword: p1 });
-    alert("Success! Login again."); location.reload();
+    alert("Success! Please log in again."); location.reload();
 }
 function handleLogout() { location.reload(); }
-function refreshPageData() {
-    const active = document.querySelector('.view:not(.hidden)');
-    if(active) { showView(active.id); }
-}
-async function fetchPortalData() {
-    try {
-        const res = await postToGoogleScript('getPortalData');
-        if (res.success) { 
-            products = res.products; 
-            customers = res.customers; 
-            shippingRules = (res.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend); 
-            renderProductCatalog(); 
-            renderProductSelectionList(); 
-            renderCustomerDropdown(); 
-        }
-        else { throw new Error(res.message); }
-    } catch (error) { alert('Could not load portal data.'); }
-}
+
 async function postToGoogleScript(action, data = {}) {
     const payload = { action, data };
     try {
