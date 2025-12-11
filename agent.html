@@ -857,6 +857,51 @@ async function saveProfile() {
     const payload = { agentId: currentAgent.id, bankName: document.getElementById('prof-bank').value, accHolder: document.getElementById('prof-holder').value, accNumber: document.getElementById('prof-acc').value };
     try { const res = await postToGoogleScript('updateAgentProfile', payload); alert(res.message); if(res.success) Object.assign(currentProfile, payload); } 
     catch(e) { alert("Error."); } finally { btn.textContent = "Save Changes"; btn.disabled = false; }
+
+    // [ Helper Function ] Calculate Monthly Sales for Agent Dashboard
+function calculateMonthlySales() {
+    // 1. Get orders from LocalStorage
+    const orders = JSON.parse(localStorage.getItem('orders_DATA')) || [];
+    
+    // 2. Get current month and year
+    const now = new Date();
+    const currentMonth = now.getMonth(); // 0-11
+    const currentYear = now.getFullYear();
+    
+    let totalSales = 0;
+    let count = 0;
+
+    // 3. Loop through orders and sum up only this month's orders
+    orders.forEach(order => {
+        // Use timestamp or date property
+        const orderDate = new Date(order.timestamp || order.date);
+        
+        // Check if the order belongs to the current month and year
+        if (orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear) {
+            // Ensure total is a number (handle string 'RM 50.00' or number 50.00)
+            let orderAmount = parseFloat(order.total);
+            if (!isNaN(orderAmount)) {
+                totalSales += orderAmount;
+                count++;
+            }
+        }
+    });
+
+    // 4. Update the Dashboard Display
+    // This looks for an element with id="monthly-sales" and "monthly-orders-count"
+    const salesDisplay = document.getElementById('monthly-sales');
+    const countDisplay = document.getElementById('monthly-orders-count');
+    
+    if (salesDisplay) {
+        salesDisplay.innerText = 'RM ' + totalSales.toFixed(2);
+    }
+    
+    if (countDisplay) {
+        countDisplay.innerText = count;
+    }
+    
+    return totalSales;
+}
 }
 </script>
 </body>
