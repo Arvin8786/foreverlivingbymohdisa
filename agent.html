@@ -39,7 +39,7 @@
             display: inline-block; padding: 12px 25px; 
             text-transform: uppercase; letter-spacing: 2px; font-size: 0.75rem; font-weight: 700;
             border: 1px solid transparent; cursor: pointer; transition: 0.3s; text-align: center;
-            text-decoration: none;
+            text-decoration: none; border-radius: var(--border-radius);
         }
         .btn:disabled { background: #ccc !important; border-color: #ccc !important; cursor: not-allowed; }
         
@@ -48,6 +48,9 @@
         
         .btn-secondary { background: transparent; border-color: var(--primary-color); color: var(--primary-color); }
         .btn-secondary:hover:not(:disabled) { background: var(--primary-color); color: #fff; }
+
+        .btn-danger { background: var(--danger-color); color: #fff; border-color: var(--danger-color); }
+        .btn-danger:hover { background: #8e2b2b; }
         
         /* Cards */
         .card { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow-soft); padding: 30px; margin-bottom: 25px; border: 1px solid #eee; }
@@ -121,6 +124,11 @@
         td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
         tr:hover { background: #fcfcfc; }
 
+        /* Admin Tabs */
+        .admin-tabs { display: flex; gap: 20px; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        .tab-link { padding: 10px 20px; cursor: pointer; color: #999; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .tab-link.active { color: var(--primary-color); border-bottom: 3px solid var(--secondary-color); margin-bottom: -2px; }
+
         @media (max-width: 1000px) {
             #order-creation-workflow { grid-template-columns: 1fr; }
         }
@@ -131,8 +139,9 @@
 
 <div id="login-view">
     <div class="card" id="login-box">
-        <!-- Replace FL.jpg with your logo URL -->
-        <div style="font-family: 'Playfair Display'; font-size: 2rem; color: var(--primary-color); margin-bottom: 10px;">FL</div>
+        <!-- Logo: Replace src with valid URL if FL.jpg isn't loading -->
+        <img src="FL.jpg" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'" style="width: 80px; margin: 0 auto 20px auto; display:block;">
+        <h1 style="display:none; text-align:center; color:var(--primary-color);">FL</h1>
         <h1>Agent Portal</h1>
         <p>Sign in to manage your sales and team.</p>
         <form id="login-form">
@@ -243,6 +252,7 @@
     
     <div id="my-commission-view" class="view hidden card">
         <h3>Commission Statement</h3>
+        <p style="font-size:0.8rem; color:#777;">Only confirmed commissions are displayed here.</p>
         <div id="my-commission-list"></div>
     </div>
 
@@ -286,23 +296,77 @@
 
     <div id="admin-dashboard-view" class="view hidden card">
         <h3>Admin Dashboard</h3>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom:30px;">
-            <div style="background:#fff; border:1px solid #eee; padding:20px;">
-                <label style="font-size:0.8rem; color:#999; text-transform:uppercase;">Total Sales</label>
-                <div id="admin-total-sales" style="font-size:1.5rem; font-weight:700; color:var(--primary-color);">...</div>
-            </div>
-            <div style="background:#fff; border:1px solid #eee; padding:20px;">
-                <label style="font-size:0.8rem; color:#999; text-transform:uppercase;">Total CC</label>
-                <div id="admin-total-cc" style="font-size:1.5rem; font-weight:700; color:var(--secondary-color);">...</div>
-            </div>
-            <div style="background:#fff; border:1px solid #eee; padding:20px;">
-                <label style="font-size:0.8rem; color:#999; text-transform:uppercase;">On Target</label>
-                <div id="admin-agents-on-target" style="font-size:1.5rem; font-weight:700; color:var(--accent-color);">...</div>
-            </div>
+        
+        <!-- ADMIN TABS -->
+        <div class="admin-tabs">
+            <span class="tab-link active" onclick="switchAdminTab('employees')">Employees</span>
+            <span class="tab-link" onclick="switchAdminTab('payroll')">Payroll</span>
+            <span class="tab-link" onclick="switchAdminTab('stats')">Statistics</span>
         </div>
-        <canvas id="performanceChart" height="100"></canvas>
-        <h4 style="margin-top:40px;">Detailed Breakdown</h4>
-        <div id="admin-data-table" style="margin-top:20px;"></div>
+
+        <!-- TAB: EMPLOYEES -->
+        <div id="admin-sub-employees">
+            <button class="btn btn-primary" onclick="openEmpModal()">+ Add New Employee</button>
+            <div id="admin-emp-list" style="margin-top:20px;">Loading employees...</div>
+        </div>
+
+        <!-- TAB: PAYROLL -->
+        <div id="admin-sub-payroll" class="hidden">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background:#f9f9f9; padding:15px;">
+                <div>
+                    <strong>Payroll Action</strong><br>
+                    <span style="font-size:0.8rem; color:#666;">Review and edit commissions. Lock to release payments to agents.</span>
+                </div>
+                <button class="btn btn-danger" onclick="lockPayroll()">Confirm & Lock Batch</button>
+            </div>
+            <div id="admin-payroll-list">Loading payroll...</div>
+        </div>
+
+        <!-- TAB: STATS -->
+        <div id="admin-sub-stats" class="hidden">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom:30px;">
+                <div style="background:#fff; border:1px solid #eee; padding:20px;">
+                    <label style="font-size:0.8rem; color:#999; text-transform:uppercase;">Total Sales</label>
+                    <div id="admin-total-sales" style="font-size:1.5rem; font-weight:700; color:var(--primary-color);">...</div>
+                </div>
+                <div style="background:#fff; border:1px solid #eee; padding:20px;">
+                    <label style="font-size:0.8rem; color:#999; text-transform:uppercase;">Total CC</label>
+                    <div id="admin-total-cc" style="font-size:1.5rem; font-weight:700; color:var(--secondary-color);">...</div>
+                </div>
+                <div style="background:#fff; border:1px solid #eee; padding:20px;">
+                    <label style="font-size:0.8rem; color:#999; text-transform:uppercase;">On Target</label>
+                    <div id="admin-agents-on-target" style="font-size:1.5rem; font-weight:700; color:var(--accent-color);">...</div>
+                </div>
+            </div>
+            <canvas id="performanceChart" height="100"></canvas>
+            <h4 style="margin-top:40px;">Detailed Breakdown</h4>
+            <div id="admin-data-table" style="margin-top:20px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- EMPLOYEE MODAL (Popup) -->
+<div id="emp-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; display:flex; justify-content:center; align-items:center;">
+    <div class="card" style="width:500px; position:relative;">
+        <button onclick="document.getElementById('emp-modal').classList.add('hidden')" style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+        <h3>Manage Employee</h3>
+        <div style="display:grid; gap:15px;">
+            <input id="emp-id" placeholder="Agent ID">
+            <input id="emp-name" placeholder="Full Name">
+            <input id="emp-phone" placeholder="Phone">
+            <select id="emp-status">
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+            </select>
+            <select id="emp-role">
+                <option value="AGENT">Agent</option>
+                <option value="ADMIN">Admin</option>
+            </select>
+        </div>
+        <div style="margin-top:20px; text-align:right;">
+            <button class="btn btn-secondary" onclick="document.getElementById('emp-modal').classList.add('hidden')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveEmployee()">Save Changes</button>
+        </div>
     </div>
 </div>
 
@@ -313,7 +377,7 @@
 
 // 1. DYNAMIC URL DETECTION
 // This ensures the fetch URL matches your specific Google Script deployment
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNEimr2v1AtnHbIpnm1ehzZ6WJ8KS-1IweE5lXJhjsP5lxDO1DC_fEGWosGwWBYLHT-w/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfBRSGiWVH4WWMGcgOEQMbwNndySaPDiQuQmslnvbXpb4ku7wkkwCZ2urWCXLF4SywkQ/exec";
 
 let products = [], customers = [], shippingRules = [], currentAgent = null;
 let currentOrder = { items: [] }, performanceChartInstance = null;
@@ -359,7 +423,7 @@ async function handleLogin() {
             currentAgent.isAdmin = res.isAdmin;
             currentAgent.isManager = res.isManager;
             currentAgent.password = password; 
-            currentProfile = res.profile;
+            currentProfile = res.profile; // This is the strictly mapped profile object
             canEditProfile = res.allowEdit;
 
             if (res.mustChangePassword) {
@@ -371,7 +435,9 @@ async function handleLogin() {
 
             await fetchPortalData();
             
+            // If Admin, trigger load of flat list for assign boxes
             if(currentAgent.isAdmin) {
+                // We load standard data here, Admin tab loads specific data when clicked
                 const adminData = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
                 if(adminData.success) allAgentsList = adminData.flatList || [];
             }
@@ -392,7 +458,7 @@ async function handleLogin() {
             status.textContent = res.message;
             status.style.color = 'var(--danger-color)';
         }
-    } catch(e) { status.textContent = "Connection failed."; }
+    } catch(e) { status.textContent = "Connection failed."; console.error(e); }
     finally { btn.disabled = false; }
 }
 
@@ -444,8 +510,8 @@ async function renderOpenOrders() {
 async function pickOrder(id) {
     if(!confirm("Pick this order and start processing?")) return;
     
-    const btn = document.activeElement;
-    if(btn && btn.tagName === 'BUTTON') { btn.textContent = "Processing..."; btn.disabled = true; }
+    // Find button to show loading state if possible (requires event passing, simplified here)
+    // alert("Processing..."); 
 
     try {
         const res = await postToGoogleScript('pickOrder', { invoiceId: id, agentId: currentAgent.id, agentName: currentAgent.name });
@@ -457,7 +523,7 @@ async function pickOrder(id) {
             alert(res.message);
             renderOpenOrders();
         }
-    } catch(e) { alert("Error picking order"); }
+    } catch(e) { alert("Error picking order: " + e.message); }
 }
 
 async function adminAssignOrder(id) {
@@ -469,6 +535,7 @@ async function adminAssignOrder(id) {
 }
 
 function renderProfile() {
+    // Populate form with strict profile object from verifyAgent
     document.getElementById('prof-employeeName').value = currentProfile.employeeName || '';
     document.getElementById('prof-agentID').value = currentProfile.agentID || '';
     document.getElementById('prof-position').value = currentProfile.position || '';
@@ -501,16 +568,16 @@ async function saveProfile() {
     const payload = {
         agentId: currentAgent.id, 
         bankName: document.getElementById('prof-bankName').value,
-        accountHolderName: document.getElementById('prof-accountHolderName').value, 
-        accountNumber: document.getElementById('prof-accountNumber').value
+        accHolder: document.getElementById('prof-accountHolderName').value, 
+        accNumber: document.getElementById('prof-accountNumber').value
     };
     try {
         const res = await postToGoogleScript('updateAgentProfile', payload);
         alert(res.message);
         if(res.success) {
             currentProfile.bankName = payload.bankName;
-            currentProfile.accountHolderName = payload.accountHolderName;
-            currentProfile.accountNumber = payload.accountNumber;
+            currentProfile.accountHolderName = payload.accHolder;
+            currentProfile.accountNumber = payload.accNumber;
         }
     } catch(e) { alert("An error occurred."); }
     finally { btn.textContent = "Save Changes"; btn.disabled = false; }
@@ -529,32 +596,137 @@ async function renderTeam() {
     } catch(e) { list.innerHTML = '<p style="color:red;">Error loading team data.</p>'; }
 }
 
+// -----------------------------------------------------
+// ADMIN SECTION
+// -----------------------------------------------------
+
 async function renderAdminDashboard() {
+    // Default to stats
+    switchAdminTab('stats');
+}
+
+function switchAdminTab(tabName) {
+    document.getElementById('admin-sub-employees').classList.add('hidden');
+    document.getElementById('admin-sub-payroll').classList.add('hidden');
+    document.getElementById('admin-sub-stats').classList.add('hidden');
+    document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+
+    // Highlight current tab link
+    const links = document.querySelectorAll('.tab-link');
+    if(tabName === 'employees') { links[0].classList.add('active'); loadAdminEmployees(); document.getElementById('admin-sub-employees').classList.remove('hidden'); }
+    if(tabName === 'payroll') { links[1].classList.add('active'); loadAdminPayroll(); document.getElementById('admin-sub-payroll').classList.remove('hidden'); }
+    if(tabName === 'stats') { links[2].classList.add('active'); loadAdminStats(); document.getElementById('admin-sub-stats').classList.remove('hidden'); }
+}
+
+// ADMIN: STATS
+async function loadAdminStats() {
     const div = document.getElementById('admin-data-table');
     div.innerHTML = '<p>Loading...</p>';
-    try {
-        const res = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
-        if (res.success && res.data.length > 0) {
-            document.getElementById('admin-total-sales').textContent = `RM ${res.grandTotalSales.toFixed(2)}`;
-            document.getElementById('admin-total-cc').textContent = res.grandTotalCC.toFixed(3);
-            document.getElementById('admin-agents-on-target').textContent = `${res.data.filter(a => a.targetAchieved >= 1).length} / ${res.data.length}`;
-            
-            const teams = {}; const noMgr = [];
-            res.data.forEach(a => { (a.managerId && a.managerId !== "") ? (teams[a.managerId] = teams[a.managerId] || []).push(a) : noMgr.push(a); });
-            
-            let html = '';
-            if (noMgr.length) html += `<h4>Independent / Top Level</h4>${buildAdminTable(noMgr)}`;
-            for (const [mgr, members] of Object.entries(teams)) { html += `<h4>Team: ${mgr}</h4>${buildAdminTable(members)}`; }
-            div.innerHTML = html;
-            
-            if(performanceChartInstance) performanceChartInstance.destroy();
-            performanceChartInstance = new Chart(document.getElementById('performanceChart'), {
-                type: 'bar',
-                data: { labels: res.data.map(a => a.name), datasets: [{ label: 'Sales (RM)', data: res.data.map(a => a.totalSales), backgroundColor: '#0f3d2e' }] },
-                options: { responsive: true }
-            });
-        } else { div.innerHTML = '<p>No data.</p>'; }
-    } catch(e) { div.innerHTML = '<p style="color:red;">Error loading admin data.</p>'; }
+    const res = await postToGoogleScript('getAdminData', { agentId: currentAgent.id });
+    if (res.success && res.data.length > 0) {
+        document.getElementById('admin-total-sales').textContent = `RM ${res.grandTotalSales.toFixed(2)}`;
+        document.getElementById('admin-total-cc').textContent = res.grandTotalCC.toFixed(3);
+        document.getElementById('admin-agents-on-target').textContent = `${res.data.filter(a => a.targetAchieved >= 1).length} / ${res.data.length}`;
+        
+        const teams = {}; const noMgr = [];
+        res.data.forEach(a => { (a.managerId && a.managerId !== "") ? (teams[a.managerId] = teams[a.managerId] || []).push(a) : noMgr.push(a); });
+        
+        let html = '';
+        if (noMgr.length) html += `<h4>Independent / Top Level</h4>${buildAdminTable(noMgr)}`;
+        for (const [mgr, members] of Object.entries(teams)) { html += `<h4>Team: ${mgr}</h4>${buildAdminTable(members)}`; }
+        div.innerHTML = html;
+        
+        if(performanceChartInstance) performanceChartInstance.destroy();
+        performanceChartInstance = new Chart(document.getElementById('performanceChart'), {
+            type: 'bar',
+            data: { labels: res.data.map(a => a.name), datasets: [{ label: 'Sales (RM)', data: res.data.map(a => a.totalSales), backgroundColor: '#0f3d2e' }] },
+            options: { responsive: true }
+        });
+    } else { div.innerHTML = '<p>No data.</p>'; }
+}
+
+// ADMIN: EMPLOYEES
+async function loadAdminEmployees() {
+    const div = document.getElementById('admin-emp-list');
+    div.innerHTML = 'Loading...';
+    const res = await postToGoogleScript('adminGetEmployees', { agentId: currentAgent.id });
+    if(res.success) {
+        div.innerHTML = `<table>
+            <thead><tr><th>ID</th><th>Name</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>${res.employees.map(e => `
+                <tr>
+                    <td>${e.AgentID}</td><td>${e.EmployeeName}</td><td>${e.IsAdmin}</td><td>${e.EmployeeStatus}</td>
+                    <td><button class="btn btn-secondary" style="padding:5px 10px; font-size:0.7rem;" onclick='openEditEmp(${JSON.stringify(e)})'>Edit</button></td>
+                </tr>`).join('')}
+            </tbody></table>`;
+    }
+}
+
+function openEditEmp(e) {
+    document.getElementById('emp-id').value = e.AgentID;
+    document.getElementById('emp-name').value = e.EmployeeName;
+    document.getElementById('emp-phone').value = e.EmployeePhone;
+    document.getElementById('emp-status').value = e.EmployeeStatus;
+    document.getElementById('emp-role').value = e.IsAdmin === 'ADMIN' ? 'ADMIN' : 'AGENT';
+    document.getElementById('emp-modal').classList.remove('hidden');
+}
+
+function openEmpModal() {
+    ['emp-id','emp-name','emp-phone'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('emp-modal').classList.remove('hidden');
+}
+
+async function saveEmployee() {
+    const data = {
+        adminId: currentAgent.id,
+        employeeData: {
+            AgentID: document.getElementById('emp-id').value,
+            EmployeeName: document.getElementById('emp-name').value,
+            EmployeePhone: document.getElementById('emp-phone').value,
+            EmployeeStatus: document.getElementById('emp-status').value,
+            IsAdmin: document.getElementById('emp-role').value
+        }
+    };
+    const res = await postToGoogleScript('adminSaveEmployee', data);
+    alert(res.message);
+    document.getElementById('emp-modal').classList.add('hidden');
+    loadAdminEmployees();
+}
+
+// ADMIN: PAYROLL
+async function loadAdminPayroll() {
+    const div = document.getElementById('admin-payroll-list');
+    div.innerHTML = "Loading...";
+    const res = await postToGoogleScript('adminGetPayroll', { agentId: currentAgent.id });
+    if(res.success) {
+        div.innerHTML = `<table style="font-size:0.85rem;">
+            <thead><tr><th>Agent</th><th>Invoice</th><th>Cost</th><th>Ship</th><th>Net Profit</th><th>Commission</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>${res.payroll.map(p => `
+                <tr>
+                    <td>${p.agentName}</td>
+                    <td>${p.invoiceId}</td>
+                    <td>${p.cost}</td>
+                    <td>${p.shipping}</td>
+                    <td>${p.netProfit}</td>
+                    <td><input type="number" id="pay-val-${p.row}" value="${p.commissionAmount}" style="width:80px; padding:5px;"></td>
+                    <td><span style="font-weight:700; color:${p.status==='Pending'?'orange':'green'}">${p.status}</span></td>
+                    <td><button class="btn btn-secondary" style="padding:5px; font-size:0.7rem;" onclick="updatePayroll(${p.row})">Save</button></td>
+                </tr>`).join('')}
+            </tbody></table>`;
+    }
+}
+
+async function updatePayroll(row) {
+    const val = document.getElementById(`pay-val-${row}`).value;
+    const res = await postToGoogleScript('adminUpdatePayroll', { adminId: currentAgent.id, row: row, field: 'commission', value: val });
+    if(res.success) alert("Updated");
+}
+
+async function lockPayroll() {
+    if(!confirm("Are you sure? This will confirm all Pending commissions and make them visible to agents.")) return;
+    const res = await postToGoogleScript('adminLockPayroll', { adminId: currentAgent.id });
+    alert(res.message);
+    loadAdminPayroll();
 }
 
 function buildAdminTable(agents) {
@@ -609,7 +781,6 @@ function renderOrderSummary() {
     }
     calculateTotals();
 }
-
 async function renderMyOrders() {
     const list = document.getElementById('my-orders-list');
     try {
@@ -710,6 +881,7 @@ function populateCreateOrderForm(data) {
     renderOrderSummary();
 }
 
+
 function handleNewCustomerToggle() {
     const form = document.getElementById('new-customer-form');
     form.classList.toggle('hidden');
@@ -780,6 +952,10 @@ async function handleChangePassword() {
     alert("Success! Login again."); location.reload();
 }
 function handleLogout() { location.reload(); }
+function refreshPageData() {
+    const active = document.querySelector('.view:not(.hidden)');
+    if(active) { showView(active.id); }
+}
 async function fetchPortalData() {
     try {
         const res = await postToGoogleScript('getPortalData');
