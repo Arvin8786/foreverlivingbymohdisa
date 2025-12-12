@@ -377,7 +377,7 @@
 
 // 1. DYNAMIC URL DETECTION
 // This ensures the fetch URL matches your specific Google Script deployment
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfBRSGiWVH4WWMGcgOEQMbwNndySaPDiQuQmslnvbXpb4ku7wkkwCZ2urWCXLF4SywkQ/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVijHbrh7C6O4C51-ccQCHkE-IMkokC9Iovd-_Vr9uh4vNs78yOMybca9U5BM61oN1lw/exec";
 
 let products = [], customers = [], shippingRules = [], currentAgent = null;
 let currentOrder = { items: [] }, performanceChartInstance = null;
@@ -697,38 +697,70 @@ async function saveEmployee() {
 async function loadAdminPayroll() {
     const div = document.getElementById('admin-payroll-list');
     div.innerHTML = "Loading...";
-    const res = await postToGoogleScript('adminGetPayroll', { agentId: currentAgent.id });
+    const res = await post('adminGetPayroll', { agentId: currentAgent.agent.id });
     if(res.success) {
-        div.innerHTML = `<table style="font-size:0.85rem;">
-            <thead><tr><th>Agent</th><th>Invoice</th><th>Cost</th><th>Ship</th><th>Net Profit</th><th>Commission</th><th>Status</th><th>Action</th></tr></thead>
+        div.innerHTML = `<table style="font-size:0.8rem; width:100%;">
+            <thead>
+                <tr style="background:#0a291f; color:#fff;">
+                    <th>Agent</th>
+                    <th>Invoice</th>
+                    <th>Cost</th>
+                    <th>Ship</th>
+                    <th>Net Profit</th>
+                    <th>Pre-Calc Comm</th>
+                    <th>Final Comm</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
             <tbody>${res.payroll.map(p => `
-                <tr>
+                <tr style="background:${p.status==='Confirmed'?'#e8f5e9':'#fff'}">
                     <td>${p.agentName}</td>
                     <td>${p.invoiceId}</td>
                     <td>${p.cost}</td>
                     <td>${p.shipping}</td>
                     <td>${p.netProfit}</td>
-                    <td><input type="number" id="pay-val-${p.row}" value="${p.commissionAmount}" style="width:80px; padding:5px;"></td>
+                    <td>${p.preCalcComm}</td>
+                    <td>
+                        <input type="number" id="pay-val-${p.row}" value="${p.commissionAmount}" 
+                        style="width:70px; padding:5px; border:1px solid #ccc;" 
+                        ${p.status!=='Pending'?'disabled':''}>
+                    </td>
                     <td><span style="font-weight:700; color:${p.status==='Pending'?'orange':'green'}">${p.status}</span></td>
-                    <td><button class="btn btn-secondary" style="padding:5px; font-size:0.7rem;" onclick="updatePayroll(${p.row})">Save</button></td>
+                    <td>
+                        ${p.status==='Pending' ? 
+                        `<button class="btn btn-secondary" style="padding:2px 5px; font-size:0.7rem;" onclick="updatePayroll(${p.row})">Save</button>` : 
+                        `<i class="fas fa-lock" style="color:#999;"></i>`}
+                    </td>
                 </tr>`).join('')}
-            </tbody></table>`;
+            </tbody></table>
+            
+            <div style="margin-top:20px; text-align:right; border-top:1px solid #eee; padding-top:10px;">
+                <button class="btn btn-primary" onclick="lockPayroll()" style="margin-right:10px;">1. Confirm & Lock Batch</button>
+                <button class="btn btn-danger" onclick="releasePayment()">2. Release Payment (End Cycle)</button>
+            </div>`;
     }
 }
 
 async function updatePayroll(row) {
     const val = document.getElementById(`pay-val-${row}`).value;
-    const res = await postToGoogleScript('adminUpdatePayroll', { adminId: currentAgent.id, row: row, field: 'commission', value: val });
+    const res = await post('adminUpdatePayroll', { adminId: currentAgent.agent.id, row: row, field: 'commission', value: val });
     if(res.success) alert("Updated");
 }
 
 async function lockPayroll() {
-    if(!confirm("Are you sure? This will confirm all Pending commissions and make them visible to agents.")) return;
-    const res = await postToGoogleScript('adminLockPayroll', { adminId: currentAgent.id });
+    if(!confirm("CONFIRM & LOCK?\n\nThis will change all 'Pending' items to 'Confirmed'.\nAgents will be able to see these amounts.\nYou cannot edit them here after this.")) return;
+    const res = await post('adminLockPayroll', { adminId: currentAgent.agent.id });
     alert(res.message);
     loadAdminPayroll();
 }
 
+async function releasePayment() {
+    if(!confirm("RELEASE PAYMENT (END OF CYCLE)?\n\nThis will mark all 'Confirmed' items as 'PAID'.\nThey will be archived and removed from this active view.\nAgents will see their current balance reset.")) return;
+    const res = await post('adminReleasePayment', { adminId: currentAgent.agent.id });
+    alert(res.message);
+    loadAdminPayroll();
+}
 function buildAdminTable(agents) {
     return `<table><thead><tr><th>Name</th><th>Target</th><th>Sales</th><th>%</th></tr></thead><tbody>${agents.map(a => `<tr><td>${a.name}</td><td>RM ${a.target.toFixed(2)}</td><td>RM ${a.totalSales.toFixed(2)}</td><td style="color:${a.targetAchieved>=1?'green':'red'}">${(a.targetAchieved*100).toFixed(0)}%</td></tr>`).join('')}</tbody></table>`;
 }
