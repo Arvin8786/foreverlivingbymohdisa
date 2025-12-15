@@ -278,16 +278,15 @@
     </div>
 </div>
 
-<div id="emp-modal" class="hidden"></div>
-
 <script>
 // =================================================================
-// BUSINESS PARTNER PORTAL SCRIPT (FINAL v50)
+// BUSINESS PARTNER PORTAL SCRIPT (FIXED)
 // =================================================================
-// ⚠️ PASTE YOUR V42.0 WEB APP URL HERE:
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTt_rKQ8aa0UpNH06eIeuQzI9iNS3Kh8izztziPNzY2k0uC72AAUAkp1r92_ywlv7Uxw/exec';
+// ⚠️ PASTE YOUR DEPLOYMENT URL HERE ⚠️
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyftF2MN1NcPr61MmVuvIAQMsh0teVsgnXtbK30itL5atCPmOvoZuHqGS_YMgp02izC3A/exec"; 
 
-let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
+let products = [], customers = [], shippingRules = [], currentAgent = null;
+let currentOrder = { items: [] }, performanceChartInstance = null;
 let currentProfile = {}, canEditProfile = false, allAgentsList = [];
 let currentDraftInvoiceId = null;
 
@@ -623,7 +622,7 @@ async function releasePayment() { if(confirm("Release Payment?")) { const res = 
 async function handleChangePassword() {
     const p1 = document.getElementById('new-password-input').value;
     const p2 = document.getElementById('confirm-password-input').value;
-    if(p1.length < 6 || p1!==p2) { alert("Invalid."); return; }
+    if (p1.length < 6 || p1!==p2) { alert("Invalid."); return; }
     await postToGoogleScript('updatePassword', { agentId: currentAgent.id, newPassword: p1 });
     alert("Success. Login again."); location.reload();
 }
@@ -675,7 +674,14 @@ async function renderAdminDashboard() {
     } else div.innerHTML='No data.';
 }
 async function postToGoogleScript(action, data = {}) {
-    const res = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action, data }) });
+    // Correctly using CORS method for Google Script Web App
+    const res = await fetch(GOOGLE_SCRIPT_URL, { 
+        method: 'POST', 
+        mode: 'cors', // Crucial for getting the response
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Simple content type to avoid preflight
+        body: JSON.stringify({ action, data }) 
+    });
+    if (!res.ok) throw new Error("Server Error");
     return await res.json();
 }
 function getBase64(file) {
