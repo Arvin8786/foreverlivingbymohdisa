@@ -39,12 +39,15 @@
             display: inline-block; padding: 12px 25px; 
             text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; font-weight: 700;
             border: 1px solid transparent; cursor: pointer; transition: 0.3s; text-align: center;
+            border-radius: var(--border-radius);
         }
         .btn:disabled { background: #ccc !important; border-color: #ccc !important; cursor: not-allowed; }
         .btn-primary { background: var(--primary-color); color: #fff; }
         .btn-primary:hover:not(:disabled) { background: var(--secondary-color); border-color: var(--secondary-color); color: #000; }
         .btn-secondary { background: transparent; border-color: var(--primary-color); color: var(--primary-color); }
         .btn-secondary:hover:not(:disabled) { background: var(--primary-color); color: #fff; }
+        .btn-danger { background: var(--danger-color); color: #fff; border-color: var(--danger-color); }
+        .btn-danger:hover { background: #8e2b2b; }
         
         /* Cards & Layout */
         .card { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow-soft); padding: 30px; margin-bottom: 25px; border: 1px solid #eee; }
@@ -61,7 +64,7 @@
 
         /* [ 2.0 ] LOGIN */
         #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary-color), #000); }
-        #login-box { width: 500px; text-align: center; border-top: 5px solid var(--secondary-color); }
+        #login-box { width: 500px; text-align: center; border-top: 5px solid var(--secondary-color); background: #fff; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
         #login-subtext { font-size: 0.85rem; color: #666; margin-bottom: 30px; line-height: 1.5; }
 
         /* [ 3.0 ] HEADER & NAV */
@@ -88,10 +91,10 @@
         .product-item-selectable img { width: 50px; height: 50px; object-fit: contain; }
         
         /* [ 5.0 ] TABLES */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
         thead { background: var(--primary-color); color: #fff; }
         th { padding: 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
         tr:hover { background: #fcfcfc; }
 
         /* [ 6.0 ] ADMIN TABS */
@@ -106,10 +109,11 @@
 <body>
 
 <div id="login-view">
-    <div class="card" id="login-box">
-        <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
+    <div id="login-box">
+        <img src="FL.jpg" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'" style="width: 80px; margin: 0 auto 20px auto; display:block;">
+        <h1 style="display:none; text-align:center; color:var(--primary-color);">FL</h1>
         <h1>Business Partner Login</h1>
-        <p id="login-subtext">Agents, Administrators and Independent Workers login page to manage sales and payment.</p>
+        <p id="login-subtext">Agents, Administrators and Independent Workers login page.</p>
         <form id="login-form">
             <input type="text" id="agent-id-input" placeholder="User ID" required>
             <input type="password" id="agent-password-input" placeholder="Password" required>
@@ -149,9 +153,9 @@
         <button id="nav-my-orders-btn" class="btn">My Orders</button>
         <button id="nav-my-commission-btn" class="btn">Commissions</button>
         <button id="nav-profile-btn" class="btn">Profile</button>
+        <button id="nav-learning-btn" class="btn">Learning</button> <!-- NEW TAB -->
         <button id="nav-team-btn" class="btn hidden">My Team</button> 
         <button id="nav-admin-dashboard-btn" class="btn hidden">Admin</button> 
-        <button id="nav-manage-employees-btn" class="btn hidden">Employees</button>
     </nav>
 
     <div id="open-orders-view" class="view">
@@ -209,10 +213,20 @@
     
     <div id="profile-view" class="view hidden card">
         <div style="display:flex; justify-content:space-between;"><h3>My Profile</h3><button id="save-profile-btn" class="btn btn-primary hidden" onclick="saveProfile()">Save Changes</button></div>
-        <div class="profile-grid" style="margin-top:20px;">
+        <div class="profile-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top:20px;">
             <div><h4>Identity</h4><input id="prof-name" disabled><input id="prof-id" disabled><input id="prof-pos" disabled></div>
             <div><h4>Target</h4><input id="prof-rate" disabled><input id="prof-target" disabled><input id="prof-mgr" disabled></div>
             <div><h4>Banking <span id="edit-badge" style="display:none; font-size:0.7rem;">(EDITABLE)</span></h4><input id="prof-bank" disabled><input id="prof-holder" disabled><input id="prof-acc" disabled></div>
+        </div>
+    </div>
+
+    <!-- NEW LEARNING TAB -->
+    <div id="learning-view" class="view hidden card">
+        <div style="text-align:center; padding:40px;">
+            <i class="fas fa-graduation-cap" style="font-size:3rem; color:var(--secondary-color); margin-bottom:20px;"></i>
+            <h3>Learning & Development</h3>
+            <p>Access exclusive training materials and tools. Only for active agents.</p>
+            <button class="btn btn-primary" onclick="accessSora()" style="margin-top:20px;">Access SORA 2</button>
         </div>
     </div>
 
@@ -230,6 +244,7 @@
         <div class="admin-tabs">
             <span class="tab-link active" onclick="switchAdminTab('stats')">Statistics</span>
             <span class="tab-link" onclick="switchAdminTab('payroll')">Payroll</span>
+            <span class="tab-link" onclick="switchAdminTab('employees')">Employees</span>
         </div>
         
         <div id="admin-sub-stats">
@@ -244,46 +259,70 @@
         
         <div id="admin-sub-payroll" class="hidden">
             <div style="background:#fff3cd; padding:10px; margin-bottom:15px; border-radius:4px;">
-                <strong>Payroll Action:</strong> Review commissions below. Click "Lock" to finalize batch, then "Release" to archive.
+                <strong>Payroll Action:</strong> Review commissions below. Click "Lock" to finalize batch (visible to agent), then "Release" to archive.
             </div>
-            <button class="btn btn-primary" onclick="lockPayroll()">Lock Batch</button>
-            <button class="btn btn-danger" onclick="releasePayment()">Release Payment</button>
-            <div id="admin-payroll-list" style="margin-top:20px;"></div>
+            <div style="margin-bottom:20px;">
+                <button class="btn btn-primary" onclick="lockPayroll()">Confirm & Lock Batch</button>
+                <button class="btn btn-danger" onclick="releasePayment()">Release Payment (End Cycle)</button>
+            </div>
+            <div id="admin-payroll-list"></div>
+        </div>
+
+        <div id="admin-sub-employees" class="hidden">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4>Employee Database</h4>
+                <button class="btn btn-primary" onclick="openEmpModal()">+ Add New</button>
+            </div>
+            <div id="admin-emp-list" style="margin-top:20px;"></div>
         </div>
     </div>
+</div>
 
-    <div id="manage-employees-view" class="view hidden card">
-        <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Manage Employees</h3><button class="btn btn-secondary" onclick="renderEmployeeList()">Refresh</button></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px; margin-top:20px;">
-            <div><h4>Employee List</h4><div id="employee-list-container" style="max-height:500px; overflow-y:auto; border:1px solid #eee;"></div></div>
-            <div>
-                <h4 id="emp-form-title">Create New Employee</h4>
-                <form id="employee-form">
-                    <input id="emp-agentid" placeholder="Agent ID (Unique)" required>
-                    <input id="emp-name" placeholder="Full Name" required>
-                    <input id="emp-phone" placeholder="Phone">
-                    <input id="emp-email" placeholder="Email">
-                    <input id="emp-position" placeholder="Position">
-                    <select id="emp-status"><option value="ACTIVE">ACTIVE</option><option value="INACTIVE">INACTIVE</option></select>
-                    <input type="number" id="emp-basic" placeholder="Basic Pay">
-                    <input type="number" id="emp-comm" placeholder="Comm Rate (0.15)" step="0.01">
-                    <input type="number" id="emp-target" placeholder="Target">
-                    <input id="emp-manager" placeholder="Manager ID">
-                    <select id="emp-isadmin"><option value="">Not Admin</option><option value="ADMIN">Admin</option></select>
-                    <button type="submit" id="emp-save-btn" class="btn btn-primary" style="width:100%;">Create Employee</button>
-                    <button type="button" id="emp-clear-btn" class="btn btn-secondary" style="width:100%; margin-top:10px;">Clear</button>
-                </form>
-            </div>
+<!-- SORA MODAL -->
+<div id="sora-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; display:flex; justify-content:center; align-items:center;">
+    <div class="card" style="width:400px; text-align:center;">
+        <i class="fas fa-key" style="font-size:2rem; color:var(--secondary-color); margin-bottom:20px;"></i>
+        <h3>Access Granted</h3>
+        <p>Use these credentials to login at Sora:</p>
+        <div style="background:#f9f9f9; padding:15px; margin:20px 0; text-align:left; border:1px solid #eee;">
+            <div style="margin-bottom:10px;"><strong>Email:</strong> <span id="sora-email"></span></div>
+            <div><strong>Password:</strong> <span id="sora-pass" style="font-family:monospace;"></span></div>
+        </div>
+        <a id="sora-link" href="#" target="_blank" class="btn btn-primary" style="display:block; width:100%; text-decoration:none;">Go to Login</a>
+        <button class="btn btn-secondary" onclick="document.getElementById('sora-modal').classList.add('hidden')" style="width:100%; margin-top:10px;">Close</button>
+    </div>
+</div>
+
+<!-- EMPLOYEE MODAL -->
+<div id="emp-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; display:flex; justify-content:center; align-items:center;">
+    <div class="card" style="width:500px; position:relative;">
+        <button onclick="document.getElementById('emp-modal').classList.add('hidden')" style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+        <h3 id="emp-form-title">Manage Employee</h3>
+        <div style="display:grid; gap:15px;">
+            <input id="emp-agentid" placeholder="Agent ID">
+            <input id="emp-name" placeholder="Full Name">
+            <input id="emp-email" placeholder="Email">
+            <input id="emp-phone" placeholder="Phone">
+            <input id="emp-position" placeholder="Position">
+            <select id="emp-status"><option value="ACTIVE">ACTIVE</option><option value="INACTIVE">INACTIVE</option></select>
+            <input id="emp-basic" placeholder="Basic Pay" type="number">
+            <input id="emp-comm" placeholder="Comm Rate (e.g. 0.15)" type="number" step="0.01">
+            <input id="emp-target" placeholder="Target" type="number">
+            <input id="emp-manager" placeholder="Manager ID">
+            <select id="emp-isadmin"><option value="">Standard</option><option value="ADMIN">Administrator</option></select>
+        </div>
+        <div style="margin-top:20px; text-align:right;">
+            <button class="btn btn-secondary" onclick="document.getElementById('emp-modal').classList.add('hidden')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveEmployee()">Save Changes</button>
         </div>
     </div>
 </div>
 
 <script>
 // =================================================================
-// BUSINESS PARTNER PORTAL SCRIPT (FIXED)
+// BUSINESS PARTNER PORTAL SCRIPT (FIXED & UPDATED)
 // =================================================================
-// ⚠️ PASTE YOUR DEPLOYMENT URL HERE ⚠️
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyftF2MN1NcPr61MmVuvIAQMsh0teVsgnXtbK30itL5atCPmOvoZuHqGS_YMgp02izC3A/exec"; 
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7waU07Va75dpnwyNDU6dpZcLZiCup9umNHb1BwdMwtpYLedCFmNzmtZpIK-1v7JDvfg/exec"; 
 
 let products = [], customers = [], shippingRules = [], currentAgent = null;
 let currentOrder = { items: [] }, performanceChartInstance = null;
@@ -295,11 +334,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('logout-btn').addEventListener('click', () => location.reload());
     document.getElementById('refresh-data-btn').addEventListener('click', () => {
          const active = document.querySelector('.view:not(.hidden)');
-         if(active) showView(active.id);
+         if(active) showView(active.id.replace('view-','')); // Fix ID match
     });
 
     // Nav
-    const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'team', 'admin-dashboard', 'manage-employees'];
+    const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'learning', 'team', 'admin-dashboard'];
     navs.forEach(n => {
         const btn = document.getElementById(`nav-${n}-btn`);
         if(btn) btn.addEventListener('click', () => showView(`${n}-view`));
@@ -312,9 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
     document.getElementById('product-order-search').addEventListener('keyup', renderProductSelectionList);
     document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
-    
-    document.getElementById('employee-form').addEventListener('submit', handleEmployeeSubmit);
-    document.getElementById('emp-clear-btn').addEventListener('click', clearEmployeeForm);
 });
 
 async function handleLogin() {
@@ -328,8 +364,8 @@ async function handleLogin() {
     try {
         const res = await postToGoogleScript('verifyAgent', { agentId: aid, password: pwd });
         if (res.success) {
-            currentAgent = { ...res.agent, ...res }; // Merge details
-            currentAgent.password = pwd; // Store for refresh
+            currentAgent = { ...res.agent, ...res }; 
+            currentAgent.password = pwd; 
             currentProfile = res.profile;
             canEditProfile = res.allowEdit;
 
@@ -339,26 +375,19 @@ async function handleLogin() {
                 return;
             }
 
-            // Load Initial Data
             await fetchPortalData();
             
-            // If Admin, load full agent list for assignment dropdowns
             if(currentAgent.isAdmin) {
                 const adminData = await postToGoogleScript('getAllAgentsList', {agentId: currentAgent.id});
                 if(adminData.success) allAgentsList = adminData.list;
             }
 
-            // UI Setup
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
             document.getElementById('agent-details-display').textContent = `${res.position || 'Partner'} | ID: ${currentAgent.id}`;
             
-            // Show Tabs based on Role
-            if(currentAgent.isAdmin) {
-                document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
-                document.getElementById('nav-manage-employees-btn').classList.remove('hidden');
-            }
+            if(currentAgent.isAdmin) document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
             if(currentAgent.isManager) document.getElementById('nav-team-btn').classList.remove('hidden');
 
             renderTargetBar();
@@ -376,16 +405,31 @@ function showView(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
     document.querySelectorAll('nav .btn').forEach(b => b.classList.remove('active'));
     document.getElementById(viewId).classList.remove('hidden');
-    document.getElementById(`nav-${viewId.replace('-view','-btn')}`).classList.add('active');
+    // Handle special naming
+    const navId = viewId.replace('-view',''); 
+    const btn = document.getElementById(`nav-${navId}-btn`);
+    if(btn) btn.classList.add('active');
 
     // Force Render Logic
     if(viewId === 'open-orders-view') renderOpenOrders();
     if(viewId === 'my-orders-view') renderMyOrders();
     if(viewId === 'my-commission-view') renderMyCommission();
     if(viewId === 'team-view') renderTeam();
-    if(viewId === 'admin-dashboard-view') renderAdminDashboard();
+    if(viewId === 'admin-dashboard-view') switchAdminTab('stats');
     if(viewId === 'profile-view') renderProfile();
-    if(viewId === 'manage-employees-view') renderEmployeeList();
+}
+
+// --- NEW: SORA ACCESS ---
+async function accessSora() {
+    const res = await postToGoogleScript('getSoraAccess', {agentId: currentAgent.id});
+    if(res.success) {
+        document.getElementById('sora-email').textContent = res.credentials.email;
+        document.getElementById('sora-pass').textContent = res.credentials.password;
+        document.getElementById('sora-link').href = res.url;
+        document.getElementById('sora-modal').classList.remove('hidden');
+    } else {
+        alert(res.message);
+    }
 }
 
 // --- MARKETPLACE LOGIC ---
@@ -421,7 +465,6 @@ async function pickOrder(id) {
     if(!confirm("Claim this order?")) return;
     const res = await postToGoogleScript('pickOrder', { invoiceId: id, agentId: currentAgent.id, agentName: currentAgent.name });
     if(res.success) {
-        // Populate create order form with this data
         populateCreateOrderForm(res.orderData);
         showView('create-order-view');
     } else { alert(res.message); renderOpenOrders(); }
@@ -436,11 +479,18 @@ async function adminAssignOrder(id) {
 }
 
 // --- ORDER CREATION ---
+function handleNewCustomerToggle() {
+    const form = document.getElementById('new-customer-form');
+    form.classList.toggle('hidden');
+    document.getElementById('customer-dropdown').disabled = !form.classList.contains('hidden');
+}
+function handleCustomerSelection() { if (document.getElementById('customer-dropdown').value) { document.getElementById('new-customer-form').classList.add('hidden'); document.getElementById('customer-dropdown').disabled = false; } }
+
 function updatePrice(id, pr) {
     const i = currentOrder.items.find(x => String(x.id) === String(id));
     if(i) {
         i.customPrice = parseFloat(pr) || 0;
-        renderOrderSummary(); // Re-calc logic handles validation
+        renderOrderSummary();
     }
 }
 
@@ -464,13 +514,6 @@ function renderOrderSummary() {
             </div>`;
         }).join('');
     }
-    
-    // Validate Total
-    const invalid = currentOrder.items.some(i => i.customPrice < (i.rsp * 0.75));
-    document.getElementById('submit-order-btn').disabled = invalid;
-    if(invalid) document.getElementById('submit-status').textContent = "Price Error: Fix red items.";
-    else document.getElementById('submit-status').textContent = "";
-    
     calculateTotals();
 }
 
@@ -483,60 +526,104 @@ function calculateTotals() {
     document.getElementById('summary-total').textContent = `RM ${(sub + ship).toFixed(2)}`;
 }
 
-// --- EMPLOYEE MANAGEMENT ---
-async function renderEmployeeList() {
-    const list = document.getElementById('employee-list-container');
-    list.innerHTML = 'Loading...';
-    const res = await postToGoogleScript('getAllEmployeesFull', {agentId: currentAgent.id});
-    if(res.success) {
-        list.innerHTML = `<table style="font-size:0.8rem;"><thead><tr><th>ID</th><th>Name</th><th>Role</th><th>Action</th></tr></thead><tbody>${res.employees.map(e => `<tr><td>${e.AgentID}</td><td>${e.EmployeeName}</td><td>${e.Position}</td><td><button class="btn btn-secondary" style="padding:2px 5px;font-size:0.6rem;" onclick='editEmployee(${JSON.stringify(e)})'>Edit</button></td></tr>`).join('')}</tbody></table>`;
-    }
-}
-function editEmployee(e) {
-    document.getElementById('emp-form-title').textContent = "Edit: " + e.AgentID;
-    document.getElementById('emp-agentid').value = e.AgentID;
-    document.getElementById('emp-agentid').disabled = true; 
-    document.getElementById('emp-name').value = e.EmployeeName;
-    document.getElementById('emp-email').value = e.EmployeeEmail;
-    document.getElementById('emp-phone').value = e.EmployeePhone;
-    document.getElementById('emp-position').value = e.Position;
-    document.getElementById('emp-status').value = e.EmployeeStatus;
-    document.getElementById('emp-basic').value = e.BasicPay;
-    document.getElementById('emp-comm').value = e.CommissionRate;
-    document.getElementById('emp-target').value = e.Target;
-    document.getElementById('emp-manager').value = e.ManagerID;
-    document.getElementById('emp-isadmin').value = e.IsAdmin;
-    document.getElementById('emp-save-btn').textContent = "Update";
-}
-function clearEmployeeForm() {
-    document.getElementById('employee-form').reset();
-    document.getElementById('emp-form-title').textContent = "Create New Employee";
-    document.getElementById('emp-agentid').disabled = false;
-    document.getElementById('emp-save-btn').textContent = "Create";
-}
-async function handleEmployeeSubmit(e) {
-    e.preventDefault();
-    const isEdit = document.getElementById('emp-agentid').disabled;
-    const data = {
-        AgentID: document.getElementById('emp-agentid').value,
-        EmployeeName: document.getElementById('emp-name').value,
-        EmployeeEmail: document.getElementById('emp-email').value,
-        EmployeePhone: document.getElementById('emp-phone').value,
-        Position: document.getElementById('emp-position').value,
-        EmployeeStatus: document.getElementById('emp-status').value,
-        BasicPay: document.getElementById('emp-basic').value,
-        CommissionRate: document.getElementById('emp-comm').value,
-        Target: document.getElementById('emp-target').value,
-        ManagerID: document.getElementById('emp-manager').value,
-        IsAdmin: document.getElementById('emp-isadmin').value,
-        agentId: currentAgent.id 
-    };
-    const action = isEdit ? 'updateEmployeeFull' : 'createEmployee';
-    const res = await postToGoogleScript(action, data);
-    alert(res.message); if(res.success) { clearEmployeeForm(); renderEmployeeList(); }
+// --- ADMIN ---
+function switchAdminTab(tabName) {
+    document.getElementById('admin-sub-stats').classList.add('hidden');
+    document.getElementById('admin-sub-payroll').classList.add('hidden');
+    document.getElementById('admin-sub-employees').classList.add('hidden');
+    document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+    
+    // Highlight
+    const links = document.querySelectorAll('.tab-link');
+    if(tabName==='stats') links[0].classList.add('active');
+    if(tabName==='payroll') links[1].classList.add('active');
+    if(tabName==='employees') links[2].classList.add('active');
+
+    if(tabName === 'stats') { document.getElementById('admin-sub-stats').classList.remove('hidden'); renderAdminDashboard(); }
+    if(tabName === 'payroll') { document.getElementById('admin-sub-payroll').classList.remove('hidden'); loadAdminPayroll(); }
+    if(tabName === 'employees') { document.getElementById('admin-sub-employees').classList.remove('hidden'); renderEmployeeList(); }
 }
 
-// --- STANDARD FUNCTIONS ---
+async function loadAdminPayroll() {
+    document.getElementById('admin-payroll-list').innerHTML = "Loading...";
+    const res = await postToGoogleScript('adminGetPayroll', { agentId: currentAgent.id });
+    if(res.success) {
+        document.getElementById('admin-payroll-list').innerHTML = `<table style="font-size:0.8rem; width:100%;">
+        <thead><tr style="background:#0a291f; color:#fff;"><th>Agent</th><th>Invoice</th><th>Cost</th><th>Profit</th><th>Comm</th><th>Status</th><th>Edit</th></tr></thead>
+        <tbody>${res.payroll.map(p => `
+        <tr style="background:${p.status==='Confirmed'?'#e8f5e9':'#fff'}">
+            <td>${p.agentName}</td>
+            <td>${p.invoiceId}</td>
+            <td>${p.cost}</td>
+            <td>${p.netProfit}</td>
+            <td><input id="pay-val-${p.row}" value="${p.commissionAmount}" style="width:60px;" ${p.status!=='Pending'?'disabled':''}></td>
+            <td>${p.status}</td>
+            <td>${p.status==='Pending' ? `<button class="btn btn-secondary" style="padding:2px;" onclick="updatePayroll(${p.row})">Save</button>` : '<i class="fas fa-lock"></i>'}</td>
+        </tr>`).join('')}</tbody></table>`;
+    }
+}
+
+async function updatePayroll(row) {
+    const val = document.getElementById(`pay-val-${row}`).value;
+    const res = await postToGoogleScript('adminUpdatePayroll', {adminId: currentAgent.id, row: row, field:'commission', value:val});
+    if(res.success) alert("Updated");
+}
+
+async function lockPayroll() { if(confirm("Confirm Lock?")) { const res = await postToGoogleScript('adminLockPayroll', {adminId: currentAgent.id}); alert(res.message); loadAdminPayroll(); } }
+async function releasePayment() { if(confirm("Release Payment?")) { const res = await postToGoogleScript('adminReleasePayment', {adminId: currentAgent.id}); alert(res.message); loadAdminPayroll(); } }
+
+// --- EMPLOYEES ---
+async function renderEmployeeList() {
+    const div = document.getElementById('admin-emp-list'); div.innerHTML='Loading...';
+    const res = await postToGoogleScript('adminGetEmployees', {agentId: currentAgent.id});
+    if(res.success) {
+        div.innerHTML = `<table><thead><tr><th>ID</th><th>Name</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>${res.employees.map(e => `<tr><td>${e.AgentID}</td><td>${e.EmployeeName}</td><td>${e.IsAdmin}</td><td>${e.EmployeeStatus}</td><td><button class="btn btn-secondary" style="padding:2px;" onclick='openEmpModal(${JSON.stringify(e)})'>Edit</button></td></tr>`).join('')}</tbody></table>`;
+    }
+}
+function openEmpModal(e = null) {
+    document.getElementById('emp-modal').classList.remove('hidden');
+    if(e) {
+        document.getElementById('emp-form-title').textContent = "Edit Employee";
+        document.getElementById('emp-agentid').value = e.AgentID;
+        document.getElementById('emp-agentid').disabled = true;
+        document.getElementById('emp-name').value = e.EmployeeName;
+        document.getElementById('emp-email').value = e.EmployeeEmail;
+        document.getElementById('emp-phone').value = e.EmployeePhone;
+        document.getElementById('emp-position').value = e.Position;
+        document.getElementById('emp-status').value = e.EmployeeStatus;
+        document.getElementById('emp-basic').value = e.BasicPay;
+        document.getElementById('emp-comm').value = e.CommissionRate;
+        document.getElementById('emp-target').value = e.Target;
+        document.getElementById('emp-manager').value = e.ManagerID;
+        document.getElementById('emp-isadmin').value = e.IsAdmin;
+    } else {
+        document.getElementById('emp-form-title').textContent = "Create New Employee";
+        document.querySelectorAll('#emp-modal input').forEach(i => { i.value = ''; i.disabled = false; });
+    }
+}
+async function saveEmployee() {
+    const data = {
+        adminId: currentAgent.id,
+        employeeData: {
+            AgentID: document.getElementById('emp-agentid').value,
+            EmployeeName: document.getElementById('emp-name').value,
+            EmployeeEmail: document.getElementById('emp-email').value,
+            EmployeePhone: document.getElementById('emp-phone').value,
+            Position: document.getElementById('emp-position').value,
+            EmployeeStatus: document.getElementById('emp-status').value,
+            BasicPay: document.getElementById('emp-basic').value,
+            CommissionRate: document.getElementById('emp-comm').value,
+            Target: document.getElementById('emp-target').value,
+            ManagerID: document.getElementById('emp-manager').value,
+            IsAdmin: document.getElementById('emp-isadmin').value
+        }
+    };
+    const res = await postToGoogleScript('adminSaveEmployee', data);
+    alert(res.message); if(res.success) { document.getElementById('emp-modal').classList.add('hidden'); renderEmployeeList(); }
+}
+
+// --- STANDARD ---
 function populateCreateOrderForm(data) {
     currentDraftInvoiceId = data.invoiceId;
     document.getElementById('processing-msg').style.display = 'block';
@@ -585,8 +672,8 @@ async function submitOrder() {
         const base64 = await getBase64(file);
         const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
         const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
-        const payload = { action: 'submitAgentOrder', data: { agent: currentAgent, customer: cust, items: currentOrder.items, shippingFee: ship, paymentProof: { file: base64.split(',')[1], mimeType: file.type }, invoiceId: currentDraftInvoiceId } };
-        const res = await postToGoogleScript('submitAgentOrder', payload.data);
+        const payload = { agent: currentAgent, customer: cust, items: currentOrder.items, shippingFee: ship, paymentProof: { file: base64.split(',')[1], mimeType: file.type }, invoiceId: currentDraftInvoiceId };
+        const res = await postToGoogleScript('submitAgentOrder', payload);
         if(res.success) { alert(`Success! Invoice: ${res.invoiceId}`); resetCreateOrderForm(); } else { alert(res.message); }
     } catch(e) { alert("Error."); } finally { btn.disabled = false; }
 }
@@ -602,23 +689,16 @@ function resetCreateOrderForm() {
     document.getElementById('processing-msg').style.display = 'none';
     renderOrderSummary();
 }
-function switchAdminTab(tabName) {
-    document.getElementById('admin-sub-stats').classList.add('hidden');
-    document.getElementById('admin-sub-payroll').classList.add('hidden');
-    document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
-    if(tabName === 'stats') { document.getElementById('admin-sub-stats').classList.remove('hidden'); renderAdminDashboard(); }
-    if(tabName === 'payroll') { document.getElementById('admin-sub-payroll').classList.remove('hidden'); loadAdminPayroll(); }
+async function renderMyOrders() {
+    const list = document.getElementById('my-orders-list'); list.innerHTML = 'Loading...';
+    const res = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
+    if(res.success) list.innerHTML = res.orders.map(o => `<div class="open-order-card"><div><strong>${o.invoiceId}</strong><br>${o.customerName} - RM ${o.total}</div><div><span style="color:${o.status==='Completed'?'green':'orange'}">${o.status}</span><br><a href="${o.receiptUrl}" target="_blank" class="btn btn-secondary" style="font-size:0.7rem;padding:2px;">Receipt</a></div></div>`).join('');
 }
-async function loadAdminPayroll() {
-    document.getElementById('admin-payroll-list').innerHTML = "Loading...";
-    const res = await postToGoogleScript('adminGetPayroll', { agentId: currentAgent.id });
-    if(res.success) {
-        document.getElementById('admin-payroll-list').innerHTML = `<table style="font-size:0.8rem; width:100%;"><thead><tr style="background:#0a291f; color:#fff;"><th>Agent</th><th>Invoice</th><th>Profit</th><th>Comm</th><th>Status</th></tr></thead><tbody>${res.payroll.map(p => `<tr><td>${p.agentName}</td><td>${p.invoiceId}</td><td>${p.netProfit}</td><td>${p.commissionAmount}</td><td>${p.status}</td></tr>`).join('')}</tbody></table>`;
-    }
+async function renderMyCommission() {
+    const list = document.getElementById('my-commission-list'); list.innerHTML = 'Loading...';
+    const res = await postToGoogleScript('getAgentCommission', { agentId: currentAgent.id });
+    if(res.success) list.innerHTML = `<table><thead><tr><th>Inv</th><th>Sales</th><th>Comm</th><th>Status</th></tr></thead><tbody>${res.records.map(r=>`<tr><td>${r.invoiceId}</td><td>${r.salesAmount}</td><td>${r.commissionAmount}</td><td>${r.status}</td></tr>`).join('')}</tbody></table>`;
 }
-async function lockPayroll() { if(confirm("Confirm Lock?")) { const res = await postToGoogleScript('adminLockPayroll', {adminId: currentAgent.id}); alert(res.message); loadAdminPayroll(); } }
-async function releasePayment() { if(confirm("Release Payment?")) { const res = await postToGoogleScript('adminReleasePayment', {adminId: currentAgent.id}); alert(res.message); loadAdminPayroll(); } }
-
 async function handleChangePassword() {
     const p1 = document.getElementById('new-password-input').value;
     const p2 = document.getElementById('confirm-password-input').value;
@@ -637,20 +717,20 @@ function renderTargetBar() {
     document.getElementById('target-bar-display').innerHTML = `<div style="font-size:0.8rem; color:#666;">Target: RM ${currentAgent.currentSales.toFixed(2)} / ${currentAgent.target.toFixed(2)} (${pct.toFixed(1)}%)</div><div class="target-bar-container"><div class="target-progress" style="width:${pct}%"></div></div>`;
 }
 function renderProfile() {
-    document.getElementById('prof-employeeName').value = currentProfile.employeeName||'';
-    document.getElementById('prof-agentID').value = currentProfile.agentID||'';
-    document.getElementById('prof-position').value = currentProfile.position||'';
-    document.getElementById('prof-commissionRate').value = currentProfile.commissionRate?`${(currentProfile.commissionRate*100).toFixed(2)}%`:'';
+    document.getElementById('prof-name').value = currentProfile.employeeName||'';
+    document.getElementById('prof-id').value = currentProfile.agentID||'';
+    document.getElementById('prof-pos').value = currentProfile.position||'';
+    document.getElementById('prof-rate').value = currentProfile.commissionRate?`${(currentProfile.commissionRate*100).toFixed(2)}%`:'';
     document.getElementById('prof-target').value = `RM ${currentProfile.target||0}`;
-    document.getElementById('prof-managerID').value = currentProfile.managerID||'';
-    document.getElementById('prof-bankName').value = currentProfile.bankName||'';
-    document.getElementById('prof-accountHolderName').value = currentProfile.accountHolderName||'';
-    document.getElementById('prof-accountNumber').value = currentProfile.accountNumber||'';
-    if(canEditProfile) { ['prof-bankName','prof-accountHolderName','prof-accountNumber'].forEach(id => document.getElementById(id).disabled=false); document.getElementById('save-profile-btn').classList.remove('hidden'); document.getElementById('edit-badge').style.display='inline'; }
+    document.getElementById('prof-mgr').value = currentProfile.managerID||'';
+    document.getElementById('prof-bank').value = currentProfile.bankName||'';
+    document.getElementById('prof-holder').value = currentProfile.accountHolderName||'';
+    document.getElementById('prof-acc').value = currentProfile.accountNumber||'';
+    if(canEditProfile) { ['prof-bank','prof-holder','prof-acc'].forEach(id => document.getElementById(id).disabled=false); document.getElementById('save-profile-btn').classList.remove('hidden'); document.getElementById('edit-badge').style.display='inline'; }
 }
 async function saveProfile() {
     const btn = document.getElementById('save-profile-btn'); btn.textContent="Saving..."; btn.disabled=true;
-    const payload = { agentId: currentAgent.id, bankName: document.getElementById('prof-bankName').value, accountHolderName: document.getElementById('prof-accountHolderName').value, accountNumber: document.getElementById('prof-accountNumber').value };
+    const payload = { agentId: currentAgent.id, bankName: document.getElementById('prof-bank').value, accountHolderName: document.getElementById('prof-holder').value, accountNumber: document.getElementById('prof-acc').value };
     try { const res = await postToGoogleScript('updateAgentProfile', payload); alert(res.message); if(res.success) Object.assign(currentProfile, payload); } catch(e) { alert("Error"); } finally { btn.textContent="Save Changes"; btn.disabled=false; }
 }
 async function renderTeam() {
@@ -674,11 +754,10 @@ async function renderAdminDashboard() {
     } else div.innerHTML='No data.';
 }
 async function postToGoogleScript(action, data = {}) {
-    // Correctly using CORS method for Google Script Web App
     const res = await fetch(GOOGLE_SCRIPT_URL, { 
         method: 'POST', 
-        mode: 'cors', // Crucial for getting the response
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Simple content type to avoid preflight
+        mode: 'cors', 
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action, data }) 
     });
     if (!res.ok) throw new Error("Server Error");
