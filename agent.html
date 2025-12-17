@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Using a placeholder logo if FL.jpg is missing -->
+    <link rel="icon" type="image/jpeg" href="FL.jpg">
     
     <style>
         /* [ 1.0 ] LUXURY VARIABLES */
@@ -45,6 +47,7 @@
         .btn-secondary { background: transparent; border-color: var(--primary-color); color: var(--primary-color); }
         .btn-secondary:hover:not(:disabled) { background: var(--primary-color); color: #fff; }
         .btn-danger { background: var(--danger-color); color: #fff; border-color: var(--danger-color); }
+        .btn-danger:hover { background: #802626; }
         
         /* Cards & Layout */
         .card { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow-soft); padding: 30px; margin-bottom: 25px; border: 1px solid #eee; }
@@ -60,7 +63,7 @@
 
         /* Login */
         #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary-color), #000); }
-        #login-box { width: 500px; text-align: center; border-top: 5px solid var(--secondary-color); background: #fff; padding: 40px; }
+        #login-box { width: 500px; text-align: center; border-top: 5px solid var(--secondary-color); background: #fff; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
 
         /* Header */
         header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #eee; margin-bottom: 30px; }
@@ -77,7 +80,10 @@
         /* Tables */
         .open-order-card { padding: 20px; border: 1px solid #eee; margin-bottom: 15px; background: #fff; transition: 0.3s; }
         .open-order-card:hover { border-color: var(--secondary-color); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        .admin-assign-box { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .admin-assign-box select { margin-bottom: 0; padding: 5px; font-size: 0.8rem; border: 1px solid #ddd; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
         thead { background: var(--primary-color); color: #fff; }
         th { padding: 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
         td { padding: 12px; border-bottom: 1px solid #eee; }
@@ -103,7 +109,7 @@
         <img src="FL.jpg" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'" style="width: 80px; margin: 0 auto 20px auto; display:block;">
         <h1 style="display:none; text-align:center; color:var(--primary-color);">FL</h1>
         <h1>Business Partner</h1>
-        <p>Login to manage sales, team, and learning.</p>
+        <p id="login-subtext">Login to manage sales, team, and learning.</p>
         <form id="login-form">
             <input type="text" id="agent-id-input" placeholder="User ID" required>
             <input type="password" id="agent-password-input" placeholder="Password" required>
@@ -116,7 +122,7 @@
 <div id="password-change-view" class="container hidden" style="min-height: 100vh; display: flex; justify-content: center; align-items: center;">
     <div class="card" style="width: 400px; text-align: center;">
         <h2>Security Update</h2>
-        <p>Please update your default password to continue.</p>
+        <p>Please update your default password.</p>
         <input type="password" id="new-password-input" placeholder="New Password" required>
         <input type="password" id="confirm-password-input" placeholder="Confirm New Password" required>
         <button id="change-password-btn" class="btn btn-primary" style="width:100%;">Update Password</button>
@@ -143,7 +149,7 @@
         <button id="nav-my-orders-btn" class="btn">My Orders</button>
         <button id="nav-my-commission-btn" class="btn">Commissions</button>
         <button id="nav-profile-btn" class="btn">Profile</button>
-        <button id="nav-learning-btn" class="btn">Learning</button> <!-- LEARNING TAB -->
+        <button id="nav-learning-btn" class="btn">Learning</button> <!-- NEW -->
         <button id="nav-team-btn" class="btn hidden">My Team</button> 
         <button id="nav-admin-dashboard-btn" class="btn hidden">Admin</button> 
     </nav>
@@ -216,7 +222,7 @@
         <div style="text-align:center; padding:60px 20px;">
             <i class="fas fa-graduation-cap" style="font-size:4rem; color:var(--secondary-color); margin-bottom:20px;"></i>
             <h3>Learning & Development Center</h3>
-            <p style="color:#666; margin-bottom:30px;">Access exclusive SORA 2 training materials and AI tools. Available to active agents only.</p>
+            <p style="color:#666; margin-bottom:30px;">Access exclusive training materials and AI tools (SORA 2). Available to active agents only.</p>
             <button class="btn btn-primary" onclick="accessSora()" style="padding:15px 30px; font-size:1rem;">Access SORA 2</button>
         </div>
     </div>
@@ -253,7 +259,9 @@
         <div id="admin-sub-payroll" class="hidden">
             <div style="background:#fff3cd; padding:15px; margin-bottom:20px; border-radius:4px;">
                 <strong>Payroll Action:</strong><br>
-                1. Edit amounts (Pending). 2. <strong>Lock Batch</strong> (Visible to Agent). 3. <strong>Release Payment</strong> (Archive).
+                1. Edit commissions if needed (Status: Pending).<br>
+                2. <strong>Lock Batch</strong> to make commissions visible to agents (Status: Confirmed).<br>
+                3. <strong>Release Payment</strong> to archive records and clear current view (Status: Paid).
             </div>
             <div style="margin-bottom:20px;">
                 <button class="btn btn-primary" onclick="lockPayroll()">Confirm & Lock Batch</button>
@@ -317,7 +325,7 @@
 // =================================================================
 // BUSINESS PARTNER PORTAL SCRIPT (FINAL)
 // =================================================================
-// ⚠️ REPLACE THIS WITH YOUR DEPLOYMENT URL ⚠️
+// ⚠️ REPLACE THIS WITH YOUR NEW DEPLOYMENT URL FROM CODE.GS V52.0 ⚠️
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLBzQ3Yaz7UzS3x0XykhHnP2KQPKlIDUUxu4vGasT_7t7EAwrLXvRN5wC2XhJGe3mKoQ/exec"; 
 
 let products = [], customers = [], shippingRules = [], currentAgent = null;
@@ -404,7 +412,6 @@ function showView(viewId) {
     const btn = document.getElementById(`nav-${navId}-btn`);
     if(btn) btn.classList.add('active');
 
-    // Force Render Logic
     if(viewId === 'open-orders-view') renderOpenOrders();
     if(viewId === 'my-orders-view') renderMyOrders();
     if(viewId === 'my-commission-view') renderMyCommission();
@@ -413,7 +420,7 @@ function showView(viewId) {
     if(viewId === 'profile-view') renderProfile();
 }
 
-// --- NEW: SORA ACCESS ---
+// --- SORA ACCESS ---
 async function accessSora() {
     const res = await postToGoogleScript('getSoraAccess', {agentId: currentAgent.id});
     if(res.success) {
@@ -426,7 +433,7 @@ async function accessSora() {
     }
 }
 
-// --- MARKETPLACE LOGIC ---
+// --- MARKETPLACE & PICK ORDER FIX ---
 async function renderOpenOrders() {
     const list = document.getElementById('open-orders-list');
     list.innerHTML = 'Checking database...';
@@ -440,7 +447,6 @@ async function renderOpenOrders() {
                     const options = allAgentsList.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
                     adminControls = `<div class="admin-assign-box"><span style="font-size:0.7rem;font-weight:700;color:var(--secondary-color);">FORCE ASSIGN:</span><select id="assign-select-${o.invoiceId}">${options}</select><button class="btn btn-secondary" style="padding:5px 10px;font-size:0.7rem;" onclick="adminAssignOrder('${o.invoiceId}')">GO</button></div>`;
                 }
-                
                 return `<div class="open-order-card">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div><strong>${o.invoiceId}</strong><br>${o.customerName}<br>RM ${o.total}</div>
@@ -459,8 +465,8 @@ async function pickOrder(id) {
     if(!confirm("Claim this order?")) return;
     const res = await postToGoogleScript('pickOrder', { invoiceId: id, agentId: currentAgent.id, agentName: currentAgent.name });
     if(res.success) {
-        populateCreateOrderForm(res.orderData);
         showView('create-order-view');
+        populateCreateOrderForm(res.orderData); // This function is now robust
     } else { alert(res.message); renderOpenOrders(); }
 }
 
@@ -472,7 +478,7 @@ async function adminAssignOrder(id) {
     alert(res.message); if(res.success) renderOpenOrders();
 }
 
-// --- ORDER CREATION ---
+// --- ORDER MGMT ---
 function handleNewCustomerToggle() {
     const form = document.getElementById('new-customer-form');
     form.classList.toggle('hidden');
@@ -482,10 +488,7 @@ function handleCustomerSelection() { if (document.getElementById('customer-dropd
 
 function updatePrice(id, pr) {
     const i = currentOrder.items.find(x => String(x.id) === String(id));
-    if(i) {
-        i.customPrice = parseFloat(pr) || 0;
-        renderOrderSummary();
-    }
+    if(i) { i.customPrice = parseFloat(pr) || 0; renderOrderSummary(); }
 }
 
 function renderOrderSummary() {
@@ -530,7 +533,6 @@ function switchAdminTab(tabName) {
     document.getElementById('admin-sub-employees').classList.add('hidden');
     document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
     
-    // Highlight
     const links = document.querySelectorAll('.tab-link');
     if(tabName==='stats') links[0].classList.add('active');
     if(tabName==='payroll') links[1].classList.add('active');
@@ -541,6 +543,7 @@ function switchAdminTab(tabName) {
     if(tabName === 'employees') { document.getElementById('admin-sub-employees').classList.remove('hidden'); renderEmployeeList(); }
 }
 
+// ADMIN PAYROLL (UPDATED)
 async function loadAdminPayroll() {
     document.getElementById('admin-payroll-list').innerHTML = "Loading...";
     const res = await postToGoogleScript('adminGetPayroll', { agentId: currentAgent.id });
@@ -632,9 +635,18 @@ function populateCreateOrderForm(data) {
     document.getElementById('new-customer-email').value = data.customer.email;
     document.getElementById('new-customer-phone').value = data.customer.phone;
     document.getElementById('new-customer-address').value = data.customer.address;
+    
+    // FIX: Fallback if product not in list (avoids crash)
     currentOrder.items = data.items.map(i => {
         const p = products.find(prod => String(prod.id) === String(i.id));
-        return { id: i.id, name: i.name, quantity: parseInt(i.quantity)||1, customPrice: parseFloat(i.customPrice||i.price), rsp: p?p.rsp:0, minPrice: p?p.minPrice:0 };
+        return { 
+            id: i.id, 
+            name: i.name, 
+            quantity: parseInt(i.quantity)||1, 
+            customPrice: parseFloat(i.customPrice||i.price), 
+            rsp: p ? p.rsp : 0, 
+            minPrice: p ? p.minPrice : 0 
+        };
     });
     renderOrderSummary();
 }
@@ -669,11 +681,24 @@ async function submitOrder() {
     try {
         const base64 = await getBase64(file);
         const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-        const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
-        const payload = { agent: currentAgent, customer: cust, items: currentOrder.items, shippingFee: ship, paymentProof: { file: base64.split(',')[1], mimeType: file.type }, invoiceId: currentDraftInvoiceId };
+        
+        let ship = 0;
+        if(shippingRules.length > 0) {
+            const rule = shippingRules.find(r => sub >= r.minSpend);
+            ship = rule ? rule.charge : shippingRules[shippingRules.length-1].charge;
+        }
+
+        const payload = { 
+            agent: currentAgent, 
+            customer: cust, 
+            items: currentOrder.items, 
+            shippingFee: ship, 
+            paymentProof: { file: base64.split(',')[1], mimeType: file.type }, 
+            invoiceId: currentDraftInvoiceId 
+        };
         const res = await postToGoogleScript('submitAgentOrder', payload);
         if(res.success) { alert(`Success! Invoice: ${res.invoiceId}`); resetCreateOrderForm(); } else { alert(res.message); }
-    } catch(e) { alert("Error."); } finally { btn.disabled = false; }
+    } catch(e) { alert("Error."); console.error(e); } finally { btn.disabled = false; }
 }
 function resetCreateOrderForm() {
     currentDraftInvoiceId = null;
@@ -706,7 +731,7 @@ async function handleChangePassword() {
 }
 async function fetchPortalData() {
     const res = await postToGoogleScript('getPortalData', {});
-    if(res.success) { products = res.products; customers = res.customers; shippingRules = (res.shippingRules||[]).sort((a,b)=>b.minSpend-a.minSpend); renderProductSelectionList(); renderCustomerDropdown(); renderProductCatalog(); }
+    if(res.success) { products = res.products || []; customers = res.customers || []; shippingRules = (res.shippingRules||[]).sort((a,b)=>b.minSpend-a.minSpend); renderProductSelectionList(); renderCustomerDropdown(); renderProductCatalog(); }
 }
 function renderProductCatalog() { document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join(''); }
 function renderCustomerDropdown() { document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join(''); }
@@ -752,6 +777,7 @@ async function renderAdminDashboard() {
     } else div.innerHTML='No data.';
 }
 async function postToGoogleScript(action, data = {}) {
+    // Standard CORS POST
     const res = await fetch(GOOGLE_SCRIPT_URL, { 
         method: 'POST', 
         mode: 'cors', 
