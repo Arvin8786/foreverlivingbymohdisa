@@ -777,7 +777,44 @@ async function fetchPortalData() {
     const res = await postToGoogleScript('getPortalData', {});
     if(res.success) { products = res.products || []; customers = res.customers || []; shippingRules = (res.shippingRules||[]).sort((a,b)=>b.minSpend-a.minSpend); renderProductSelectionList(); renderCustomerDropdown(); renderProductCatalog(); }
 }
-function renderProductCatalog() { document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join(''); }
+function function renderProductCatalog() { 
+    const tbody = document.getElementById('product-catalog-table');
+    
+    // Check if user is Admin to show input fields
+    const isAdmin = currentAgent && currentAgent.isAdmin;
+
+    tbody.innerHTML = products.map(p => `
+        <tr>
+            <td>${p.id}</td>
+            <td>${p.name}</td>
+            <td>
+                ${isAdmin 
+                    ? `<input type="number" value="${p.rsp}" step="0.01" onchange="updateCatalogPrice('${p.id}', this.value)" style="width:80px; margin:0;">` 
+                    : `RM ${p.rsp.toFixed(2)}`
+                }
+            </td>
+            <td>${p.cc.toFixed(3)}</td>
+        </tr>
+    `).join(''); 
+}
+
+// Function to handle the price update sent to Google Sheets
+async function updateCatalogPrice(sku, newPrice) {
+    if(!confirm(`Update price for ${sku} to RM ${newPrice}?`)) { renderProductCatalog(); return; }
+    
+    // Optimistic UI update
+    const p = products.find(x => x.id == sku);
+    if(p) p.rsp = parseFloat(newPrice);
+
+    const res = await postToGoogleScript('adminUpdatePrice', { 
+        adminId: currentAgent.id, 
+        sku: sku, 
+        newPrice: newPrice 
+    });
+    
+    alert(res.message);
+    if(!res.success) fetchPortalData(); // Revert if failed
+}
 function renderCustomerDropdown() { document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join(''); }
 function renderTargetBar() {
     const pct = Math.min(100, currentAgent.target > 0 ? (currentAgent.currentSales / currentAgent.target) * 100 : 0);
