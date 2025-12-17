@@ -107,13 +107,15 @@
         <h1 style="display:none; text-align:center; color:var(--primary-color);">FL</h1>
         <h1>Business Partner</h1>
         <p id="login-subtext">Login to manage sales, team, and learning.</p>
+        
+        <!-- FIXED FORM START -->
         <form id="login-form">
             <input type="text" id="agent-id-input" placeholder="User ID" required>
-            <input type="password" id="agent-password-input" placeholder="Password" required onkeydown="if(event.key === 'Enter'){handleLogin()}">
-            <!-- Changed type to 'button' to prevent page refresh -->
-            <button type="button" id="login-btn" class="btn btn-primary" style="width:100%;" onclick="handleLogin()">Secure Login</button>
+            <input type="password" id="agent-password-input" placeholder="Password" required>
+            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">Secure Login</button>
             <p id="login-status" style="margin-top: 15px; font-size: 0.9rem; font-weight: 600; text-align: center;"></p>
         </form>
+        <!-- FIXED FORM END -->
     </div>
 </div>
 
@@ -347,19 +349,36 @@ let currentProfile = {}, canEditProfile = false, allAgentsList = [];
 let currentDraftInvoiceId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('login-form').addEventListener('submit', (event) => { event.preventDefault(); handleLogin(); });
-    document.getElementById('logout-btn').addEventListener('click', () => location.reload());
-    document.getElementById('refresh-data-btn').addEventListener('click', () => {
-         const active = document.querySelector('.view:not(.hidden)');
-         if(active) showView(active.id.replace('view-','').replace('-view',''));
-    });
+    // 1. FIX LOGIN FORM LISTENER
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // STOP PAGE RELOAD
+            handleLogin();          // RUN LOGIN LOGIC
+        });
+    }
 
-    const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'learning', 'team', 'admin-dashboard'];
+    // 2. LOGOUT LISTENER
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', () => location.reload());
+
+    // 3. REFRESH LISTENER
+    const refreshBtn = document.getElementById('refresh-data-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            const active = document.querySelector('.view:not(.hidden)');
+            if(active) showView(active.id.replace('view-','').replace('-view',''));
+        });
+    }
+
+    // 4. NAV BUTTON LISTENERS
+    const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'learning', 'team', 'admin-dashboard', 'manage-employees'];
     navs.forEach(n => {
         const btn = document.getElementById(`nav-${n}-btn`);
         if(btn) btn.addEventListener('click', () => showView(`${n}-view`));
     });
 
+    // 5. OTHER EVENT LISTENERS
     document.getElementById('change-password-btn').addEventListener('click', handleChangePassword);
     document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
     document.getElementById('customer-dropdown').addEventListener('change', handleCustomerSelection);
@@ -374,68 +393,55 @@ async function handleLogin() {
     const btn = document.getElementById('login-btn');
     const status = document.getElementById('login-status');
     
-    if(!aid || !pwd) {
-        status.textContent = "Please enter User ID and Password.";
-        status.style.color = 'var(--danger-color)';
-        return;
-    }
-
-    // UI Loading State
+    // VISUAL FEEDBACK START
     btn.disabled = true; 
     btn.textContent = "Verifying..."; 
     status.textContent = "";
+    status.style.color = "#333";
+    // VISUAL FEEDBACK END
 
     try {
         const res = await postToGoogleScript('verifyAgent', { agentId: aid, password: pwd });
         
         if (res.success) {
-            // 1. Save Data
             currentAgent = { ...res.agent, ...res }; 
             currentAgent.password = pwd; 
             currentProfile = res.profile;
             canEditProfile = res.allowEdit;
 
-            // 2. Check Force Password Change
             if (res.mustChangePassword) {
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('password-change-view').classList.remove('hidden');
                 return;
             }
 
-            // 3. Load Initial Data (Background)
-            // We don't await this so the UI switches immediately
-            fetchPortalData();
+            await fetchPortalData();
             
-            // 4. Load Admin List if applicable
             if(currentAgent.isAdmin) {
+                // Background load admin data
                 postToGoogleScript('getAllAgentsList', {agentId: currentAgent.id})
-                .then(data => { if(data.success) allAgentsList = data.list; });
+                .then(r => { if(r.success) allAgentsList = r.list; });
             }
 
-            // 5. Switch UI
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
             
-            // 6. Update Headers
+            // Update Headers
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
             document.getElementById('agent-details-display').textContent = `${res.position || 'Partner'} | ID: ${currentAgent.id}`;
             
-            // 7. Show Tabs based on Role
+            // Show Tabs
             if(currentAgent.isAdmin) {
                 document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
-                document.getElementById('nav-manage-employees-btn').classList.remove('hidden');
             }
             if(currentAgent.isManager) {
                 document.getElementById('nav-team-btn').classList.remove('hidden');
             }
 
-            // 8. Render Default Views
             renderTargetBar();
             renderProfile();
             showView('open-orders-view'); 
-
         } else {
-            // Login Failed
             status.textContent = res.message;
             status.style.color = 'var(--danger-color)';
             btn.disabled = false;
@@ -443,7 +449,7 @@ async function handleLogin() {
         }
     } catch(e) { 
         console.error(e);
-        status.textContent = "System Error: Check Internet Connection.";
+        status.textContent = "Connection Error. Check URL."; 
         status.style.color = 'var(--danger-color)';
         btn.disabled = false;
         btn.textContent = "Secure Login";
