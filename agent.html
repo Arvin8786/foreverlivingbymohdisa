@@ -9,17 +9,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Using a placeholder logo if FL.jpg is missing -->
     <link rel="icon" type="image/jpeg" href="FL.jpg">
     
     <style>
         /* [ 1.0 ] LUXURY VARIABLES */
         :root {
-            --primary-color: #0a291f;      /* Deep Regal Green */
-            --secondary-color: #d4af37;    /* Satin Gold */
-            --accent-color: #14523d;       /* Lighter Emerald */
-            --bg-color: #fcfcfc;           /* Pearl White */
-            --card-bg: #ffffff;            /* Pure White */
+            --primary-color: #0a291f;      
+            --secondary-color: #d4af37;    
+            --bg-color: #fcfcfc;           
+            --card-bg: #ffffff;            
             --text-main: #333333;
             --text-light: #777777;
             --danger-color: #a83232;
@@ -47,7 +45,6 @@
         .btn-secondary { background: transparent; border-color: var(--primary-color); color: var(--primary-color); }
         .btn-secondary:hover:not(:disabled) { background: var(--primary-color); color: #fff; }
         .btn-danger { background: var(--danger-color); color: #fff; border-color: var(--danger-color); }
-        .btn-danger:hover { background: #802626; }
         
         /* Cards & Layout */
         .card { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow-soft); padding: 30px; margin-bottom: 25px; border: 1px solid #eee; }
@@ -222,8 +219,11 @@
         <div style="text-align:center; padding:60px 20px;">
             <i class="fas fa-graduation-cap" style="font-size:4rem; color:var(--secondary-color); margin-bottom:20px;"></i>
             <h3>Learning & Development Center</h3>
-            <p style="color:#666; margin-bottom:30px;">Access exclusive training materials and AI tools (SORA 2). Available to active agents only.</p>
-            <button class="btn btn-primary" onclick="accessSora()" style="padding:15px 30px; font-size:1rem;">Access SORA 2</button>
+            <p style="color:#666; margin-bottom:30px;">Access exclusive SORA 2 training materials and AI tools. Available to active agents only.</p>
+            <div id="learning-platforms-list" style="display:flex; flex-wrap:wrap; justify-content:center; gap:15px;">
+                <button class="btn btn-primary" onclick="accessSora()" style="padding:15px 30px; font-size:1rem;">Access SORA 2</button>
+                <!-- Dynamic Platforms will render here -->
+            </div>
         </div>
     </div>
 
@@ -242,6 +242,7 @@
             <span class="tab-link active" onclick="switchAdminTab('stats')">Statistics</span>
             <span class="tab-link" onclick="switchAdminTab('payroll')">Payroll</span>
             <span class="tab-link" onclick="switchAdminTab('employees')">Employees</span>
+            <span class="tab-link" onclick="switchAdminTab('learning')">Learning Mgmt</span>
         </div>
         
         <!-- Stats -->
@@ -259,8 +260,8 @@
         <div id="admin-sub-payroll" class="hidden">
             <div style="background:#fff3cd; padding:15px; margin-bottom:20px; border-radius:4px;">
                 <strong>Payroll Action:</strong><br>
-                1. Edit commissions if needed (Status: Pending).<br>
-                2. <strong>Lock Batch</strong> to make commissions visible to agents (Status: Confirmed).<br>
+                1. Edit amounts if needed (Pending).<br>
+                2. <strong>Lock Batch</strong> to show amounts to agents (Confirmed).<br>
                 3. <strong>Release Payment</strong> to archive records and clear current view (Status: Paid).
             </div>
             <div style="margin-bottom:20px;">
@@ -277,6 +278,17 @@
                 <button class="btn btn-primary" onclick="openEmpModal()">+ Add New</button>
             </div>
             <div id="admin-emp-list" style="margin-top:20px;"></div>
+        </div>
+
+        <!-- Learning Management -->
+        <div id="admin-sub-learning" class="hidden">
+            <h4>Manage Learning Platforms</h4>
+            <div style="display:flex; gap:10px; margin-bottom:20px; background:#f9f9f9; padding:15px;">
+                <input id="new-platform-name" placeholder="Platform Name">
+                <input id="new-platform-url" placeholder="URL Link">
+                <button class="btn btn-primary" onclick="addPlatform()">Add</button>
+            </div>
+            <!-- List will be dynamic here -->
         </div>
     </div>
 </div>
@@ -323,10 +335,10 @@
 
 <script>
 // =================================================================
-// BUSINESS PARTNER PORTAL SCRIPT (FINAL)
+// BUSINESS PARTNER PORTAL SCRIPT (FINAL V54.0)
 // =================================================================
-// ⚠️ REPLACE THIS WITH YOUR NEW DEPLOYMENT URL FROM CODE.GS V52.0 ⚠️
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLBzQ3Yaz7UzS3x0XykhHnP2KQPKlIDUUxu4vGasT_7t7EAwrLXvRN5wC2XhJGe3mKoQ/exec"; 
+// ⚠️ PASTE YOUR DEPLOYMENT URL HERE ⚠️
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6haFUhB-Vds1JemMGxxsgUHAuKmZ6cjlR1B2mGtYHsHVSQik3h9MgswOQVIkzS_c84A/exec"; 
 
 let products = [], customers = [], shippingRules = [], currentAgent = null;
 let currentOrder = { items: [] }, performanceChartInstance = null;
@@ -394,6 +406,7 @@ async function handleLogin() {
 
             renderTargetBar();
             renderProfile();
+            loadLearningPlatforms(); // Initial Load
             showView('open-orders-view'); 
         } else {
             status.textContent = res.message;
@@ -412,15 +425,17 @@ function showView(viewId) {
     const btn = document.getElementById(`nav-${navId}-btn`);
     if(btn) btn.classList.add('active');
 
+    // Force Render Logic
     if(viewId === 'open-orders-view') renderOpenOrders();
     if(viewId === 'my-orders-view') renderMyOrders();
     if(viewId === 'my-commission-view') renderMyCommission();
     if(viewId === 'team-view') renderTeam();
     if(viewId === 'admin-dashboard-view') switchAdminTab('stats');
     if(viewId === 'profile-view') renderProfile();
+    if(viewId === 'learning-view') loadLearningPlatforms();
 }
 
-// --- SORA ACCESS ---
+// --- NEW: SORA ACCESS & LEARNING ---
 async function accessSora() {
     const res = await postToGoogleScript('getSoraAccess', {agentId: currentAgent.id});
     if(res.success) {
@@ -433,7 +448,40 @@ async function accessSora() {
     }
 }
 
-// --- MARKETPLACE & PICK ORDER FIX ---
+async function loadLearningPlatforms() {
+    const res = await postToGoogleScript('getLearningPlatforms', {});
+    const container = document.getElementById('learning-platforms-list');
+    
+    // Clear dynamic items (Keep Sora Button)
+    const soraBtn = container.firstElementChild;
+    container.innerHTML = '';
+    container.appendChild(soraBtn);
+
+    if(res.success && res.platforms) {
+        res.platforms.forEach(p => {
+            const a = document.createElement('a');
+            a.href = p.url;
+            a.target = "_blank";
+            a.className = "btn btn-secondary";
+            a.style.padding = "15px 30px";
+            a.style.fontSize = "1rem";
+            a.style.textDecoration = "none";
+            a.textContent = p.name;
+            container.appendChild(a);
+        });
+    }
+}
+
+async function addPlatform() {
+    const name = document.getElementById('new-platform-name').value;
+    const url = document.getElementById('new-platform-url').value;
+    if(!name || !url) return alert("Fill all fields");
+    const res = await postToGoogleScript('adminAddPlatform', {adminId: currentAgent.id, name, url});
+    alert(res.message);
+    loadLearningPlatforms();
+}
+
+// --- MARKETPLACE LOGIC ---
 async function renderOpenOrders() {
     const list = document.getElementById('open-orders-list');
     list.innerHTML = 'Checking database...';
@@ -447,6 +495,7 @@ async function renderOpenOrders() {
                     const options = allAgentsList.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
                     adminControls = `<div class="admin-assign-box"><span style="font-size:0.7rem;font-weight:700;color:var(--secondary-color);">FORCE ASSIGN:</span><select id="assign-select-${o.invoiceId}">${options}</select><button class="btn btn-secondary" style="padding:5px 10px;font-size:0.7rem;" onclick="adminAssignOrder('${o.invoiceId}')">GO</button></div>`;
                 }
+                
                 return `<div class="open-order-card">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div><strong>${o.invoiceId}</strong><br>${o.customerName}<br>RM ${o.total}</div>
@@ -466,7 +515,7 @@ async function pickOrder(id) {
     const res = await postToGoogleScript('pickOrder', { invoiceId: id, agentId: currentAgent.id, agentName: currentAgent.name });
     if(res.success) {
         showView('create-order-view');
-        populateCreateOrderForm(res.orderData); // This function is now robust
+        populateCreateOrderForm(res.orderData);
     } else { alert(res.message); renderOpenOrders(); }
 }
 
@@ -488,7 +537,10 @@ function handleCustomerSelection() { if (document.getElementById('customer-dropd
 
 function updatePrice(id, pr) {
     const i = currentOrder.items.find(x => String(x.id) === String(id));
-    if(i) { i.customPrice = parseFloat(pr) || 0; renderOrderSummary(); }
+    if(i) {
+        i.customPrice = parseFloat(pr) || 0;
+        renderOrderSummary();
+    }
 }
 
 function renderOrderSummary() {
@@ -531,31 +583,32 @@ function switchAdminTab(tabName) {
     document.getElementById('admin-sub-stats').classList.add('hidden');
     document.getElementById('admin-sub-payroll').classList.add('hidden');
     document.getElementById('admin-sub-employees').classList.add('hidden');
+    document.getElementById('admin-sub-learning').classList.add('hidden');
     document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
     
     const links = document.querySelectorAll('.tab-link');
     if(tabName==='stats') links[0].classList.add('active');
     if(tabName==='payroll') links[1].classList.add('active');
     if(tabName==='employees') links[2].classList.add('active');
+    if(tabName==='learning') links[3].classList.add('active');
 
     if(tabName === 'stats') { document.getElementById('admin-sub-stats').classList.remove('hidden'); renderAdminDashboard(); }
     if(tabName === 'payroll') { document.getElementById('admin-sub-payroll').classList.remove('hidden'); loadAdminPayroll(); }
     if(tabName === 'employees') { document.getElementById('admin-sub-employees').classList.remove('hidden'); renderEmployeeList(); }
+    if(tabName === 'learning') { document.getElementById('admin-sub-learning').classList.remove('hidden'); }
 }
 
-// ADMIN PAYROLL (UPDATED)
 async function loadAdminPayroll() {
     document.getElementById('admin-payroll-list').innerHTML = "Loading...";
     const res = await postToGoogleScript('adminGetPayroll', { agentId: currentAgent.id });
     if(res.success) {
         document.getElementById('admin-payroll-list').innerHTML = `<table style="font-size:0.8rem; width:100%;">
-        <thead><tr style="background:#0a291f; color:#fff;"><th>Agent</th><th>Inv</th><th>Cost</th><th>Ship</th><th>Profit</th><th>Comm</th><th>Status</th><th>Edit</th></tr></thead>
+        <thead><tr style="background:#0a291f; color:#fff;"><th>Agent</th><th>Inv</th><th>Cost</th><th>Profit</th><th>Comm</th><th>Status</th><th>Edit</th></tr></thead>
         <tbody>${res.payroll.map(p => `
         <tr style="background:${p.status==='Confirmed'?'#e8f5e9':'#fff'}">
             <td>${p.agentName}</td>
             <td>${p.invoiceId}</td>
             <td>${p.cost}</td>
-            <td>${p.shipping}</td>
             <td>${p.netProfit}</td>
             <td><input id="pay-val-${p.row}" value="${p.commissionAmount}" style="width:60px;" ${p.status!=='Pending'?'disabled':''}></td>
             <td>${p.status}</td>
@@ -635,18 +688,9 @@ function populateCreateOrderForm(data) {
     document.getElementById('new-customer-email').value = data.customer.email;
     document.getElementById('new-customer-phone').value = data.customer.phone;
     document.getElementById('new-customer-address').value = data.customer.address;
-    
-    // FIX: Fallback if product not in list (avoids crash)
     currentOrder.items = data.items.map(i => {
         const p = products.find(prod => String(prod.id) === String(i.id));
-        return { 
-            id: i.id, 
-            name: i.name, 
-            quantity: parseInt(i.quantity)||1, 
-            customPrice: parseFloat(i.customPrice||i.price), 
-            rsp: p ? p.rsp : 0, 
-            minPrice: p ? p.minPrice : 0 
-        };
+        return { id: i.id, name: i.name, quantity: parseInt(i.quantity)||1, customPrice: parseFloat(i.customPrice||i.price), rsp: p?p.rsp:0, minPrice: p?p.minPrice:0 };
     });
     renderOrderSummary();
 }
@@ -777,7 +821,6 @@ async function renderAdminDashboard() {
     } else div.innerHTML='No data.';
 }
 async function postToGoogleScript(action, data = {}) {
-    // Standard CORS POST
     const res = await fetch(GOOGLE_SCRIPT_URL, { 
         method: 'POST', 
         mode: 'cors', 
