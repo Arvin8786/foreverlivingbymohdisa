@@ -1,4 +1,4 @@
-=<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -30,7 +30,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
         .container { max-width: 1300px; margin: 30px auto; padding: 0 30px; }
-        
         h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; }
         
         /* Buttons */
@@ -47,7 +46,7 @@
         .btn-secondary:hover:not(:disabled) { background: var(--primary-color); color: #fff; }
         .btn-danger { background: var(--danger-color); color: #fff; border-color: var(--danger-color); }
         
-        /* Cards */
+        /* Cards & Layout */
         .card { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow-soft); padding: 30px; margin-bottom: 25px; border: 1px solid #eee; }
         .hidden { display: none !important; }
 
@@ -75,10 +74,10 @@
         nav .btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
         nav .btn.hidden { display: none; }
 
-        /* Tables & Lists */
+        /* Tables */
         .open-order-card { padding: 20px; border: 1px solid #eee; margin-bottom: 15px; background: #fff; transition: 0.3s; }
         .open-order-card:hover { border-color: var(--secondary-color); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
         thead { background: var(--primary-color); color: #fff; }
         th { padding: 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
         td { padding: 12px; border-bottom: 1px solid #eee; }
@@ -101,7 +100,6 @@
 
 <div id="login-view">
     <div id="login-box">
-        <!-- Logo -->
         <img src="FL.jpg" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'" style="width: 80px; margin: 0 auto 20px auto; display:block;">
         <h1 style="display:none; text-align:center; color:var(--primary-color);">FL</h1>
         <h1>Business Partner</h1>
@@ -118,7 +116,7 @@
 <div id="password-change-view" class="container hidden" style="min-height: 100vh; display: flex; justify-content: center; align-items: center;">
     <div class="card" style="width: 400px; text-align: center;">
         <h2>Security Update</h2>
-        <p>Please update your default password.</p>
+        <p>Please update your default password to continue.</p>
         <input type="password" id="new-password-input" placeholder="New Password" required>
         <input type="password" id="confirm-password-input" placeholder="Confirm New Password" required>
         <button id="change-password-btn" class="btn btn-primary" style="width:100%;">Update Password</button>
@@ -145,10 +143,9 @@
         <button id="nav-my-orders-btn" class="btn">My Orders</button>
         <button id="nav-my-commission-btn" class="btn">Commissions</button>
         <button id="nav-profile-btn" class="btn">Profile</button>
-        <button id="nav-learning-btn" class="btn">Learning</button> <!-- NEW TAB -->
+        <button id="nav-learning-btn" class="btn">Learning</button> <!-- LEARNING TAB -->
         <button id="nav-team-btn" class="btn hidden">My Team</button> 
         <button id="nav-admin-dashboard-btn" class="btn hidden">Admin</button> 
-        <button id="nav-manage-employees-btn" class="btn hidden">Employees</button>
     </nav>
 
     <!-- VIEWS -->
@@ -192,7 +189,7 @@
                     <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.2rem; color:var(--primary-color); margin-top:10px;"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
                 </div>
                 <div style="margin-top: 30px;">
-                    <label style="font-size:0.8rem; font-weight:700; text-transform:uppercase; color:#999;">Payment Proof</label>
+                    <label style="font-size:0.8rem; font-weight:700; text-transform:uppercase; color:#999;">Upload Payment Proof</label>
                     <input type="file" id="payment-proof">
                     <button id="submit-order-btn" class="btn btn-primary" style="width:100%;">Submit Order</button>
                     <p id="submit-status" style="text-align: center; margin-top: 10px; font-weight: 600;"></p>
@@ -256,9 +253,7 @@
         <div id="admin-sub-payroll" class="hidden">
             <div style="background:#fff3cd; padding:15px; margin-bottom:20px; border-radius:4px;">
                 <strong>Payroll Action:</strong><br>
-                1. Edit amounts if needed (Pending).<br>
-                2. <strong>Lock Batch</strong> to show amounts to agents (Confirmed).<br>
-                3. <strong>Release Payment</strong> after paying to archive records (Paid).
+                1. Edit amounts (Pending). 2. <strong>Lock Batch</strong> (Visible to Agent). 3. <strong>Release Payment</strong> (Archive).
             </div>
             <div style="margin-bottom:20px;">
                 <button class="btn btn-primary" onclick="lockPayroll()">Confirm & Lock Batch</button>
@@ -276,14 +271,8 @@
             <div id="admin-emp-list" style="margin-top:20px;"></div>
         </div>
     </div>
-    
-    <!-- Fallback View for Employees Tab in Nav -->
-    <div id="manage-employees-view" class="view hidden card">
-        <p>Please use Admin Dashboard > Employees tab.</p>
-    </div>
 </div>
 
-<!-- MODALS -->
 <!-- SORA MODAL -->
 <div id="sora-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; display:flex; justify-content:center; align-items:center;">
     <div class="card" style="width:400px; text-align:center;">
@@ -328,7 +317,7 @@
 // =================================================================
 // BUSINESS PARTNER PORTAL SCRIPT (FINAL)
 // =================================================================
-// ⚠️ PASTE YOUR CURRENT WEB APP URL HERE ⚠️
+// ⚠️ REPLACE THIS WITH YOUR DEPLOYMENT URL ⚠️
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLBzQ3Yaz7UzS3x0XykhHnP2KQPKlIDUUxu4vGasT_7t7EAwrLXvRN5wC2XhJGe3mKoQ/exec"; 
 
 let products = [], customers = [], shippingRules = [], currentAgent = null;
@@ -344,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
          if(active) showView(active.id.replace('view-','').replace('-view',''));
     });
 
-    const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'learning', 'team', 'admin-dashboard', 'manage-employees'];
+    const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'learning', 'team', 'admin-dashboard'];
     navs.forEach(n => {
         const btn = document.getElementById(`nav-${n}-btn`);
         if(btn) btn.addEventListener('click', () => showView(`${n}-view`));
@@ -422,7 +411,6 @@ function showView(viewId) {
     if(viewId === 'team-view') renderTeam();
     if(viewId === 'admin-dashboard-view') switchAdminTab('stats');
     if(viewId === 'profile-view') renderProfile();
-    if(viewId === 'manage-employees-view') renderEmployeeList();
 }
 
 // --- NEW: SORA ACCESS ---
@@ -542,6 +530,7 @@ function switchAdminTab(tabName) {
     document.getElementById('admin-sub-employees').classList.add('hidden');
     document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
     
+    // Highlight
     const links = document.querySelectorAll('.tab-link');
     if(tabName==='stats') links[0].classList.add('active');
     if(tabName==='payroll') links[1].classList.add('active');
@@ -557,12 +546,13 @@ async function loadAdminPayroll() {
     const res = await postToGoogleScript('adminGetPayroll', { agentId: currentAgent.id });
     if(res.success) {
         document.getElementById('admin-payroll-list').innerHTML = `<table style="font-size:0.8rem; width:100%;">
-        <thead><tr style="background:#0a291f; color:#fff;"><th>Agent</th><th>Inv</th><th>Cost</th><th>Profit</th><th>Comm</th><th>Status</th><th>Edit</th></tr></thead>
+        <thead><tr style="background:#0a291f; color:#fff;"><th>Agent</th><th>Inv</th><th>Cost</th><th>Ship</th><th>Profit</th><th>Comm</th><th>Status</th><th>Edit</th></tr></thead>
         <tbody>${res.payroll.map(p => `
         <tr style="background:${p.status==='Confirmed'?'#e8f5e9':'#fff'}">
             <td>${p.agentName}</td>
             <td>${p.invoiceId}</td>
             <td>${p.cost}</td>
+            <td>${p.shipping}</td>
             <td>${p.netProfit}</td>
             <td><input id="pay-val-${p.row}" value="${p.commissionAmount}" style="width:60px;" ${p.status!=='Pending'?'disabled':''}></td>
             <td>${p.status}</td>
@@ -679,24 +669,11 @@ async function submitOrder() {
     try {
         const base64 = await getBase64(file);
         const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-        
-        let ship = 0;
-        if(shippingRules.length > 0) {
-            const rule = shippingRules.find(r => sub >= r.minSpend);
-            ship = rule ? rule.charge : shippingRules[shippingRules.length-1].charge;
-        }
-
-        const payload = { 
-            agent: currentAgent, 
-            customer: cust, 
-            items: currentOrder.items, 
-            shippingFee: ship, 
-            paymentProof: { file: base64.split(',')[1], mimeType: file.type }, 
-            invoiceId: currentDraftInvoiceId 
-        };
+        const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
+        const payload = { agent: currentAgent, customer: cust, items: currentOrder.items, shippingFee: ship, paymentProof: { file: base64.split(',')[1], mimeType: file.type }, invoiceId: currentDraftInvoiceId };
         const res = await postToGoogleScript('submitAgentOrder', payload);
         if(res.success) { alert(`Success! Invoice: ${res.invoiceId}`); resetCreateOrderForm(); } else { alert(res.message); }
-    } catch(e) { alert("Error."); console.error(e); } finally { btn.disabled = false; }
+    } catch(e) { alert("Error."); } finally { btn.disabled = false; }
 }
 function resetCreateOrderForm() {
     currentDraftInvoiceId = null;
@@ -729,7 +706,7 @@ async function handleChangePassword() {
 }
 async function fetchPortalData() {
     const res = await postToGoogleScript('getPortalData', {});
-    if(res.success) { products = res.products || []; customers = res.customers || []; shippingRules = (res.shippingRules||[]).sort((a,b)=>b.minSpend-a.minSpend); renderProductSelectionList(); renderCustomerDropdown(); renderProductCatalog(); }
+    if(res.success) { products = res.products; customers = res.customers; shippingRules = (res.shippingRules||[]).sort((a,b)=>b.minSpend-a.minSpend); renderProductSelectionList(); renderCustomerDropdown(); renderProductCatalog(); }
 }
 function renderProductCatalog() { document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join(''); }
 function renderCustomerDropdown() { document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join(''); }
@@ -775,7 +752,6 @@ async function renderAdminDashboard() {
     } else div.innerHTML='No data.';
 }
 async function postToGoogleScript(action, data = {}) {
-    // Standard CORS POST
     const res = await fetch(GOOGLE_SCRIPT_URL, { 
         method: 'POST', 
         mode: 'cors', 
