@@ -109,8 +109,9 @@
         <p id="login-subtext">Login to manage sales, team, and learning.</p>
         <form id="login-form">
             <input type="text" id="agent-id-input" placeholder="User ID" required>
-            <input type="password" id="agent-password-input" placeholder="Password" required>
-            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">Secure Login</button>
+            <input type="password" id="agent-password-input" placeholder="Password" required onkeydown="if(event.key === 'Enter'){handleLogin()}">
+            <!-- Changed type to 'button' to prevent page refresh -->
+            <button type="button" id="login-btn" class="btn btn-primary" style="width:100%;" onclick="handleLogin()">Secure Login</button>
             <p id="login-status" style="margin-top: 15px; font-size: 0.9rem; font-weight: 600; text-align: center;"></p>
         </form>
     </div>
@@ -373,49 +374,81 @@ async function handleLogin() {
     const btn = document.getElementById('login-btn');
     const status = document.getElementById('login-status');
     
-    btn.disabled = true; status.textContent = "Verifying Credentials..."; 
+    if(!aid || !pwd) {
+        status.textContent = "Please enter User ID and Password.";
+        status.style.color = 'var(--danger-color)';
+        return;
+    }
+
+    // UI Loading State
+    btn.disabled = true; 
+    btn.textContent = "Verifying..."; 
+    status.textContent = "";
 
     try {
         const res = await postToGoogleScript('verifyAgent', { agentId: aid, password: pwd });
+        
         if (res.success) {
+            // 1. Save Data
             currentAgent = { ...res.agent, ...res }; 
             currentAgent.password = pwd; 
             currentProfile = res.profile;
             canEditProfile = res.allowEdit;
 
+            // 2. Check Force Password Change
             if (res.mustChangePassword) {
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('password-change-view').classList.remove('hidden');
                 return;
             }
 
-            await fetchPortalData();
+            // 3. Load Initial Data (Background)
+            // We don't await this so the UI switches immediately
+            fetchPortalData();
             
+            // 4. Load Admin List if applicable
             if(currentAgent.isAdmin) {
-                const adminData = await postToGoogleScript('getAllAgentsList', {agentId: currentAgent.id});
-                if(adminData.success) allAgentsList = adminData.list;
+                postToGoogleScript('getAllAgentsList', {agentId: currentAgent.id})
+                .then(data => { if(data.success) allAgentsList = data.list; });
             }
 
+            // 5. Switch UI
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
+            
+            // 6. Update Headers
             document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
             document.getElementById('agent-details-display').textContent = `${res.position || 'Partner'} | ID: ${currentAgent.id}`;
             
-            if(currentAgent.isAdmin) document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
-            if(currentAgent.isManager) document.getElementById('nav-team-btn').classList.remove('hidden');
+            // 7. Show Tabs based on Role
+            if(currentAgent.isAdmin) {
+                document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
+                document.getElementById('nav-manage-employees-btn').classList.remove('hidden');
+            }
+            if(currentAgent.isManager) {
+                document.getElementById('nav-team-btn').classList.remove('hidden');
+            }
 
+            // 8. Render Default Views
             renderTargetBar();
             renderProfile();
-            loadLearningPlatforms(); // Initial Load
             showView('open-orders-view'); 
+
         } else {
+            // Login Failed
             status.textContent = res.message;
             status.style.color = 'var(--danger-color)';
+            btn.disabled = false;
+            btn.textContent = "Secure Login";
         }
-    } catch(e) { status.textContent = "Connection Error: " + e.message; console.error(e); }
-    finally { btn.disabled = false; }
+    } catch(e) { 
+        console.error(e);
+        status.textContent = "System Error: Check Internet Connection.";
+        status.style.color = 'var(--danger-color)';
+        btn.disabled = false;
+        btn.textContent = "Secure Login";
+    }
 }
-
 function showView(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
     document.querySelectorAll('nav .btn').forEach(b => b.classList.remove('active'));
@@ -800,20 +833,29 @@ function function renderProductCatalog() {
 
 // Function to handle the price update sent to Google Sheets
 async function updateCatalogPrice(sku, newPrice) {
-    if(!confirm(`Update price for ${sku} to RM ${newPrice}?`)) { renderProductCatalog(); return; }
+    if(!confirm(`Update price for ${sku} to RM ${newPrice}?`)) { 
+        renderProductCatalog(); // Revert UI if cancelled
+        return; 
+    }
     
-    // Optimistic UI update
-    const p = products.find(x => x.id == sku);
+    // 1. Optimistic UI update (makes it feel fast)
+    const p = products.find(x => String(x.id) === String(sku));
     if(p) p.rsp = parseFloat(newPrice);
 
-    const res = await postToGoogleScript('adminUpdatePrice', { 
-        adminId: currentAgent.id, 
-        sku: sku, 
-        newPrice: newPrice 
-    });
-    
-    alert(res.message);
-    if(!res.success) fetchPortalData(); // Revert if failed
+    // 2. Send to Backend
+    try {
+        const res = await postToGoogleScript('adminUpdatePrice', { 
+            adminId: currentAgent.id, 
+            sku: sku, 
+            newPrice: newPrice 
+        });
+        
+        alert(res.message);
+        if(!res.success) fetchPortalData(); // Re-fetch real data if failed
+    } catch(e) {
+        alert("Failed to update price.");
+        fetchPortalData(); // Revert
+    }
 }
 function renderCustomerDropdown() { document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join(''); }
 function renderTargetBar() {
