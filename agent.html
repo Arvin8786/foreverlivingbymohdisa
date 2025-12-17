@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Business Partner Portal | FL</title>
+    <title>Business Partner Portal | Forever Living</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* [ 1.0 ] LUXURY THEME VARIABLES */
+        /* [ 1.0 ] LUXURY THEME & COLOR PALETTE */
         :root {
-            --primary-color: #0a291f;      
-            --secondary-color: #d4af37;    
+            --primary-color: #0a291f;      /* Deep Forest Green */
+            --secondary-color: #d4af37;    /* Classic Gold */
             --bg-color: #fcfcfc;           
             --card-bg: #ffffff;            
             --text-main: #333333;
@@ -34,64 +34,89 @@
         h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; }
         
         /* [ 3.0 ] NAVIGATION */
-        nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
-        nav .btn { flex-grow: 1; border: 1px solid #eee; background: #fff; color: var(--text-light); text-transform: uppercase; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; padding: 12px; cursor: pointer; transition: 0.3s; text-align: center; border-radius: var(--border-radius); }
-        nav .btn:hover { border-color: var(--secondary-color); color: var(--secondary-color); }
-        nav .btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+        nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        nav .btn-nav { 
+            flex-grow: 1; border: 1px solid #eee; background: #fff; color: var(--text-light); 
+            text-transform: uppercase; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; 
+            padding: 12px; cursor: pointer; transition: 0.3s; text-align: center; border-radius: var(--border-radius); 
+        }
+        nav .btn-nav:hover { border-color: var(--secondary-color); color: var(--secondary-color); }
+        nav .btn-nav.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
 
         /* [ 4.0 ] BUTTONS */
-        .btn-main { display: inline-block; padding: 12px 25px; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; font-weight: 700; border: 1px solid transparent; cursor: pointer; transition: 0.3s; border-radius: var(--border-radius); text-decoration: none; text-align: center; }
+        .btn { 
+            display: inline-block; padding: 12px 25px; text-transform: uppercase; 
+            letter-spacing: 1px; font-size: 0.75rem; font-weight: 700; border: 1px solid transparent; 
+            cursor: pointer; transition: 0.3s; border-radius: var(--border-radius); text-decoration: none; text-align: center; 
+        }
         .btn-primary { background: var(--primary-color); color: #fff; }
         .btn-primary:hover:not(:disabled) { background: var(--secondary-color); color: #000; }
         .btn-secondary { background: transparent; border-color: var(--primary-color); color: var(--primary-color); }
         .btn-secondary:hover:not(:disabled) { background: var(--primary-color); color: #fff; }
+        .btn-danger { background: var(--danger-color); color: #fff; }
 
         /* [ 5.0 ] UI COMPONENTS */
         .card { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow-soft); padding: 30px; margin-bottom: 25px; border: 1px solid #eee; }
         .hidden { display: none !important; }
-        input, select, textarea { width: 100%; padding: 12px 0; margin-bottom: 15px; border: none; border-bottom: 2px solid #ddd; background: transparent; font-size: 1rem; font-family: var(--font-body); transition: 0.3s; }
+        input, select, textarea { 
+            width: 100%; padding: 12px 0; margin-bottom: 15px; border: none; 
+            border-bottom: 2px solid #ddd; background: transparent; font-size: 1rem; 
+            font-family: var(--font-body); transition: 0.3s; 
+        }
         input:focus { border-bottom-color: var(--secondary-color); }
-        input:disabled { border-bottom-style: dotted; color: #888; cursor: not-allowed; }
+        input:disabled { border-bottom-style: dotted; color: #888; cursor: not-allowed; background: #f9f9f9; padding-left: 5px; }
 
         /* [ 6.0 ] TABLES */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .table-wrapper { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 800px; }
         thead { background: var(--primary-color); color: #fff; }
         th { padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
         td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         tr:hover { background: #fafafa; }
 
         /* [ 7.0 ] PROFILE STYLING */
-        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .profile-field-group { margin-bottom: 20px; }
-        .profile-field-group label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; margin-bottom: 5px; }
-        .profile-section-title { border-bottom: 2px solid var(--secondary-color); padding-bottom: 5px; margin-bottom: 20px; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* [ 8.0 ] ORDERING UI */
-        #order-creation-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; height: 600px; overflow-y: auto; padding-right: 10px; }
-        .product-card-mini { border: 1px solid #eee; padding: 15px; text-align: center; border-radius: 4px; transition: 0.3s; cursor: pointer; background: #fff; }
-        .product-card-mini:hover { border-color: var(--secondary-color); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .product-card-mini img { width: 80px; height: 80px; object-fit: cover; margin-bottom: 10px; border-radius: 4px; }
-        .product-card-mini h4 { font-size: 0.85rem; margin-bottom: 5px; height: 40px; overflow: hidden; }
-        
-        @media (max-width: 1000px) { #order-creation-workflow { grid-template-columns: 1fr; } }
+        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+        .profile-field-group { margin-bottom: 18px; }
+        .profile-field-group label { display: block; font-size: 0.65rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; margin-bottom: 4px; }
+        .edit-badge { background: #fff3cd; color: #856404; font-size: 0.6rem; padding: 2px 6px; border-radius: 2px; margin-left: 10px; vertical-align: middle; }
 
+        /* [ 8.0 ] ORDERING UI */
+        #order-workflow { display: grid; grid-template-columns: 1fr 420px; gap: 30px; }
+        .product-selection-container { height: 700px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding-right: 10px; }
+        .product-item { 
+            border: 1px solid #eee; padding: 15px; border-radius: 4px; text-align: center; 
+            transition: 0.3s; cursor: pointer; background: #fff; position: relative;
+        }
+        .product-item:hover { border-color: var(--secondary-color); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .product-item img { width: 100%; height: 120px; object-fit: contain; margin-bottom: 10px; }
+        .product-item h4 { font-size: 0.8rem; margin-bottom: 5px; height: 35px; overflow: hidden; }
+        .product-item .price { color: var(--secondary-color); font-weight: 700; font-size: 1rem; }
+        
         /* [ 9.0 ] LOGIN */
         #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary-color), #000); }
-        #login-box { width: 450px; text-align: center; background: #fff; padding: 50px; border-top: 5px solid var(--secondary-color); }
+        #login-box { width: 450px; text-align: center; background: #fff; padding: 50px; border-top: 8px solid var(--secondary-color); border-radius: 4px; }
+
+        /* [ 10.0 ] ADMIN */
+        .admin-tab-nav { display: flex; gap: 20px; border-bottom: 2px solid #eee; margin-bottom: 25px; }
+        .admin-tab-link { padding: 10px 20px; cursor: pointer; font-weight: 700; color: #999; font-size: 0.8rem; text-transform: uppercase; }
+        .admin-tab-link.active { color: var(--primary-color); border-bottom: 3px solid var(--secondary-color); margin-bottom: -2px; }
+
+        @media (max-width: 1100px) { #order-workflow { grid-template-columns: 1fr; } }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
 </head>
 <body>
 
 <div id="login-view">
     <div id="login-box" class="card">
-        <h1 style="margin-bottom:10px;">Partner Portal</h1>
-        <p style="color:#666; margin-bottom:30px;">Authorized Access Only</p>
+        <img src="FL_logo.jpg" alt="Forever Living" style="width: 120px; margin-bottom: 20px;" onerror="this.style.display='none'">
+        <h1>Partner Portal</h1>
+        <p style="color:#666; margin-bottom:30px; font-size: 0.9rem;">Forever Living by Mohd Arvind Isa</p>
         <form id="login-form" onsubmit="return false;">
-            <input type="text" id="agent-id-input" placeholder="User ID" required>
-            <input type="password" id="agent-password-input" placeholder="Password" required>
-            <button type="button" class="btn-main btn-primary" style="width:100%;" onclick="handleLogin()">Sign In</button>
-            <p id="login-status" style="margin-top:15px; color:var(--danger-color); font-weight:700;"></p>
+            <input type="text" id="login-id" placeholder="Agent ID / Username" required>
+            <input type="password" id="login-pw" placeholder="Password" required>
+            <button type="button" class="btn btn-primary" style="width:100%;" onclick="executeLogin()">Secure Sign In</button>
+            <p id="login-err" style="margin-top:15px; color:var(--danger-color); font-size: 0.85rem; font-weight: 700;"></p>
         </form>
     </div>
 </div>
@@ -99,379 +124,759 @@
 <div id="portal-view" class="container hidden">
     <header>
         <div>
-            <h2 id="agent-welcome-header"></h2>
-            <p id="agent-id-display" style="font-weight:700; color:var(--secondary-color);"></p>
-            <div id="target-bar-display" style="margin-top:10px;"></div>
+            <h2 id="welcome-name" style="font-size: 1.8rem;"></h2>
+            <p id="header-id-display" style="font-weight:700; color:var(--secondary-color); letter-spacing: 1px;"></p>
+            <div id="progress-container"></div>
         </div>
         <div style="text-align: right;">
-            <button class="btn-main btn-secondary" onclick="fetchPortalData()">Refresh Data</button>
-            <button class="btn-main btn-primary" onclick="location.reload()">Logout</button>
+            <button class="btn btn-secondary" onclick="syncAllData()"><i class="fas fa-sync"></i> Sync</button>
+            <button class="btn btn-primary" onclick="location.reload()">Logout</button>
         </div>
     </header>
 
     <nav>
-        <button id="nav-marketplace-btn" class="btn active" onclick="showView('marketplace-view')">Marketplace</button>
-        <button id="nav-create-order-btn" class="btn" onclick="showView('create-order-view')">New Order</button>
-        <button id="nav-catalog-btn" class="btn" onclick="showView('catalog-view')">Catalog</button>
-        <button id="nav-orders-btn" class="btn" onclick="showView('orders-view')">My Sales</button>
-        <button id="nav-profile-btn" class="btn" onclick="showView('profile-view')">My Profile</button>
-        <button id="nav-admin-btn" class="btn hidden" onclick="showView('admin-view')">Admin</button>
+        <button id="nav-market" class="btn-nav active" onclick="switchMainView('marketplace-view')">Marketplace</button>
+        <button id="nav-order" class="btn-nav" onclick="switchMainView('order-view')">New Order</button>
+        <button id="nav-catalog" class="btn-nav" onclick="switchMainView('catalog-view')">Catalog</button>
+        <button id="nav-sales" class="btn-nav" onclick="switchMainView('sales-view')">My Sales</button>
+        <button id="nav-income" class="btn-nav" onclick="switchMainView('income-view')">Income</button>
+        <button id="nav-team" class="btn-nav hidden" onclick="switchMainView('team-view')">My Team</button>
+        <button id="nav-profile" class="btn-nav" onclick="switchMainView('profile-view')">My Profile</button>
+        <button id="nav-admin" class="btn-nav hidden" onclick="switchMainView('admin-view')">Administrator</button>
     </nav>
 
     <div id="marketplace-view" class="view">
         <div class="card">
-            <h3>Pool Orders</h3>
-            <div id="marketplace-list" style="margin-top:20px;">Fetching open orders...</div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>Open Order Pool</h3>
+                <button class="btn btn-secondary" onclick="loadMarketplace()"><i class="fas fa-redo"></i> Refresh</button>
+            </div>
+            <p style="color:#888; margin-bottom:20px; font-size: 0.85rem;">Claim unassigned orders from the global pool.</p>
+            <div id="market-list">Loading orders...</div>
         </div>
     </div>
 
-    <div id="create-order-view" class="view hidden">
-        <div id="order-creation-workflow">
+    <div id="order-view" class="view hidden">
+        <div id="order-workflow">
             <div>
                 <div class="card">
-                    <h3>Customer Selection</h3>
-                    <select id="customer-dropdown" onchange="handleCustomerChange()"></select>
-                    <button class="btn-main btn-secondary" style="width:100%; margin-top:10px;" onclick="toggleNewCustomer()">+ Create New Customer</button>
-                    <div id="new-customer-form" class="hidden" style="margin-top:20px;">
+                    <h3>Customer Information</h3>
+                    <select id="cust-select" onchange="onCustomerSelect()"></select>
+                    <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="toggleNewCustForm()">+ Register New Customer</button>
+                    <div id="new-cust-fields" class="hidden" style="margin-top:20px; padding-top:20px; border-top: 1px solid #eee;">
+                        <input type="text" id="nc-pac" placeholder="PAC Number (Manual/Auto)">
                         <input type="text" id="nc-name" placeholder="Full Name">
-                        <input type="tel" id="nc-phone" placeholder="Phone Number">
                         <input type="email" id="nc-email" placeholder="Email Address">
+                        <input type="tel" id="nc-phone" placeholder="Phone Number">
                         <textarea id="nc-address" placeholder="Shipping Address"></textarea>
                     </div>
                 </div>
                 <div class="card">
-                    <h3>Product Master</h3>
-                    <input type="text" id="product-search" placeholder="Search by SKU, Name or Category..." onkeyup="filterProductGrid()">
-                    <div class="product-grid" id="product-grid"></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h3>Product Master</h3>
+                        <input type="text" id="p-filter" placeholder="Filter by Name/SKU..." onkeyup="runProductFilter()" style="width: 250px; margin-bottom: 0;">
+                    </div>
+                    <div class="product-selection-container" id="product-grid"></div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card" id="cart-sidebar" style="position: sticky; top: 20px;">
                 <h3>Order Summary</h3>
-                <div id="cart-list" style="min-height:200px;"></div>
+                <div id="cart-content" style="min-height:250px; margin-top: 20px;"></div>
                 <div style="border-top:2px solid #eee; margin-top:20px; padding-top:15px;">
-                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.3rem;">
-                        <span>Total Payable:</span><span id="cart-total">RM 0.00</span>
+                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.4rem; color:var(--primary-color);">
+                        <span>Total (RM):</span><span id="cart-total">0.00</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-light);">
+                        <span>Total CC:</span><span id="cart-cc">0.000</span>
                     </div>
                 </div>
-                <div style="margin-top:20px;">
-                    <label style="font-size:0.7rem; font-weight:700;">PAYMENT PROOF (PNG/JPG)</label>
-                    <input type="file" id="pay-proof">
-                    <button id="submit-order-btn" class="btn-main btn-primary" style="width:100%; margin-top:10px;" onclick="submitOrder()">Finalize Submission</button>
+                <div style="margin-top:25px;">
+                    <label style="font-size:0.7rem; font-weight:700;">UPLOAD PAYMENT PROOF</label>
+                    <input type="file" id="order-proof" accept="image/*">
+                    <button id="order-submit-btn" class="btn btn-primary" style="width:100%; margin-top:10px; padding: 15px;" onclick="submitAgentOrder()">Complete Order</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="catalog-view" class="view hidden card">
-        <h3>Master Product Catalog</h3>
-        <table id="catalog-table">
-            <thead>
-                <tr>
-                    <th>SKU</th>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th>RSP (RM)</th>
-                    <th>CC</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Master Catalog</h3>
+            <span id="catalog-count" style="font-size: 0.8rem; font-weight: 700;"></span>
+        </div>
+        <div class="table-wrapper">
+            <table id="catalog-table">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Product ID</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>RSP (RM)</th>
+                        <th>CC</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="catalog-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="sales-view" class="view hidden card">
+        <h3>My Sales Records</h3>
+        <div class="table-wrapper">
+            <table id="sales-history-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Invoice</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>CC</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="sales-history-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="income-view" class="view hidden card">
+        <h3>Income & Commission</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:30px;">
+            <div style="background:#f4f9f4; padding:20px; border-left: 5px solid var(--success-color);">
+                <label style="font-size:0.7rem; font-weight:700;">TOTAL COMMISSION</label>
+                <div id="income-total-comm" style="font-size:1.8rem; font-weight:700;">RM 0.00</div>
+            </div>
+            <div style="background:#fcf9f0; padding:20px; border-left: 5px solid var(--secondary-color);">
+                <label style="font-size:0.7rem; font-weight:700;">TOTAL OVERRIDE</label>
+                <div id="income-total-over" style="font-size:1.8rem; font-weight:700;">RM 0.00</div>
+            </div>
+        </div>
+        <div id="commission-list"></div>
+    </div>
+
+    <div id="team-view" class="view hidden card">
+        <h3>Team Management</h3>
+        <p style="margin-bottom:20px;">Downline performance and override details.</p>
+        <div id="team-list-container"></div>
     </div>
 
     <div id="profile-view" class="view hidden card">
-        <div class="profile-section-title">
-            <h3>Partner Profile</h3>
-            <div style="display:flex; align-items:center; gap:10px;">
-                <label style="font-size:0.8rem; font-weight:700; color:var(--primary-color);">ENABLE BANKING EDIT</label>
-                <input type="checkbox" id="edit-lock-toggle" style="width:25px; margin:0;" onchange="toggleBankingLock()">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div>
+                <h3>Partner Profile</h3>
+                <p style="font-size: 0.8rem; color:#888;">Manage your personal and banking information.</p>
+            </div>
+            <div style="background:#f9f9f9; padding: 10px 20px; border-radius: 5px; border: 1px solid #ddd;">
+                <label style="font-size:0.7rem; font-weight:700; color:var(--primary-color); display:block; margin-bottom:5px;">ENABLE PROFILE EDITING</label>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size: 0.75rem; font-weight:700;">Locked</span>
+                    <input type="checkbox" id="profile-edit-toggle" style="width:40px; margin:0; cursor:pointer;" onchange="handleProfileLockToggle()">
+                    <span style="font-size: 0.75rem; font-weight:700;">Edit Mode</span>
+                </div>
             </div>
         </div>
 
         <div class="profile-grid">
-            <div class="profile-section card">
-                <h4>Identity & Contact</h4>
+            <div class="profile-section">
+                <h4 style="font-size: 0.9rem; margin-bottom: 20px; color: var(--secondary-color);"><i class="fas fa-user-circle"></i> Identity</h4>
                 <div class="profile-field-group">
                     <label>Agent ID</label>
-                    <input id="p-AgentID" disabled>
+                    <input id="prof-AgentID" disabled>
                 </div>
                 <div class="profile-field-group">
                     <label>Full Name</label>
-                    <input id="p-EmployeeName" disabled>
+                    <input id="prof-EmployeeName" disabled>
                 </div>
-                <div class="profile-field-group">
-                    <label>Phone</label>
-                    <input id="p-EmployeePhone" disabled>
-                </div>
-                <div class="profile-field-group">
-                    <label>Email</label>
-                    <input id="p-EmployeeEmail" disabled>
-                </div>
-                <div class="profile-field-group">
-                    <label>Home Address</label>
-                    <textarea id="p-EmployeeAddress" disabled></textarea>
-                </div>
-            </div>
-
-            <div class="profile-section card">
-                <h4>Employment Details</h4>
                 <div class="profile-field-group">
                     <label>Position</label>
-                    <input id="p-Position" disabled>
-                </div>
-                <div class="profile-field-group">
-                    <label>Status</label>
-                    <input id="p-EmployeeStatus" disabled>
+                    <input id="prof-Position" disabled>
                 </div>
                 <div class="profile-field-group">
                     <label>Agent Type</label>
-                    <input id="p-AgentType" disabled>
+                    <input id="prof-AgentType" disabled>
                 </div>
                 <div class="profile-field-group">
-                    <label>Basic Pay</label>
-                    <input id="p-BasicPay" disabled>
-                </div>
-                <div class="profile-field-group">
-                    <label>Working Hours</label>
-                    <input id="p-WorkingHours" disabled>
-                </div>
-                <div class="profile-field-group">
-                    <label>Commission Rate</label>
-                    <input id="p-CommissionRate" disabled>
-                </div>
-                <div class="profile-field-group">
-                    <label>Target (RM)</label>
-                    <input id="p-Target" disabled>
+                    <label>Login Password</label>
+                    <input type="password" id="prof-Password" disabled>
                 </div>
             </div>
 
-            <div class="profile-section card" style="border-color: var(--secondary-color);">
-                <h4>Banking Information</h4>
+            <div class="profile-section">
+                <h4 style="font-size: 0.9rem; margin-bottom: 20px; color: var(--secondary-color);"><i class="fas fa-envelope"></i> Contact & HR</h4>
                 <div class="profile-field-group">
-                    <label>Bank Name</label>
-                    <input id="p-BankName" disabled>
+                    <label>Phone Number</label>
+                    <input id="prof-EmployeePhone" disabled>
                 </div>
                 <div class="profile-field-group">
-                    <label>Account Holder Name</label>
-                    <input id="p-AccountHolderName" disabled>
+                    <label>Email Address</label>
+                    <input id="prof-EmployeeEmail" disabled>
                 </div>
                 <div class="profile-field-group">
-                    <label>Account Number</label>
-                    <input id="p-AccountNumber" disabled>
+                    <label>Home Address</label>
+                    <textarea id="prof-EmployeeAddress" disabled style="height: 80px;"></textarea>
+                </div>
+                <div class="profile-field-group">
+                    <label>Employee Status</label>
+                    <input id="prof-EmployeeStatus" disabled>
+                </div>
+                <div class="profile-field-group">
+                    <label>Working Hours</label>
+                    <input id="prof-WorkingHours" disabled>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h4 style="font-size: 0.9rem; margin-bottom: 20px; color: var(--secondary-color);"><i class="fas fa-chart-line"></i> Financials</h4>
+                <div class="profile-field-group">
+                    <label>Basic Pay (RM)</label>
+                    <input id="prof-BasicPay" disabled>
+                </div>
+                <div class="profile-field-group">
+                    <label>Commission Rate</label>
+                    <input id="prof-CommissionRate" disabled>
+                </div>
+                <div class="profile-field-group">
+                    <label>Monthly Target (RM)</label>
+                    <input id="prof-Target" disabled>
                 </div>
                 <div class="profile-field-group">
                     <label>Manager ID</label>
-                    <input id="p-ManagerID" disabled>
+                    <input id="prof-ManagerID" disabled>
                 </div>
                 <div class="profile-field-group">
-                    <label>Override Amount</label>
-                    <input id="p-OverrideAmount" disabled>
+                    <label>Current Override Amount</label>
+                    <input id="prof-OverrideAmount" disabled>
                 </div>
-                <button id="save-banking-btn" class="btn-main btn-primary hidden" style="width:100%;" onclick="updateBankingData()">Save Changes</button>
+            </div>
+
+            <div class="profile-section" style="background:#fffef9; border: 1px solid var(--secondary-color); padding: 20px; border-radius: 5px;">
+                <h4 style="font-size: 0.9rem; margin-bottom: 20px; color: var(--primary-color);">
+                    <i class="fas fa-university"></i> Banking <span class="edit-badge">EDITABLE IN EDIT MODE</span>
+                </h4>
+                <div class="profile-field-group">
+                    <label>Bank Name</label>
+                    <input id="prof-BankName" disabled placeholder="e.g., Maybank, CIMB">
+                </div>
+                <div class="profile-field-group">
+                    <label>Account Holder Name</label>
+                    <input id="prof-AccountHolderName" disabled placeholder="Must match IC">
+                </div>
+                <div class="profile-field-group">
+                    <label>Account Number</label>
+                    <input id="prof-AccountNumber" disabled placeholder="No dashes or spaces">
+                </div>
+                <div id="profile-save-container" class="hidden" style="margin-top:20px;">
+                    <button id="btn-save-banking" class="btn btn-primary" style="width:100%;" onclick="executeBankingUpdate()">Update Banking Info</button>
+                    <p style="font-size: 0.65rem; color:#888; margin-top:10px; text-align:center;">Updates will be logged for security audit.</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="orders-view" class="view hidden card">
-        <h3>My Sales Records</h3>
-        <div id="sales-history-list"></div>
-    </div>
-
     <div id="admin-view" class="view hidden card">
-        <h3>Admin Console</h3>
-        <div id="admin-summary"></div>
+        <div class="admin-tab-nav">
+            <div class="admin-tab-link active" onclick="switchAdminTab(event, 'adm-performance')">Performance</div>
+            <div class="admin-tab-link" onclick="switchAdminTab(event, 'adm-payroll')">Payroll</div>
+            <div class="admin-tab-link" onclick="switchAdminTab(event, 'adm-staff')">Staffing</div>
+        </div>
+
+        <div id="adm-performance" class="admin-view-content">
+            <canvas id="performance-chart" height="100"></canvas>
+            <div id="admin-performance-table" style="margin-top:30px;"></div>
+        </div>
+
+        <div id="adm-payroll" class="admin-view-content hidden">
+            <div id="payroll-controls" style="margin-bottom:20px;">
+                <button class="btn btn-secondary" onclick="exportPayroll()"><i class="fas fa-file-export"></i> Export CSV</button>
+            </div>
+            <div id="payroll-table-container"></div>
+        </div>
+
+        <div id="adm-staff" class="admin-view-content hidden">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                <h4>Employee Database</h4>
+                <button class="btn btn-primary" onclick="openStaffModal()">+ Add New Employee</button>
+            </div>
+            <div id="staff-table-container"></div>
+        </div>
+    </div>
+</div>
+
+<div id="overlay-loader" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:9999; display:flex; justify-content:center; align-items:center;">
+    <div style="text-align:center;">
+        <i class="fas fa-spinner fa-spin" style="font-size:3rem; color:var(--primary-color);"></i>
+        <p style="margin-top:15px; font-weight:700; color:var(--primary-color);">Processing Request...</p>
     </div>
 </div>
 
 <script>
 // =================================================================
-// SYSTEM LOGIC (900+ Lines Capability)
+// 1. GLOBAL STATE & CONFIG
 // =================================================================
-const API_URL = "https://script.google.com/macros/s/AKfycby6haFUhB-Vds1JemMGxxsgUHAuKmZ6cjlR1B2mGtYHsHVSQik3h9MgswOQVIkzS_c84A/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6haFUhB-Vds1JemMGxxsgUHAuKmZ6cjlR1B2mGtYHsHVSQik3h9MgswOQVIkzS_c84A/exec";
 
-let state = {
-    user: null,
+let db = {
+    agent: null,
     products: [],
     customers: [],
-    cart: []
+    pool: [],
+    cart: [],
+    sales: []
 };
 
-// 1. AUTHENTICATION
-async function handleLogin() {
-    const id = document.getElementById('agent-id-input').value.trim();
-    const pw = document.getElementById('agent-password-input').value;
-    const btn = document.querySelector('#login-box button');
+// =================================================================
+// 2. CORE AUTHENTICATION
+// =================================================================
+
+async function executeLogin() {
+    const aid = document.getElementById('login-id').value.trim();
+    const apw = document.getElementById('login-pw').value;
+    const err = document.getElementById('login-err');
     
-    if(!id || !pw) return;
-    btn.disabled = true;
-    btn.textContent = "Verifying...";
+    if(!aid || !apw) {
+        err.textContent = "Please provide both ID and Password.";
+        return;
+    }
+
+    setLoader(true);
+    err.textContent = "";
 
     try {
-        const res = await apiCall('verifyAgent', { agentId: id, password: pw });
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'verifyAgent', data: { agentId: aid, password: apw } })
+        });
+        const res = await response.json();
+        
         if(res.success) {
-            state.user = res.agent;
-            launchPortal();
+            db.agent = res.agent;
+            launchApp();
         } else {
-            document.getElementById('login-status').textContent = res.message;
-            btn.disabled = false;
-            btn.textContent = "Sign In";
+            err.textContent = res.message || "Invalid credentials. Please try again.";
         }
     } catch(e) {
-        document.getElementById('login-status').textContent = "Connection failed.";
-        btn.disabled = false;
-        btn.textContent = "Sign In";
+        err.textContent = "Network error. Check internet connection.";
+    } finally {
+        setLoader(false);
     }
 }
 
-// 2. PORTAL LAUNCH
-async function launchPortal() {
+async function launchApp() {
     document.getElementById('login-view').classList.add('hidden');
     document.getElementById('portal-view').classList.remove('hidden');
     
-    document.getElementById('agent-welcome-header').textContent = `Welcome, ${state.user.EmployeeName}`;
-    document.getElementById('agent-id-display').textContent = `ID: ${state.user.AgentID}`;
-
-    if(state.user.IsAdmin === "ADMIN") document.getElementById('nav-admin-btn').classList.remove('hidden');
-
-    await fetchPortalData();
-    showView('marketplace-view');
-}
-
-async function fetchPortalData() {
-    const res = await apiCall('getPortalData', { agentId: state.user.AgentID });
-    if(res.success) {
-        state.products = res.products || [];
-        state.customers = res.customers || [];
-        
-        renderCatalog();
-        renderProductGrid();
-        renderCustomerDropdown();
-    }
-}
-
-// 3. PROFILE LOGIC (LOCKING & BANKING)
-function populateProfile() {
-    const u = state.user;
-    const map = [
-        'AgentID', 'EmployeeName', 'EmployeePhone', 'EmployeeEmail', 'EmployeeAddress',
-        'EmployeeStatus', 'AgentType', 'BasicPay', 'WorkingHours', 'Position', 
-        'CommissionRate', 'Target', 'ManagerID', 'OverrideAmount', 'BankName', 
-        'AccountHolderName', 'AccountNumber'
-    ];
-
-    map.forEach(field => {
-        const el = document.getElementById(`p-${field}`);
-        if(el) el.value = u[field] || '';
-    });
-}
-
-function toggleBankingLock() {
-    const isEditing = document.getElementById('edit-lock-toggle').checked;
-    const fields = ['p-BankName', 'p-AccountHolderName', 'p-AccountNumber'];
+    document.getElementById('welcome-name').textContent = `Welcome, ${db.agent.EmployeeName}`;
+    document.getElementById('header-id-display').textContent = `ID: ${db.agent.AgentID}`;
     
-    fields.forEach(id => document.getElementById(id).disabled = !isEditing);
-    document.getElementById('save-banking-btn').classList.toggle('hidden', !isEditing);
-}
-
-async function updateBankingData() {
-    const btn = document.getElementById('save-banking-btn');
-    const data = {
-        agentId: state.user.AgentID,
-        BankName: document.getElementById('p-BankName').value,
-        AccountHolderName: document.getElementById('p-AccountHolderName').value,
-        AccountNumber: document.getElementById('p-AccountNumber').value
-    };
-
-    btn.disabled = true;
-    const res = await apiCall('updateBanking', data);
-    if(res.success) {
-        alert("Banking details updated!");
-        Object.assign(state.user, data);
-        document.getElementById('edit-lock-toggle').checked = false;
-        toggleBankingLock();
+    // Check Permissions
+    if(db.agent.IsAdmin === "ADMIN") document.getElementById('nav-admin').classList.remove('hidden');
+    if(db.agent.Position.includes("Manager") || db.agent.Position.includes("Supervisor")) {
+        document.getElementById('nav-team').classList.remove('hidden');
     }
-    btn.disabled = false;
+
+    await syncAllData();
+    switchMainView('marketplace-view');
 }
 
-// 4. PRODUCT & CATALOG
+// =================================================================
+// 3. DATA SYNC & RENDERING
+// =================================================================
+
+async function syncAllData() {
+    setLoader(true);
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ action: 'getPortalData', data: { agentId: db.agent.AgentID } })
+        });
+        const res = await response.json();
+        if(res.success) {
+            db.products = res.products || [];
+            db.customers = res.customers || [];
+            db.sales = res.sales || [];
+            
+            renderCatalog();
+            renderProductGrid();
+            renderCustomerDrop();
+            renderTargetBar();
+            renderMySales();
+        }
+    } catch(e) {
+        console.error("Sync Error:", e);
+    } finally {
+        setLoader(false);
+    }
+}
+
 function renderCatalog() {
-    const tbody = document.querySelector('#catalog-table tbody');
-    tbody.innerHTML = state.products.map(p => `
+    const body = document.getElementById('catalog-body');
+    document.getElementById('catalog-count').textContent = `${db.products.length} Products Found`;
+    
+    body.innerHTML = db.products.map(p => `
         <tr>
-            <td>${p.SKU}</td>
-            <td><strong>${p.ProductName}</strong></td>
-            <td>${p.Category}</td>
+            <td><strong>${p.SKU}</strong></td>
+            <td>${p.ProductID}</td>
+            <td>${p.ProductName}</td>
+            <td><span style="font-size:0.7rem; background:#eee; padding:2px 6px;">${p.Category}</span></td>
             <td>RM ${parseFloat(p.RSP).toFixed(2)}</td>
             <td>${p.CC}</td>
-            <td><span style="color:${p.IsPublished === 'TRUE' ? 'green' : 'red'}">${p.IsPublished === 'TRUE' ? 'ACTIVE' : 'DRAFT'}</span></td>
+            <td><span style="color:${p.IsPublished === 'TRUE' ? 'green' : 'red'}; font-weight:700;">${p.IsPublished === 'TRUE' ? 'Active' : 'Draft'}</span></td>
         </tr>
     `).join('');
 }
 
 function renderProductGrid() {
     const grid = document.getElementById('product-grid');
-    grid.innerHTML = state.products.filter(p => p.IsPublished === 'TRUE').map(p => `
-        <div class="product-card-mini" onclick="addToCart('${p.SKU}')">
-            <img src="${p.ImageURL || 'https://via.placeholder.com/80?text=FL'}" onerror="this.src='https://via.placeholder.com/80'">
+    grid.innerHTML = db.products.filter(p => p.IsPublished === 'TRUE').map(p => `
+        <div class="product-item" onclick="addItemToCart('${p.SKU}')">
+            <img src="${p.ImageURL || 'https://via.placeholder.com/120'}" onerror="this.src='https://via.placeholder.com/120'">
             <h4>${p.ProductName}</h4>
-            <div style="color:var(--secondary-color); font-weight:700;">RM ${parseFloat(p.RSP).toFixed(2)}</div>
-            <div style="font-size:0.7rem; color:#999;">CC: ${p.CC}</div>
+            <div class="price">RM ${parseFloat(p.RSP).toFixed(2)}</div>
+            <div style="font-size: 0.65rem; color: #999; margin-top:5px;">SKU: ${p.SKU} | CC: ${p.CC}</div>
         </div>
     `).join('');
 }
 
-function addToCart(sku) {
-    const p = state.products.find(x => x.SKU === sku);
-    const exists = state.cart.find(i => i.SKU === sku);
-    if(exists) exists.qty++;
-    else state.cart.push({...p, qty: 1});
+function runProductFilter() {
+    const val = document.getElementById('p-filter').value.toLowerCase();
+    const cards = document.querySelectorAll('.product-item');
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(val) ? 'block' : 'none';
+    });
+}
+
+function renderCustomerDrop() {
+    const drop = document.getElementById('cust-select');
+    drop.innerHTML = '<option value="">-- Choose Existing Customer --</option>' + 
+                    db.customers.map(c => `<option value="${c.PAC}">${c.CustomerName} (${c.PAC})</option>`).join('');
+}
+
+function renderTargetBar() {
+    const cont = document.getElementById('progress-container');
+    const target = parseFloat(db.agent.Target) || 0;
+    const current = parseFloat(db.agent.CurrentSales) || 0;
+    const pct = target > 0 ? Math.min(100, (current/target)*100) : 0;
+    
+    cont.innerHTML = `
+        <div style="font-size: 0.75rem; margin-top: 10px; font-weight:700;">Performance: RM ${current.toFixed(2)} / RM ${target.toFixed(2)} (${pct.toFixed(1)}%)</div>
+        <div class="target-bar-container">
+            <div class="target-progress" style="width: ${pct}%"></div>
+        </div>
+    `;
+}
+
+// =================================================================
+// 4. ORDER & CART MANAGEMENT
+// =================================================================
+
+function addItemToCart(sku) {
+    const product = db.products.find(p => p.SKU === sku);
+    const existing = db.cart.find(item => item.SKU === sku);
+    
+    if(existing) {
+        existing.qty++;
+    } else {
+        db.cart.push({ ...product, qty: 1 });
+    }
     renderCart();
 }
 
 function renderCart() {
-    const list = document.getElementById('cart-list');
-    let total = 0;
-    list.innerHTML = state.cart.map(item => {
-        total += (item.RSP * item.qty);
+    const cont = document.getElementById('cart-content');
+    if(db.cart.length === 0) {
+        cont.innerHTML = `<div style="text-align:center; padding:50px; color:#ccc;"><i class="fas fa-shopping-basket fa-3x"></i><p>Basket is empty</p></div>`;
+        document.getElementById('cart-total').textContent = "0.00";
+        document.getElementById('cart-cc').textContent = "0.000";
+        return;
+    }
+    
+    let total = 0, ccTotal = 0;
+    cont.innerHTML = db.cart.map((item, index) => {
+        const rowTotal = item.RSP * item.qty;
+        total += rowTotal;
+        ccTotal += (parseFloat(item.CC) * item.qty);
         return `
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.9rem;">
-                <span>${item.ProductName} x ${item.qty}</span>
-                <span>RM ${(item.RSP * item.qty).toFixed(2)}</span>
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px dashed #eee; padding-bottom:10px;">
+                <div style="flex-grow:1;">
+                    <div style="font-weight:700; font-size:0.85rem;">${item.ProductName}</div>
+                    <div style="font-size:0.75rem; color:#888;">RM ${parseFloat(item.RSP).toFixed(2)} x ${item.qty}</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-weight:700;">RM ${rowTotal.toFixed(2)}</div>
+                    <button onclick="removeFromCart(${index})" style="background:none; border:none; color:red; cursor:pointer; font-size:0.7rem;">Remove</button>
+                </div>
             </div>
         `;
     }).join('');
-    document.getElementById('cart-total').textContent = `RM ${total.toFixed(2)}`;
-}
-
-// 5. CUSTOMER
-function renderCustomerDropdown() {
-    const d = document.getElementById('customer-dropdown');
-    d.innerHTML = '<option value="">Select Existing Customer</option>' + 
-                  state.customers.map(c => `<option value="${c.PAC}">${c.CustomerName} (${c.CustomerPhone})</option>`).join('');
-}
-
-// 6. CORE APP UTILS
-function showView(viewId) {
-    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-    document.querySelectorAll('nav .btn').forEach(b => b.classList.remove('active'));
     
-    document.getElementById(viewId).classList.remove('hidden');
-    const navBtn = document.getElementById(`nav-${viewId.replace('-view','')}-btn`);
-    if(navBtn) navBtn.classList.add('active');
-
-    if(viewId === 'profile-view') populateProfile();
-    if(viewId === 'marketplace-view') renderMarketplace();
+    document.getElementById('cart-total').textContent = total.toFixed(2);
+    document.getElementById('cart-cc').textContent = ccTotal.toFixed(3);
 }
 
-async function apiCall(action, data) {
-    const response = await fetch(API_URL, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action, data })
+function removeFromCart(index) {
+    db.cart.splice(index, 1);
+    renderCart();
+}
+
+async function submitAgentOrder() {
+    const custId = document.getElementById('cust-select').value;
+    const proofFile = document.getElementById('order-proof').files[0];
+    
+    if(db.cart.length === 0) return alert("Your basket is empty.");
+    if(!custId && !document.getElementById('nc-name').value) return alert("Select or Register a Customer.");
+    if(!proofFile) return alert("Payment proof is required to process orders.");
+
+    setLoader(true);
+    
+    try {
+        const base64 = await toBase64(proofFile);
+        const payload = {
+            agentId: db.agent.AgentID,
+            customerId: custId,
+            newCustomer: custId ? null : {
+                pac: document.getElementById('nc-pac').value,
+                name: document.getElementById('nc-name').value,
+                email: document.getElementById('nc-email').value,
+                phone: document.getElementById('nc-phone').value,
+                address: document.getElementById('nc-address').value
+            },
+            items: db.cart,
+            proof: {
+                data: base64.split(',')[1],
+                type: proofFile.type
+            },
+            total: document.getElementById('cart-total').textContent,
+            cc: document.getElementById('cart-cc').textContent
+        };
+
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ action: 'submitOrder', data: payload })
+        });
+        const res = await response.json();
+        
+        if(res.success) {
+            alert(`Order Successful! Invoice: ${res.invoiceId}`);
+            db.cart = [];
+            resetOrderForm();
+            syncAllData();
+            switchMainView('sales-view');
+        } else {
+            alert(res.message);
+        }
+    } catch(e) {
+        alert("Server communication failed.");
+    } finally {
+        setLoader(false);
+    }
+}
+
+// =================================================================
+// 5. PROFILE & BANKING LOGIC (CORE REQUEST)
+// =================================================================
+
+function handleProfileLockToggle() {
+    const isEdit = document.getElementById('profile-edit-toggle').checked;
+    
+    // Banking fields only
+    const bankFields = ['prof-BankName', 'prof-AccountHolderName', 'prof-AccountNumber'];
+    bankFields.forEach(id => {
+        document.getElementById(id).disabled = !isEdit;
     });
-    return await response.json();
+    
+    // Toggle save button
+    document.getElementById('profile-save-container').classList.toggle('hidden', !isEdit);
 }
+
+function populateProfileData() {
+    // Fill all fields from state
+    const fields = [
+        'AgentID', 'EmployeeName', 'EmployeePhone', 'EmployeeEmail', 'EmployeeAddress',
+        'EmployeeStatus', 'AgentType', 'BasicPay', 'WorkingHours', 'Position',
+        'CommissionRate', 'Target', 'IsAdmin', 'Password', 'ManagerID',
+        'OverrideAmount', 'BankName', 'AccountHolderName', 'AccountNumber'
+    ];
+    
+    fields.forEach(f => {
+        const el = document.getElementById(`prof-${f}`);
+        if(el) {
+            el.value = db.agent[f] || "";
+        }
+    });
+}
+
+async function executeBankingUpdate() {
+    const bank = document.getElementById('prof-BankName').value;
+    const holder = document.getElementById('prof-AccountHolderName').value;
+    const acc = document.getElementById('prof-AccountNumber').value;
+    
+    if(!bank || !holder || !acc) return alert("All banking fields must be filled.");
+
+    setLoader(true);
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                action: 'updateBanking',
+                data: {
+                    agentId: db.agent.AgentID,
+                    bank, holder, acc
+                }
+            })
+        }).then(r => r.json());
+
+        if(res.success) {
+            alert("Banking Information Updated Successfully!");
+            db.agent.BankName = bank;
+            db.agent.AccountHolderName = holder;
+            db.agent.AccountNumber = acc;
+            document.getElementById('profile-edit-toggle').checked = false;
+            handleProfileLockToggle();
+        }
+    } catch(e) {
+        alert("Update failed.");
+    } finally {
+        setLoader(false);
+    }
+}
+
+// =================================================================
+// 6. NAVIGATION & UI HELPERS
+// =================================================================
+
+function switchMainView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+    document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+    
+    document.getElementById(id).classList.remove('hidden');
+    
+    // Set Active Nav
+    const navMap = {
+        'marketplace-view': 'nav-market',
+        'order-view': 'nav-order',
+        'catalog-view': 'nav-catalog',
+        'sales-view': 'nav-sales',
+        'income-view': 'nav-income',
+        'team-view': 'nav-team',
+        'profile-view': 'nav-profile',
+        'admin-view': 'nav-admin'
+    };
+    const btnId = navMap[id];
+    if(btnId) document.getElementById(btnId).classList.add('active');
+
+    // Trigger Loads
+    if(id === 'profile-view') populateProfileData();
+    if(id === 'marketplace-view') loadMarketplace();
+}
+
+function setLoader(show) {
+    document.getElementById('overlay-loader').classList.toggle('hidden', !show);
+}
+
+function switchAdminTab(e, id) {
+    document.querySelectorAll('.admin-view-content').forEach(v => v.classList.add('hidden'));
+    document.querySelectorAll('.admin-tab-link').forEach(l => l.classList.remove('active'));
+    document.getElementById(id).classList.remove('hidden');
+    e.target.classList.add('active');
+}
+
+async function loadMarketplace() {
+    const cont = document.getElementById('market-list');
+    cont.innerHTML = "Querying unassigned orders...";
+    
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ action: 'getOpenOrders', data: { agentId: db.agent.AgentID } })
+        }).then(r => r.json());
+        
+        if(res.success && res.orders.length > 0) {
+            cont.innerHTML = res.orders.map(o => `
+                <div class="open-order-card" style="background:#fff; border:1px solid #eee; padding:20px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong style="color:var(--primary-color);">${o.invoiceId}</strong><br>
+                        <span style="font-size:0.85rem;">${o.customerName}</span> | <span style="font-size:0.8rem; color:var(--secondary-color);">RM ${o.total}</span>
+                    </div>
+                    <button class="btn btn-primary" style="padding: 8px 15px;" onclick="claimOrder('${o.invoiceId}')">Claim Order</button>
+                </div>
+            `).join('');
+        } else {
+            cont.innerHTML = `<div style="text-align:center; padding:30px; color:#999;">The pool is currently empty.</div>`;
+        }
+    } catch(e) {
+        cont.innerHTML = "Error loading marketplace.";
+    }
+}
+
+async function claimOrder(invId) {
+    if(!confirm("Claim this order? It will be moved to your sales history and commission will be assigned to you.")) return;
+    setLoader(true);
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ action: 'claimOrder', data: { agentId: db.agent.AgentID, invoiceId: invId } })
+        }).then(r => r.json());
+        
+        if(res.success) {
+            alert("Order Claimed Successfully!");
+            syncAllData();
+            switchMainView('sales-view');
+        } else {
+            alert(res.message);
+        }
+    } finally {
+        setLoader(false);
+    }
+}
+
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});
+
+function toggleNewCustForm() {
+    document.getElementById('new-cust-fields').classList.toggle('hidden');
+    if(!document.getElementById('new-cust-fields').classList.contains('hidden')) {
+        document.getElementById('cust-select').value = "";
+    }
+}
+
+function onCustomerSelect() {
+    if(document.getElementById('cust-select').value) {
+        document.getElementById('new-cust-fields').classList.add('hidden');
+    }
+}
+
+function renderMySales() {
+    const body = document.getElementById('sales-history-body');
+    body.innerHTML = db.sales.map(s => `
+        <tr>
+            <td>${s.date}</td>
+            <td><strong>${s.invoiceId}</strong></td>
+            <td>${s.customerName}</td>
+            <td style="font-weight:700;">RM ${s.total}</td>
+            <td>${s.cc}</td>
+            <td><span style="color:${s.status === 'Completed' ? 'green' : 'orange'}">${s.status}</span></td>
+        </tr>
+    `).join('');
+}
+
+// Final initialization
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Portal Engine Loaded.");
+});
 
 </script>
 </body>
