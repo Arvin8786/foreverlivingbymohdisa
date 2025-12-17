@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/jpeg" href="FL.jpg">
     
     <style>
         /* [ 1.0 ] LUXURY VARIABLES */
@@ -22,7 +21,7 @@
             --text-main: #333333;
             --text-light: #777777;
             --danger-color: #a83232;
-            --border-radius: 2px;
+            --border-radius: 4px;
             --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
             --shadow-hover: 0 20px 40px rgba(0,0,0,0.1);
             --font-heading: 'Playfair Display', serif;
@@ -110,6 +109,7 @@
 
 <div id="login-view">
     <div id="login-box">
+        <!-- Make sure FL.jpg is in the same folder or use a full URL -->
         <img src="FL.jpg" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'" style="width: 80px; margin: 0 auto 20px auto; display:block;">
         <h1 style="display:none; text-align:center; color:var(--primary-color);">FL</h1>
         <h1>Business Partner Login</h1>
@@ -153,9 +153,10 @@
         <button id="nav-my-orders-btn" class="btn">My Orders</button>
         <button id="nav-my-commission-btn" class="btn">Commissions</button>
         <button id="nav-profile-btn" class="btn">Profile</button>
-        <button id="nav-learning-btn" class="btn">Learning</button> <!-- NEW TAB -->
+        <button id="nav-learning-btn" class="btn">Learning</button>
         <button id="nav-team-btn" class="btn hidden">My Team</button> 
         <button id="nav-admin-dashboard-btn" class="btn hidden">Admin</button> 
+        <button id="nav-manage-employees-btn" class="btn hidden">Employees</button>
     </nav>
 
     <div id="open-orders-view" class="view">
@@ -276,6 +277,10 @@
             <div id="admin-emp-list" style="margin-top:20px;"></div>
         </div>
     </div>
+    
+    <div id="manage-employees-view" class="view hidden card">
+        <p>Use Admin Dashboard > Employees tab.</p>
+    </div>
 </div>
 
 <!-- SORA MODAL -->
@@ -320,8 +325,9 @@
 
 <script>
 // =================================================================
-// BUSINESS PARTNER PORTAL SCRIPT (FIXED & UPDATED)
+// BUSINESS PARTNER PORTAL SCRIPT (FINAL)
 // =================================================================
+// ⚠️ REPLACE THIS WITH YOUR DEPLOYMENT URL ⚠️
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7waU07Va75dpnwyNDU6dpZcLZiCup9umNHb1BwdMwtpYLedCFmNzmtZpIK-1v7JDvfg/exec"; 
 
 let products = [], customers = [], shippingRules = [], currentAgent = null;
@@ -334,17 +340,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('logout-btn').addEventListener('click', () => location.reload());
     document.getElementById('refresh-data-btn').addEventListener('click', () => {
          const active = document.querySelector('.view:not(.hidden)');
-         if(active) showView(active.id.replace('view-','')); // Fix ID match
+         if(active) showView(active.id.replace('view-','').replace('-view',''));
     });
 
-    // Nav
     const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'learning', 'team', 'admin-dashboard'];
     navs.forEach(n => {
         const btn = document.getElementById(`nav-${n}-btn`);
         if(btn) btn.addEventListener('click', () => showView(`${n}-view`));
     });
 
-    // Actions
     document.getElementById('change-password-btn').addEventListener('click', handleChangePassword);
     document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
     document.getElementById('customer-dropdown').addEventListener('change', handleCustomerSelection);
@@ -359,7 +363,7 @@ async function handleLogin() {
     const btn = document.getElementById('login-btn');
     const status = document.getElementById('login-status');
     
-    btn.disabled = true; status.textContent = "Verifying Credentials..."; 
+    btn.disabled = true; status.textContent = "Verifying..."; 
 
     try {
         const res = await postToGoogleScript('verifyAgent', { agentId: aid, password: pwd });
@@ -397,7 +401,7 @@ async function handleLogin() {
             status.textContent = res.message;
             status.style.color = 'var(--danger-color)';
         }
-    } catch(e) { status.textContent = "Connection Error."; }
+    } catch(e) { status.textContent = "Connection Error: " + e.message; console.error(e); }
     finally { btn.disabled = false; }
 }
 
@@ -405,12 +409,12 @@ function showView(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
     document.querySelectorAll('nav .btn').forEach(b => b.classList.remove('active'));
     document.getElementById(viewId).classList.remove('hidden');
-    // Handle special naming
+    
     const navId = viewId.replace('-view',''); 
     const btn = document.getElementById(`nav-${navId}-btn`);
     if(btn) btn.classList.add('active');
 
-    // Force Render Logic
+    // Force Render logic on view switch
     if(viewId === 'open-orders-view') renderOpenOrders();
     if(viewId === 'my-orders-view') renderMyOrders();
     if(viewId === 'my-commission-view') renderMyCommission();
@@ -432,7 +436,7 @@ async function accessSora() {
     }
 }
 
-// --- MARKETPLACE LOGIC ---
+// --- MARKETPLACE & PICK ORDER FIXED ---
 async function renderOpenOrders() {
     const list = document.getElementById('open-orders-list');
     list.innerHTML = 'Checking database...';
@@ -457,7 +461,7 @@ async function renderOpenOrders() {
                     ${adminControls}
                 </div>`;
             }).join('');
-        } else { list.innerHTML = '<p style="padding:20px;">No open orders available right now.</p>'; }
+        } else { list.innerHTML = '<p style="padding:20px;">No open orders available.</p>'; }
     } catch(e) { list.innerHTML = 'Error loading orders.'; }
 }
 
@@ -465,9 +469,41 @@ async function pickOrder(id) {
     if(!confirm("Claim this order?")) return;
     const res = await postToGoogleScript('pickOrder', { invoiceId: id, agentId: currentAgent.id, agentName: currentAgent.name });
     if(res.success) {
-        populateCreateOrderForm(res.orderData);
+        // Switch View FIRST
         showView('create-order-view');
+        // THEN Populate Data
+        populateCreateOrderForm(res.orderData);
     } else { alert(res.message); renderOpenOrders(); }
+}
+
+function populateCreateOrderForm(data) {
+    currentDraftInvoiceId = data.invoiceId;
+    document.getElementById('processing-msg').style.display = 'block';
+    document.getElementById('draft-id-display').textContent = data.invoiceId;
+    
+    // Set Customer
+    document.getElementById('customer-dropdown').value = "";
+    document.getElementById('new-customer-form').classList.remove('hidden');
+    document.getElementById('new-customer-name').value = data.customer.name;
+    document.getElementById('new-customer-email').value = data.customer.email;
+    document.getElementById('new-customer-phone').value = data.customer.phone;
+    document.getElementById('new-customer-address').value = data.customer.address;
+    
+    // Set Items (Safe Mapping)
+    currentOrder.items = data.items.map(i => {
+        // Find product if it exists in current loaded catalog
+        const p = products.find(prod => String(prod.id) === String(i.id));
+        return { 
+            id: i.id, 
+            name: i.name, 
+            quantity: parseInt(i.quantity)||1, 
+            // Use custom price from order if available, else standard price
+            customPrice: parseFloat(i.customPrice||i.price), 
+            rsp: p ? p.rsp : 0, 
+            minPrice: p ? p.minPrice : 0 
+        };
+    });
+    renderOrderSummary();
 }
 
 async function adminAssignOrder(id) {
@@ -478,7 +514,7 @@ async function adminAssignOrder(id) {
     alert(res.message); if(res.success) renderOpenOrders();
 }
 
-// --- ORDER CREATION ---
+// --- ORDER MGMT ---
 function handleNewCustomerToggle() {
     const form = document.getElementById('new-customer-form');
     form.classList.toggle('hidden');
@@ -488,10 +524,7 @@ function handleCustomerSelection() { if (document.getElementById('customer-dropd
 
 function updatePrice(id, pr) {
     const i = currentOrder.items.find(x => String(x.id) === String(id));
-    if(i) {
-        i.customPrice = parseFloat(pr) || 0;
-        renderOrderSummary();
-    }
+    if(i) { i.customPrice = parseFloat(pr) || 0; renderOrderSummary(); }
 }
 
 function renderOrderSummary() {
@@ -510,7 +543,7 @@ function renderOrderSummary() {
                         <button onclick="removeItemFromOrder('${item.id}')" style="background:none; border:none; color:red; cursor:pointer;">&times;</button>
                     </div>
                 </div>
-                ${isLow ? `<div style="color:red; font-size:0.75rem; text-align:right;">Min Allowed: RM ${minPrice.toFixed(2)}</div>` : ''}
+                ${isLow ? `<div style="color:red; font-size:0.75rem; text-align:right;">Min: RM ${minPrice.toFixed(2)}</div>` : ''}
             </div>`;
         }).join('');
     }
@@ -519,14 +552,21 @@ function renderOrderSummary() {
 
 function calculateTotals() {
     const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-    const bestRule = shippingRules.find(r => sub >= r.minSpend);
-    const ship = bestRule ? bestRule.charge : (shippingRules.length > 0 ? shippingRules[shippingRules.length-1].charge : 0);
+    // Find shipping rule
+    let ship = 0;
+    if(shippingRules.length > 0) {
+       // Rules are usually sorted Desc in backend, so find first matching
+       const rule = shippingRules.find(r => sub >= r.minSpend);
+       if(rule) ship = rule.charge;
+       else if(shippingRules.length > 0) ship = shippingRules[shippingRules.length-1].charge; // Fallback
+    }
+    
     document.getElementById('summary-subtotal').textContent = `RM ${sub.toFixed(2)}`;
     document.getElementById('summary-shipping').textContent = `RM ${ship.toFixed(2)}`;
     document.getElementById('summary-total').textContent = `RM ${(sub + ship).toFixed(2)}`;
 }
 
-// --- ADMIN ---
+// --- ADMIN TABS ---
 function switchAdminTab(tabName) {
     document.getElementById('admin-sub-stats').classList.add('hidden');
     document.getElementById('admin-sub-payroll').classList.add('hidden');
@@ -549,12 +589,13 @@ async function loadAdminPayroll() {
     const res = await postToGoogleScript('adminGetPayroll', { agentId: currentAgent.id });
     if(res.success) {
         document.getElementById('admin-payroll-list').innerHTML = `<table style="font-size:0.8rem; width:100%;">
-        <thead><tr style="background:#0a291f; color:#fff;"><th>Agent</th><th>Invoice</th><th>Cost</th><th>Profit</th><th>Comm</th><th>Status</th><th>Edit</th></tr></thead>
+        <thead><tr style="background:#0a291f; color:#fff;"><th>Agent</th><th>Inv</th><th>Cost</th><th>Ship</th><th>Profit</th><th>Comm</th><th>Status</th><th>Edit</th></tr></thead>
         <tbody>${res.payroll.map(p => `
         <tr style="background:${p.status==='Confirmed'?'#e8f5e9':'#fff'}">
             <td>${p.agentName}</td>
             <td>${p.invoiceId}</td>
             <td>${p.cost}</td>
+            <td>${p.shipping}</td>
             <td>${p.netProfit}</td>
             <td><input id="pay-val-${p.row}" value="${p.commissionAmount}" style="width:60px;" ${p.status!=='Pending'?'disabled':''}></td>
             <td>${p.status}</td>
@@ -623,23 +664,7 @@ async function saveEmployee() {
     alert(res.message); if(res.success) { document.getElementById('emp-modal').classList.add('hidden'); renderEmployeeList(); }
 }
 
-// --- STANDARD ---
-function populateCreateOrderForm(data) {
-    currentDraftInvoiceId = data.invoiceId;
-    document.getElementById('processing-msg').style.display = 'block';
-    document.getElementById('draft-id-display').textContent = data.invoiceId;
-    document.getElementById('customer-dropdown').value = "";
-    document.getElementById('new-customer-form').classList.remove('hidden');
-    document.getElementById('new-customer-name').value = data.customer.name;
-    document.getElementById('new-customer-email').value = data.customer.email;
-    document.getElementById('new-customer-phone').value = data.customer.phone;
-    document.getElementById('new-customer-address').value = data.customer.address;
-    currentOrder.items = data.items.map(i => {
-        const p = products.find(prod => String(prod.id) === String(i.id));
-        return { id: i.id, name: i.name, quantity: parseInt(i.quantity)||1, customPrice: parseFloat(i.customPrice||i.price), rsp: p?p.rsp:0, minPrice: p?p.minPrice:0 };
-    });
-    renderOrderSummary();
-}
+// --- HELPER FUNCS ---
 function renderProductSelectionList() { 
     const term = document.getElementById('product-order-search').value.toLowerCase();
     const filtered = products.filter(p => p.name.toLowerCase().includes(term) || String(p.id).toLowerCase().includes(term));
@@ -649,12 +674,6 @@ function renderProductSelectionList() {
             <div><strong>${p.name} (${p.id})</strong><p style="font-size:0.8rem">RSP: RM ${p.rsp.toFixed(2)}</p></div>
             <button class="btn btn-primary" style="margin-left:auto; padding:5px 10px; font-size:0.7rem;">ADD</button>
         </div>`).join('') : "<p>No products found.</p>";
-}
-function addProductToOrder(id) {
-    const p = products.find(x => String(x.id) === String(id));
-    if (!p || currentOrder.items.some(i => String(i.id) === String(id))) return;
-    currentOrder.items.push({ id: p.id, name: p.name, quantity: 1, rsp: p.rsp, cc: p.cc, customPrice: p.rsp, minPrice: p.minPrice });
-    renderOrderSummary();
 }
 function updateQuantity(id, qty) { const i = currentOrder.items.find(x => String(x.id) === String(id)); if(i) i.quantity = parseInt(qty)||1; renderOrderSummary(); }
 function removeItemFromOrder(id) { currentOrder.items = currentOrder.items.filter(i => String(i.id) !== String(id)); renderOrderSummary(); }
@@ -671,11 +690,25 @@ async function submitOrder() {
     try {
         const base64 = await getBase64(file);
         const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-        const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
-        const payload = { agent: currentAgent, customer: cust, items: currentOrder.items, shippingFee: ship, paymentProof: { file: base64.split(',')[1], mimeType: file.type }, invoiceId: currentDraftInvoiceId };
+        
+        // Shipping Logic: Force a basic calculation if rules are missing
+        let ship = 0;
+        if(shippingRules.length > 0) {
+            const rule = shippingRules.find(r => sub >= r.minSpend);
+            ship = rule ? rule.charge : shippingRules[shippingRules.length-1].charge;
+        }
+
+        const payload = { 
+            agent: currentAgent, 
+            customer: cust, 
+            items: currentOrder.items, 
+            shippingFee: ship, 
+            paymentProof: { file: base64.split(',')[1], mimeType: file.type }, 
+            invoiceId: currentDraftInvoiceId 
+        };
         const res = await postToGoogleScript('submitAgentOrder', payload);
         if(res.success) { alert(`Success! Invoice: ${res.invoiceId}`); resetCreateOrderForm(); } else { alert(res.message); }
-    } catch(e) { alert("Error."); } finally { btn.disabled = false; }
+    } catch(e) { alert("Error."); console.error(e); } finally { btn.disabled = false; }
 }
 function resetCreateOrderForm() {
     currentDraftInvoiceId = null;
@@ -708,7 +741,7 @@ async function handleChangePassword() {
 }
 async function fetchPortalData() {
     const res = await postToGoogleScript('getPortalData', {});
-    if(res.success) { products = res.products; customers = res.customers; shippingRules = (res.shippingRules||[]).sort((a,b)=>b.minSpend-a.minSpend); renderProductSelectionList(); renderCustomerDropdown(); renderProductCatalog(); }
+    if(res.success) { products = res.products || []; customers = res.customers || []; shippingRules = (res.shippingRules||[]).sort((a,b)=>b.minSpend-a.minSpend); renderProductSelectionList(); renderCustomerDropdown(); renderProductCatalog(); }
 }
 function renderProductCatalog() { document.getElementById('product-catalog-table').innerHTML = products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>RM ${p.rsp.toFixed(2)}</td><td>${p.cc.toFixed(3)}</td></tr>`).join(''); }
 function renderCustomerDropdown() { document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing --</option>` + customers.map(c => `<option value="${c.pac}">${c.name} (${c.phone||c.email})</option>`).join(''); }
@@ -754,6 +787,7 @@ async function renderAdminDashboard() {
     } else div.innerHTML='No data.';
 }
 async function postToGoogleScript(action, data = {}) {
+    // Standard CORS POST
     const res = await fetch(GOOGLE_SCRIPT_URL, { 
         method: 'POST', 
         mode: 'cors', 
