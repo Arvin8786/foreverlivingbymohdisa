@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Agent Sales Portal</title>
+    <title>FL LUXE | Agent Sales Portal</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,271 +12,307 @@
     <link rel="icon" type="image/jpeg" href="FL.jpg">
     
     <style>
-        /* [ 1.0 ] LUXURY VARIABLES - PRESERVED EXACTLY */
+        /* [ 1.0 ] DESIGN SYSTEM & VARIABLES */
         :root {
-            --primary-color: #0a291f;      /* Deep Emerald */
-            --secondary-color: #d4af37;    /* Satin Gold */
-            --bg-color: #fcfcfc;           /* Pearl White */
+            --primary: #0a291f;      /* Deep Emerald */
+            --secondary: #d4af37;    /* Satin Gold */
+            --accent: #1a4d3c;
+            --bg: #fcfcfc;           
             --card-bg: #ffffff;
-            --text-main: #333333;
+            --text-main: #1a1a1a;
             --text-light: #777777;
-            --danger-color: #a83232;
+            --danger: #a83232;
+            --success: #2e7d32;
+            --ms-blue: #00a4ef;      /* Microsoft Branding */
             
-            --border-radius: 2px;          /* Sharp corners */
-            --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
+            --border-radius: 2px;
+            --shadow-sm: 0 5px 15px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.1);
             
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Lato', sans-serif;
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
-        .container { max-width: 1300px; margin: 30px auto; padding: 0 30px; }
+        body { font-family: var(--font-body); background-color: var(--bg); color: var(--text-main); line-height: 1.6; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
         
-        h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); font-weight: 700; }
+        h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary); font-weight: 700; }
         
-        /* Buttons */
+        /* [ 2.0 ] BUTTONS */
         .btn { 
-            display: inline-block; padding: 12px 25px; 
-            text-transform: uppercase; letter-spacing: 2px; font-size: 0.75rem; font-weight: 700;
-            border: 1px solid transparent; cursor: pointer; transition: 0.3s; text-align: center;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 14px 28px; text-transform: uppercase; letter-spacing: 2px; font-size: 0.75rem; font-weight: 700;
+            border: 1px solid transparent; cursor: pointer; transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            text-decoration: none;
         }
-        .btn:disabled { background: #ccc !important; border-color: #ccc !important; cursor: not-allowed; }
+        .btn:disabled { background: #eee !important; border-color: #eee !important; color: #aaa !important; cursor: not-allowed; }
         
-        .btn-primary { background: var(--primary-color); color: #fff; }
-        .btn-primary:hover:not(:disabled) { background: var(--secondary-color); border-color: var(--secondary-color); color: #000; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover:not(:disabled) { background: var(--secondary); color: #000; transform: translateY(-2px); box-shadow: var(--shadow-lg); }
         
-        .btn-secondary { background: transparent; border-color: var(--primary-color); color: var(--primary-color); }
-        .btn-secondary:hover:not(:disabled) { background: var(--primary-color); color: #fff; }
-        
-        /* Cards */
-        .card { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow-soft); padding: 30px; margin-bottom: 25px; border: 1px solid #eee; }
-        .card h3 { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; font-size: 1.5rem; }
+        .btn-secondary { background: transparent; border-color: var(--primary); color: var(--primary); }
+        .btn-secondary:hover:not(:disabled) { background: var(--primary); color: #fff; }
 
-        /* Inputs */
+        .btn-ms { background: var(--ms-blue); color: #fff; }
+        .btn-ms:hover { filter: brightness(1.1); }
+        
+        /* [ 3.0 ] UI COMPONENTS */
+        .card { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow-sm); padding: 40px; margin-bottom: 30px; border: 1px solid #eee; }
+        .card h3 { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 25px; font-size: 1.6rem; display: flex; align-items: center; gap: 15px; }
+
         input, select, textarea { 
-            width: 100%; padding: 12px 0; margin-bottom: 20px; border: none;
-            border-bottom: 2px solid #ccc; background: transparent; font-size: 1rem;
+            width: 100%; padding: 12px 15px; margin-bottom: 20px; border: none;
+            border-bottom: 2px solid #ddd; background: #f9f9f9; font-size: 1rem;
             font-family: var(--font-body); transition: 0.3s; border-radius: 0;
         }
-        input:focus, select:focus, textarea:focus { border-bottom-color: var(--secondary-color); }
+        input:focus { border-bottom-color: var(--secondary); background: #fff; }
         
+        label { display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-light); margin-bottom: 8px; letter-spacing: 1px; }
+
         .hidden { display: none !important; }
 
-        /* [ 2.0 ] LOGIN & HEADER */
-        #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary-color), #000); }
-        #login-box { width: 450px; text-align: center; border-top: 5px solid var(--secondary-color); }
+        /* [ 4.0 ] LOGIN VIEW */
+        #login-view { height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at center, #0a291f 0%, #000 100%); }
+        .login-box { width: 450px; text-align: center; border-top: 5px solid var(--secondary); background: #fff; padding: 60px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        .login-box img { width: 100px; height: 100px; margin-bottom: 25px; object-fit: contain; }
         
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #eee; margin-bottom: 30px; }
-        #agent-welcome-header { margin: 0; font-size: 2rem; }
-        #agent-details-display { font-size: 0.9rem; color: var(--secondary-color); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        /* [ 5.0 ] HEADER & NAV */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 30px 0; border-bottom: 1px solid #eee; margin-bottom: 40px; }
+        #agent-welcome-header { font-size: 2.5rem; margin-bottom: 5px; }
+        #agent-details-display { font-size: 0.85rem; color: var(--secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* Target Bar */
-        .target-bar-container { width: 100%; height: 6px; background: #eee; border-radius: 3px; margin-top: 10px; overflow: hidden; }
-        .target-progress { height: 100%; background: var(--secondary-color); transition: width 0.5s; }
+        nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        nav .btn { flex-grow: 1; background: #fff; border: 1px solid #eee; color: var(--text-light); min-width: 150px; }
+        nav .btn i { font-size: 1.1rem; }
+        nav .btn:hover { border-color: var(--secondary); color: var(--secondary); }
+        nav .btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-        /* Navigation */
-        nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
-        nav .btn { flex-grow: 1; border: 1px solid #eee; background: #fff; color: var(--text-light); }
-        nav .btn:hover { border-color: var(--secondary-color); color: var(--secondary-color); }
-        nav .btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
-        nav .btn.hidden { display: none; }
+        /* [ 6.0 ] TABLES */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 20px; background: #f9f9f9; color: var(--primary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid var(--secondary); }
+        td { padding: 20px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
+        tr:hover td { background: #fafafa; }
 
-        /* Expandable Tables Styling */
-        .expandable-row { cursor: pointer; transition: background 0.2s; }
-        .expandable-row:hover { background: #f9f9f9; }
-        .details-pane { background: #fdfdfd; padding: 20px; border: 1px inset #eee; display: none; }
-        .details-pane table { background: #fff; margin-top: 10px; border: 1px solid #eee; }
-        .details-pane th { background: #f5f5f5; color: #333; font-size: 0.7rem; }
+        /* [ 7.0 ] SORA ACCESS STYLES */
+        .sora-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+        .sora-badge { background: #f0f7ff; border: 1px solid #c2e0ff; padding: 30px; text-align: center; }
+        .sora-badge i { font-size: 3rem; color: var(--ms-blue); margin-bottom: 15px; }
+        .cred-box { background: #fff; padding: 15px; border: 1px dashed #ccc; margin: 10px 0; font-family: monospace; font-size: 1.1rem; position: relative; }
+        .copy-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--ms-blue); }
 
-        /* Admin Inputs */
-        .admin-price-input { border: 1px solid #ddd !important; padding: 5px !important; width: 100px !important; margin-bottom: 0 !important; font-size: 0.85rem !important; }
+        /* [ 8.0 ] PROFILE GRID */
+        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .profile-section { background: #fbfbfb; padding: 25px; border: 1px solid #eee; }
+        .profile-section h4 { font-size: 0.9rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .profile-item { margin-bottom: 15px; }
+        .profile-item label { color: #999; font-size: 0.65rem; }
+        .profile-item input { background: transparent; border-bottom: 1px solid #ccc; margin-bottom: 0; padding: 5px 0; font-weight: 600; color: var(--primary); }
 
-        @media (max-width: 1000px) { #order-creation-workflow { grid-template-columns: 1fr; } }
+        @media (max-width: 1000px) { .sora-container, .profile-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
+<!-- LOGIN VIEW -->
 <div id="login-view">
-    <div class="card" id="login-box">
-        <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
-        <h1>Agent Portal</h1>
+    <div class="login-box card">
+        <img src="FL.jpg" alt="Logo">
+        <h1>Executive Portal</h1>
+        <p style="margin-bottom: 30px; font-style: italic; color: #888;">Enter your credentials to access the sales authority.</p>
         <form id="login-form">
             <input type="text" id="agent-id-input" placeholder="Agent ID" required>
-            <input type="password" id="agent-password-input" placeholder="Password" required>
-            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">Login</button>
-            <p id="login-status" style="margin-top: 15px; font-size: 0.9rem;"></p>
+            <input type="password" id="agent-password-input" placeholder="Access Password" required>
+            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">Authorize Session</button>
+            <p id="login-status" style="margin-top: 20px; font-weight: 700; font-size: 0.85rem;"></p>
         </form>
     </div>
 </div>
 
+<!-- PORTAL VIEW -->
 <div id="portal-view" class="container hidden">
     <header>
         <div>
-            <h2 id="agent-welcome-header"></h2>
+            <h2 id="agent-welcome-header">Welcome</h2>
             <p id="agent-details-display"></p>
-            <div id="target-bar-display" style="margin-top: 10px;"></div>
         </div>
         <div style="text-align: right;">
-            <button id="logout-btn" class="btn btn-primary">Logout</button>
+            <button id="logout-btn" class="btn btn-secondary btn-small"><i class="fa-solid fa-sign-out"></i> Logout</button>
         </div>
     </header>
 
     <nav>
-        <button id="nav-open-orders-btn" class="btn active">Marketplace</button>
-        <button id="nav-create-order-btn" class="btn">New Order</button>
-        <button id="nav-learning-btn" class="btn">Learning & Marketing</button>
-        <button id="nav-products-btn" class="btn">Products</button>
-        <button id="nav-my-orders-btn" class="btn">My Sales</button>
-        <button id="nav-my-commission-btn" class="btn">Commission</button>
-        <button id="nav-profile-btn" class="btn">Profile</button>
-        <button id="nav-admin-dashboard-btn" class="btn hidden">Admin</button> 
+        <button id="nav-open-orders-btn" class="btn active"><i class="fa-solid fa-globe"></i> Marketplace</button>
+        <button id="nav-create-order-btn" class="btn"><i class="fa-solid fa-cart-plus"></i> New Order</button>
+        <button id="nav-sora-btn" class="btn"><i class="fa-brands fa-microsoft"></i> Sora Access</button>
+        <button id="nav-products-btn" class="btn"><i class="fa-solid fa-boxes-stacked"></i> Products</button>
+        <button id="nav-my-orders-btn" class="btn"><i class="fa-solid fa-list-check"></i> My Sales</button>
+        <button id="nav-my-commission-btn" class="btn"><i class="fa-solid fa-sack-dollar"></i> Commission</button>
+        <button id="nav-profile-btn" class="btn"><i class="fa-solid fa-user-tie"></i> Profile</button>
+        <button id="nav-admin-dashboard-btn" class="btn hidden"><i class="fa-solid fa-shield-halved"></i> Admin</button> 
     </nav>
 
-    <!-- LEARNING & MARKETING (FORMERLY SORA) -->
-    <div id="learning-view" class="view hidden card">
-        <h3>Learning & Marketing</h3>
-        <p style="margin-bottom: 20px; color:#666;">Access your dedicated resources and marketing credentials.</p>
-        <div id="learning-access-container" class="profile-grid">
-            <!-- Data from soraaccess sheet -->
+    <!-- SORA ACCESS VIEW -->
+    <div id="sora-view" class="view hidden card">
+        <h3><i class="fa-brands fa-microsoft" style="color:var(--ms-blue)"></i> Sora Enterprise Access</h3>
+        <div class="sora-container">
+            <div class="sora-badge">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <h4>Microsoft Integrated SSO</h4>
+                <p style="color: #666; margin-top: 10px;">Your dedicated Sora credentials are tied to your Executive ID. Use these to sign in via the Microsoft login portal.</p>
+            </div>
+            <div>
+                <label>Assigned Microsoft Email</label>
+                <div class="cred-box" id="sora-email">Loading...</div>
+                
+                <label>Access Password</label>
+                <div class="cred-box" id="sora-password">••••••••</div>
+                
+                <p style="font-size: 0.8rem; color: #999; margin: 20px 0;">* Credentials are managed by IT. If status is 'Inactive', access is revoked.</p>
+                <button class="btn btn-ms" style="width: 100%;" onclick="launchSora()"><i class="fa-solid fa-external-link"></i> Launch Sora Portal</button>
+            </div>
         </div>
     </div>
 
-    <!-- MARKETPLACE -->
+    <!-- MARKETPLACE VIEW -->
     <div id="open-orders-view" class="view">
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3>Marketplace</h3>
-                <button class="btn btn-secondary" onclick="renderOpenOrders()">Refresh List</button>
+                <h3><i class="fa-solid fa-handshake-angle"></i> Marketplace</h3>
+                <button class="btn btn-secondary btn-small" onclick="renderOpenOrders()">Refresh List</button>
             </div>
-            <div id="open-orders-list">Loading...</div>
+            <div id="open-orders-list">Scanning for active leads...</div>
         </div>
     </div>
 
-    <!-- CREATE ORDER -->
+    <!-- CREATE ORDER VIEW -->
     <div id="create-order-view" class="view hidden">
-        <div id="order-creation-workflow" style="display:grid; grid-template-columns: 1fr 400px; gap: 30px;">
+        <div id="order-creation-workflow" style="display: grid; grid-template-columns: 1fr 450px; gap: 30px;">
             <div>
                 <div class="card">
-                    <h3>Customer</h3>
+                    <h3><i class="fa-solid fa-user-tag"></i> Client Selection</h3>
                     <select id="customer-dropdown"></select>
-                    <button id="new-customer-btn" class="btn btn-secondary" style="width:100%; margin-top:10px;">New Customer</button>
-                    <div id="new-customer-form" class="hidden" style="margin-top: 20px;">
-                        <input type="text" id="new-customer-name" placeholder="Name">
-                        <input type="email" id="new-customer-email" placeholder="Email">
-                        <input type="tel" id="new-customer-phone" placeholder="Phone">
-                        <textarea id="new-customer-address" placeholder="Address" rows="2"></textarea>
+                    <button id="new-customer-btn" class="btn btn-secondary" style="width:100%;"><i class="fa-solid fa-plus"></i> New Customer Registration</button>
+                    <div id="new-customer-form" class="hidden" style="margin-top: 25px;">
+                        <input type="text" id="new-customer-name" placeholder="Full Legal Name">
+                        <input type="email" id="new-customer-email" placeholder="Email Address">
+                        <input type="tel" id="new-customer-phone" placeholder="Contact Number">
+                        <textarea id="new-customer-address" placeholder="Full Shipping Address" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="card">
-                    <h3>Products</h3>
-                    <input type="text" id="product-order-search" placeholder="Search SKU or Name...">
-                    <div id="product-selection-list"></div>
+                    <h3><i class="fa-solid fa-box"></i> Product Selection</h3>
+                    <input type="text" id="product-order-search" placeholder="Search Collection by SKU or Name...">
+                    <div id="product-selection-list" style="max-height: 400px; overflow-y: auto;"></div>
                 </div>
             </div>
-            <div class="card" id="order-summary-card">
-                <h3>Summary</h3>
-                <div id="summary-items-list"></div>
-                <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+            <div class="card" id="order-summary-card" style="border: 2px solid var(--primary);">
+                <h3>Order Summary</h3>
+                <div id="summary-items-list" style="min-height: 100px;"></div>
+                <div style="margin-top: 30px; border-top: 2px solid var(--secondary); padding-top: 20px;">
                     <div style="display:flex; justify-content:space-between;"><span>Subtotal:</span><span id="summary-subtotal">RM 0.00</span></div>
                     <div style="display:flex; justify-content:space-between;"><span>Shipping:</span><span id="summary-shipping">RM 0.00</span></div>
-                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.2rem; color:var(--primary-color); margin-top:10px;"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
+                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.4rem; color:var(--primary); margin-top:15px;"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
                 </div>
-                <div style="margin-top: 30px;">
-                    <label style="font-size:0.8rem; font-weight:700; text-transform:uppercase; color:#999;">Payment Proof</label>
-                    <input type="file" id="payment-proof">
-                    <button id="submit-order-btn" class="btn btn-primary" style="width:100%;">Submit Order</button>
+                <div style="margin-top: 35px;">
+                    <label>Payment Proof (JPG/PNG)</label>
+                    <input type="file" id="payment-proof" accept="image/*">
+                    <button id="submit-order-btn" class="btn btn-primary" style="width:100%;">Finalize & Submit Sale</button>
+                    <p id="submit-status" style="text-align: center; margin-top: 15px; font-weight: 700;"></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PRODUCTS -->
+    <!-- PRODUCT CATALOG -->
     <div id="products-view" class="view hidden card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3>Product Catalog</h3>
-            <span id="admin-indicator" class="hidden" style="color:var(--secondary-color); font-weight:700; font-size:0.8rem;">ADMIN EDITING ENABLED</span>
-        </div>
+        <h3><i class="fa-solid fa-list-ul"></i> Master Catalog</h3>
         <table>
-            <thead><tr><th>SKU</th><th>Name</th><th>RSP (RM)</th><th>CC</th><th id="th-admin-actions" class="hidden">Actions</th></tr></thead>
+            <thead><tr><th>SKU</th><th>Product Details</th><th>RSP (RM)</th><th>CC Value</th></tr></thead>
             <tbody id="product-catalog-table"></tbody>
         </table>
     </div>
 
     <!-- MY SALES -->
     <div id="my-orders-view" class="view hidden card">
-        <h3>My Sales</h3>
-        <p style="font-size: 0.8rem; color: #999; margin-bottom: 15px;">* Click a row to view itemized details.</p>
+        <h3><i class="fa-solid fa-history"></i> My Sales Performance</h3>
         <div id="my-orders-list"></div>
     </div>
-    
-    <!-- COMMISSION -->
-    <div id="my-commission-view" class="view hidden card">
-        <h3>Commission Statement (AgentsPay)</h3>
-        <p style="font-size: 0.8rem; color: #999; margin-bottom: 15px;">* Reflects your latest payouts including Incentives and Overrides.</p>
-        <div id="my-commission-list" style="overflow-x: auto;"></div>
-    </div>
 
-    <!-- PROFILE -->
-    <div id="profile-view" class="view hidden card">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <h3>My Profile</h3>
-            <button id="save-profile-btn" class="btn btn-primary hidden">Save Changes</button>
-        </div>
-        <div class="profile-grid">
-            <div class="profile-section">
-                <h4>Identity</h4>
-                <div class="profile-item"><label>Full Name</label><input id="prof-employeeName" disabled></div>
-                <div class="profile-item"><label>Agent ID</label><input id="prof-agentID" disabled></div>
-                <div class="profile-item"><label>Position</label><input id="prof-position" disabled></div>
-                <div class="profile-item"><label>Agent Type</label><input id="prof-agentType" disabled></div>
-                <div class="profile-item"><label>Working Hours</label><input id="prof-workingHours" disabled></div>
+    <!-- PROFILE VIEW -->
+    <div id="profile-view" class="view hidden">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                <h3><i class="fa-solid fa-id-card-clip"></i> Executive Profile</h3>
+                <button id="save-profile-btn" class="btn btn-primary hidden"><i class="fa-solid fa-save"></i> Save Banking Details</button>
             </div>
-            <div class="profile-section">
-                <h4>Compensation</h4>
-                <div class="profile-item"><label>Basic Pay</label><input id="prof-basicPay" disabled></div>
-                <div class="profile-item"><label>Comm Rate</label><input id="prof-commissionRate" disabled></div>
-                <div class="profile-item"><label>Monthly Target</label><input id="prof-target" disabled></div>
-                <div class="profile-item"><label>Override Amount (Current)</label><input id="prof-overrideAmount" disabled></div>
-                <div class="profile-item"><label>Manager ID</label><input id="prof-managerID" disabled></div>
-            </div>
-            <div class="profile-section">
-                <h4>Banking</h4>
-                <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bankName" disabled></div>
-                <div class="profile-item"><label>Account Holder</label><input type="text" id="prof-accountHolderName" disabled></div>
-                <div class="profile-item"><label>Account Number</label><input type="text" id="prof-accountNumber" disabled></div>
+            <div class="profile-grid">
+                <div class="profile-section">
+                    <h4>Employment Info</h4>
+                    <div class="profile-item"><label>Full Name</label><input id="prof-employeeName" disabled></div>
+                    <div class="profile-item"><label>Executive ID</label><input id="prof-agentID" disabled></div>
+                    <div class="profile-item"><label>Official Position</label><input id="prof-position" disabled></div>
+                </div>
+                <div class="profile-section">
+                    <h4>Performance & Targets</h4>
+                    <div class="profile-item"><label>Commission Rate</label><input id="prof-commissionRate" disabled></div>
+                    <div class="profile-item"><label>Monthly Target</label><input id="prof-target" disabled></div>
+                    <div class="profile-item"><label>Reporting Manager</label><input id="prof-managerID" disabled></div>
+                </div>
+                <div class="profile-section" style="border-top: 3px solid var(--secondary);">
+                    <h4>Settlement Bank</h4>
+                    <div class="profile-item"><label>Bank Name</label><input type="text" id="prof-bankName" disabled></div>
+                    <div class="profile-item"><label>Account Holder</label><input type="text" id="prof-accountHolderName" disabled></div>
+                    <div class="profile-item"><label>Account Number</label><input type="text" id="prof-accountNumber" disabled></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ADMIN DASHBOARD -->
+    <!-- ADMIN VIEW -->
     <div id="admin-dashboard-view" class="view hidden card">
-        <h3>Admin Dashboard</h3>
+        <h3><i class="fa-solid fa-chart-line"></i> Administration Dashboard</h3>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom:40px;">
+            <div style="background:#0a291f; color:#fff; padding:30px; text-align:center;">
+                <label style="color:var(--secondary)">Total Enterprise Sales</label>
+                <div id="admin-total-sales" style="font-size:2rem; font-weight:700;">RM 0.00</div>
+            </div>
+            <div style="background:#fff; border:1px solid #eee; padding:30px; text-align:center;">
+                <label>Total CC Volume</label>
+                <div id="admin-total-cc" style="font-size:2rem; font-weight:700; color:var(--secondary);">0.00</div>
+            </div>
+            <div style="background:#fff; border:1px solid #eee; padding:30px; text-align:center;">
+                <label>On-Target Agents</label>
+                <div id="admin-agents-on-target" style="font-size:2rem; font-weight:700; color:var(--success);">0</div>
+            </div>
+        </div>
         <canvas id="performanceChart" height="100"></canvas>
-        <div id="admin-data-table" style="margin-top:20px;"></div>
+        <div id="admin-data-table" style="margin-top:40px;"></div>
     </div>
 </div>
 
 <script>
 // =================================================================
-// AGENT PORTAL ENGINE
+// AGENT PORTAL ENGINE - LUXURY EDITION
 // =================================================================
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxAdCfuiM8jnVG-r5MIgYaidDNgmkwP3T-gtta4Lg1ijdr_kHpBKOpw6nW8Ypjtl_h4WA/exec'; 
 
 let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] };
-let currentProfile = {}, allOrdersData = [];
+let currentProfile = {}, soraAccess = null, performanceChartInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-form').addEventListener('submit', (e) => { e.preventDefault(); handleLogin(); });
     document.getElementById('logout-btn').addEventListener('click', () => location.reload());
-
-    const navs = ['open-orders', 'create-order', 'learning', 'products', 'my-orders', 'my-commission', 'profile', 'admin-dashboard'];
+    
+    // View Navigation Mapping
+    const navs = ['open-orders', 'create-order', 'products', 'my-orders', 'my-commission', 'profile', 'admin-dashboard', 'sora'];
     navs.forEach(n => {
         const btn = document.getElementById(`nav-${n}-btn`);
         if(btn) btn.addEventListener('click', () => showView(`${n}-view`));
     });
 
-    document.getElementById('new-customer-btn').addEventListener('click', () => document.getElementById('new-customer-form').classList.toggle('hidden'));
+    document.getElementById('new-customer-btn').addEventListener('click', handleNewCustomerToggle);
+    document.getElementById('customer-dropdown').addEventListener('change', handleCustomerSelection);
     document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
     document.getElementById('product-order-search').addEventListener('keyup', renderProductSelectionList);
     document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
@@ -284,220 +320,233 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function handleLogin() {
     const agentId = document.getElementById('agent-id-input').value.trim();
-    const password = document.getElementById('agent-password-input').value;
+    const password = document.getElementById('agent-password-input').value; 
+    const btn = document.getElementById('login-btn');
     const status = document.getElementById('login-status');
     
-    status.textContent = "Verifying Credentials...";
+    btn.disabled = true; 
+    status.textContent = "Authenticating with Secure Server..."; 
+    status.style.color = "var(--primary)";
 
     try {
         const res = await postToGoogleScript('verifyAgent', { agentId, password });
         if (res.success) {
             currentAgent = res.agent;
             currentProfile = res.profile;
+            
+            // Load Sora Access Details specifically for this agent
+            const soraRes = await postToGoogleScript('getSoraAccess', { agentId: currentAgent.id });
+            if(soraRes.success) soraAccess = soraRes.data;
 
             await fetchPortalData();
             
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
             
-            document.getElementById('agent-welcome-header').textContent = `Welcome, ${currentAgent.name}`;
-            document.getElementById('agent-details-display').textContent = `${currentAgent.position} | ${currentAgent.id}`;
+            document.getElementById('agent-welcome-header').textContent = `Hello, ${currentAgent.name}`;
+            document.getElementById('agent-details-display').textContent = `${res.position || 'Executive Agent'} | ${currentAgent.id}`;
 
-            if(currentAgent.isAdmin) {
-                document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
-                document.getElementById('admin-indicator').classList.remove('hidden');
-                document.getElementById('th-admin-actions').classList.remove('hidden');
-            }
+            if(res.isAdmin) document.getElementById('nav-admin-dashboard-btn').classList.remove('hidden');
 
-            renderTargetBar();
             renderProfile();
             showView('open-orders-view'); 
         } else {
             status.textContent = res.message;
-            status.style.color = 'var(--danger-color)';
+            status.style.color = 'var(--danger)';
         }
-    } catch(e) { status.textContent = "Connection failed."; }
+    } catch(e) { status.textContent = "Server Connection Error."; }
+    finally { btn.disabled = false; }
 }
 
 function showView(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
     document.querySelectorAll('nav .btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(viewId).classList.remove('hidden');
-    document.getElementById(`nav-${viewId.replace('-view','-btn')}`).classList.add('active');
     
+    document.getElementById(viewId).classList.remove('hidden');
+    const navBtnId = `nav-${viewId.replace('-view','')}-btn`;
+    const btn = document.getElementById(navBtnId);
+    if(btn) btn.classList.add('active');
+    
+    // View Specific Logic
     if(viewId === 'open-orders-view') renderOpenOrders();
+    if(viewId === 'sora-view') renderSora();
+    if(viewId === 'admin-dashboard-view') renderAdminDashboard();
     if(viewId === 'my-orders-view') renderMyOrders();
-    if(viewId === 'my-commission-view') renderMyCommission();
     if(viewId === 'products-view') renderProducts();
-    if(viewId === 'learning-view') renderLearning();
 }
 
-// ---------------------------------------------------------
-// PRODUCTS & ADMIN PRICING
-// ---------------------------------------------------------
-function renderProducts() {
-    const table = document.getElementById('product-catalog-table');
-    table.innerHTML = products.map(p => `
-        <tr>
-            <td>${p.id}</td>
-            <td>${p.name}</td>
-            <td>
-                ${currentAgent.isAdmin ? `<input type="number" class="admin-price-input" id="price-${p.id}" value="${p.rsp}">` : `RM ${p.rsp.toFixed(2)}`}
-            </td>
-            <td>
-                ${currentAgent.isAdmin ? `<input type="number" step="0.001" class="admin-price-input" id="cc-${p.id}" value="${p.cc}">` : p.cc.toFixed(3)}
-            </td>
-            ${currentAgent.isAdmin ? `<td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.6rem;" onclick="adminUpdateProduct('${p.id}')">Save</button></td>` : ''}
-        </tr>
-    `).join('');
+// SORA LOGIC
+function renderSora() {
+    if(!soraAccess) {
+        document.getElementById('sora-email').textContent = "No assigned access found.";
+        return;
+    }
+    document.getElementById('sora-email').textContent = soraAccess.email;
+    document.getElementById('sora-password').textContent = soraAccess.password;
 }
 
-async function adminUpdateProduct(id) {
-    const newPrice = document.getElementById(`price-${id}`).value;
-    const newCC = document.getElementById(`cc-${id}`).value;
-    const res = await postToGoogleScript('adminUpdateProduct', { id, rsp: newPrice, cc: newCC });
-    alert(res.message);
-    if(res.success) fetchPortalData();
+function launchSora() {
+    if(!soraAccess || soraAccess.status !== 'Active') {
+        alert("Your Sora Access is currently inactive or restricted. Please contact IT.");
+        return;
+    }
+    // Redirecting to Microsoft Login
+    window.open("https://login.microsoftonline.com/", "_blank");
 }
 
-// ---------------------------------------------------------
-// EXPANDABLE SALES & COMMISSION
-// ---------------------------------------------------------
-async function renderMyOrders() {
-    const list = document.getElementById('my-orders-list');
-    const res = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
-    if (res.success && res.orders.length > 0) {
-        allOrdersData = res.orders;
-        let html = `<table><thead><tr><th>Invoice ID</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>`;
-        res.orders.forEach(o => {
-            html += `
-            <tr class="expandable-row" onclick="toggleDetails('order-${o.invoiceId}')">
-                <td><strong>${o.invoiceId}</strong></td>
-                <td>${o.date}</td>
-                <td>${o.customerName}</td>
-                <td>RM ${o.total}</td>
-                <td>${o.status}</td>
-            </tr>
-            <tr id="details-order-${o.invoiceId}" class="details-pane">
-                <td colspan="5">
-                    <div style="padding:15px; border:1px solid #ddd; background:#fff;">
-                        <h4 style="font-size:0.8rem;">Order Items</h4>
-                        <table>
-                            <thead><tr><th>SKU</th><th>Product</th><th>Qty</th><th>Price</th></tr></thead>
-                            <tbody>${o.items.map(i => `<tr><td>${i.id}</td><td>${i.name}</td><td>${i.quantity}</td><td>RM ${i.customPrice}</td></tr>`).join('')}</tbody>
-                        </table>
-                        <div style="text-align:right; margin-top:10px;">
-                            <strong>Shipping Fee: RM ${o.shippingFee || '0.00'}</strong>
-                        </div>
+// MARKETPLACE LOGIC
+async function renderOpenOrders() {
+    const list = document.getElementById('open-orders-list');
+    list.innerHTML = '<p style="text-align:center; padding:20px;">Refreshing global marketplace...</p>';
+    try {
+        const res = await postToGoogleScript('getOpenOrders', {agentId: currentAgent.id});
+        if (res.success && res.orders.length > 0) {
+            list.innerHTML = res.orders.map(o => `
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center; border-left:4px solid var(--secondary); padding:20px 30px;">
+                    <div>
+                        <strong style="font-size:1.2rem; color:var(--primary)">${o.invoiceId}</strong><br>
+                        <span style="color:#666">${o.customerName}</span><br>
+                        <span style="font-weight:700; color:var(--secondary)">RM ${o.total}</span>
                     </div>
-                </td>
-            </tr>`;
-        });
-        html += `</tbody></table>`;
-        list.innerHTML = html;
-    } else { list.innerHTML = '<p>No sales found.</p>'; }
+                    <button class="btn btn-primary btn-small" onclick="pickOrder('${o.invoiceId}')">Pick Order</button>
+                </div>`).join('');
+        } else { list.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">The marketplace is currently clear of new leads.</p>'; }
+    } catch(e) { list.innerHTML = '<p>Error loading leads.</p>'; }
 }
 
-async function renderMyCommission() {
-    const list = document.getElementById('my-commission-list');
-    const res = await postToGoogleScript('getAgentsPayData', { agentId: currentAgent.id });
-    if (res.success && res.records.length > 0) {
-        let html = `<table><thead><tr><th>Invoice</th><th>Sales</th><th>Comm Rate</th><th>Earnings</th><th>Override</th><th>Incentive</th><th>Total Payable</th><th>Status</th></tr></thead><tbody>`;
-        res.records.forEach(r => {
-            html += `
-            <tr class="expandable-row" onclick="toggleDetails('comm-${r.invoiceId}')">
-                <td>${r.invoiceId}</td>
-                <td>RM ${r.salesAmount}</td>
-                <td>${(r.commissionRate * 100).toFixed(0)}%</td>
-                <td>RM ${r.commissionAmount}</td>
-                <td>RM ${r.overrideAmount}</td>
-                <td>RM ${r.incentive}</td>
-                <td style="color:var(--primary-color); font-weight:700;">RM ${r.totalPayable}</td>
-                <td>${r.status}</td>
-            </tr>
-            <tr id="details-comm-${r.invoiceId}" class="details-pane">
-                <td colspan="8">
-                    <div style="padding:15px; border:1px solid #ddd; background:#fff;">
-                        <h4 style="font-size:0.8rem;">Payout Details Breakdown</h4>
-                        <p><strong>Position:</strong> ${r.position} | <strong>Working Hours:</strong> ${r.workingHours}</p>
-                        <p><strong>Others/Adjustment:</strong> RM ${r.others || '0.00'}</p>
-                    </div>
-                </td>
-            </tr>`;
-        });
-        html += `</tbody></table>`;
-        list.innerHTML = html;
-    } else { list.innerHTML = '<p>No commission records found in AgentsPay.</p>'; }
+async function pickOrder(id) {
+    if(!confirm("Are you sure you want to assign this order to your portfolio?")) return;
+    const res = await postToGoogleScript('pickOrder', { invoiceId: id, agentId: currentAgent.id, agentName: currentAgent.name });
+    alert(res.message); 
+    if(res.success) renderOpenOrders();
 }
 
-function toggleDetails(id) {
-    const el = document.getElementById(`details-${id}`);
-    const isHidden = window.getComputedStyle(el).display === 'none';
-    document.querySelectorAll('.details-pane').forEach(p => p.style.display = 'none');
-    if (isHidden) el.style.display = 'table-row';
+// CREATE ORDER LOGIC
+function renderProductSelectionList() { 
+    const term = document.getElementById('product-order-search').value.toLowerCase();
+    const filtered = products.filter(p => p.name.toLowerCase().includes(term) || String(p.id).toLowerCase().includes(term));
+    document.getElementById('product-selection-list').innerHTML = filtered.length ? filtered.map(p => `
+        <div style="display:flex; align-items:center; gap:20px; padding:15px; border-bottom:1px solid #eee; cursor:pointer;" onclick="addProductToOrder('${p.id}')">
+            <img src="${p.image || 'FL.jpg'}" style="width:40px; height:40px; object-fit:contain;">
+            <div style="flex-grow:1;"><strong>${p.name}</strong><br><small style="color:var(--secondary)">RSP: RM ${p.rsp.toFixed(2)}</small></div>
+            <i class="fa-solid fa-plus-circle" style="color:var(--primary)"></i>
+        </div>`).join('') : "<p>No matching collections found.</p>";
 }
 
-// ---------------------------------------------------------
-// LEARNING & MARKETING
-// ---------------------------------------------------------
-async function renderLearning() {
-    const container = document.getElementById('learning-access-container');
-    container.innerHTML = 'Loading...';
-    const res = await postToGoogleScript('getSoraAccess', { agentId: currentAgent.id });
-    if (res.success && res.data) {
-        container.innerHTML = `
-            <div class="profile-section">
-                <h4>Microsoft / Portal Access</h4>
-                <div class="profile-item"><label>Email / Username</label><input value="${res.data.email}" disabled></div>
-                <div class="profile-item"><label>Password</label><input value="${res.data.password}" disabled></div>
-                <div class="profile-item"><label>Account Status</label><input value="${res.data.status}" disabled></div>
-            </div>
-            <div class="profile-section">
-                <h4>Instructions</h4>
-                <p style="font-size:0.8rem;">Use these credentials to sign in to the Sora Microsoft environment. Ensure you are using the official company link.</p>
-                <a href="https://login.microsoftonline.com" target="_blank" class="btn btn-secondary" style="margin-top:20px; width:100%;">Launch Microsoft Login</a>
-            </div>`;
-    } else { container.innerHTML = '<p>No learning access credentials found for your ID.</p>'; }
+function addProductToOrder(id) {
+    const p = products.find(x => String(x.id) === String(id));
+    if (!p) return;
+    const existing = currentOrder.items.find(i => i.id === id);
+    if(existing) existing.quantity++;
+    else currentOrder.items.push({ ...p, quantity: 1, customPrice: p.rsp });
+    renderOrderSummary();
 }
 
-// ---------------------------------------------------------
-// ORDERING LOGIC (FIXED SHIPPING)
-// ---------------------------------------------------------
+function renderOrderSummary() {
+    const container = document.getElementById('summary-items-list');
+    if (currentOrder.items.length === 0) { 
+        container.innerHTML = "<p style='text-align:center; padding:40px; color:#999;'>Your selection is empty.</p>"; 
+    } else {
+        container.innerHTML = currentOrder.items.map(item => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dashed #ddd;">
+                <div style="width:60%"><strong>${item.name}</strong></div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input type="number" value="${item.quantity}" onchange="updateQty('${item.id}', this.value)" style="width:50px; margin:0; padding:5px; text-align:center;">
+                    <button onclick="removeItem('${item.id}')" style="background:none; border:none; color:var(--danger); cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            </div>`).join('');
+    }
+    calculateTotals();
+}
+
+function updateQty(id, val) {
+    const item = currentOrder.items.find(i => i.id === id);
+    if(item) item.quantity = parseInt(val) || 1;
+    calculateTotals();
+}
+
+function removeItem(id) {
+    currentOrder.items = currentOrder.items.filter(i => i.id !== id);
+    renderOrderSummary();
+}
+
 function calculateTotals() {
     const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
-    // Fixed: check spend vs rules
-    let ship = 0;
-    if (sub > 0) {
-        const rule = shippingRules.find(r => sub >= r.minSpend);
-        ship = rule ? rule.charge : (shippingRules.length > 0 ? shippingRules[shippingRules.length-1].charge : 0);
-    }
+    const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
     document.getElementById('summary-subtotal').textContent = `RM ${sub.toFixed(2)}`;
     document.getElementById('summary-shipping').textContent = `RM ${ship.toFixed(2)}`;
     document.getElementById('summary-total').textContent = `RM ${(sub+ship).toFixed(2)}`;
 }
 
-// ---------------------------------------------------------
-// PROFILE DATA
-// ---------------------------------------------------------
-function renderProfile() {
-    const p = currentProfile;
-    document.getElementById('prof-employeeName').value = p.employeeName || '';
-    document.getElementById('prof-agentID').value = p.agentID || '';
-    document.getElementById('prof-position').value = p.position || '';
-    document.getElementById('prof-agentType').value = p.agentType || 'N/A';
-    document.getElementById('prof-workingHours').value = p.workingHours || 'N/A';
-    document.getElementById('prof-basicPay').value = `RM ${p.basicPay || '0.00'}`;
-    document.getElementById('prof-commissionRate').value = `${(p.commissionRate * 100).toFixed(0)}%`;
-    document.getElementById('prof-target').value = `RM ${p.target || '0.00'}`;
-    document.getElementById('prof-overrideAmount').value = `RM ${p.overrideAmount || '0.00'}`;
-    document.getElementById('prof-managerID').value = p.managerID || 'None';
+async function submitOrder() {
+    const btn = document.getElementById('submit-order-btn');
+    if(currentOrder.items.length === 0) return alert("Please select products.");
     
-    document.getElementById('prof-bankName').value = p.bankName || '';
-    document.getElementById('prof-accountHolderName').value = p.accountHolderName || '';
-    document.getElementById('prof-accountNumber').value = p.accountNumber || '';
+    let cust;
+    const pac = document.getElementById('customer-dropdown').value;
+    if(pac) cust = customers.find(c => c.pac === pac);
+    else {
+        cust = { 
+            name: document.getElementById('new-customer-name').value, 
+            email: document.getElementById('new-customer-email').value, 
+            phone: document.getElementById('new-customer-phone').value, 
+            address: document.getElementById('new-customer-address').value 
+        };
+        if(!cust.name) return alert("Customer details required.");
+    }
+    
+    const file = document.getElementById('payment-proof').files[0];
+    if(!file) return alert("Payment proof is mandatory.");
+    
+    btn.disabled = true;
+    document.getElementById('submit-status').textContent = "Submitting Order...";
 
-    if(p.allowEdit) {
-        ['prof-bankName', 'prof-accountHolderName', 'prof-accountNumber'].forEach(id => document.getElementById(id).disabled = false);
+    try {
+        const base64 = await getBase64(file);
+        const sub = currentOrder.items.reduce((s, i) => s + (i.customPrice * i.quantity), 0);
+        const ship = (shippingRules.find(r => sub >= r.minSpend) || {charge:0}).charge;
+        
+        const payload = { 
+            agent: currentAgent, 
+            customer: cust, 
+            items: currentOrder.items, 
+            shippingFee: ship, 
+            paymentProof: { file: base64.split(',')[1], mimeType: file.type } 
+        };
+        
+        const res = await postToGoogleScript('submitAgentOrder', payload);
+        if(res.success) {
+            alert(`Order Successful! Invoice ID: ${res.invoiceId}`);
+            resetOrderForm();
+        } else {
+            alert(res.message);
+        }
+    } catch(e) { alert("An error occurred during submission."); }
+    finally { btn.disabled = false; document.getElementById('submit-status').textContent = ""; }
+}
+
+function resetOrderForm() {
+    currentOrder = { items: [] };
+    document.getElementById('new-customer-form').classList.add('hidden');
+    document.getElementById('customer-dropdown').value = "";
+    document.getElementById('payment-proof').value = "";
+    renderOrderSummary();
+}
+
+// PROFILE LOGIC
+function renderProfile() {
+    const fields = ['employeeName', 'agentID', 'position', 'commissionRate', 'target', 'managerID', 'bankName', 'accountHolderName', 'accountNumber'];
+    fields.forEach(f => {
+        const el = document.getElementById(`prof-${f}`);
+        if(!el) return;
+        let val = currentProfile[f] || "";
+        if(f === 'commissionRate' && val) val = (val * 100).toFixed(2) + "%";
+        if(f === 'target' && val) val = "RM " + parseFloat(val).toFixed(2);
+        el.value = val;
+    });
+
+    if(currentProfile.allowEdit) {
+        ['bankName', 'accountHolderName', 'accountNumber'].forEach(f => document.getElementById(`prof-${f}`).disabled = false);
         document.getElementById('save-profile-btn').classList.remove('hidden');
     }
 }
@@ -513,98 +562,56 @@ async function saveProfile() {
     alert(res.message);
 }
 
-// ---------------------------------------------------------
-// CORE UTILS
-// ---------------------------------------------------------
+// DATA FETCHING
 async function fetchPortalData() {
-    const res = await postToGoogleScript('getPortalData');
-    if (res.success) { 
-        products = res.products; customers = res.customers; 
-        shippingRules = (res.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend); 
-        renderProducts(); renderProductSelectionList(); renderCustomerDropdown(); 
-    }
-}
-
-async function submitOrder() {
-    const btn = document.getElementById('submit-order-btn');
-    if(btn.disabled || currentOrder.items.length === 0) return;
-    btn.disabled = true;
-    
-    let cust;
-    const pac = document.getElementById('customer-dropdown').value;
-    if(pac) cust = customers.find(c => c.pac === pac);
-    else {
-        cust = { 
-            name: document.getElementById('new-customer-name').value, 
-            email: document.getElementById('new-customer-email').value, 
-            phone: document.getElementById('new-customer-phone').value, 
-            address: document.getElementById('new-customer-address').value 
-        };
-        if(!cust.name) { alert("Customer details required."); btn.disabled = false; return; }
-    }
-    
-    const file = document.getElementById('payment-proof').files[0];
-    if(!file) { alert("Proof required."); btn.disabled = false; return; }
-    
     try {
-        const base64 = await getBase64(file);
-        const sub = parseFloat(document.getElementById('summary-subtotal').textContent.replace('RM ',''));
-        const ship = parseFloat(document.getElementById('summary-shipping').textContent.replace('RM ',''));
-        
-        const payload = { 
-            agent: currentAgent, customer: cust, items: currentOrder.items, 
-            shippingFee: ship, paymentProof: { file: base64.split(',')[1], mimeType: file.type } 
-        };
-        const res = await postToGoogleScript('submitAgentOrder', payload);
-        alert(res.message);
-        if(res.success) showView('my-orders-view');
-    } catch(e) { alert("Error."); }
-    finally { btn.disabled = false; }
+        const res = await postToGoogleScript('getPortalData');
+        if (res.success) { 
+            products = res.products; 
+            customers = res.customers; 
+            shippingRules = (res.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend); 
+            renderProductSelectionList(); 
+            renderCustomerDropdown(); 
+        }
+    } catch (e) { console.error("Data fetch failed."); }
 }
 
+function renderProducts() {
+    document.getElementById('product-catalog-table').innerHTML = products.map(p => `
+        <tr>
+            <td><strong>${p.id}</strong></td>
+            <td>${p.name}</td>
+            <td>RM ${p.rsp.toFixed(2)}</td>
+            <td style="color:var(--secondary); font-weight:700;">${p.cc.toFixed(3)}</td>
+        </tr>`).join('');
+}
+
+async function renderMyOrders() {
+    const list = document.getElementById('my-orders-list');
+    const res = await postToGoogleScript('getAgentOrders', { agentId: currentAgent.id });
+    if (res.success && res.orders.length > 0) {
+        list.innerHTML = `<table><thead><tr><th>Invoice</th><th>Client</th><th>Total</th><th>Status</th></tr></thead><tbody>${res.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.customerName}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>`).join('')}</tbody></table>`;
+    } else {
+        list.innerHTML = "<p>No sales records found.</p>";
+    }
+}
+
+// UTILS
 async function postToGoogleScript(action, data = {}) {
+    const payload = { action, data };
     const res = await fetch(GOOGLE_SCRIPT_URL, { 
-        method: 'POST', mode: 'cors',
+        method: 'POST', 
+        mode: 'cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action, data }) 
+        body: JSON.stringify(payload) 
     });
     return await res.json();
 }
 
-// UI HELPERS
-function renderTargetBar() {
-    const pct = Math.min(100, currentAgent.target > 0 ? (currentAgent.currentSales / currentAgent.target) * 100 : 0);
-    document.getElementById('target-bar-display').innerHTML = `<div style="font-size:0.8rem; color:#666;">Target Achievement: ${(pct).toFixed(1)}%</div><div class="target-bar-container"><div class="target-progress" style="width:${pct}%"></div></div>`;
-}
-function renderProductSelectionList() { 
-    const term = document.getElementById('product-order-search').value.toLowerCase();
-    const filtered = products.filter(p => p.name.toLowerCase().includes(term) || String(p.id).toLowerCase().includes(term));
-    document.getElementById('product-selection-list').innerHTML = filtered.map(p => `
-        <div class="product-item-selectable" onclick="addProductToOrder('${p.id}')">
-            <div><strong>${p.name} (${p.id})</strong><p style="font-size:0.8rem">RM ${p.rsp.toFixed(2)}</p></div>
-            <button class="btn btn-primary" style="margin-left:auto; padding:5px 10px; font-size:0.7rem;">ADD</button>
-        </div>`).join('');
-}
-function addProductToOrder(id) {
-    const p = products.find(x => String(x.id) === String(id));
-    if (!p) return;
-    currentOrder.items.push({ id: p.id, name: p.name, quantity: 1, rsp: p.rsp, cc: p.cc, customPrice: p.rsp });
-    renderOrderSummary();
-}
-function renderOrderSummary() {
-    const container = document.getElementById('summary-items-list');
-    container.innerHTML = currentOrder.items.map((item, idx) => `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed #eee;">
-            <div><strong>${item.name}</strong></div>
-            <div style="display:flex; gap:5px;">
-                <input type="number" value="${item.quantity}" onchange="currentOrder.items[${idx}].quantity=this.value;calculateTotals();" style="width:40px; margin:0; padding:2px;">
-                <button onclick="currentOrder.items.splice(${idx},1);renderOrderSummary();" style="color:red; background:none; border:none;">&times;</button>
-            </div>
-        </div>`).join('');
-    calculateTotals();
-}
-function renderCustomerDropdown() { document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Existing Customer --</option>` + customers.map(c => `<option value="${c.pac}">${c.name}</option>`).join(''); }
-function getBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = e => reject(e); }); }
+function handleNewCustomerToggle() { document.getElementById('new-customer-form').classList.toggle('hidden'); }
+function handleCustomerSelection() { if(this.value) document.getElementById('new-customer-form').classList.add('hidden'); }
+function getBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); }); }
+function renderCustomerDropdown() { document.getElementById('customer-dropdown').innerHTML = `<option value="">-- Select Existing Client --</option>` + customers.map(c => `<option value="${c.pac}">${c.name}</option>`).join(''); }
 
 </script>
 </body>
