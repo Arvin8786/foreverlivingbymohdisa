@@ -1,13 +1,12 @@
 // =================================================================
-// E-Shop Frontend Script - v28.0 (FINAL COMPLETE)
-// Features: Themes, Marketing, Maintenance, Login, Cart, Chatbot
+// E-Shop Frontend Script - v28.1 (RESILIENT & DEFENSIVE)
+// Features: Robust Price Parsing, Themes, Marketing, Cart, Chatbot
 // =================================================================
 
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-// CRITICAL FIX: Using your latest, correct deployment URL
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycby8rIMbPvVXq9stp8Cu9J3vIvkhHZPNaOk2eHdnCzLNaWVhzgXl9XdQbKkF-pBB9oo7gQ/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwgbm0F9tCktQCeLJyrY1qZb3aU9NA8iP-T1FjCnRl2erH1y9Qo6tr4uKAPiFtyXSOU1w/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 const apiKey = '9582967';
 
@@ -16,11 +15,19 @@ let allJobs = [];
 let cart = [];
 let chatSession = {};
 
+// Helper: Safely parse price regardless of sheet casing or string format (e.g., "RM 95.00", "95", 95)
+function parseSafePrice(item) {
+    if (!item) return 0;
+    const raw = item.price ?? item.Price ?? item.retailPrice ?? item.RetailPrice ?? 0;
+    const cleaned = String(raw).replace(/[^0-9.-]+/g, '');
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+}
+
 // ===========================================================
 // [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
 // ===========================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Attach New Static Listeners ---
     const loginBtn = document.getElementById('nav-login-btn');
     if(loginBtn) loginBtn.addEventListener('click', () => toggleLoginModal(true));
     
@@ -33,12 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('chat-input');
     if(chatInput) chatInput.addEventListener('keyup', (e) => { if (e.key === "Enter") handleChatSubmit(); });
 
-    // --- Standard Listeners (from your original code) ---
-    // Note: Some elements like forms are dynamic, so their listeners are attached in fetchData/render
-    // but we can try to attach static ones here if they exist in HTML source.
-    // Your original code had: document.addEventListener('DOMContentLoaded', fetchData);
-    // We are replacing that single call with this block to ensure everything initializes.
-
     fetchData();
 });
 
@@ -50,20 +51,20 @@ async function fetchData() {
         
         if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
 
-        // --- NEW: Maintenance Mode & Theme Logic ---
         const marketingData = data.marketingData || {};
         const activeTheme = data.activeTheme || null;
 
         // 1. Maintenance Mode Check
-        if (marketingData.MaintenanceMode === 'TRUE') {
-            document.getElementById('store-wrapper').style.display = 'none';
+        if (String(marketingData.MaintenanceMode).trim().toUpperCase() === 'TRUE') {
+            const storeWrapper = document.getElementById('store-wrapper');
+            if (storeWrapper) storeWrapper.style.display = 'none';
             const overlay = document.getElementById('maintenance-overlay');
             if(overlay) {
                 overlay.style.display = 'flex';
                 const msg = document.getElementById('maintenance-message');
                 if(msg) msg.textContent = marketingData.MaintenanceMessage || 'Site is down for maintenance.';
             }
-            return; // Stop loading the rest of the site
+            return;
         }
 
         // 2. Apply Theme & Marketing Banners
@@ -74,14 +75,22 @@ async function fetchData() {
             applyMarketing(marketingData, activeTheme);
         }
 
-        // --- Standard Data Loading (Your Original Logic) ---
-        products = data.products || [];
+        // 3. Normalize products safely (handles case mismatches and missing fields)
+        const rawProducts = data.products || [];
+        products = rawProducts.map((p, idx) => ({
+            id: p.id ?? p.ID ?? p.productId ?? idx + 1,
+            name: p.name ?? p.Name ?? p.ProductName ?? 'Product Item',
+            price: parseSafePrice(p),
+            image: p.image ?? p.Image ?? p.imageURL ?? p.ImageURL ?? '',
+            benefits: p.benefits ?? p.Benefits ?? '',
+            consumption: p.consumption ?? p.Consumption ?? p.Usage ?? ''
+        }));
+
         allJobs = data.jobsListings || [];
         
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
-        // Updated to pass ProductTagText from Marketing sheet
         renderProducts(products, marketingData.ProductTagText); 
         renderAboutUs(data.aboutUsContent);
         renderJobs(allJobs);
@@ -92,14 +101,13 @@ async function fetchData() {
         buildFabButtons();
         buildChatbotWidget();
         
-        // NEW: Show Popup if configured
         if (marketingData.PopupMessageText || marketingData.PopupImageURL) {
             buildPopupModal(marketingData.PopupMessageText, marketingData.PopupImageURL);
         }
 
-        document.getElementById('update-timestamp').textContent = `${new Date().toLocaleDateString('en-GB')} (v28.0)`;
+        const updateElem = document.getElementById('update-timestamp');
+        if (updateElem) updateElem.textContent = `${new Date().toLocaleDateString('en-GB')} (v28.1)`;
         
-        // --- Attach Listeners for Dynamically Created Elements ---
         const enqForm = document.getElementById('enquiry-form');
         if(enqForm) enqForm.addEventListener('submit', handleEnquirySubmit);
         
@@ -120,15 +128,19 @@ async function fetchData() {
 // ===========================================================
 function renderStaticContent(content) {
     if (!content) return;
-    document.getElementById('company-name-header').innerHTML = `${content.CompanyName || ''} <span class="by-line">${content.Owner} - ${content.Role}</span> <span class="slogan">${content.Slogan}</span>`;
-    document.getElementById('footer-text').textContent = content.Footer || `© ${new Date().getFullYear()} ${content.CompanyName}`;
-    
-    // Note: Banner logic moved to applyMarketing() to handle overrides properly
-    // But we keep this safe fallthrough just in case
+    const headerElem = document.getElementById('company-name-header');
+    if (headerElem) {
+        headerElem.innerHTML = `${content.CompanyName || ''} <span class="by-line">${content.Owner || ''} - ${content.Role || ''}</span> <span class="slogan">${content.Slogan || ''}</span>`;
+    }
+    const footerElem = document.getElementById('footer-text');
+    if (footerElem) {
+        footerElem.textContent = content.Footer || `© ${new Date().getFullYear()} ${content.CompanyName || 'Forever Living'}`;
+    }
 }
 
 function renderMainContentShell() {
     const main = document.getElementById('main-content');
+    if (!main) return;
     main.innerHTML = `
         <div id="homepage" class="tab-content">
             <section id="homepage-hero" class="hero-section"></section>
@@ -151,7 +163,9 @@ function renderHomepageContent(about, jobs, testimonies) {
     if (heroContainer) heroContainer.innerHTML = `<h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p>`;
     
     const whyChooseUsContainer = document.getElementById('why-choose-us');
-    if (whyChooseUsContainer) whyChooseUsContainer.innerHTML = `<h2>${about.WhyChooseUs_Title}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon}"></i><p>${about.Point1_Text}</p></div><div><i class="${about.Point2_Icon}"></i><p>${about.Point2_Text}</p></div><div><i class="${about.Point3_Icon}"></i><p>${about.Point3_Text}</p></div></div>`;
+    if (whyChooseUsContainer) {
+        whyChooseUsContainer.innerHTML = `<h2>${about.WhyChooseUs_Title || 'Why Choose Us'}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon || 'fa-solid fa-check'}"></i><p>${about.Point1_Text || ''}</p></div><div><i class="${about.Point2_Icon || 'fa-solid fa-check'}"></i><p>${about.Point2_Text || ''}</p></div><div><i class="${about.Point3_Icon || 'fa-solid fa-check'}"></i><p>${about.Point3_Text || ''}</p></div></div>`;
+    }
         
     const youtubeSection = document.getElementById('youtube-videos');
     const videoUrls = about.YoutubeURL ? String(about.YoutubeURL).split(',').map(url => url.trim()) : [];
@@ -173,11 +187,13 @@ function renderHomepageContent(about, jobs, testimonies) {
     if (testimonies && testimonies.length > 0) {
         testimoniesContainer.innerHTML = testimonies.map(t => {
             let stars = '';
-            for (let i = 0; i < 5; i++) { stars += `<i class="fa-solid fa-star" style="color: ${i < t.Rating ? 'var(--secondary-color)' : '#ccc'}"></i>`; }
-            return `<div class="testimony-card"><div class="testimony-header"><h4>${t.ClientName}</h4><div class="testimony-rating">${stars}</div></div><p>"${t.Quote}"</p></div>`;
+            const rating = Number(t.Rating) || 5;
+            for (let i = 0; i < 5; i++) { stars += `<i class="fa-solid fa-star" style="color: ${i < rating ? 'var(--secondary-color)' : '#ccc'}"></i>`; }
+            return `<div class="testimony-card"><div class="testimony-header"><h4>${t.ClientName || 'Valued Customer'}</h4><div class="testimony-rating">${stars}</div></div><p>"${t.Quote || ''}"</p></div>`;
         }).join('');
     } else if (testimoniesContainer) {
-        document.getElementById('homepage-testimonies').style.display = 'none';
+        const homeTestimonies = document.getElementById('homepage-testimonies');
+        if (homeTestimonies) homeTestimonies.style.display = 'none';
     }
 
     const featuredJobsContainer = document.getElementById('featured-jobs-container');
@@ -185,81 +201,89 @@ function renderHomepageContent(about, jobs, testimonies) {
     if (featuredJobsContainer && featuredJobs.length > 0) {
         featuredJobsContainer.innerHTML = featuredJobs.map(job => `<div class="job-listing-summary"><h4>${job.position}</h4><p>${job.location} | ${job.type}</p></div>`).join('');
     } else if (featuredJobsContainer) {
-        document.getElementById('homepage-featured-jobs').style.display = 'none';
+        const homeJobs = document.getElementById('homepage-featured-jobs');
+        if (homeJobs) homeJobs.style.display = 'none';
     }
 }
 
 function renderProducts(productsToRender, tagText) {
     const container = document.getElementById('product-list-container');
+    if (!container) return;
     if (!productsToRender || productsToRender.length === 0) { container.innerHTML = `<p>No products available.</p>`; return; }
     
-    // NEW: Add optional marketing tag
     const tagHtml = tagText ? `<div class="product-tag">${tagText}</div>` : '';
 
-    container.innerHTML = `<div class="product-list">${productsToRender.map(p => `
+    container.innerHTML = `<div class="product-list">${productsToRender.map(p => {
+        const displayPrice = Number(p.price || 0).toFixed(2);
+        return `
         <div class="product" style="position: relative;">
             ${tagHtml}
-            <div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div>
+            <div class="product-image-container"><img src="${p.image \vert{}\vert{} ''}" alt="${p.name || ''}" onerror="this.src='https://via.placeholder.com/250?text=Forever+Living'"></div>
             <div class="product-info">
                 <h3>${p.name}</h3>
-                <div class="price-section"><span class="new-price">RM ${Number(p.price || 0).toFixed(2)}</span></div>
+                <div class="price-section"><span class="new-price">RM ${displayPrice}</span></div>
                 <div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div>
                 <div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div>
-                <div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div>
+                <div class="product-actions"><button class="btn btn-primary" onclick="addToCart('${p.id}')">Add to Cart</button></div>
             </div>
-        </div>`).join('')}</div>`;
+        </div>`;
+    }).join('')}</div>`;
 }
 
 function renderAboutUs(content) {
     const container = document.getElementById('about-us-content');
+    if (!container) return;
     if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
     const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
     container.innerHTML = `
-        <h2>About ${content.CompanyName}</h2>
+        <h2>About ${content.CompanyName || 'Us'}</h2>
         <div class="owner-profile">
-            <img src="arvind.jpg" alt="${content.Owner}" class="owner-image" onerror="this.style.display='none'">
+            <img src="arvind.jpg" alt="${content.Owner || 'Owner'}" class="owner-image" onerror="this.style.display='none'">
             <div class="owner-details">
-                <h3>${content.Owner} - ${content.Role}</h3>
-                <div>${content.MoreDetails}</div>
+                <h3>${content.Owner || ''} - ${content.Role || ''}</h3>
+                <div>${content.MoreDetails || ''}</div>
             </div>
         </div>
         <div class="about-section">
             <h4>Our Mission</h4>
-            <p>${content.OurMission}</p>
+            <p>${content.OurMission || ''}</p>
         </div>
         <div class="about-section">
             <h4>Our Vision</h4>
-            <p>${content.OurVision}</p>
+            <p>${content.OurVision || ''}</p>
         </div>
         ${historySection}`;
 }
 
 function renderJobs(jobs) {
     const container = document.getElementById('job-listings-container');
+    if (!container) return;
     if (!jobs || jobs.length === 0) { container.innerHTML = '<p>There are currently no open positions.</p>'; return; }
     container.innerHTML = jobs.map(job => `
         <div class="job-card">
-            <div class="job-header"><h3>${job.position}</h3></div>
+            <div class="job-header"><h3>${job.position || ''}</h3></div>
             <div class="job-body">
                 <div class="job-details">
-                    <div class="job-detail-item"><i class="fa-solid fa-location-dot"></i> <span>${job.location} | ${job.type}</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-money-bill-wave"></i> <span>${job.salary} RM</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-house-user"></i> <span>${job.accommodation}</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-calendar-days"></i> <span>${job.workDayPattern}</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-location-dot"></i> <span>${job.location || ''} | ${job.type || ''}</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-money-bill-wave"></i> <span>${job.salary || '0'} RM</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-house-user"></i> <span>${job.accommodation || ''}</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-calendar-days"></i> <span>${job.workDayPattern || ''}</span></div>
                 </div>
-                <div class="job-description">${job.description}</div>
-                <button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId}', '${job.position}')">Apply Now</button>
+                <div class="job-description">${job.description || ''}</div>
+                <button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId || ''}', '${job.position || ''}')">Apply Now</button>
             </div>
         </div>`).join('');
 }
 
 function buildEnquiryForm() {
     const container = document.getElementById('enquiries-form-content');
+    if (!container) return;
     container.innerHTML = `<h2>Send Us An Enquiry</h2><form id="enquiry-form" class="enquiry-form"><input type="text" id="enquiry-name" placeholder="Your Full Name" required><input type="email" id="enquiry-email" placeholder="Your Email Address" required><input type="tel" id="enquiry-phone" placeholder="Your Phone Number" required><select id="enquiry-type" required><option value="" disabled selected>Select Enquiry Type...</option><option value="General Question">General</option><option value="Product Support">Product</option></select><textarea id="enquiry-message" placeholder="Your Message" rows="6" required></textarea><button type="submit" class="btn btn-primary" style="width: 100%;">Submit</button><p id="enquiry-status"></p></form>`;
 }
 
 function buildCartModal() {
     const container = document.getElementById('cart-modal');
+    if (!container) return;
     container.innerHTML = `
         <div class="modal-content">
             <div class="modal-header">
@@ -286,16 +310,19 @@ function buildCartModal() {
 
 function buildJobApplicationModal() {
     const container = document.getElementById('job-application-modal');
+    if (!container) return;
     container.innerHTML = `<div class="modal-content"><span class="close" onclick="toggleJobModal(false)">&times;</span><h2>Apply for <span id="job-modal-title"></span></h2><form id="job-application-form" class="enquiry-form"><input type="hidden" id="job-id-input"><input type="hidden" id="job-position-input"><input type="text" id="applicant-name" placeholder="Full Name" required><input type="email" id="applicant-email" placeholder="Email" required><input type="tel" id="applicant-phone" placeholder="Phone" required><input type="text" id="applicant-citizenship" placeholder="Citizenship" required><textarea id="applicant-message" placeholder="Tell us about yourself" rows="4"></textarea><label for="applicant-resume">Upload Resume (Mandatory)</label><input type="file" id="applicant-resume" required><button type="submit" class="btn btn-primary">Submit</button><p id="job-application-status"></p></form></div>`;
 }
 
 function buildFabButtons() {
     const container = document.getElementById('fab-container');
+    if (!container) return;
     container.innerHTML = `<div id="floating-cart" class="fab floating-cart-btn" onclick="toggleCart()"><i class="fa-solid fa-cart-shopping"></i><span id="cart-count">0</span></div><div class="fab chatbot-fab" onclick="toggleChatWidget(true)"><i class="fa-solid fa-robot"></i></div>`;
 }
 
 function buildChatbotWidget() {
     const container = document.getElementById('eshop-chat-widget');
+    if (!container) return;
     container.innerHTML = `<div id="chat-header"><span>FL e-Shop Assistant</span><button id="close-chat-btn" onclick="toggleChatWidget(false)">&times;</button></div><div id="chat-body"></div><div id="chat-input-container"><input type="text" id="chat-input" placeholder="Type your message..."><button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button></div>`;
 }
 
@@ -303,73 +330,104 @@ function buildChatbotWidget() {
 // [ 4.0 ] CART LOGIC
 // ===========================================================
 function addToCart(productId) {
-    const product = products.find(p => p.id == productId);
-    const existingItem = cart.find(item => item.id == productId);
-    if (existingItem) { existingItem.quantity++; } else { cart.push({ ...product, quantity: 1 }); }
+    const product = products.find(p => String(p.id) === String(productId));
+    if (!product) return;
+    const existingItem = cart.find(item => String(item.id) === String(productId));
+    if (existingItem) { 
+        existingItem.quantity++; 
+    } else { 
+        cart.push({ ...product, quantity: 1 }); 
+    }
     updateCartDisplay();
 }
 
-function increaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity++; } updateCartDisplay(); }
-function decreaseQuantity(productId) { const item = cart.find(i => i.id == productId); if (item) { item.quantity--; if (item.quantity <= 0) { removeItemFromCart(productId); } else { updateCartDisplay(); } } }
-function removeItemFromCart(productId) { cart = cart.filter(item => item.id != productId); updateCartDisplay(); }
+function increaseQuantity(productId) { 
+    const item = cart.find(i => String(i.id) === String(productId)); 
+    if (item) { item.quantity++; } 
+    updateCartDisplay(); 
+}
+
+function decreaseQuantity(productId) { 
+    const item = cart.find(i => String(i.id) === String(productId)); 
+    if (item) { 
+        item.quantity--; 
+        if (item.quantity <= 0) { removeItemFromCart(productId); } 
+        else { updateCartDisplay(); } 
+    } 
+}
+
+function removeItemFromCart(productId) { 
+    cart = cart.filter(item => String(item.id) !== String(productId)); 
+    updateCartDisplay(); 
+}
 
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
     const checkoutArea = document.getElementById('cart-checkout-area');
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    document.getElementById('cart-count').textContent = totalItems;
+    const cartCountElem = document.getElementById('cart-count');
+    const totalItems = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+    
+    if (cartCountElem) cartCountElem.textContent = totalItems;
+    if (!cartItemsContainer) return;
     
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p style="text-align:center; padding: 20px 0;">Your cart is empty.</p>';
-        checkoutArea.style.display = 'none';
+        if (checkoutArea) checkoutArea.style.display = 'none';
         return;
     }
     
-    checkoutArea.style.display = 'block';
+    if (checkoutArea) checkoutArea.style.display = 'block';
     cartItemsContainer.innerHTML = cart.map(item => `
         <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}" class="cart-item-image"/>
+            <img src="${item.image || ''}" alt="${item.name || ''}" class="cart-item-image" onerror="this.src='https://via.placeholder.com/80?text=FL'"/>
             <div class="cart-item-details">
                 <strong>${item.name}</strong>
                 <div class="quantity-controls">
-                    <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
+                    <button class="quantity-btn" onclick="decreaseQuantity('${item.id}')">-</button>
                     <span>${item.quantity}</span>
-                    <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
+                    <button class="quantity-btn" onclick="increaseQuantity('${item.id}')">+</button>
                 </div>
             </div>
-            <strong>RM ${(item.price * item.quantity).toFixed(2)}</strong>
-            <button class="remove-item-btn" onclick="removeItemFromCart(${item.id})"><i class="fa-solid fa-trash-can"></i></button>
+            <strong>RM ${(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}</strong>
+            <button class="remove-item-btn" onclick="removeItemFromCart('${item.id}')"><i class="fa-solid fa-trash-can"></i></button>
         </div>`).join('');
         
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    document.getElementById('cart-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
-    document.getElementById('cart-total').textContent = `RM ${subtotal.toFixed(2)}`;
+    const subtotal = cart.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.quantity || 1)), 0);
+    const subtotalElem = document.getElementById('cart-subtotal');
+    const totalElem = document.getElementById('cart-total');
+    if (subtotalElem) subtotalElem.textContent = `RM ${subtotal.toFixed(2)}`;
+    if (totalElem) totalElem.textContent = `RM ${subtotal.toFixed(2)}`;
 }
 
 function toggleCart(hide = false) {
     const modal = document.getElementById('cart-modal');
+    if (!modal) return;
     modal.style.display = hide ? 'none' : 'flex';
     if (!hide) updateCartDisplay();
 }
 
 async function initiateCheckout() {
     const checkoutBtn = document.querySelector('#cart-checkout-area button');
-    checkoutBtn.disabled = true;
-    checkoutBtn.textContent = 'Processing...';
+    if (checkoutBtn) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.textContent = 'Processing...';
+    }
 
-    const name = document.getElementById('customer-name').value.trim();
-    const phone = document.getElementById('customer-phone').value.trim();
-    const address = document.getElementById('customer-address').value.trim();
-    const email = document.getElementById('customer-email').value.trim();
+    const name = document.getElementById('customer-name')?.value.trim();
+    const phone = document.getElementById('customer-phone')?.value.trim();
+    const address = document.getElementById('customer-address')?.value.trim();
+    const email = document.getElementById('customer-email')?.value.trim();
 
     if (!name || !phone || !address) {
         alert('Please fill in all required customer details: Name, Phone, and Address.');
-        checkoutBtn.disabled = false;
-        checkoutBtn.textContent = 'Complete Order';
+        if (checkoutBtn) {
+            checkoutBtn.disabled = false;
+            checkoutBtn.textContent = 'Complete Order';
+        }
         return;
     }
 
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = cart.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.quantity || 1)), 0);
     const shippingFee = 0.0; 
     const totalAmount = subtotal + shippingFee;
 
@@ -402,8 +460,10 @@ async function initiateCheckout() {
         console.error('Checkout failed:', error);
         alert('There was an error placing your order. Please try again or contact us directly.');
     } finally {
-        checkoutBtn.disabled = false;
-        checkoutBtn.textContent = 'Complete Order';
+        if (checkoutBtn) {
+            checkoutBtn.disabled = false;
+            checkoutBtn.textContent = 'Complete Order';
+        }
     }
 }
 
@@ -412,28 +472,33 @@ async function initiateCheckout() {
 // ===========================================================
 function toggleJobModal(show = false, jobId = '', jobTitle = '') {
     const modal = document.getElementById('job-application-modal');
+    if (!modal) return;
     if (show) {
-        document.getElementById('job-modal-title').textContent = jobTitle;
-        document.getElementById('job-id-input').value = jobId;
-        document.getElementById('job-position-input').value = jobTitle;
+        const titleElem = document.getElementById('job-modal-title');
+        const idInput = document.getElementById('job-id-input');
+        const posInput = document.getElementById('job-position-input');
+        if (titleElem) titleElem.textContent = jobTitle;
+        if (idInput) idInput.value = jobId;
+        if (posInput) posInput.value = jobTitle;
         modal.style.display = 'flex';
     } else {
         modal.style.display = 'none';
-        document.getElementById('job-application-form').reset();
+        const form = document.getElementById('job-application-form');
+        if (form) form.reset();
     }
 }
 
 async function handleEnquirySubmit(event) {
     event.preventDefault();
     const statusEl = document.getElementById('enquiry-status');
-    statusEl.textContent = 'Sending...';
+    if (statusEl) statusEl.textContent = 'Sending...';
     try {
-        const payload = { action: 'logEnquiry', data: { name: document.getElementById('enquiry-name').value, email: document.getElementById('enquiry-email').value, phone: document.getElementById('enquiry-phone').value, type: document.getElementById('enquiry-type').value, message: document.getElementById('enquiry-message').value } };
+        const payload = { action: 'logEnquiry', data: { name: document.getElementById('enquiry-name')?.value, email: document.getElementById('enquiry-email')?.value, phone: document.getElementById('enquiry-phone')?.value, type: document.getElementById('enquiry-type')?.value, message: document.getElementById('enquiry-message')?.value } };
         await postDataToGScript(payload);
-        statusEl.textContent = 'Enquiry sent successfully!';
+        if (statusEl) statusEl.textContent = 'Enquiry sent successfully!';
         event.target.reset();
     } catch (error) {
-        statusEl.textContent = 'An error occurred.';
+        if (statusEl) statusEl.textContent = 'An error occurred.';
     }
 }
 
@@ -441,34 +506,34 @@ async function handleJobApplicationSubmit(event) {
     event.preventDefault();
     const statusEl = document.getElementById('job-application-status');
     const fileInput = document.getElementById('applicant-resume');
-    if (fileInput.files.length === 0) {
-        statusEl.textContent = 'Resume upload is mandatory.';
+    if (fileInput && fileInput.files.length === 0) {
+        if (statusEl) statusEl.textContent = 'Resume upload is mandatory.';
         return;
     }
-    statusEl.textContent = 'Submitting...';
-    const file = fileInput.files[0];
-    const base64File = await getBase64(file);
-    const payload = {
-        action: 'logJobApplication',
-        data: {
-            jobId: document.getElementById('job-id-input').value,
-            position: document.getElementById('job-position-input').value,
-            name: document.getElementById('applicant-name').value,
-            email: document.getElementById('applicant-email').value,
-            phone: document.getElementById('applicant-phone').value,
-            citizenship: document.getElementById('applicant-citizenship').value,
-            message: document.getElementById('applicant-message').value,
-            resumeFile: base64File.split(',')[1],
-            resumeMimeType: file.type,
-            resumeFileName: file.name
-        }
-    };
+    if (statusEl) statusEl.textContent = 'Submitting...';
     try {
+        const file = fileInput.files[0];
+        const base64File = await getBase64(file);
+        const payload = {
+            action: 'logJobApplication',
+            data: {
+                jobId: document.getElementById('job-id-input')?.value,
+                position: document.getElementById('job-position-input')?.value,
+                name: document.getElementById('applicant-name')?.value,
+                email: document.getElementById('applicant-email')?.value,
+                phone: document.getElementById('applicant-phone')?.value,
+                citizenship: document.getElementById('applicant-citizenship')?.value,
+                message: document.getElementById('applicant-message')?.value,
+                resumeFile: base64File.split(',')[1],
+                resumeMimeType: file.type,
+                resumeFileName: file.name
+            }
+        };
         await postDataToGScript(payload);
-        statusEl.textContent = 'Application submitted successfully!';
+        if (statusEl) statusEl.textContent = 'Application submitted successfully!';
         setTimeout(() => { toggleJobModal(false); }, 3000);
     } catch (error) {
-        statusEl.textContent = 'An error occurred.';
+        if (statusEl) statusEl.textContent = 'An error occurred.';
     }
 }
 
@@ -487,20 +552,23 @@ function getBase64(file) {
 function toggleChatWidget(show) {
     const chatWidget = document.getElementById('eshop-chat-widget');
     const fabContainer = document.getElementById('fab-container');
+    if (!chatWidget) return;
     if (show) {
         chatWidget.classList.add('active');
-        fabContainer.style.right = '370px';
-        if (document.getElementById('chat-body').innerHTML.trim() === '') {
+        if (fabContainer) fabContainer.style.right = '370px';
+        const body = document.getElementById('chat-body');
+        if (body && body.innerHTML.trim() === '') {
             displayMainMenu();
         }
     } else {
         chatWidget.classList.remove('active');
-        fabContainer.style.right = '20px';
+        if (fabContainer) fabContainer.style.right = '20px';
     }
 }
 
 function addChatMessage(sender, text, type = 'text') {
     const chatBody = document.getElementById('chat-body');
+    if (!chatBody) return null;
     const msg = document.createElement('div');
     msg.classList.add('chat-message', sender === 'bot' ? 'bot-message' : 'user-message');
     if (type === 'html') { msg.innerHTML = text; } else { msg.textContent = text; }
@@ -517,6 +585,7 @@ function displayMainMenu() {
 
 async function handleChatSubmit() {
     const input = document.getElementById('chat-input');
+    if (!input) return;
     const text = input.value.trim();
     if (!text) return;
     addChatMessage('user', text);
@@ -528,7 +597,7 @@ async function handleChatSubmit() {
     else if (chatSession.state === 'my_account_menu') { await handleMyAccountMenu(text); }
     else { await handleMainMenu(text); }
 
-    thinkingMsg.remove();
+    if (thinkingMsg) thinkingMsg.remove();
 }
 
 async function handleMainMenu(text) {
@@ -588,7 +657,7 @@ async function handleMyAccountMenu(text) {
     if(result.success) {
         if(action === 'getPurchaseHistory') {
             let historyText = "<strong>Your Last 5 Orders:</strong><br>";
-            if (result.history.length === 0) { historyText = 'You have no purchase history.'; }
+            if (!result.history || result.history.length === 0) { historyText = 'You have no purchase history.'; }
             else { result.history.forEach(order => { historyText += `<br><strong>ID:</strong> ${order.invoiceId}<br><strong>Date:</strong> ${order.date}<br><strong>Total:</strong> RM ${order.totalAmount}<br><strong>Status:</strong> ${order.status}`; }); }
             addChatMessage('bot', historyText, 'html');
         } else {
@@ -604,7 +673,8 @@ async function handleMyAccountMenu(text) {
 // ===========================================================
 function showTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
+    const target = document.getElementById(tabId);
+    if (target) target.classList.add('active');
 }
 
 async function postDataToGScript(payload) {
@@ -636,17 +706,12 @@ async function postToRender(action, data) {
 }
 
 // ===========================================================
-// [ 8.0 ] NEW: THEME, MARKETING & LOGIN MODAL LOGIC
+// [ 8.0 ] THEME, MARKETING & LOGIN MODAL LOGIC
 // ===========================================================
-
-/**
- * Applies the active theme colors and triggers special effects.
- */
 function applyTheme(theme) {
     if (!theme) return;
     const root = document.documentElement;
 
-    // Define theme colors based on your requirements
     const themes = {
         'Christmas': { primary: '#d90429', secondary: '#FFD700', accent: '#004B23' },
         'HariRaya': { primary: '#006400', secondary: '#f0e68c', accent: '#27ae60' },
@@ -662,29 +727,25 @@ function applyTheme(theme) {
     };
 
     const colors = themes[theme.ThemeName];
-
     if (colors) {
         root.style.setProperty('--primary-color', colors.primary);
         root.style.setProperty('--secondary-color', colors.secondary);
         root.style.setProperty('--accent-color', colors.accent);
     }
     
-    // Check for special effects
-    if (theme.ThemeName === 'Christmas') {
-        if (typeof startSnowing === 'function') {
-            startSnowing();
-        }
+    if (theme.ThemeName === 'Christmas' && typeof startSnowing === 'function') {
+        startSnowing();
     }
 }
 
 function applyMarketing(marketing, theme) {
-    // 1. Running Banner
     const banner = document.getElementById('promo-running-banner');
-    // Marketing text overrides festival text
+    if (!banner) return;
     let bannerText = marketing.BannerText || (theme ? theme.WelcomeMessage : null);
     
     if (bannerText) {
-        document.getElementById('promo-banner-text').textContent = bannerText;
+        const textElem = document.getElementById('promo-banner-text');
+        if (textElem) textElem.textContent = bannerText;
         banner.style.display = 'block';
     } else {
         banner.style.display = 'none';
@@ -692,21 +753,18 @@ function applyMarketing(marketing, theme) {
 }
 
 function buildPopupModal(message, imageUrl) {
-    if (!message && !imageUrl) return; // No popup to show
-
-    // Check if popup has been shown this session
-    if (sessionStorage.getItem('eshopPopupShown') === 'true') {
-        return;
-    }
+    if (!message && !imageUrl) return;
+    if (sessionStorage.getItem('eshopPopupShown') === 'true') return;
 
     const container = document.getElementById('popup-modal');
+    if (!container) return;
     let modalHTML = '';
 
     if (imageUrl) {
         modalHTML = `
         <div class="modal-content" style="max-width: 500px; padding: 0;">
              <button class="close" style="position: absolute; top: 10px; right: 20px; font-size: 30px; background: white; border-radius: 50%; width: 40px; height: 40px; opacity: 0.8;" onclick="togglePopup(true)">&times;</button>
-             <img src="${imageUrl}" style="width: 100%; border-radius: var(--border-radius);">
+             <img src="${imageUrl}" style="width: 100%; border-radius: var(--border-radius);" onerror="this.parentElement.style.display='none'">
         </div>`;
     } else {
         modalHTML = `
@@ -722,40 +780,32 @@ function buildPopupModal(message, imageUrl) {
     }
     
     container.innerHTML = modalHTML;
-    togglePopup(false); // Show the popup
-    sessionStorage.setItem('eshopPopupShown', 'true'); // Set session flag
+    togglePopup(false);
+    sessionStorage.setItem('eshopPopupShown', 'true');
 }
 
 function togglePopup(hide = false) {
     const modal = document.getElementById('popup-modal');
-    modal.style.display = hide ? 'none' : 'flex';
+    if (modal) modal.style.display = hide ? 'none' : 'flex';
 }
 
 function toggleLoginModal(show) {
     const modal = document.getElementById('login-modal');
-    modal.style.display = show ? 'flex' : 'none';
+    if (modal) modal.style.display = show ? 'flex' : 'none';
 }
-// [ Helper Function ] Calculate Monthly Sales for Agent Dashboard
+
 function calculateMonthlySales() {
-    // 1. Get orders from LocalStorage
     const orders = JSON.parse(localStorage.getItem('orders_DATA')) || [];
-    
-    // 2. Get current month and year
     const now = new Date();
-    const currentMonth = now.getMonth(); // 0-11
+    const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
     
     let totalSales = 0;
     let count = 0;
 
-    // 3. Loop through orders and sum up only this month's orders
     orders.forEach(order => {
-        // Use timestamp or date property
         const orderDate = new Date(order.timestamp || order.date);
-        
-        // Check if the order belongs to the current month and year
         if (orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear) {
-            // Ensure total is a number (handle string 'RM 50.00' or number 50.00)
             let orderAmount = parseFloat(order.total);
             if (!isNaN(orderAmount)) {
                 totalSales += orderAmount;
@@ -764,18 +814,11 @@ function calculateMonthlySales() {
         }
     });
 
-    // 4. Update the Dashboard Display
-    // This looks for an element with id="monthly-sales" and "monthly-orders-count"
     const salesDisplay = document.getElementById('monthly-sales');
     const countDisplay = document.getElementById('monthly-orders-count');
     
-    if (salesDisplay) {
-        salesDisplay.innerText = 'RM ' + totalSales.toFixed(2);
-    }
-    
-    if (countDisplay) {
-        countDisplay.innerText = count;
-    }
+    if (salesDisplay) salesDisplay.innerText = 'RM ' + totalSales.toFixed(2);
+    if (countDisplay) countDisplay.innerText = count;
     
     return totalSales;
 }
