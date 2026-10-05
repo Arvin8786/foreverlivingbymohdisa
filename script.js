@@ -202,7 +202,7 @@ function renderProducts(productsToRender, tagText) {
             <div class="product-image-container"><img src="${p.image}" alt="${p.name}"></div>
             <div class="product-info">
                 <h3>${p.name}</h3>
-                <div class="price-section"><span class="new-price">RM ${p.price.toFixed(2)}</span></div>
+                <div class="price-section"><span class="new-price">RM ${Number(p.price || 0).toFixed(2)}</span></div>
                 <div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div>
                 <div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div>
                 <div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button></div>
