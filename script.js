@@ -290,20 +290,24 @@ function buildCartModal() {
                 <h2>Your Cart</h2>
                 <button class="close" onclick="toggleCart(true)">&times;</button>
             </div>
-            <div class="modal-body" id="cart-items"><p>Your cart is empty.</p></div>
-            <div id="cart-checkout-area">
-                <div class="modal-footer">
-                    <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
-                    <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
+            <div class="cart-scroll-area">
+                <div id="cart-items"><p style="text-align:center; padding: 20px 0;">Your cart is empty.</p></div>
+                <div id="cart-checkout-area">
+                    <div class="modal-footer">
+                        <div class="summary-line"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+                        <div class="summary-line total"><span>Total</span><span id="cart-total">RM 0.00</span></div>
+                    </div>
+                    <div class="customer-info-form">
+                        <h3>Customer Info</h3>
+                        <input type="text" id="customer-name" placeholder="Full Name" required>
+                        <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
+                        <input type="email" id="customer-email" placeholder="Email (Optional)">
+                        <textarea id="customer-address" placeholder="Shipping Address" rows="2" required></textarea>
+                    </div>
                 </div>
-                <div class="customer-info-form">
-                    <h3>Customer Info</h3>
-                    <input type="text" id="customer-name" placeholder="Full Name" required>
-                    <input type="tel" id="customer-phone" placeholder="WhatsApp Number" required>
-                    <input type="email" id="customer-email" placeholder="Email (Optional)">
-                    <textarea id="customer-address" placeholder="Shipping Address" rows="3" required></textarea>
-                </div>
-                <div style="padding: 0 30px 20px;"><button class="btn btn-primary" style="width: 100%;" onclick="initiateCheckout()">Complete Order</button></div>
+            </div>
+            <div class="cart-submit-wrap" id="cart-btn-wrap">
+                <button class="btn btn-primary" style="width: 100%;" onclick="initiateCheckout()">Complete Order</button>
             </div>
         </div>`;
 }
