@@ -158,7 +158,7 @@ function renderMainContentShell() {
 }
 
 function renderHomepageContent(about, jobs, testimonies) {
-    if (!about) return;
+    about = about || { CompanyName: "Forever Living", Slogan: "Premium Wellness & Beauty" };
     const heroContainer = document.getElementById('homepage-hero');
     if (heroContainer) heroContainer.innerHTML = `<h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p>`;
     
@@ -218,7 +218,7 @@ function renderProducts(productsToRender, tagText) {
         return `
         <div class="product" style="position: relative;">
             ${tagHtml}
-            <div class="product-image-container"><img src="${p.image \vert{}\vert{} ''}" alt="${p.name || ''}" onerror="this.src='https://via.placeholder.com/250?text=Forever+Living'"></div>
+            <div class="product-image-container"><img src="${p.image || ''}" alt="${p.name || ''}" onerror="this.src='https://via.placeholder.com/250?text=Forever+Living'"></div>
             <div class="product-info">
                 <h3>${p.name}</h3>
                 <div class="price-section"><span class="new-price">RM ${displayPrice}</span></div>
