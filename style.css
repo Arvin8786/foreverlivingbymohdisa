@@ -184,3 +184,145 @@
     border-radius: 8px;
     cursor: pointer;
 }
+
+/* --- CART MODAL FIX: COMPACT & SCROLLABLE --- */
+#cart-modal {
+    display: none;
+    position: fixed;
+    z-index: 99999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+#cart-modal .modal-content {
+    background: #ffffff !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.3) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 18px 22px !important;
+    box-sizing: border-box !important;
+}
+
+#cart-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eef2f5;
+    margin-bottom: 12px;
+}
+
+#cart-modal .modal-header h2 {
+    font-size: 1.25rem !important;
+    margin: 0 !important;
+    color: #113626 !important;
+    font-weight: 700 !important;
+}
+
+#cart-modal .close {
+    background: transparent;
+    border: none;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: #64748b;
+    cursor: pointer;
+}
+
+/* Compact Customer Info Grid */
+.customer-info-form {
+    margin-top: 10px;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.customer-info-form h3 {
+    font-size: 0.88rem !important;
+    margin: 0 0 8px 0 !important;
+    color: #113626 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cart-input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.customer-info-form input,
+.customer-info-form textarea {
+    width: 100% !important;
+    padding: 7px 10px !important;
+    font-size: 0.82rem !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
+    color: #1e293b !important;
+}
+
+.customer-info-form textarea {
+    resize: none !important;
+    height: 48px !important;
+    margin-top: 6px !important;
+}
+
+/* Summary and Submit Button */
+#cart-modal .modal-footer {
+    padding: 10px 0 6px 0;
+    border-top: 1px dashed #cbd5e1;
+    margin-top: 10px;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.88rem;
+    color: #475569;
+    margin-bottom: 3px;
+}
+
+.summary-line.total {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #113626;
+    margin-top: 4px;
+}
+
+.cart-submit-btn-area {
+    margin-top: 12px;
+    padding-bottom: 4px;
+}
+
+.cart-submit-btn-area button {
+    width: 100% !important;
+    padding: 11px !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    background-color: #113626 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: background 0.2s;
+}
+
+.cart-submit-btn-area button:hover {
+    background-color: #0b2419 !important;
+}
