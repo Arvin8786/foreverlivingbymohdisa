@@ -8,7 +8,7 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwfwwin3UjAKB43mL5VUoAHCuk6XA0yX2B5YZ4nXzKt8foLqdNCDHTORO-Axah4XXdy5Q/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxjIQmAw_C2p3E09mMcj3HeZWgQDVAjR8hOpR88iUBZjQSxoLAEavDjylcIsejGKCgLcw/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 // SECURITY NOTE: anything in this file is public. Treat this key as non-secret and
 // make sure the bot server does not rely on it alone for sensitive actions.
@@ -1472,20 +1472,43 @@ function removeItemFromCart(productId) {
     updateCartDisplay();
 }
 
-// ShippingRules sheet: MinSpend / Charge. The rule with the highest MinSpend that the subtotal reaches applies
-// (e.g. 0 -> RM 15, 150 -> RM 8, 300 -> RM 0). Below the lowest MinSpend the lowest rule is used.
+// Shipping rules come from the ShippingRules sheet (only rows with Apply ticked are sent).
+//   Tiered   = normal bands: spend between MinSpend and MaxSpend pays Charge
+//   Free     = promotion: free shipping in that range      FlatRate = promotion: flat Charge in that range
+// A running promotion beats the normal tiers. Spend below the lowest tier pays the lowest tier's charge.
 function normaliseShippingRules(raw) {
     if (!Array.isArray(raw)) return [];
     const num = v => { const n = parseFloat(String(v === undefined || v === null ? '' : v).replace(/[^0-9.\-]/g, '')); return isNaN(n) ? 0 : n; };
-    return raw.map(r => ({ minSpend: num(r.minSpend ?? r.MinSpend), charge: Math.max(0, num(r.charge ?? r.Charge)) }))
-        .sort((a, b) => a.minSpend - b.minSpend);
+    return raw.map(r => {
+        let type = String(r.type || r.RuleType || 'tiered').toLowerCase().replace(/[^a-z]/g, '');
+        if (type !== 'free' && type !== 'flatrate') type = 'tiered';
+        const max = num(r.maxSpend ?? r.MaxSpend);
+        return { type: type, minSpend: num(r.minSpend ?? r.MinSpend), maxSpend: max > 0 ? max : 999999999,
+                 charge: type === 'free' ? 0 : Math.max(0, num(r.charge ?? r.Charge)) };
+    }).sort((a, b) => a.minSpend - b.minSpend);
 }
 
 function calcShipping(subtotal) {
     if (!shippingRules.length) return 0;
-    let applied = shippingRules[0];
-    shippingRules.forEach(r => { if (subtotal >= r.minSpend) applied = r; });
-    return applied.charge;
+    const amount = Math.round(Number(subtotal) * 100) / 100;
+    const inRange = r => amount >= r.minSpend && amount <= r.maxSpend;
+
+    const promos = shippingRules.filter(r => r.type !== 'tiered' && inRange(r));
+    if (promos.length) return Math.min(...promos.map(r => r.charge));
+
+    const tiers = shippingRules.filter(r => r.type === 'tiered');
+    if (!tiers.length) return 0;
+    const hit = tiers.filter(inRange).pop();
+    if (hit) return hit.charge;
+    if (amount < tiers[0].minSpend) return tiers[0].charge;      // under the lowest band
+    const below = tiers.filter(r => amount > r.maxSpend).pop();   // gap between bands, or above the last band
+    return below ? below.charge : tiers[0].charge;
+}
+
+// The next band up that would make shipping cheaper (used for the "add RM x more" hint)
+function nextCheaperTier(subtotal) {
+    const current = calcShipping(subtotal);
+    return shippingRules.find(r => r.type === 'tiered' && r.minSpend > subtotal && r.charge < current) || null;
 }
 
 function updateCartDisplay() {
@@ -1536,7 +1559,7 @@ function updateCartDisplay() {
     if (shipElem) shipElem.textContent = shipping > 0 ? `RM ${shipping.toFixed(2)}` : 'FREE';
     if (hintElem) {
         // tell the customer how far they are from the next, cheaper shipping tier
-        const next = shippingRules.find(r => r.minSpend > subtotal && r.charge < shipping);
+        const next = nextCheaperTier(subtotal);
         if (next) {
             const more = (next.minSpend - subtotal).toFixed(2);
             hintElem.textContent = next.charge === 0 ? `Add RM ${more} more to get FREE shipping!` : `Add RM ${more} more to reduce shipping to RM ${next.charge.toFixed(2)}.`;
