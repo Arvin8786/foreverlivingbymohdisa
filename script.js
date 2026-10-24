@@ -1,5 +1,5 @@
 // =================================================================
-// E-Shop Frontend Script - v30.0 (FESTIVAL ENGINE + PRODUCT PAGES)
+// E-Shop Frontend Script - v31.0 (CALMER FESTIVAL THEMES, SHIPPING RULES, VIDEO FIX)
 // Features: Festival themes (live backgrounds, graphics, moving animations),
 //           robust price parsing, marketing, cart, chatbot
 // Preview any theme without waiting for its dates:  yoursite.com/?festival=Christmas
@@ -8,7 +8,7 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzTTneDgYSmXuPsIl3zIf-POU5n36vC3alU35185l_ryz85SwbSK3CMel3gRECcNZn7SA/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwfwwin3UjAKB43mL5VUoAHCuk6XA0yX2B5YZ4nXzKt8foLqdNCDHTORO-Axah4XXdy5Q/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 // SECURITY NOTE: anything in this file is public. Treat this key as non-secret and
 // make sure the bot server does not rely on it alone for sensitive actions.
@@ -18,6 +18,7 @@ let products = [];
 let allJobs = [];
 let cart = [];
 let chatSession = {};
+let shippingRules = []; // [{ minSpend, charge }] from the ShippingRules sheet
 
 const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="250" height="250"><rect width="100%" height="100%" fill="#eef2f0"/>' +
@@ -52,98 +53,91 @@ function parseSafePrice(item) {
 // every ~20-30 seconds, and an optional string of festive lights along the top.
 // Strings starting with # are drawn as coloured confetti; everything else is an emoji.
 const FESTIVAL_THEMES = {
+    // Rule for every theme: only items that genuinely belong to that festival.
+    // Strings starting with # are drawn as small coloured confetti; everything else is an emoji.
     Christmas: {
         icon: '🎄', colors: { primary: '#d90429', secondary: '#FFD700', accent: '#004B23' },
         bg: [['#fff3f3', '#effaf2', '#fff9e3'], ['#f0faf3', '#fff0f0', '#fffcec']],
-        fall: { glyphs: ['❄️', '❄️', '🎄', '⭐', '🎁', '#cfe8ff', '#ffffff'], count: 46, size: [14, 30], speed: [0.5, 1.3], sway: 30 },
-        traveler: { glyph: '🛷', trail: '✨', duration: 20 },
-        garland: ['#d90429', '#ffd700', '#1b9a4a', '#ffffff']
+        fall: { glyphs: ['❄️', '❄️', '❄️', '🎄'], count: 12, size: [16, 26], speed: [0.45, 1.0], sway: 16 },
+        traveler: { glyph: '🛷', trail: '❄️', duration: 22 }
     },
     HariRaya: {
         icon: '🌙', colors: { primary: '#006400', secondary: '#f0e68c', accent: '#27ae60' },
         bg: [['#f1faf1', '#fbf8e6', '#eaf6ee'], ['#fbf8e6', '#eaf6ee', '#f1faf1']],
-        rise: { glyphs: ['🏮', '🌙', '⭐', '✨', '🏮'], count: 26, size: [18, 34], speed: [0.35, 0.9], sway: 22 },
-        fireworks: { colors: ['#27ae60', '#f0e68c', '#ffd700', '#ffffff'], every: [3, 6] },
-        traveler: { glyph: '🌙', trail: '⭐', duration: 22 }
+        rise: { glyphs: ['🌙', '⭐', '🏮'], count: 10, size: [18, 28], speed: [0.3, 0.7], sway: 14 },
+        fireworks: { colors: ['#27ae60', '#f0c419', '#ffd700'], every: [6, 11] },
+        traveler: { glyph: '🌙', trail: '⭐', duration: 24 }
     },
     CNY: {
         icon: '🧧', colors: { primary: '#E00000', secondary: '#FFD700', accent: '#C04000' },
         bg: [['#fff1ee', '#fff8e1', '#ffeceb'], ['#fff8e1', '#ffeceb', '#fff1ee']],
-        rise: { glyphs: ['🏮', '🧧', '🏮', '✨', '🪙'], count: 26, size: [20, 36], speed: [0.35, 0.95], sway: 20 },
-        fall: { glyphs: ['#ffd700', '#e00000', '#ffb300'], count: 24, size: [10, 18], speed: [0.6, 1.3], sway: 24, spin: true },
-        fireworks: { colors: ['#ff2a2a', '#ffd700', '#ff8c00'], every: [2, 4.5] },
-        traveler: { glyph: '🐉', trail: '✨', duration: 18 },
-        garland: ['#e00000', '#ffd700', '#e00000', '#ff8c00']
+        rise: { glyphs: ['🏮', '🧧', '🏮'], count: 10, size: [20, 30], speed: [0.3, 0.7], sway: 14 },
+        fall: { glyphs: ['🪙'], count: 5, size: [16, 22], speed: [0.5, 1.0], sway: 12, spin: true },
+        fireworks: { colors: ['#ff2a2a', '#ffd700', '#ff8c00'], every: [5, 9] },
+        traveler: { glyph: '🐉', trail: '🏮', duration: 20 }
     },
     Thaipusam: {
         icon: '🔱', colors: { primary: '#FF9933', secondary: '#4B0082', accent: '#F0E68C' },
         bg: [['#fff6ea', '#f6efff', '#fffbe8'], ['#f6efff', '#fffbe8', '#fff6ea']],
-        fall: { glyphs: ['🌼', '🌺', '#ff9933', '🌼', '#4b0082'], count: 36, size: [14, 28], speed: [0.5, 1.2], sway: 30, spin: true },
-        traveler: { glyph: '🪔', trail: '✨', duration: 22 }
+        rise: { glyphs: ['🪔', '🔱', '🌼'], count: 9, size: [18, 26], speed: [0.3, 0.7], sway: 14 },
+        traveler: { glyph: '🪔', trail: '🌼', duration: 24 }
     },
     NationalDay: {
-        icon: '🎆', colors: { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
+        icon: '🇲🇾', colors: { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
         bg: [['#eef0ff', '#fff6dc', '#ffecec'], ['#fff6dc', '#ffecec', '#eef0ff']],
-        fall: { glyphs: ['#cc0000', '#000066', '#ffcc00', '⭐', '🌺'], count: 42, size: [12, 26], speed: [0.6, 1.4], sway: 28, spin: true },
-        fireworks: { colors: ['#cc0000', '#ffcc00', '#2a3cff', '#ffffff'], every: [1.6, 3.4] },
-        traveler: { glyph: '🎈', trail: '⭐', duration: 20 }
+        fall: { glyphs: ['🌺', '⭐'], count: 10, size: [16, 26], speed: [0.5, 1.0], sway: 14, spin: true },
+        fireworks: { colors: ['#cc0000', '#ffcc00', '#2a3cff', '#ffffff'], every: [5, 9] },
+        traveler: { glyph: '🎈', trail: '⭐', duration: 22 }
     },
     MalaysiaDay: {
-        icon: '🌺', colors: { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
+        icon: '🇲🇾', colors: { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
         bg: [['#eef0ff', '#fff6dc', '#ffecec'], ['#ffecec', '#eef0ff', '#fff6dc']],
-        fall: { glyphs: ['🌺', '⭐', '#cc0000', '#000066', '#ffcc00'], count: 40, size: [14, 28], speed: [0.6, 1.3], sway: 28, spin: true },
-        fireworks: { colors: ['#cc0000', '#ffcc00', '#2a3cff', '#ffffff'], every: [1.8, 3.6] },
-        traveler: { glyph: '🎈', trail: '🌺', duration: 20 }
+        fall: { glyphs: ['🌺', '⭐'], count: 10, size: [16, 26], speed: [0.5, 1.0], sway: 14, spin: true },
+        fireworks: { colors: ['#cc0000', '#ffcc00', '#2a3cff', '#ffffff'], every: [5, 9] },
+        traveler: { glyph: '🎈', trail: '🌺', duration: 22 }
     },
     MooncakeFestival: {
         icon: '🥮', colors: { primary: '#C04000', secondary: '#FFD700', accent: '#E00000' },
         bg: [['#fff3e8', '#fff9e1', '#fdeee6'], ['#eef0ff', '#fff9e1', '#fff3e8']],
-        rise: { glyphs: ['🏮', '🥮', '🌕', '🏮', '✨', '🐇'], count: 26, size: [20, 36], speed: [0.35, 0.9], sway: 22 },
-        traveler: { glyph: '🐇', trail: '✨', duration: 22 },
-        garland: ['#ffb300', '#e65100', '#ffd700', '#ff8f00']
+        rise: { glyphs: ['🏮', '🥮', '🌕'], count: 10, size: [20, 30], speed: [0.3, 0.7], sway: 14 },
+        traveler: { glyph: '🐇', trail: '🥮', duration: 24 }
     },
     Deepavali: {
         icon: '🪔', colors: { primary: '#FF8C00', secondary: '#FF00FF', accent: '#FFD700' },
         bg: [['#fff5e6', '#fdeeff', '#fffbe0'], ['#fdeeff', '#fffbe0', '#fff5e6']],
-        rise: { glyphs: ['🪔', '✨', '🪔', '🌼', '🎇'], count: 28, size: [18, 34], speed: [0.35, 0.95], sway: 20 },
-        fall: { glyphs: ['#ff8c00', '#ff00ff', '#ffd700', '🌼'], count: 26, size: [10, 20], speed: [0.5, 1.2], sway: 26, spin: true },
-        fireworks: { colors: ['#ff8c00', '#ff00ff', '#ffd700', '#ffffff'], every: [2, 4] },
-        traveler: { glyph: '🪔', trail: '✨', duration: 20 },
-        garland: ['#ff8c00', '#ffd700', '#ff00ff', '#ff5722']
+        rise: { glyphs: ['🪔'], count: 10, size: [20, 30], speed: [0.3, 0.75], sway: 14 },
+        fireworks: { colors: ['#ff8c00', '#ff2db4', '#ffd700'], every: [5, 9] },
+        traveler: { glyph: '🪔', trail: '🪔', duration: 22 }
     },
     NewYear: {
         icon: '🎉', colors: { primary: '#111111', secondary: '#FFD700', accent: '#C0C0C0' },
         bg: [['#f6f6f8', '#fff9e0', '#eeeef2'], ['#fff9e0', '#eeeef2', '#f6f6f8']],
-        fall: { glyphs: ['#ffd700', '#c0c0c0', '#111111', '🎉', '🥂', '✨'], count: 44, size: [12, 26], speed: [0.6, 1.4], sway: 26, spin: true },
-        fireworks: { colors: ['#ffd700', '#ffffff', '#ff5e5e', '#5ec8ff'], every: [1.2, 2.8] },
-        traveler: { glyph: '🥂', trail: '✨', duration: 18 },
-        garland: ['#ffd700', '#c0c0c0', '#ffd700', '#ffffff']
+        fall: { glyphs: ['🥂', '🎉'], count: 10, size: [16, 26], speed: [0.5, 1.0], sway: 14, spin: true },
+        fireworks: { colors: ['#ffd700', '#ffffff', '#ff5e5e', '#5ec8ff'], every: [4, 8] },
+        traveler: { glyph: '🥂', trail: '🎉', duration: 20 }
     },
     Valentines: {
         icon: '💖', colors: { primary: '#D70040', secondary: '#FFC0CB', accent: '#C71585' },
         bg: [['#fff0f4', '#fff5f8', '#ffeaf3'], ['#ffeaf3', '#fff0f4', '#fff5f8']],
-        rise: { glyphs: ['💖', '💕', '🌹', '💌', '💗'], count: 28, size: [16, 32], speed: [0.4, 1.0], sway: 24 },
-        traveler: { glyph: '💘', trail: '💕', duration: 20 }
+        rise: { glyphs: ['💖', '🌹', '💕'], count: 10, size: [18, 28], speed: [0.35, 0.8], sway: 14 },
+        traveler: { glyph: '💘', trail: '💕', duration: 22 }
     },
     GrandOpening: {
         icon: '🎊', colors: { primary: '#1a5276', secondary: '#f39c12', accent: '#27ae60' },
         bg: [['#eaf3fa', '#fff5e3', '#eaf8ef'], ['#fff5e3', '#eaf8ef', '#eaf3fa']],
-        fall: { glyphs: ['#1a5276', '#f39c12', '#27ae60', '#e74c3c', '🎉', '🎊'], count: 44, size: [12, 26], speed: [0.6, 1.4], sway: 26, spin: true },
-        fireworks: { colors: ['#f39c12', '#27ae60', '#e74c3c', '#3498db'], every: [2, 4] },
-        traveler: { glyph: '🎈', trail: '🎉', duration: 20 }
+        fall: { glyphs: ['🎈', '🎉'], count: 9, size: [18, 26], speed: [0.5, 1.0], sway: 14, spin: true },
+        traveler: { glyph: '🎈', trail: '🎉', duration: 22 }
     },
     Vesak: {
         icon: '🪷', colors: { primary: '#b8860b', secondary: '#fff3b0', accent: '#8e44ad' },
         bg: [['#fffbe8', '#f6efff', '#fff6e0'], ['#f6efff', '#fff6e0', '#fffbe8']],
-        rise: { glyphs: ['🏮', '🪷', '✨', '🏮'], count: 24, size: [18, 34], speed: [0.3, 0.8], sway: 18 },
-        traveler: { glyph: '🕊️', trail: '✨', duration: 24 }
+        rise: { glyphs: ['🪷', '🏮'], count: 9, size: [18, 28], speed: [0.25, 0.6], sway: 12 },
+        traveler: { glyph: '🕊️', trail: '🪷', duration: 26 }
     },
-    // Used when a festival is running but its name is not recognised: keeps site colours, adds light confetti.
+    // Unrecognised festival: keeps the site's own colours and adds only the soft background and string lights.
     Default: {
         icon: '🎉', colors: null,
-        bg: [['#fbfbfd', '#f3f8f5', '#fffaf0'], ['#f3f8f5', '#fffaf0', '#fbfbfd']],
-        fall: { glyphs: ['#f39c12', '#27ae60', '#e74c3c', '#3498db', '🎉'], count: 28, size: [12, 24], speed: [0.6, 1.3], sway: 24, spin: true },
-        traveler: { glyph: '🎉', trail: '✨', duration: 20 }
+        bg: [['#fbfbfd', '#f3f8f5', '#fffaf0'], ['#f3f8f5', '#fffaf0', '#fbfbfd']]
     }
 };
 
@@ -165,87 +159,87 @@ const FESTIVAL_MATCHERS = [
     ['NewYear', /newyear/]
 ];
 
-// Scene data per theme: people/characters that parade along the bottom of the screen,
-// props that stand along the ground, ornaments hung on product cards, and the colours
-// that the string lights cycle through. (Lights must be 6-digit hex colours.)
+// Scene data per theme: people/characters that stroll along the bottom of the screen, props that stand along
+// the ground, the ornament hung on product cards, and the colours the string lights cycle through.
+// Only single-character emoji are used so they look the same on every phone and computer.
 const FESTIVAL_SCENES = {
     Christmas: {
-        walkers: ['🎅', '🤶', '🧑‍🎄', '🧒', '👧', '⛄', '🦌', '👨‍👩‍👧', '🐧'],
-        props: ['🎄', '⛄', '🎁', '🎄', '🔔', '🎁', '🎄'],
-        orn: ['🎄', '🎁', '⭐', '🔔', '🍬'], ribbon: 'Christmas Special',
-        ground: 'rgba(255,255,255,.75)', lights: ['#ff3b3b', '#ffd700', '#2ecc71', '#ffffff', '#4da6ff']
+        walkers: ['🎅', '🤶', '🧒', '👧', '⛄', '🦌'],
+        props: ['🎄', '⛄', '🎁', '🎄', '🔔'],
+        orn: ['🎄', '🎁', '⭐', '🔔'], ribbon: 'Christmas Special',
+        ground: 'rgba(255,255,255,.7)', lights: ['#ff3b3b', '#ffd700', '#2ecc71', '#ffffff', '#4da6ff']
     },
     HariRaya: {
-        walkers: ['🧕', '👨‍👩‍👧', '🧒', '👧', '👦', '🧑', '🚶‍♀️'],
-        props: ['🕌', '🌙', '🏮', '🕌', '⭐', '🏮', '🌙'],
+        walkers: ['🧕', '🧒', '👧', '👦', '🧑'],
+        props: ['🕌', '🌙', '🏮', '🕌', '⭐'],
         orn: ['🌙', '⭐', '🏮', '🕌'], ribbon: 'Raya Special',
-        ground: 'rgba(39,174,96,.28)', lights: ['#27ae60', '#f1c40f', '#ffffff', '#1abc9c', '#f39c12']
+        ground: 'rgba(39,174,96,.25)', lights: ['#27ae60', '#f1c40f', '#ffffff', '#1abc9c', '#f39c12']
     },
     CNY: {
-        walkers: ['🦁', '🐉', '🧧', '👦', '👧', '🧒', '👨‍👩‍👧', '🏮'],
-        props: ['🏮', '🧧', '🏮', '🎋', '🍊', '🏮', '🧧'],
-        orn: ['🧧', '🏮', '🍊', '🪙', '🐉'], ribbon: 'CNY Special',
-        ground: 'rgba(224,0,0,.25)', lights: ['#ff2a2a', '#ffd700', '#ff8c00', '#ff2a2a', '#ffb300']
+        walkers: ['🦁', '🐉', '🧒', '👧', '👦'],
+        props: ['🏮', '🧧', '🏮', '🍊', '🏮'],
+        orn: ['🧧', '🏮', '🍊', '🪙'], ribbon: 'CNY Special',
+        ground: 'rgba(224,0,0,.22)', lights: ['#ff2a2a', '#ffd700', '#ff8c00', '#ff2a2a', '#ffb300']
     },
     Thaipusam: {
-        walkers: ['🧑', '👧', '🧒', '🙏', '👨‍👩‍👧'],
-        props: ['🔱', '🪔', '🌼', '🌺', '🪔', '🌼'],
-        orn: ['🌼', '🔱', '🪔', '🌺'], ribbon: 'Thaipusam',
-        ground: 'rgba(255,153,51,.28)', lights: ['#ff9933', '#8e44ad', '#ffd700', '#e67e22']
+        walkers: ['🧑', '👧', '🧒', '🙏'],
+        props: ['🔱', '🪔', '🌼', '🪔', '🌺'],
+        orn: ['🪔', '🌼', '🔱'], ribbon: 'Thaipusam',
+        ground: 'rgba(255,153,51,.25)', lights: ['#ff9933', '#8e44ad', '#ffd700', '#e67e22']
     },
     NationalDay: {
-        walkers: ['🧒', '👧', '👦', '🚶‍♂️', '👨‍👩‍👧', '🚴', '🏃'],
-        props: ['🎆', '🌺', '🎈', '⭐', '🌺', '🎇', '🎈'],
-        orn: ['🎆', '🌺', '🎈', '⭐'], ribbon: 'Merdeka Special',
-        ground: 'rgba(0,0,102,.22)', lights: ['#e02424', '#ffd700', '#2a3cff', '#ffffff', '#e02424']
+        walkers: ['🧒', '👧', '👦', '🚴', '🏃'],
+        props: ['🌺', '⭐', '🎈', '🌺', '⭐'],
+        orn: ['🌺', '⭐', '🎈'], ribbon: 'Merdeka Special',
+        ground: 'rgba(0,0,102,.18)', lights: ['#e02424', '#ffd700', '#2a3cff', '#ffffff', '#e02424']
     },
     MalaysiaDay: {
-        walkers: ['🧒', '👧', '👦', '🚶‍♂️', '👨‍👩‍👧', '🚴', '🏃'],
-        props: ['🌺', '🎆', '🎈', '⭐', '🎇', '🌺', '🎈'],
-        orn: ['🌺', '🎆', '🎈', '⭐'], ribbon: 'Malaysia Day',
-        ground: 'rgba(0,0,102,.22)', lights: ['#e02424', '#ffd700', '#2a3cff', '#ffffff']
+        walkers: ['🧒', '👧', '👦', '🚴', '🏃'],
+        props: ['🌺', '⭐', '🎈', '🌺', '⭐'],
+        orn: ['🌺', '⭐', '🎈'], ribbon: 'Malaysia Day',
+        ground: 'rgba(0,0,102,.18)', lights: ['#e02424', '#ffd700', '#2a3cff', '#ffffff']
     },
     MooncakeFestival: {
-        walkers: ['🧒', '👧', '🐇', '👨‍👩‍👧', '👦', '🏮'],
-        props: ['🏮', '🥮', '🌕', '🏮', '🍵', '🥮', '🏮'],
-        orn: ['🥮', '🌕', '🏮', '🐇'], ribbon: 'Mid-Autumn',
-        ground: 'rgba(192,64,0,.25)', lights: ['#ffb300', '#ff7043', '#ffd700', '#ff8f00', '#ffe082']
+        walkers: ['🧒', '👧', '🐇', '👦'],
+        props: ['🏮', '🥮', '🌕', '🏮', '🥮'],
+        orn: ['🥮', '🌕', '🏮'], ribbon: 'Mid-Autumn',
+        ground: 'rgba(192,64,0,.22)', lights: ['#ffb300', '#ff7043', '#ffd700', '#ff8f00', '#ffe082']
     },
     Deepavali: {
-        walkers: ['💃', '🕺', '🧒', '👧', '👨‍👩‍👧‍👦', '🧑', '🪔'],
-        props: ['🪔', '🪔', '🎆', '🌼', '🪔', '🏮', '🪔'],
-        orn: ['🪔', '🌼', '✨', '🎇'], ribbon: 'Deepavali Special',
-        ground: 'rgba(255,140,0,.28)', lights: ['#ff8c00', '#ff2db4', '#ffd700', '#ff5722', '#a855f7']
+        walkers: ['💃', '🕺', '🧒', '👧', '👦'],
+        props: ['🪔', '🪔', '🪔', '🪔', '🪔'],
+        orn: ['🪔'], ribbon: 'Deepavali Special',
+        ground: 'rgba(255,140,0,.25)', lights: ['#ff8c00', '#ff2db4', '#ffd700', '#ff5722', '#a855f7']
     },
     NewYear: {
-        walkers: ['🥳', '💃', '🕺', '🧒', '👯', '🧑‍🤝‍🧑'],
-        props: ['🎆', '🥂', '🎉', '🎇', '🍾', '🎆', '🎉'],
-        orn: ['🎉', '🥂', '✨', '🎆', '🍾'], ribbon: 'New Year',
-        ground: 'rgba(255,215,0,.25)', lights: ['#ffd700', '#c0c0c0', '#ff5e5e', '#5ec8ff', '#b388ff']
+        walkers: ['🥳', '💃', '🕺', '🧒'],
+        props: ['🥂', '🎉', '🍾', '🥂', '🎉'],
+        orn: ['🎉', '🥂', '🍾'], ribbon: 'New Year',
+        ground: 'rgba(255,215,0,.22)', lights: ['#ffd700', '#c0c0c0', '#ff5e5e', '#5ec8ff', '#b388ff']
     },
     Valentines: {
-        walkers: ['💑', '👫', '💃', '🕺', '🌹'],
-        props: ['🌹', '💖', '💌', '🌹', '💕', '🎀', '💖'],
-        orn: ['💖', '🌹', '💌', '💕'], ribbon: "Valentine's",
-        ground: 'rgba(215,0,64,.2)', lights: ['#ff2d6f', '#ff8fb1', '#d70040', '#ffc0cb']
+        walkers: ['💃', '🕺', '🌹'],
+        props: ['🌹', '💖', '💌', '🌹', '💕'],
+        orn: ['💖', '🌹', '💌'], ribbon: "Valentine's",
+        ground: 'rgba(215,0,64,.18)', lights: ['#ff2d6f', '#ff8fb1', '#d70040', '#ffc0cb']
     },
     GrandOpening: {
-        walkers: ['🥳', '💃', '🕺', '👏', '🧑‍💼', '🧒'],
-        props: ['🎊', '🎈', '🎉', '🎈', '🎊', '⭐', '🎈'],
-        orn: ['🎊', '🎈', '⭐', '🎉'], ribbon: 'Grand Opening',
-        ground: 'rgba(243,156,18,.25)', lights: ['#1a8cd8', '#f39c12', '#27ae60', '#e74c3c', '#9b59b6']
+        walkers: ['🥳', '💃', '🕺', '👏'],
+        props: ['🎊', '🎈', '🎉', '🎈', '🎊'],
+        orn: ['🎊', '🎈', '🎉'], ribbon: 'Grand Opening',
+        ground: 'rgba(243,156,18,.22)', lights: ['#1a8cd8', '#f39c12', '#27ae60', '#e74c3c', '#9b59b6']
     },
     Vesak: {
-        walkers: ['🧘', '🙏', '🧒', '👧', '🧑', '🚶'],
-        props: ['🪷', '🏮', '🪷', '🕊️', '🏮', '🪷'],
-        orn: ['🪷', '🏮', '✨'], ribbon: 'Vesak Day',
-        ground: 'rgba(184,134,11,.22)', lights: ['#ffd54f', '#ffb300', '#ce93d8', '#fff59d']
+        walkers: ['🧘', '🙏', '🧒', '👧'],
+        props: ['🪷', '🏮', '🪷', '🕊️', '🪷'],
+        orn: ['🪷', '🏮'], ribbon: 'Vesak Day',
+        ground: 'rgba(184,134,11,.2)', lights: ['#ffd54f', '#ffb300', '#ce93d8', '#fff59d']
     },
+    // Unrecognised festival: lights only, no characters
     Default: {
-        walkers: ['🥳', '🧒', '👧', '💃', '🕺'],
-        props: ['🎉', '🎈', '🎊', '🎈', '🎉'],
-        orn: ['🎉', '🎈', '⭐'], ribbon: 'Special Offer',
-        ground: 'rgba(0,0,0,.12)', lights: ['#f39c12', '#27ae60', '#e74c3c', '#3498db']
+        walkers: [], props: [],
+        orn: ['⭐'], ribbon: 'Special Offer',
+        ground: 'rgba(0,0,0,.08)', lights: ['#f39c12', '#27ae60', '#e74c3c', '#3498db']
     }
 };
 
@@ -329,7 +323,7 @@ body.fl-on {
 @keyframes flHop { from { transform: translateY(0) rotate(-5deg); } to { transform: translateY(-10px) rotate(5deg); } }
 
 .fl-traveler { position: fixed; left: 0; top: 30vh; z-index: 60; pointer-events: none; opacity: 0; will-change: transform;
-    font-size: clamp(34px, 5vw, 58px); white-space: nowrap; filter: drop-shadow(0 4px 6px rgba(0,0,0,.25)); }
+    font-size: clamp(28px, 3.2vw, 42px); white-space: nowrap; filter: drop-shadow(0 4px 6px rgba(0,0,0,.25)); }
 .fl-traveler.go { animation: flFly var(--fl-dur, 20s) linear forwards; }
 .fl-traveler.go.rtl { animation-name: flFlyRtl; }
 .fl-tv-inner { display: flex; align-items: center; gap: 4px; animation: flBob 2.4s ease-in-out infinite; }
@@ -506,6 +500,12 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
         return s;
     }
 
+    // Particles live in a narrow strip down each side of the screen so they never sit on top of text or products
+    function edgeX() {
+        const band = Math.max(40, Math.min(S.w * 0.12, S.w < 700 ? 40 : 150));
+        return Math.random() < 0.5 ? rand(10, band) : rand(S.w - band, S.w - 10);
+    }
+
     function spawn(initial) {
         const cfg = S.cfg;
         const useRise = !!cfg.rise && (!cfg.fall || Math.random() < 0.6);
@@ -514,7 +514,7 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
         const glyph = pick(spec.glyphs);
         const size = Math.max(10, Math.round(rand(spec.size[0], spec.size[1]) / 4) * 4);
         const spr = sprite(glyph, size);
-        const bx = rand(0, S.w);
+        const bx = edgeX();
         S.particles.push({
             spr: spr, rise: useRise, spin: !!spec.spin,
             bx: bx, x: bx,
@@ -523,7 +523,7 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
             amp: rand(0.4, 1) * (spec.sway || 24),
             phase: rand(0, 6.28), freq: rand(0.4, 1.1),
             rot: rand(0, 6.28), vr: spec.spin ? rand(-2.2, 2.2) : 0,
-            alpha: rand(0.6, 0.95)
+            alpha: rand(0.55, 0.85)
         });
     }
 
@@ -535,26 +535,14 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
         if (cfg.rise) base += cfg.rise.count;
         const area = (S.w * S.h) / (1366 * 768);
         const mobile = S.w < 700 ? 0.6 : 1;
-        const n = Math.max(14, Math.round(base * Math.min(area, 1.4) * mobile));
+        const n = Math.max(6, Math.round(base * Math.min(area, 1.2) * mobile));
         for (let i = 0; i < n; i++) spawn(true);
 
-        // soft colour glows and twinkling stars (white is skipped: invisible on the light background)
-        const cols = S.scene.lights.filter(c => c.toLowerCase() !== '#ffffff');
-        const ng = S.w < 700 ? 4 : 7;
-        for (let i = 0; i < ng; i++) {
-            S.glows.push({ spr: sprite('@' + cols[i % cols.length], 128), x: rand(0, S.w), y: rand(0, S.h),
-                vx: rand(-9, 9), vy: rand(-6, 6), sz: rand(260, 480), a: rand(0.1, 0.2), ph: rand(0, 6.28) });
-        }
-        const ns = S.w < 700 ? 10 : 20;
-        for (let i = 0; i < ns; i++) {
-            S.stars.push({ spr: sprite('*' + cols[i % cols.length], 18), x: rand(0, S.w), y: rand(0, S.h * 0.85),
-                ph: rand(0, 6.28), fr: rand(0.8, 2.0) });
-        }
     }
 
     function launchRocket() {
         const colors = S.cfg.fireworks.colors;
-        S.rockets.push({ x: rand(0.12, 0.88) * S.w, y: S.h + 10, ty: rand(0.12, 0.5) * S.h, vy: -rand(420, 560), color: pick(colors) });
+        S.rockets.push({ x: edgeX(), y: S.h + 10, ty: rand(0.15, 0.45) * S.h, vy: -rand(420, 560), color: pick(colors) });
     }
 
     function explode(x, y, color) {
@@ -626,7 +614,7 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
             for (let i = S.rockets.length - 1; i >= 0; i--) {
                 const r = S.rockets[i];
                 r.y += r.vy * dt;
-                ctx.globalAlpha = 0.9;
+                ctx.globalAlpha = 0.7;
                 ctx.strokeStyle = r.color;
                 ctx.lineWidth = 2.5;
                 ctx.beginPath(); ctx.moveTo(r.x, r.y); ctx.lineTo(r.x, r.y + 16); ctx.stroke();
@@ -640,7 +628,7 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
                 sp.x += sp.vx * dt; sp.y += sp.vy * dt;
                 sp.life -= sp.decay * dt;
                 if (sp.life <= 0) { S.sparks.splice(i, 1); continue; }
-                ctx.globalAlpha = Math.max(0, sp.life);
+                ctx.globalAlpha = Math.max(0, sp.life) * 0.75;
                 ctx.strokeStyle = sp.color;
                 ctx.lineWidth = 2;
                 ctx.beginPath(); ctx.moveTo(sp.px, sp.py); ctx.lineTo(sp.x, sp.y); ctx.stroke();
@@ -653,7 +641,7 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
     function scheduleTraveler(first) {
         clearTimeout(S.travelTimer);
         if (!S.running || !S.cfg || !S.cfg.traveler) return;
-        S.travelTimer = setTimeout(runTraveler, first ? 3500 : rand(18000, 32000));
+        S.travelTimer = setTimeout(runTraveler, first ? 6000 : rand(35000, 60000));
     }
 
     function runTraveler() {
@@ -699,20 +687,21 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
     function buildParade() {
         if (!S.scene || !S.paradeEl) return;
         const sc = S.scene;
+        if (!sc.walkers.length && !sc.props.length) { S.paradeEl.innerHTML = ''; S.paradeEl.style.display = 'none'; return; }
         const mobile = window.innerWidth < 700;
-        const nProps = mobile ? 3 : 7;
-        const nWalk = mobile ? 4 : 8;
+        const nProps = mobile ? 3 : 5;
+        const nWalk = mobile ? 3 : 5;
         let html = '';
         for (let i = 0; i < nProps; i++) {
             const left = ((i + 0.5) / nProps * 100 + rand(-3, 3)).toFixed(1);
-            html += '<span class="fl-prop" style="left:' + left + '%;--s:' + rand(34, 52).toFixed(0) + 'px;animation-delay:-' + rand(0, 4).toFixed(2) + 's">' +
+            html += '<span class="fl-prop" style="left:' + left + '%;--s:' + rand(28, 38).toFixed(0) + 'px;animation-delay:-' + rand(0, 4).toFixed(2) + 's">' +
                 sc.props[i % sc.props.length] + '</span>';
         }
         for (let i = 0; i < nWalk; i++) {
             const dur = rand(48, 95);
             const rev = Math.random() < 0.4;
             html += '<span class="fl-walker' + (rev ? ' rev' : '') + '" style="--d:' + dur.toFixed(0) + 's;--dl:-' + rand(0, dur).toFixed(1) +
-                's;--s:' + rand(26, 40).toFixed(0) + 'px;--y:' + rand(0, 16).toFixed(0) + 'px"><span class="fl-flip"><span class="fl-hop" style="animation-delay:-' +
+                's;--s:' + rand(24, 32).toFixed(0) + 'px;--y:' + rand(0, 16).toFixed(0) + 'px"><span class="fl-flip"><span class="fl-hop" style="animation-delay:-' +
                 rand(0, 0.7).toFixed(2) + 's;animation-duration:' + rand(0.5, 0.85).toFixed(2) + 's">' + pick(sc.walkers) + '</span></span></span>';
         }
         S.paradeEl.innerHTML = html;
@@ -879,6 +868,26 @@ function injectShopStyles() {
 .product-list .product-more { font-size: .76rem; font-weight: 700; color: var(--primary-color, #113626); }
 .product-list .product-actions { margin-top: auto; }
 .product-list .product-actions .btn { width: 100%; padding: 8px 10px; font-size: .82rem; }
+
+/* YouTube cards */
+#youtube-videos-container { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
+.yt-item { max-width: 680px; width: 100%; margin: 0 auto; }
+.yt-frame { position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #0f1a15; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+.yt-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.yt-play { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+.yt-play img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+.yt-play:hover img { transform: scale(1.04); }
+.yt-btn { position: absolute; left: 50%; top: 50%; width: 68px; height: 48px; margin: -24px 0 0 -34px; border-radius: 14px; background: rgba(210,20,20,.92); }
+.yt-btn::after { content: ''; position: absolute; left: 27px; top: 14px; border-left: 18px solid #fff; border-top: 10px solid transparent; border-bottom: 10px solid transparent; }
+.yt-fallback { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 10px;
+    padding: 18px; text-align: center; color: #fff; text-decoration: none; font-size: .9rem; line-height: 1.4; }
+.yt-fallback .yt-btn { top: 38%; }
+.yt-link { display: inline-block; margin-top: 8px; font-size: .85rem; font-weight: 600; color: var(--primary-color, #113626); text-decoration: none; }
+.yt-link:hover { text-decoration: underline; }
+
+/* cart: let the whole list show (the modal itself scrolls) */
+#cart-items { max-height: none !important; overflow: visible !important; }
+#cart-items .cart-item { flex-shrink: 0; }
 
 /* dedicated product page */
 .pd-wrap { max-width: 1100px; margin: 0 auto; padding: 18px 14px 30px; }
@@ -1104,6 +1113,7 @@ async function fetchData() {
             consumption: p.consumption ?? p.Consumption ?? p.Usage ?? ''
         }));
 
+        shippingRules = normaliseShippingRules(data.shippingRules);
         allJobs = data.jobsListings || [];
 
         renderMainContentShell();
@@ -1125,7 +1135,7 @@ async function fetchData() {
         }
 
         const updateElem = document.getElementById('update-timestamp');
-        if (updateElem) updateElem.textContent = `${new Date().toLocaleDateString('en-GB')} (v30.0)`;
+        if (updateElem) updateElem.textContent = `${new Date().toLocaleDateString('en-GB')} (v31.0)`;
 
         const enqForm = document.getElementById('enquiry-form');
         if (enqForm) enqForm.addEventListener('submit', handleEnquirySubmit);
@@ -1177,15 +1187,45 @@ function renderMainContentShell() {
     `;
 }
 
-function youtubeId(url) {
+// Accepts watch links, youtu.be links, shorts/embed/live links, links without https://, a bare 11-character
+// video ID, or a whole pasted <iframe ...> embed code.
+function youtubeId(input) {
+    let str = String(input || '').trim();
+    if (!str) return null;
+    const src = str.match(/src\s*=\s*["']([^"']+)["']/i);
+    if (src) str = src[1];
+    if (/^[\w-]{11}$/.test(str)) return str;
+    if (!/^https?:\/\//i.test(str)) str = 'https://' + str.replace(/^\/\//, '');
     try {
-        const u = new URL(url);
-        if (u.hostname.includes('youtu.be')) return u.pathname.slice(1) || null;
-        const v = u.searchParams.get('v');
-        if (v) return v;
-        const m = u.pathname.match(/\/(embed|shorts)\/([\w-]{6,})/);
-        return m ? m[2] : null;
+        const u = new URL(str);
+        const host = u.hostname.replace(/^(www|m)\./i, '').toLowerCase();
+        let id = null;
+        if (host === 'youtu.be') id = u.pathname.split('/')[1] || null;
+        else if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')) {
+            id = u.searchParams.get('v');
+            if (!id) { const m = u.pathname.match(/\/(embed|shorts|live|v)\/([\w-]+)/); if (m) id = m[2]; }
+        }
+        return id && /^[\w-]{6,}$/.test(id) ? id : null;
     } catch (e) { return null; }
+}
+
+// Click-to-play video card. The thumbnail loads first; the real player is only created when someone clicks,
+// and a plain "Watch on YouTube" link is always shown, so the section still works if embedding is blocked.
+function playYoutube(btn) {
+    const frame = btn.closest('.yt-frame');
+    if (!frame) return;
+    const id = frame.dataset.vid;
+    frame.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?autoplay=1&rel=0&playsinline=1" title="YouTube video" ' +
+        'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
+        'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+}
+
+function ytThumbFailed(img) {
+    const frame = img.closest('.yt-frame');
+    if (!frame) return;
+    const id = frame.dataset.vid;
+    frame.innerHTML = '<a class="yt-fallback" href="https://www.youtube.com/watch?v=' + encodeURIComponent(id) + '" target="_blank" rel="noopener">' +
+        '<span class="yt-btn"></span><span>Preview unavailable on this connection.<br>Tap to watch on YouTube</span></a>';
 }
 
 function renderHomepageContent(about, jobs, testimonies) {
@@ -1199,18 +1239,19 @@ function renderHomepageContent(about, jobs, testimonies) {
     }
 
     const youtubeSection = document.getElementById('youtube-videos');
-    const videoUrls = about.YoutubeURL ? String(about.YoutubeURL).split(',').map(url => url.trim()).filter(Boolean) : [];
-    if (youtubeSection && videoUrls.length > 0) {
-        const videosHtml = videoUrls.map(url => {
-            const videoId = youtubeId(url);
-            if (!videoId) { console.error("Invalid YouTube URL:", url); return ''; }
-            return `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${encodeURIComponent(videoId)}" title="Video" loading="lazy" frameborder="0" allowfullscreen></iframe></div>`;
-        }).join('');
-        if (videosHtml) {
-            youtubeSection.innerHTML = `<h2>${esc(about.YoutubeSection_Title || 'Learn More')}</h2><div id="youtube-videos-container">${videosHtml}</div>`;
-        } else {
-            youtubeSection.style.display = 'none';
-        }
+    const videoIds = about.YoutubeURL ? String(about.YoutubeURL).split(/[,\n]+/).map(youtubeId).filter(Boolean) : [];
+    if (youtubeSection && videoIds.length > 0) {
+        const videosHtml = videoIds.map(id => `
+            <div class="yt-item">
+                <div class="yt-frame" data-vid="${esc(id)}">
+                    <button type="button" class="yt-play" onclick="playYoutube(this)" aria-label="Play video">
+                        <img src="https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg" alt="" loading="lazy" onerror="ytThumbFailed(this)">
+                        <span class="yt-btn"></span>
+                    </button>
+                </div>
+                <a class="yt-link" href="https://www.youtube.com/watch?v=${encodeURIComponent(id)}" target="_blank" rel="noopener">Watch on YouTube &#8599;</a>
+            </div>`).join('');
+        youtubeSection.innerHTML = `<h2>${esc(about.YoutubeSection_Title || 'Learn More')}</h2><div id="youtube-videos-container">${videosHtml}</div>`;
     } else if (youtubeSection) {
         youtubeSection.style.display = 'none';
     }
@@ -1348,6 +1389,8 @@ function buildCartModal() {
                 <div id="cart-checkout-area">
                     <div style="border-top:1px dashed #cbd5e1; border-bottom:1px dashed #cbd5e1; padding:10px 0; margin-bottom:12px;">
                         <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#475569; margin-bottom:3px;"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+                        <div id="cart-shipping-row" style="display:none; justify-content:space-between; font-size:0.85rem; color:#475569; margin-bottom:3px;"><span>Shipping</span><span id="cart-shipping">RM 0.00</span></div>
+                        <div id="cart-ship-hint" style="display:none; font-size:0.76rem; color:#b45309; background:#fffbeb; border-radius:6px; padding:5px 8px; margin:4px 0 6px;"></div>
                         <div style="display:flex; justify-content:space-between; font-size:1.05rem; font-weight:bold; color:#113626;"><span>Total</span><span id="cart-total">RM 0.00</span></div>
                     </div>
                     <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:10px;">
@@ -1429,6 +1472,22 @@ function removeItemFromCart(productId) {
     updateCartDisplay();
 }
 
+// ShippingRules sheet: MinSpend / Charge. The rule with the highest MinSpend that the subtotal reaches applies
+// (e.g. 0 -> RM 15, 150 -> RM 8, 300 -> RM 0). Below the lowest MinSpend the lowest rule is used.
+function normaliseShippingRules(raw) {
+    if (!Array.isArray(raw)) return [];
+    const num = v => { const n = parseFloat(String(v === undefined || v === null ? '' : v).replace(/[^0-9.\-]/g, '')); return isNaN(n) ? 0 : n; };
+    return raw.map(r => ({ minSpend: num(r.minSpend ?? r.MinSpend), charge: Math.max(0, num(r.charge ?? r.Charge)) }))
+        .sort((a, b) => a.minSpend - b.minSpend);
+}
+
+function calcShipping(subtotal) {
+    if (!shippingRules.length) return 0;
+    let applied = shippingRules[0];
+    shippingRules.forEach(r => { if (subtotal >= r.minSpend) applied = r; });
+    return applied.charge;
+}
+
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
     const checkoutArea = document.getElementById('cart-checkout-area');
@@ -1466,8 +1525,26 @@ function updateCartDisplay() {
     const subtotal = cart.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.quantity || 1)), 0);
     const subtotalElem = document.getElementById('cart-subtotal');
     const totalElem = document.getElementById('cart-total');
+    const shipping = calcShipping(subtotal);
     if (subtotalElem) subtotalElem.textContent = `RM ${subtotal.toFixed(2)}`;
-    if (totalElem) totalElem.textContent = `RM ${subtotal.toFixed(2)}`;
+    if (totalElem) totalElem.textContent = `RM ${(subtotal + shipping).toFixed(2)}`;
+
+    const shipRow = document.getElementById('cart-shipping-row');
+    const shipElem = document.getElementById('cart-shipping');
+    const hintElem = document.getElementById('cart-ship-hint');
+    if (shipRow) shipRow.style.display = shippingRules.length ? 'flex' : 'none';
+    if (shipElem) shipElem.textContent = shipping > 0 ? `RM ${shipping.toFixed(2)}` : 'FREE';
+    if (hintElem) {
+        // tell the customer how far they are from the next, cheaper shipping tier
+        const next = shippingRules.find(r => r.minSpend > subtotal && r.charge < shipping);
+        if (next) {
+            const more = (next.minSpend - subtotal).toFixed(2);
+            hintElem.textContent = next.charge === 0 ? `Add RM ${more} more to get FREE shipping!` : `Add RM ${more} more to reduce shipping to RM ${next.charge.toFixed(2)}.`;
+            hintElem.style.display = 'block';
+        } else {
+            hintElem.style.display = 'none';
+        }
+    }
 }
 
 function toggleCart(hide = false) {
@@ -1497,7 +1574,7 @@ async function initiateCheckout() {
     if (checkoutBtn) { checkoutBtn.disabled = true; checkoutBtn.textContent = 'Processing...'; }
 
     const subtotal = cart.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.quantity || 1)), 0);
-    const shippingFee = 0.0;
+    const shippingFee = calcShipping(subtotal);
     const totalAmount = subtotal + shippingFee;
     const itemsPurchased = cart.map(item => `${item.id}x${item.quantity}`).join(', ');
 
@@ -1519,7 +1596,8 @@ async function initiateCheckout() {
     try {
         const result = await postDataToGScript(payload);
         const ref = result && result.invoiceId ? ` Your order reference is ${result.invoiceId}.` : '';
-        alert('Your order has been placed successfully!' + ref + ' We will contact you via WhatsApp shortly to confirm payment and shipping.');
+        const paid = result && result.totalAmount !== undefined ? ` Order total: RM ${Number(result.totalAmount).toFixed(2)} (including shipping RM ${Number(result.shippingFee || 0).toFixed(2)}).` : '';
+        alert('Your order has been placed successfully!' + ref + paid + ' We will contact you via WhatsApp shortly to confirm payment and shipping.');
         cart = [];
         toggleCart(true);
         updateCartDisplay();
