@@ -1,13 +1,17 @@
 // =================================================================
-// E-Shop Frontend Script - v28.1 (RESILIENT & DEFENSIVE)
-// Features: Robust Price Parsing, Themes, Marketing, Cart, Chatbot
+// E-Shop Frontend Script - v29.0 (FESTIVAL ENGINE)
+// Features: Festival themes (live backgrounds, graphics, moving animations),
+//           robust price parsing, marketing, cart, chatbot
+// Preview any theme without waiting for its dates:  yoursite.com/?festival=Christmas
 // =================================================================
 
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzpikoYb-1e6vcDoFtJT9-fT8LjNIAwl7NtAbBKVJzZovJRO5sIXXHqIDMOTYnmjWDTKQ/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbyF2KL0ZMZRmoIr5Y66GqsBlIMR1T2wQaqrjxG9nHfe-Ofdnn4XdzBmcdusAiLuY7i5ZQ/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
+// SECURITY NOTE: anything in this file is public. Treat this key as non-secret and
+// make sure the bot server does not rely on it alone for sensitive actions.
 const apiKey = '9582967';
 
 let products = [];
@@ -15,13 +19,596 @@ let allJobs = [];
 let cart = [];
 let chatSession = {};
 
-// Helper: Safely parse price regardless of sheet casing or string format (e.g., "RM 95.00", "95", 95)
+const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="250" height="250"><rect width="100%" height="100%" fill="#eef2f0"/>' +
+    '<text x="50%" y="50%" fill="#7a8a83" font-family="sans-serif" font-size="18" text-anchor="middle" dominant-baseline="middle">Forever Living</text></svg>'
+);
+
+// Escape text before putting it into HTML (stops broken markup and script injection from sheet data)
+function esc(v) {
+    return String(v === undefined || v === null ? '' : v).replace(/[&<>"']/g, c => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+}
+// Safe argument for inline handlers, e.g. onclick="addToCart(${jsArg(id)})"
+function jsArg(v) {
+    return esc(JSON.stringify(String(v === undefined || v === null ? '' : v)));
+}
+
+// Safely parse price regardless of sheet casing or string format (e.g., "RM 95.00", "95", 95)
 function parseSafePrice(item) {
     if (!item) return 0;
-    const raw = item.price ?? item.Price ?? item.retailPrice ?? item.RetailPrice ?? 0;
+    const raw = item.price ?? item.Price ?? item.retailPrice ?? item.RetailPrice ?? item.rsp ?? 0;
     const cleaned = String(raw).replace(/[^0-9.-]+/g, '');
     const parsed = parseFloat(cleaned);
     return isNaN(parsed) ? 0 : parsed;
+}
+
+// ===========================================================
+// [ 1.5 ] FESTIVAL ENGINE
+// ===========================================================
+// Each theme: brand colours, two background palettes (the page slowly cross-fades between them),
+// falling or rising graphics, optional fireworks, a "traveller" that crosses the screen
+// every ~20-30 seconds, and an optional string of festive lights along the top.
+// Strings starting with # are drawn as coloured confetti; everything else is an emoji.
+const FESTIVAL_THEMES = {
+    Christmas: {
+        icon: '🎄', colors: { primary: '#d90429', secondary: '#FFD700', accent: '#004B23' },
+        bg: [['#fff3f3', '#effaf2', '#fff9e3'], ['#f0faf3', '#fff0f0', '#fffcec']],
+        fall: { glyphs: ['❄️', '❄️', '🎄', '⭐', '🎁', '#cfe8ff', '#ffffff'], count: 46, size: [14, 30], speed: [0.5, 1.3], sway: 30 },
+        traveler: { glyph: '🛷', trail: '✨', duration: 20 },
+        garland: ['#d90429', '#ffd700', '#1b9a4a', '#ffffff']
+    },
+    HariRaya: {
+        icon: '🌙', colors: { primary: '#006400', secondary: '#f0e68c', accent: '#27ae60' },
+        bg: [['#f1faf1', '#fbf8e6', '#eaf6ee'], ['#fbf8e6', '#eaf6ee', '#f1faf1']],
+        rise: { glyphs: ['🏮', '🌙', '⭐', '✨', '🏮'], count: 26, size: [18, 34], speed: [0.35, 0.9], sway: 22 },
+        fireworks: { colors: ['#27ae60', '#f0e68c', '#ffd700', '#ffffff'], every: [3, 6] },
+        traveler: { glyph: '🌙', trail: '⭐', duration: 22 }
+    },
+    CNY: {
+        icon: '🧧', colors: { primary: '#E00000', secondary: '#FFD700', accent: '#C04000' },
+        bg: [['#fff1ee', '#fff8e1', '#ffeceb'], ['#fff8e1', '#ffeceb', '#fff1ee']],
+        rise: { glyphs: ['🏮', '🧧', '🏮', '✨', '🪙'], count: 26, size: [20, 36], speed: [0.35, 0.95], sway: 20 },
+        fall: { glyphs: ['#ffd700', '#e00000', '#ffb300'], count: 24, size: [10, 18], speed: [0.6, 1.3], sway: 24, spin: true },
+        fireworks: { colors: ['#ff2a2a', '#ffd700', '#ff8c00'], every: [2, 4.5] },
+        traveler: { glyph: '🐉', trail: '✨', duration: 18 },
+        garland: ['#e00000', '#ffd700', '#e00000', '#ff8c00']
+    },
+    Thaipusam: {
+        icon: '🔱', colors: { primary: '#FF9933', secondary: '#4B0082', accent: '#F0E68C' },
+        bg: [['#fff6ea', '#f6efff', '#fffbe8'], ['#f6efff', '#fffbe8', '#fff6ea']],
+        fall: { glyphs: ['🌼', '🌺', '#ff9933', '🌼', '#4b0082'], count: 36, size: [14, 28], speed: [0.5, 1.2], sway: 30, spin: true },
+        traveler: { glyph: '🪔', trail: '✨', duration: 22 }
+    },
+    NationalDay: {
+        icon: '🎆', colors: { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
+        bg: [['#eef0ff', '#fff6dc', '#ffecec'], ['#fff6dc', '#ffecec', '#eef0ff']],
+        fall: { glyphs: ['#cc0000', '#000066', '#ffcc00', '⭐', '🌺'], count: 42, size: [12, 26], speed: [0.6, 1.4], sway: 28, spin: true },
+        fireworks: { colors: ['#cc0000', '#ffcc00', '#2a3cff', '#ffffff'], every: [1.6, 3.4] },
+        traveler: { glyph: '🎈', trail: '⭐', duration: 20 }
+    },
+    MalaysiaDay: {
+        icon: '🌺', colors: { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
+        bg: [['#eef0ff', '#fff6dc', '#ffecec'], ['#ffecec', '#eef0ff', '#fff6dc']],
+        fall: { glyphs: ['🌺', '⭐', '#cc0000', '#000066', '#ffcc00'], count: 40, size: [14, 28], speed: [0.6, 1.3], sway: 28, spin: true },
+        fireworks: { colors: ['#cc0000', '#ffcc00', '#2a3cff', '#ffffff'], every: [1.8, 3.6] },
+        traveler: { glyph: '🎈', trail: '🌺', duration: 20 }
+    },
+    MooncakeFestival: {
+        icon: '🥮', colors: { primary: '#C04000', secondary: '#FFD700', accent: '#E00000' },
+        bg: [['#fff3e8', '#fff9e1', '#fdeee6'], ['#eef0ff', '#fff9e1', '#fff3e8']],
+        rise: { glyphs: ['🏮', '🥮', '🌕', '🏮', '✨', '🐇'], count: 26, size: [20, 36], speed: [0.35, 0.9], sway: 22 },
+        traveler: { glyph: '🐇', trail: '✨', duration: 22 },
+        garland: ['#ffb300', '#e65100', '#ffd700', '#ff8f00']
+    },
+    Deepavali: {
+        icon: '🪔', colors: { primary: '#FF8C00', secondary: '#FF00FF', accent: '#FFD700' },
+        bg: [['#fff5e6', '#fdeeff', '#fffbe0'], ['#fdeeff', '#fffbe0', '#fff5e6']],
+        rise: { glyphs: ['🪔', '✨', '🪔', '🌼', '🎇'], count: 28, size: [18, 34], speed: [0.35, 0.95], sway: 20 },
+        fall: { glyphs: ['#ff8c00', '#ff00ff', '#ffd700', '🌼'], count: 26, size: [10, 20], speed: [0.5, 1.2], sway: 26, spin: true },
+        fireworks: { colors: ['#ff8c00', '#ff00ff', '#ffd700', '#ffffff'], every: [2, 4] },
+        traveler: { glyph: '🪔', trail: '✨', duration: 20 },
+        garland: ['#ff8c00', '#ffd700', '#ff00ff', '#ff5722']
+    },
+    NewYear: {
+        icon: '🎉', colors: { primary: '#111111', secondary: '#FFD700', accent: '#C0C0C0' },
+        bg: [['#f6f6f8', '#fff9e0', '#eeeef2'], ['#fff9e0', '#eeeef2', '#f6f6f8']],
+        fall: { glyphs: ['#ffd700', '#c0c0c0', '#111111', '🎉', '🥂', '✨'], count: 44, size: [12, 26], speed: [0.6, 1.4], sway: 26, spin: true },
+        fireworks: { colors: ['#ffd700', '#ffffff', '#ff5e5e', '#5ec8ff'], every: [1.2, 2.8] },
+        traveler: { glyph: '🥂', trail: '✨', duration: 18 },
+        garland: ['#ffd700', '#c0c0c0', '#ffd700', '#ffffff']
+    },
+    Valentines: {
+        icon: '💖', colors: { primary: '#D70040', secondary: '#FFC0CB', accent: '#C71585' },
+        bg: [['#fff0f4', '#fff5f8', '#ffeaf3'], ['#ffeaf3', '#fff0f4', '#fff5f8']],
+        rise: { glyphs: ['💖', '💕', '🌹', '💌', '💗'], count: 28, size: [16, 32], speed: [0.4, 1.0], sway: 24 },
+        traveler: { glyph: '💘', trail: '💕', duration: 20 }
+    },
+    GrandOpening: {
+        icon: '🎊', colors: { primary: '#1a5276', secondary: '#f39c12', accent: '#27ae60' },
+        bg: [['#eaf3fa', '#fff5e3', '#eaf8ef'], ['#fff5e3', '#eaf8ef', '#eaf3fa']],
+        fall: { glyphs: ['#1a5276', '#f39c12', '#27ae60', '#e74c3c', '🎉', '🎊'], count: 44, size: [12, 26], speed: [0.6, 1.4], sway: 26, spin: true },
+        fireworks: { colors: ['#f39c12', '#27ae60', '#e74c3c', '#3498db'], every: [2, 4] },
+        traveler: { glyph: '🎈', trail: '🎉', duration: 20 }
+    },
+    Vesak: {
+        icon: '🪷', colors: { primary: '#b8860b', secondary: '#fff3b0', accent: '#8e44ad' },
+        bg: [['#fffbe8', '#f6efff', '#fff6e0'], ['#f6efff', '#fff6e0', '#fffbe8']],
+        rise: { glyphs: ['🏮', '🪷', '✨', '🏮'], count: 24, size: [18, 34], speed: [0.3, 0.8], sway: 18 },
+        traveler: { glyph: '🕊️', trail: '✨', duration: 24 }
+    },
+    // Used when a festival is running but its name is not recognised: keeps site colours, adds light confetti.
+    Default: {
+        icon: '🎉', colors: null,
+        bg: [['#fbfbfd', '#f3f8f5', '#fffaf0'], ['#f3f8f5', '#fffaf0', '#fbfbfd']],
+        fall: { glyphs: ['#f39c12', '#27ae60', '#e74c3c', '#3498db', '🎉'], count: 28, size: [12, 24], speed: [0.6, 1.3], sway: 24, spin: true },
+        traveler: { glyph: '🎉', trail: '✨', duration: 20 }
+    }
+};
+
+// Works out which theme to use from the sheet row (ThemeName column if present,
+// otherwise the Festival ID / Event name, e.g. "DEEPAVALI2026" or "Deepavali (Major)").
+// Order matters: CNY is tested before NewYear, MalaysiaDay before NationalDay.
+const FESTIVAL_MATCHERS = [
+    ['Christmas', /christmas|xmas/],
+    ['Deepavali', /deepavali|diwali/],
+    ['CNY', /cny|chinesenewyear|lunarnewyear|springfestival/],
+    ['HariRaya', /hariraya|aidil|eidul|eidfitr|ramadan|raya/],
+    ['Thaipusam', /thaipusam/],
+    ['MooncakeFestival', /mooncake|midautumn/],
+    ['MalaysiaDay', /malaysiaday/],
+    ['NationalDay', /merdeka|nationalday|kemerdekaan/],
+    ['Valentines', /valentine/],
+    ['GrandOpening', /grandopening/],
+    ['Vesak', /vesak|wesak/],
+    ['NewYear', /newyear/]
+];
+
+const FestivalFX = (() => {
+    const STORE_KEY = 'fl_fx_enabled';
+    const S = {
+        key: null, cfg: null, info: null, enabled: true, running: false,
+        canvas: null, ctx: null, w: 0, h: 0, dpr: 1, t: 0, last: 0, raf: 0,
+        particles: [], rockets: [], sparks: [], sprites: new Map(), nextFirework: 2,
+        travelerEl: null, garlandEl: null, toggleEl: null,
+        travelTimer: 0, paletteTimer: 0, paletteIdx: 0, resizeTimer: 0, bound: false
+    };
+
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const storeGet = () => { try { return localStorage.getItem(STORE_KEY); } catch (e) { return null; } };
+    const storeSet = v => { try { localStorage.setItem(STORE_KEY, v); } catch (e) { /* private mode */ } };
+
+    function resolveKey(info) {
+        if (!info) return null;
+        const explicit = String(info.ThemeName || '').trim();
+        if (FESTIVAL_THEMES[explicit]) return explicit;
+        const hay = norm([info.ThemeName, info.FestivalID, info.EventName].join(' '));
+        for (const [key, rx] of FESTIVAL_MATCHERS) if (rx.test(hay)) return key;
+        return 'Default';
+    }
+
+    function cleanTitle(info) {
+        const raw = info.EventName || info.FestivalID || '';
+        return String(raw).replace(/\s*\((major|minor)\)\s*/ig, '').trim();
+    }
+
+    // ---------- styles ----------
+    function injectStyles() {
+        if (document.getElementById('fl-fx-style')) return;
+        const css = `
+@property --fl-c1 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --fl-c2 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --fl-c3 { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+body.fl-on {
+    background-color: var(--fl-c1) !important;
+    background-image: linear-gradient(120deg, var(--fl-c1), var(--fl-c2), var(--fl-c3), var(--fl-c1)) !important;
+    background-size: 300% 300% !important;
+    background-attachment: fixed !important;
+    animation: flBgDrift 32s ease-in-out infinite;
+    transition: --fl-c1 3s ease, --fl-c2 3s ease, --fl-c3 3s ease;
+}
+@keyframes flBgDrift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+#fl-fx-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 55; pointer-events: none; display: none; }
+
+#fl-garland { position: fixed; top: 0; left: 0; right: 0; height: 26px; z-index: 58; pointer-events: none; overflow: hidden; display: none; }
+#fl-garland .fl-wire { position: absolute; top: 2px; left: 0; right: 0; height: 2px; background: rgba(0,0,0,.35); }
+#fl-garland b { position: absolute; top: 4px; width: 10px; height: 14px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: var(--c); box-shadow: 0 0 10px 2px var(--c); animation: flTwinkle 1.6s ease-in-out infinite alternate; }
+@keyframes flTwinkle { from { opacity: .4; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
+
+.fl-traveler { position: fixed; left: 0; top: 30vh; z-index: 60; pointer-events: none; opacity: 0; will-change: transform;
+    font-size: clamp(34px, 5vw, 58px); white-space: nowrap; filter: drop-shadow(0 4px 6px rgba(0,0,0,.25)); }
+.fl-traveler.go { animation: flFly var(--fl-dur, 20s) linear forwards; }
+.fl-traveler.go.rtl { animation-name: flFlyRtl; }
+.fl-tv-inner { display: flex; align-items: center; gap: 4px; animation: flBob 2.4s ease-in-out infinite; }
+.fl-traveler.rtl .fl-tv-inner { transform: scaleX(-1); }
+.fl-tv-t { font-size: .45em; }
+.fl-tv-t:nth-child(1) { opacity: .25; } .fl-tv-t:nth-child(2) { opacity: .5; } .fl-tv-t:nth-child(3) { opacity: .8; }
+@keyframes flFly { from { transform: translateX(-30vw); opacity: 1; } to { transform: translateX(115vw); opacity: 1; } }
+@keyframes flFlyRtl { from { transform: translateX(115vw); opacity: 1; } to { transform: translateX(-30vw); opacity: 1; } }
+@keyframes flBob { 0%, 100% { translate: 0 0; rotate: -3deg; } 50% { translate: 0 -16px; rotate: 3deg; } }
+
+#fl-fx-toggle { position: fixed; left: 16px; bottom: 16px; z-index: 70; width: 44px; height: 44px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.9); background: var(--primary-color, #113626); color: #fff; font-size: 20px; line-height: 1;
+    cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,.25); transition: transform .2s, opacity .2s; }
+#fl-fx-toggle:hover { transform: scale(1.08); }
+#fl-fx-toggle.off { opacity: .6; filter: grayscale(1); }
+
+.fl-greeting { margin: 22px auto 0; max-width: 760px; padding: 16px 22px; border-radius: 16px; text-align: center;
+    background: rgba(255,255,255,.92); color: #1f2937; border: 2px solid var(--secondary-color, #FFD700);
+    box-shadow: 0 10px 30px rgba(0,0,0,.15); animation: flGreetIn .9s cubic-bezier(.2,.8,.2,1) both; }
+.fl-greeting .fl-pill { display: inline-block; padding: 5px 16px; border-radius: 999px; font-weight: 700; letter-spacing: .4px;
+    background: var(--primary-color, #113626); color: #fff; font-size: .95rem; }
+.fl-greeting p { margin: 12px 0 6px; line-height: 1.55; font-size: 1rem; }
+.fl-greeting small { display: block; color: #64748b; font-size: .8rem; }
+@keyframes flGreetIn { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 600px) { .fl-greeting { margin: 16px 12px 0; padding: 14px 16px; } .fl-greeting p { font-size: .92rem; } }
+@media (prefers-reduced-motion: reduce) {
+    body.fl-on { animation: none; }
+    #fl-garland b, .fl-tv-inner, .fl-greeting { animation: none; }
+}`;
+        const el = document.createElement('style');
+        el.id = 'fl-fx-style';
+        el.textContent = css;
+        document.head.appendChild(el);
+    }
+
+    function ensureDom() {
+        if (!S.canvas) {
+            S.canvas = document.createElement('canvas');
+            S.canvas.id = 'fl-fx-canvas';
+            S.canvas.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(S.canvas);
+            S.ctx = S.canvas.getContext('2d');
+        }
+        if (!S.travelerEl) {
+            S.travelerEl = document.createElement('div');
+            S.travelerEl.className = 'fl-traveler';
+            S.travelerEl.setAttribute('aria-hidden', 'true');
+            S.travelerEl.addEventListener('animationend', e => {
+                if (e.target !== S.travelerEl) return;
+                S.travelerEl.classList.remove('go');
+                scheduleTraveler(false);
+            });
+            document.body.appendChild(S.travelerEl);
+        }
+        if (!S.garlandEl) {
+            S.garlandEl = document.createElement('div');
+            S.garlandEl.id = 'fl-garland';
+            S.garlandEl.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(S.garlandEl);
+        }
+        if (!S.toggleEl) {
+            S.toggleEl = document.createElement('button');
+            S.toggleEl.id = 'fl-fx-toggle';
+            S.toggleEl.type = 'button';
+            S.toggleEl.textContent = '🎊';
+            S.toggleEl.addEventListener('click', () => {
+                S.enabled = !S.enabled;
+                storeSet(S.enabled ? '1' : '0');
+                syncToggle();
+                S.enabled ? start() : stop();
+            });
+            document.body.appendChild(S.toggleEl);
+        }
+        if (!S.bound) {
+            S.bound = true;
+            window.addEventListener('resize', () => {
+                clearTimeout(S.resizeTimer);
+                S.resizeTimer = setTimeout(() => { if (S.running) { resize(); seed(); buildGarland(); } }, 200);
+            });
+            document.addEventListener('visibilitychange', () => {
+                if (!S.running) return;
+                if (document.hidden) { cancelAnimationFrame(S.raf); }
+                else { S.last = performance.now(); S.raf = requestAnimationFrame(frame); }
+            });
+        }
+    }
+
+    function syncToggle() {
+        if (!S.toggleEl) return;
+        S.toggleEl.classList.toggle('off', !S.enabled);
+        S.toggleEl.setAttribute('aria-pressed', String(S.enabled));
+        S.toggleEl.title = S.enabled ? 'Turn festive effects off' : 'Turn festive effects on';
+        S.toggleEl.setAttribute('aria-label', S.toggleEl.title);
+    }
+
+    // ---------- canvas helpers ----------
+    function resize() {
+        S.dpr = Math.min(window.devicePixelRatio || 1, 2);
+        S.w = window.innerWidth;
+        S.h = window.innerHeight;
+        S.canvas.width = Math.round(S.w * S.dpr);
+        S.canvas.height = Math.round(S.h * S.dpr);
+        S.sprites.clear();
+    }
+
+    function sprite(glyph, size) {
+        const key = glyph + '|' + size;
+        let s = S.sprites.get(key);
+        if (s) return s;
+        const d = Math.ceil(size * 1.5) + 8;
+        const c = document.createElement('canvas');
+        c.width = c.height = Math.round(d * S.dpr);
+        const x = c.getContext('2d');
+        x.scale(S.dpr, S.dpr);
+        if (glyph.charAt(0) === '#') {
+            x.fillStyle = glyph;
+            x.fillRect(d / 2 - size * 0.25, d / 2 - size * 0.12, size * 0.5, size * 0.24);
+        } else {
+            x.font = size + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+            x.textAlign = 'center';
+            x.textBaseline = 'middle';
+            x.fillText(glyph, d / 2, d / 2);
+        }
+        s = { c: c, d: d };
+        S.sprites.set(key, s);
+        return s;
+    }
+
+    function spawn(initial) {
+        const cfg = S.cfg;
+        const useRise = !!cfg.rise && (!cfg.fall || Math.random() < 0.6);
+        const spec = useRise ? cfg.rise : cfg.fall;
+        if (!spec) return;
+        const glyph = pick(spec.glyphs);
+        const size = Math.max(10, Math.round(rand(spec.size[0], spec.size[1]) / 4) * 4);
+        const spr = sprite(glyph, size);
+        const bx = rand(0, S.w);
+        S.particles.push({
+            spr: spr, rise: useRise, spin: !!spec.spin,
+            bx: bx, x: bx,
+            y: initial ? rand(0, S.h) : (useRise ? S.h + size : -size * 1.5),
+            vy: rand(spec.speed[0], spec.speed[1]) * 60 * (useRise ? -1 : 1),
+            amp: rand(0.4, 1) * (spec.sway || 24),
+            phase: rand(0, 6.28), freq: rand(0.4, 1.1),
+            rot: rand(0, 6.28), vr: spec.spin ? rand(-2.2, 2.2) : 0,
+            alpha: rand(0.6, 0.95)
+        });
+    }
+
+    function seed() {
+        S.particles = []; S.rockets = []; S.sparks = [];
+        const cfg = S.cfg;
+        let base = 0;
+        if (cfg.fall) base += cfg.fall.count;
+        if (cfg.rise) base += cfg.rise.count;
+        const area = (S.w * S.h) / (1366 * 768);
+        const mobile = S.w < 700 ? 0.6 : 1;
+        const n = Math.max(14, Math.round(base * Math.min(area, 1.4) * mobile));
+        for (let i = 0; i < n; i++) spawn(true);
+    }
+
+    function launchRocket() {
+        const colors = S.cfg.fireworks.colors;
+        S.rockets.push({ x: rand(0.12, 0.88) * S.w, y: S.h + 10, ty: rand(0.12, 0.5) * S.h, vy: -rand(420, 560), color: pick(colors) });
+    }
+
+    function explode(x, y, color) {
+        if (S.sparks.length > 500) return;
+        const colors = S.cfg.fireworks.colors;
+        const n = 46;
+        for (let i = 0; i < n; i++) {
+            const a = (Math.PI * 2 * i) / n + rand(-0.08, 0.08);
+            const sp = rand(70, 220);
+            S.sparks.push({
+                x: x, y: y, px: x, py: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+                life: 1, decay: rand(0.55, 0.95), color: Math.random() < 0.25 ? pick(colors) : color
+            });
+        }
+    }
+
+    function frame(ts) {
+        if (!S.running) return;
+        S.raf = requestAnimationFrame(frame);
+        const dt = Math.min(0.05, (ts - S.last) / 1000 || 0.016);
+        S.last = ts;
+        S.t += dt;
+        const ctx = S.ctx, dpr = S.dpr;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, S.canvas.width, S.canvas.height);
+
+        // graphics
+        for (let i = S.particles.length - 1; i >= 0; i--) {
+            const p = S.particles[i];
+            p.y += p.vy * dt;
+            p.x = p.bx + Math.sin(p.phase + S.t * p.freq) * p.amp;
+            p.rot += p.vr * dt;
+            const off = p.rise ? p.y < -p.spr.d : p.y > S.h + p.spr.d;
+            if (off) { S.particles.splice(i, 1); spawn(false); continue; }
+            const r = p.spin ? p.rot : Math.sin(p.phase + S.t * p.freq) * 0.25;
+            const c = Math.cos(r), s = Math.sin(r);
+            ctx.globalAlpha = p.alpha;
+            ctx.setTransform(dpr * c, dpr * s, -dpr * s, dpr * c, p.x * dpr, p.y * dpr);
+            ctx.drawImage(p.spr.c, -p.spr.d / 2, -p.spr.d / 2, p.spr.d, p.spr.d);
+        }
+
+        // fireworks
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        if (S.cfg.fireworks) {
+            S.nextFirework -= dt;
+            if (S.nextFirework <= 0) {
+                launchRocket();
+                const ev = S.cfg.fireworks.every;
+                S.nextFirework = rand(ev[0], ev[1]);
+            }
+            ctx.lineCap = 'round';
+            for (let i = S.rockets.length - 1; i >= 0; i--) {
+                const r = S.rockets[i];
+                r.y += r.vy * dt;
+                ctx.globalAlpha = 0.9;
+                ctx.strokeStyle = r.color;
+                ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.moveTo(r.x, r.y); ctx.lineTo(r.x, r.y + 16); ctx.stroke();
+                if (r.y <= r.ty) { explode(r.x, r.y, r.color); S.rockets.splice(i, 1); }
+            }
+            const drag = Math.pow(0.1, dt);
+            for (let i = S.sparks.length - 1; i >= 0; i--) {
+                const sp = S.sparks[i];
+                sp.px = sp.x; sp.py = sp.y;
+                sp.vx *= drag; sp.vy = sp.vy * drag + 110 * dt;
+                sp.x += sp.vx * dt; sp.y += sp.vy * dt;
+                sp.life -= sp.decay * dt;
+                if (sp.life <= 0) { S.sparks.splice(i, 1); continue; }
+                ctx.globalAlpha = Math.max(0, sp.life);
+                ctx.strokeStyle = sp.color;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(sp.px, sp.py); ctx.lineTo(sp.x, sp.y); ctx.stroke();
+            }
+        }
+        ctx.globalAlpha = 1;
+    }
+
+    // ---------- traveller crossing the screen ----------
+    function scheduleTraveler(first) {
+        clearTimeout(S.travelTimer);
+        if (!S.running || !S.cfg || !S.cfg.traveler) return;
+        S.travelTimer = setTimeout(runTraveler, first ? 3500 : rand(18000, 32000));
+    }
+
+    function runTraveler() {
+        if (!S.running || document.hidden) { scheduleTraveler(false); return; }
+        const tv = S.cfg.traveler;
+        const rtl = Math.random() < 0.5;
+        const el = S.travelerEl;
+        const trail = '<span class="fl-tv-t">' + tv.trail + '</span>';
+        el.innerHTML = '<div class="fl-tv-inner">' + trail + trail + trail + '<span>' + tv.glyph + '</span></div>';
+        el.style.top = rand(14, 62).toFixed(0) + 'vh';
+        el.style.setProperty('--fl-dur', tv.duration + 's');
+        el.className = 'fl-traveler';
+        void el.offsetWidth; // restart the animation
+        el.className = 'fl-traveler go' + (rtl ? ' rtl' : '');
+    }
+
+    // ---------- string lights ----------
+    function buildGarland() {
+        const cols = S.cfg && S.cfg.garland;
+        if (!cols) { S.garlandEl.style.display = 'none'; return; }
+        const n = Math.ceil(window.innerWidth / 44) + 1;
+        let html = '<i class="fl-wire"></i>';
+        for (let i = 0; i < n; i++) {
+            html += '<b style="left:' + (i * 44 + 8) + 'px;--c:' + cols[i % cols.length] + ';animation-delay:' + ((i % 7) * 0.25) + 's"></b>';
+        }
+        S.garlandEl.innerHTML = html;
+        S.garlandEl.style.display = 'block';
+    }
+
+    // ---------- background palette cycling ----------
+    function setPalette(i) {
+        const pal = S.cfg.bg[i % S.cfg.bg.length];
+        document.body.style.setProperty('--fl-c1', pal[0]);
+        document.body.style.setProperty('--fl-c2', pal[1]);
+        document.body.style.setProperty('--fl-c3', pal[2]);
+    }
+
+    function start() {
+        if (S.running || !S.cfg) return;
+        ensureDom();
+        S.running = true;
+        S.t = 0;
+        S.nextFirework = 1.5;
+        document.body.classList.add('fl-on');
+        S.canvas.style.display = 'block';
+        resize();
+        setPalette(S.paletteIdx);
+        seed();
+        buildGarland();
+        S.last = performance.now();
+        S.raf = requestAnimationFrame(frame);
+        scheduleTraveler(true);
+        clearInterval(S.paletteTimer);
+        if (S.cfg.bg.length > 1) {
+            S.paletteTimer = setInterval(() => { S.paletteIdx = (S.paletteIdx + 1) % S.cfg.bg.length; setPalette(S.paletteIdx); }, 15000);
+        }
+    }
+
+    function stop() {
+        S.running = false;
+        cancelAnimationFrame(S.raf);
+        clearTimeout(S.travelTimer);
+        clearInterval(S.paletteTimer);
+        document.body.classList.remove('fl-on');
+        if (S.canvas) { S.ctx.setTransform(1, 0, 0, 1, 0, 0); S.ctx.clearRect(0, 0, S.canvas.width, S.canvas.height); S.canvas.style.display = 'none'; }
+        if (S.travelerEl) S.travelerEl.className = 'fl-traveler';
+        if (S.garlandEl) S.garlandEl.style.display = 'none';
+    }
+
+    function applyColors(colors) {
+        if (!colors) return;
+        const root = document.documentElement;
+        root.style.setProperty('--primary-color', colors.primary);
+        root.style.setProperty('--secondary-color', colors.secondary);
+        root.style.setProperty('--accent-color', colors.accent);
+    }
+
+    // info = { FestivalID, EventName, ThemeName, WelcomeMessage, StartDate, EndDate }
+    function init(info) {
+        if (!info) { destroy(); return; }
+        const key = resolveKey(info);
+        S.key = key;
+        S.cfg = FESTIVAL_THEMES[key];
+        S.info = info;
+        S.paletteIdx = 0;
+        injectStyles();
+        ensureDom();
+        applyColors(S.cfg.colors);
+        const saved = storeGet();
+        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        S.enabled = saved === null ? !reduced : saved === '1';
+        syncToggle();
+        stop();
+        if (S.enabled) start();
+        console.info('[Festival] theme:', key, '| effects:', S.enabled ? 'on' : 'off', '| source:', info.FestivalID || info.EventName || info.ThemeName);
+    }
+
+    function destroy() {
+        stop();
+        S.cfg = null; S.info = null;
+        ['fl-fx-canvas', 'fl-garland', 'fl-fx-toggle'].forEach(id => { const el = document.getElementById(id); if (el) el.remove(); });
+        if (S.travelerEl) S.travelerEl.remove();
+        S.canvas = S.ctx = S.travelerEl = S.garlandEl = S.toggleEl = null;
+    }
+
+    // Festive greeting card inside the homepage hero (call after the hero has been rendered)
+    function mountHero() {
+        const hero = document.getElementById('homepage-hero');
+        if (!hero || !S.info || !S.cfg) return;
+        const old = hero.querySelector('.fl-greeting');
+        if (old) old.remove();
+        const info = S.info;
+        let when = '';
+        if (info.EndDate) {
+            const end = new Date(info.EndDate + 'T00:00:00');
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const left = Math.round((end - today) / 86400000);
+            if (!isNaN(left) && left >= 0) {
+                const label = end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                when = left === 0 ? 'Last day of our celebration!' : 'Celebrating until ' + label + ' · ' + left + ' day' + (left === 1 ? '' : 's') + ' left';
+            }
+        }
+        const card = document.createElement('div');
+        card.className = 'fl-greeting';
+        card.innerHTML = '<span class="fl-pill">' + S.cfg.icon + ' ' + esc(cleanTitle(info) || 'Celebration') + '</span>' +
+            (info.WelcomeMessage ? '<p>' + esc(info.WelcomeMessage) + '</p>' : '') +
+            (when ? '<small>' + esc(when) + '</small>' : '');
+        hero.appendChild(card);
+    }
+
+    return { init: init, destroy: destroy, mountHero: mountHero, resolveKey: resolveKey };
+})();
+
+// Lets you preview a theme by adding ?festival=Christmas (or Deepavali, CNY, ...) to the site address.
+function getPreviewTheme() {
+    try {
+        const wanted = new URLSearchParams(window.location.search).get('festival');
+        if (!wanted || !FESTIVAL_THEMES[wanted]) return null;
+        return { FestivalID: wanted.toUpperCase() + '-PREVIEW', EventName: wanted, ThemeName: wanted, WelcomeMessage: 'Preview of the ' + wanted + ' theme.', EndDate: '' };
+    } catch (e) { return null; }
 }
 
 // ===========================================================
@@ -29,16 +616,10 @@ function parseSafePrice(item) {
 // ===========================================================
 document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('nav-login-btn');
-    if(loginBtn) loginBtn.addEventListener('click', () => toggleLoginModal(true));
-    
-    const closeLoginBtn = document.getElementById('close-login-modal-btn');
-    if(closeLoginBtn) closeLoginBtn.addEventListener('click', () => toggleLoginModal(false));
+    if (loginBtn) loginBtn.addEventListener('click', () => toggleLoginModal(true));
 
-    const chatSend = document.getElementById('chat-send-btn');
-    if(chatSend) chatSend.addEventListener('click', handleChatSubmit);
-    
-    const chatInput = document.getElementById('chat-input');
-    if(chatInput) chatInput.addEventListener('keyup', (e) => { if (e.key === "Enter") handleChatSubmit(); });
+    const closeLoginBtn = document.getElementById('close-login-modal-btn');
+    if (closeLoginBtn) closeLoginBtn.addEventListener('click', () => toggleLoginModal(false));
 
     fetchData();
 });
@@ -48,32 +629,29 @@ async function fetchData() {
         const response = await fetch(googleScriptURL);
         if (!response.ok) throw new Error('Network response failed');
         const data = await response.json();
-        
+
         if (data.status !== 'success') throw new Error(data.message || 'Unknown backend error');
+        if (data.failedSections && data.failedSections.length) console.warn('Backend sections failed:', data.failedSections);
 
         const marketingData = data.marketingData || {};
-        const activeTheme = data.activeTheme || null;
+        const activeTheme = getPreviewTheme() || data.activeTheme || null;
 
         // 1. Maintenance Mode Check
         if (String(marketingData.MaintenanceMode).trim().toUpperCase() === 'TRUE') {
             const storeWrapper = document.getElementById('store-wrapper');
             if (storeWrapper) storeWrapper.style.display = 'none';
             const overlay = document.getElementById('maintenance-overlay');
-            if(overlay) {
+            if (overlay) {
                 overlay.style.display = 'flex';
                 const msg = document.getElementById('maintenance-message');
-                if(msg) msg.textContent = marketingData.MaintenanceMessage || 'Site is down for maintenance.';
+                if (msg) msg.textContent = marketingData.MaintenanceMessage || 'Site is down for maintenance.';
             }
             return;
         }
 
         // 2. Apply Theme & Marketing Banners
-        if (activeTheme) {
-            applyTheme(activeTheme);
-        }
-        if (marketingData) {
-            applyMarketing(marketingData, activeTheme);
-        }
+        applyTheme(activeTheme);
+        applyMarketing(marketingData, activeTheme);
 
         // 3. Normalize products safely (handles case mismatches and missing fields)
         const rawProducts = data.products || [];
@@ -87,39 +665,40 @@ async function fetchData() {
         }));
 
         allJobs = data.jobsListings || [];
-        
+
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
-        renderProducts(products, marketingData.ProductTagText); 
+        FestivalFX.mountHero();
+        renderProducts(products, marketingData.ProductTagText);
         renderAboutUs(data.aboutUsContent);
         renderJobs(allJobs);
-        
+
         buildEnquiryForm();
         buildCartModal();
         buildJobApplicationModal();
         buildFabButtons();
         buildChatbotWidget();
-        
+
         if (marketingData.PopupMessageText || marketingData.PopupImageURL) {
             buildPopupModal(marketingData.PopupMessageText, marketingData.PopupImageURL);
         }
 
         const updateElem = document.getElementById('update-timestamp');
-        if (updateElem) updateElem.textContent = `${new Date().toLocaleDateString('en-GB')} (v28.1)`;
-        
+        if (updateElem) updateElem.textContent = `${new Date().toLocaleDateString('en-GB')} (v29.0)`;
+
         const enqForm = document.getElementById('enquiry-form');
-        if(enqForm) enqForm.addEventListener('submit', handleEnquirySubmit);
-        
+        if (enqForm) enqForm.addEventListener('submit', handleEnquirySubmit);
+
         const jobForm = document.getElementById('job-application-form');
-        if(jobForm) jobForm.addEventListener('submit', handleJobApplicationSubmit);
+        if (jobForm) jobForm.addEventListener('submit', handleJobApplicationSubmit);
 
         showTab('homepage');
 
     } catch (error) {
         console.error("Fatal Error fetching store data:", error);
         const main = document.getElementById('main-content');
-        if(main) main.innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
+        if (main) main.innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
     }
 }
 
@@ -130,7 +709,7 @@ function renderStaticContent(content) {
     if (!content) return;
     const headerElem = document.getElementById('company-name-header');
     if (headerElem) {
-        headerElem.innerHTML = `${content.CompanyName || ''} <span class="by-line">${content.Owner || ''} - ${content.Role || ''}</span> <span class="slogan">${content.Slogan || ''}</span>`;
+        headerElem.innerHTML = `${esc(content.CompanyName)} <span class="by-line">${esc(content.Owner)} - ${esc(content.Role)}</span> <span class="slogan">${esc(content.Slogan)}</span>`;
     }
     const footerElem = document.getElementById('footer-text');
     if (footerElem) {
@@ -157,41 +736,53 @@ function renderMainContentShell() {
     `;
 }
 
+function youtubeId(url) {
+    try {
+        const u = new URL(url);
+        if (u.hostname.includes('youtu.be')) return u.pathname.slice(1) || null;
+        const v = u.searchParams.get('v');
+        if (v) return v;
+        const m = u.pathname.match(/\/(embed|shorts)\/([\w-]{6,})/);
+        return m ? m[2] : null;
+    } catch (e) { return null; }
+}
+
 function renderHomepageContent(about, jobs, testimonies) {
     about = about || { CompanyName: "Forever Living", Slogan: "Premium Wellness & Beauty" };
     const heroContainer = document.getElementById('homepage-hero');
-    if (heroContainer) heroContainer.innerHTML = `<h2>${about.CompanyName || 'Welcome'}</h2><p>${about.Slogan || 'High-quality wellness products'}</p>`;
-    
+    if (heroContainer) heroContainer.innerHTML = `<h2>${esc(about.CompanyName || 'Welcome')}</h2><p>${esc(about.Slogan || 'High-quality wellness products')}</p>`;
+
     const whyChooseUsContainer = document.getElementById('why-choose-us');
     if (whyChooseUsContainer) {
-        whyChooseUsContainer.innerHTML = `<h2>${about.WhyChooseUs_Title || 'Why Choose Us'}</h2><div class="why-choose-us-grid"><div><i class="${about.Point1_Icon || 'fa-solid fa-check'}"></i><p>${about.Point1_Text || ''}</p></div><div><i class="${about.Point2_Icon || 'fa-solid fa-check'}"></i><p>${about.Point2_Text || ''}</p></div><div><i class="${about.Point3_Icon || 'fa-solid fa-check'}"></i><p>${about.Point3_Text || ''}</p></div></div>`;
+        whyChooseUsContainer.innerHTML = `<h2>${esc(about.WhyChooseUs_Title || 'Why Choose Us')}</h2><div class="why-choose-us-grid"><div><i class="${esc(about.Point1_Icon || 'fa-solid fa-check')}"></i><p>${esc(about.Point1_Text)}</p></div><div><i class="${esc(about.Point2_Icon || 'fa-solid fa-check')}"></i><p>${esc(about.Point2_Text)}</p></div><div><i class="${esc(about.Point3_Icon || 'fa-solid fa-check')}"></i><p>${esc(about.Point3_Text)}</p></div></div>`;
     }
-        
+
     const youtubeSection = document.getElementById('youtube-videos');
-    const videoUrls = about.YoutubeURL ? String(about.YoutubeURL).split(',').map(url => url.trim()) : [];
-    if (youtubeSection && videoUrls.length > 0 && videoUrls[0]) {
+    const videoUrls = about.YoutubeURL ? String(about.YoutubeURL).split(',').map(url => url.trim()).filter(Boolean) : [];
+    if (youtubeSection && videoUrls.length > 0) {
         const videosHtml = videoUrls.map(url => {
-            try {
-                const videoId = new URL(url).searchParams.get('v');
-                if (videoId) return `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
-            } catch(e) { console.error("Invalid YouTube URL:", url); }
-            return '';
+            const videoId = youtubeId(url);
+            if (!videoId) { console.error("Invalid YouTube URL:", url); return ''; }
+            return `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${encodeURIComponent(videoId)}" title="Video" loading="lazy" frameborder="0" allowfullscreen></iframe></div>`;
         }).join('');
-        const youtubeTitle = about.YoutubeSection_Title || 'Learn More';
-        youtubeSection.innerHTML = `<h2>${youtubeTitle}</h2><div id="youtube-videos-container">${videosHtml}</div>`;
-    } else if(youtubeSection) {
+        if (videosHtml) {
+            youtubeSection.innerHTML = `<h2>${esc(about.YoutubeSection_Title || 'Learn More')}</h2><div id="youtube-videos-container">${videosHtml}</div>`;
+        } else {
+            youtubeSection.style.display = 'none';
+        }
+    } else if (youtubeSection) {
         youtubeSection.style.display = 'none';
     }
 
     const testimoniesContainer = document.getElementById('testimonies-container');
-    if (testimonies && testimonies.length > 0) {
+    if (testimoniesContainer && testimonies && testimonies.length > 0) {
         testimoniesContainer.innerHTML = testimonies.map(t => {
             let stars = '';
             const rating = Number(t.Rating) || 5;
             for (let i = 0; i < 5; i++) { stars += `<i class="fa-solid fa-star" style="color: ${i < rating ? 'var(--secondary-color)' : '#ccc'}"></i>`; }
-            return `<div class="testimony-card"><div class="testimony-header"><h4>${t.ClientName || 'Valued Customer'}</h4><div class="testimony-rating">${stars}</div></div><p>"${t.Quote || ''}"</p></div>`;
+            return `<div class="testimony-card"><div class="testimony-header"><h4>${esc(t.ClientName || 'Valued Customer')}</h4><div class="testimony-rating">${stars}</div></div><p>"${esc(t.Quote)}"</p></div>`;
         }).join('');
-    } else if (testimoniesContainer) {
+    } else {
         const homeTestimonies = document.getElementById('homepage-testimonies');
         if (homeTestimonies) homeTestimonies.style.display = 'none';
     }
@@ -199,8 +790,8 @@ function renderHomepageContent(about, jobs, testimonies) {
     const featuredJobsContainer = document.getElementById('featured-jobs-container');
     const featuredJobs = jobs ? jobs.filter(j => j.isFeatured) : [];
     if (featuredJobsContainer && featuredJobs.length > 0) {
-        featuredJobsContainer.innerHTML = featuredJobs.map(job => `<div class="job-listing-summary"><h4>${job.position}</h4><p>${job.location} | ${job.type}</p></div>`).join('');
-    } else if (featuredJobsContainer) {
+        featuredJobsContainer.innerHTML = featuredJobs.map(job => `<div class="job-listing-summary"><h4>${esc(job.position)}</h4><p>${esc(job.location)} | ${esc(job.type)}</p></div>`).join('');
+    } else {
         const homeJobs = document.getElementById('homepage-featured-jobs');
         if (homeJobs) homeJobs.style.display = 'none';
     }
@@ -210,21 +801,21 @@ function renderProducts(productsToRender, tagText) {
     const container = document.getElementById('product-list-container');
     if (!container) return;
     if (!productsToRender || productsToRender.length === 0) { container.innerHTML = `<p>No products available.</p>`; return; }
-    
-    const tagHtml = tagText ? `<div class="product-tag">${tagText}</div>` : '';
+
+    const tagHtml = tagText ? `<div class="product-tag">${esc(tagText)}</div>` : '';
 
     container.innerHTML = `<div class="product-list">${productsToRender.map(p => {
         const displayPrice = Number(p.price || 0).toFixed(2);
         return `
         <div class="product" style="position: relative;">
             ${tagHtml}
-            <div class="product-image-container"><img src="${p.image || ''}" alt="${p.name || ''}" onerror="this.src='https://via.placeholder.com/250?text=Forever+Living'"></div>
+            <div class="product-image-container"><img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG"></div>
             <div class="product-info">
-                <h3>${p.name}</h3>
+                <h3>${esc(p.name)}</h3>
                 <div class="price-section"><span class="new-price">RM ${displayPrice}</span></div>
-                <div class="product-benefits"><strong>Benefits:</strong> ${p.benefits || ''}</div>
-                <div class="product-consumption"><strong>Usage:</strong> ${p.consumption || ''}</div>
-                <div class="product-actions"><button class="btn btn-primary" onclick="addToCart('${p.id}')">Add to Cart</button></div>
+                <div class="product-benefits"><strong>Benefits:</strong> ${esc(p.benefits)}</div>
+                <div class="product-consumption"><strong>Usage:</strong> ${esc(p.consumption)}</div>
+                <div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${jsArg(p.id)})">Add to Cart</button></div>
             </div>
         </div>`;
     }).join('')}</div>`;
@@ -234,23 +825,23 @@ function renderAboutUs(content) {
     const container = document.getElementById('about-us-content');
     if (!container) return;
     if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
-    const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${content.History}</p></div>` : '';
+    const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${esc(content.History)}</p></div>` : '';
     container.innerHTML = `
-        <h2>About ${content.CompanyName || 'Us'}</h2>
+        <h2>About ${esc(content.CompanyName || 'Us')}</h2>
         <div class="owner-profile">
-            <img src="arvind.jpg" alt="${content.Owner || 'Owner'}" class="owner-image" onerror="this.style.display='none'">
+            <img src="arvind.jpg" alt="${esc(content.Owner || 'Owner')}" class="owner-image" onerror="this.style.display='none'">
             <div class="owner-details">
-                <h3>${content.Owner || ''} - ${content.Role || ''}</h3>
+                <h3>${esc(content.Owner)} - ${esc(content.Role)}</h3>
                 <div>${content.MoreDetails || ''}</div>
             </div>
         </div>
         <div class="about-section">
             <h4>Our Mission</h4>
-            <p>${content.OurMission || ''}</p>
+            <p>${esc(content.OurMission)}</p>
         </div>
         <div class="about-section">
             <h4>Our Vision</h4>
-            <p>${content.OurVision || ''}</p>
+            <p>${esc(content.OurVision)}</p>
         </div>
         ${historySection}`;
 }
@@ -261,16 +852,16 @@ function renderJobs(jobs) {
     if (!jobs || jobs.length === 0) { container.innerHTML = '<p>There are currently no open positions.</p>'; return; }
     container.innerHTML = jobs.map(job => `
         <div class="job-card">
-            <div class="job-header"><h3>${job.position || ''}</h3></div>
+            <div class="job-header"><h3>${esc(job.position)}</h3></div>
             <div class="job-body">
                 <div class="job-details">
-                    <div class="job-detail-item"><i class="fa-solid fa-location-dot"></i> <span>${job.location || ''} | ${job.type || ''}</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-money-bill-wave"></i> <span>${job.salary || '0'} RM</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-house-user"></i> <span>${job.accommodation || ''}</span></div>
-                    <div class="job-detail-item"><i class="fa-solid fa-calendar-days"></i> <span>${job.workDayPattern || ''}</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-location-dot"></i> <span>${esc(job.location)} | ${esc(job.type)}</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-money-bill-wave"></i> <span>${esc(job.salary || '0')} RM</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-house-user"></i> <span>${esc(job.accommodation)}</span></div>
+                    <div class="job-detail-item"><i class="fa-solid fa-calendar-days"></i> <span>${esc(job.workDayPattern)}</span></div>
                 </div>
                 <div class="job-description">${job.description || ''}</div>
-                <button class="btn btn-primary" onclick="toggleJobModal(true, '${job.jobId || ''}', '${job.position || ''}')">Apply Now</button>
+                <button class="btn btn-primary" onclick="toggleJobModal(true, ${jsArg(job.jobId)}, ${jsArg(job.position)})">Apply Now</button>
             </div>
         </div>`).join('');
 }
@@ -285,13 +876,14 @@ function buildCartModal() {
     const container = document.getElementById('cart-modal');
     if (!container) return;
     container.style.cssText = "display:none; position:fixed; z-index:999999; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); justify-content:center; align-items:center; padding:12px; box-sizing:border-box;";
+    container.onclick = e => { if (e.target === container) toggleCart(true); };
     container.innerHTML = `
         <div class="modal-content" style="background:#fff !important; width:100% !important; max-width:460px !important; max-height:86vh !important; display:flex !important; flex-direction:column !important; border-radius:12px !important; overflow:hidden !important; box-shadow:0 15px 35px rgba(0,0,0,0.3) !important;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #e2e8f0; background:#f8fafc;">
                 <h2 style="margin:0; font-size:1.15rem; color:#113626; font-weight:700;">Your Cart</h2>
-                <button type="button" onclick="toggleCart(true)" style="background:none; border:none; font-size:1.6rem; line-height:1; color:#64748b; cursor:pointer;">&times;</button>
+                <button type="button" aria-label="Close cart" onclick="toggleCart(true)" style="background:none; border:none; font-size:1.6rem; line-height:1; color:#64748b; cursor:pointer;">&times;</button>
             </div>
-            
+
             <div style="overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; padding:14px 18px; flex:1 1 auto;">
                 <div id="cart-items" style="display:flex; flex-direction:column; gap:10px; margin-bottom:12px;"><p style="text-align:center; padding:15px 0;">Your cart is empty.</p></div>
                 <div id="cart-checkout-area">
@@ -310,9 +902,9 @@ function buildCartModal() {
                     </div>
                 </div>
             </div>
-            
+
             <div style="padding:12px 18px 14px; background:#f8fafc; border-top:1px solid #e2e8f0; flex-shrink:0;">
-                <button type="button" onclick="initiateCheckout()" style="width:100%; padding:10px; font-size:0.95rem; font-weight:700; background:#113626; color:#ffffff; border:none; border-radius:6px; cursor:pointer;">Complete Order</button>
+                <button type="button" id="checkout-btn" onclick="initiateCheckout()" style="width:100%; padding:10px; font-size:0.95rem; font-weight:700; background:#113626; color:#ffffff; border:none; border-radius:6px; cursor:pointer;">Complete Order</button>
             </div>
         </div>`;
 }
@@ -333,6 +925,13 @@ function buildChatbotWidget() {
     const container = document.getElementById('eshop-chat-widget');
     if (!container) return;
     container.innerHTML = `<div id="chat-header"><span>FL e-Shop Assistant</span><button id="close-chat-btn" onclick="toggleChatWidget(false)">&times;</button></div><div id="chat-body"></div><div id="chat-input-container"><input type="text" id="chat-input" placeholder="Type your message..."><button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button></div>`;
+
+    // FIX: these elements only exist after this function runs, so the listeners
+    // must be attached here (they were previously attached before the elements existed).
+    const chatSend = document.getElementById('chat-send-btn');
+    if (chatSend) chatSend.addEventListener('click', handleChatSubmit);
+    const chatInput = document.getElementById('chat-input');
+    if (chatInput) chatInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') handleChatSubmit(); });
 }
 
 // ===========================================================
@@ -342,65 +941,68 @@ function addToCart(productId) {
     const product = products.find(p => String(p.id) === String(productId));
     if (!product) return;
     const existingItem = cart.find(item => String(item.id) === String(productId));
-    if (existingItem) { 
-        existingItem.quantity++; 
-    } else { 
-        cart.push({ ...product, quantity: 1 }); 
+    if (existingItem) {
+        existingItem.quantity++;
+    } else {
+        cart.push({ ...product, quantity: 1 });
     }
     updateCartDisplay();
 }
 
-function increaseQuantity(productId) { 
-    const item = cart.find(i => String(i.id) === String(productId)); 
-    if (item) { item.quantity++; } 
-    updateCartDisplay(); 
+function increaseQuantity(productId) {
+    const item = cart.find(i => String(i.id) === String(productId));
+    if (item) { item.quantity++; }
+    updateCartDisplay();
 }
 
-function decreaseQuantity(productId) { 
-    const item = cart.find(i => String(i.id) === String(productId)); 
-    if (item) { 
-        item.quantity--; 
-        if (item.quantity <= 0) { removeItemFromCart(productId); } 
-        else { updateCartDisplay(); } 
-    } 
+function decreaseQuantity(productId) {
+    const item = cart.find(i => String(i.id) === String(productId));
+    if (item) {
+        item.quantity--;
+        if (item.quantity <= 0) { removeItemFromCart(productId); }
+        else { updateCartDisplay(); }
+    }
 }
 
-function removeItemFromCart(productId) { 
-    cart = cart.filter(item => String(item.id) !== String(productId)); 
-    updateCartDisplay(); 
+function removeItemFromCart(productId) {
+    cart = cart.filter(item => String(item.id) !== String(productId));
+    updateCartDisplay();
 }
 
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
     const checkoutArea = document.getElementById('cart-checkout-area');
+    const checkoutBtn = document.getElementById('checkout-btn');
     const cartCountElem = document.getElementById('cart-count');
     const totalItems = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
-    
+
     if (cartCountElem) cartCountElem.textContent = totalItems;
     if (!cartItemsContainer) return;
-    
+
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p style="text-align:center; padding: 20px 0;">Your cart is empty.</p>';
         if (checkoutArea) checkoutArea.style.display = 'none';
+        if (checkoutBtn) checkoutBtn.style.display = 'none';
         return;
     }
-    
+
     if (checkoutArea) checkoutArea.style.display = 'block';
+    if (checkoutBtn) checkoutBtn.style.display = 'block';
     cartItemsContainer.innerHTML = cart.map(item => `
         <div class="cart-item">
-            <img src="${item.image || ''}" alt="${item.name || ''}" class="cart-item-image" onerror="this.src='https://via.placeholder.com/80?text=FL'"/>
+            <img src="${esc(item.image)}" alt="${esc(item.name)}" class="cart-item-image" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG"/>
             <div class="cart-item-details">
-                <strong>${item.name}</strong>
+                <strong>${esc(item.name)}</strong>
                 <div class="quantity-controls">
-                    <button class="quantity-btn" onclick="decreaseQuantity('${item.id}')">-</button>
+                    <button class="quantity-btn" onclick="decreaseQuantity(${jsArg(item.id)})">-</button>
                     <span>${item.quantity}</span>
-                    <button class="quantity-btn" onclick="increaseQuantity('${item.id}')">+</button>
+                    <button class="quantity-btn" onclick="increaseQuantity(${jsArg(item.id)})">+</button>
                 </div>
             </div>
             <strong>RM ${(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}</strong>
-            <button class="remove-item-btn" onclick="removeItemFromCart('${item.id}')"><i class="fa-solid fa-trash-can"></i></button>
+            <button class="remove-item-btn" aria-label="Remove item" onclick="removeItemFromCart(${jsArg(item.id)})"><i class="fa-solid fa-trash-can"></i></button>
         </div>`).join('');
-        
+
     const subtotal = cart.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.quantity || 1)), 0);
     const subtotalElem = document.getElementById('cart-subtotal');
     const totalElem = document.getElementById('cart-total');
@@ -416,11 +1018,11 @@ function toggleCart(hide = false) {
 }
 
 async function initiateCheckout() {
-    const checkoutBtn = document.querySelector('#cart-checkout-area button');
-    if (checkoutBtn) {
-        checkoutBtn.disabled = true;
-        checkoutBtn.textContent = 'Processing...';
-    }
+    // FIX: the button lives outside #cart-checkout-area, so the old selector never found it
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const resetBtn = () => { if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.textContent = 'Complete Order'; } };
+
+    if (cart.length === 0) { alert('Your cart is empty.'); return; }
 
     const name = document.getElementById('customer-name')?.value.trim();
     const phone = document.getElementById('customer-phone')?.value.trim();
@@ -429,17 +1031,14 @@ async function initiateCheckout() {
 
     if (!name || !phone || !address) {
         alert('Please fill in all required customer details: Name, Phone, and Address.');
-        if (checkoutBtn) {
-            checkoutBtn.disabled = false;
-            checkoutBtn.textContent = 'Complete Order';
-        }
         return;
     }
 
-    const subtotal = cart.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.quantity || 1)), 0);
-    const shippingFee = 0.0; 
-    const totalAmount = subtotal + shippingFee;
+    if (checkoutBtn) { checkoutBtn.disabled = true; checkoutBtn.textContent = 'Processing...'; }
 
+    const subtotal = cart.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.quantity || 1)), 0);
+    const shippingFee = 0.0;
+    const totalAmount = subtotal + shippingFee;
     const itemsPurchased = cart.map(item => `${item.id}x${item.quantity}`).join(', ');
 
     const payload = {
@@ -450,29 +1049,25 @@ async function initiateCheckout() {
             customerEmail: email,
             customerAddress: address,
             itemsPurchased: itemsPurchased,
-            cart: cart, 
+            cart: cart,
             totalAmount: totalAmount,
             shippingFee: shippingFee,
-            totalPointsForThisPurchase: 0 
+            totalPointsForThisPurchase: 0
         }
     };
 
     try {
-        await postDataToGScript(payload);
-        alert('Your order has been placed successfully! We will contact you via WhatsApp shortly to confirm payment and shipping.');
-        
-        cart = []; 
-        toggleCart(true); 
-        updateCartDisplay(); 
-
+        const result = await postDataToGScript(payload);
+        const ref = result && result.invoiceId ? ` Your order reference is ${result.invoiceId}.` : '';
+        alert('Your order has been placed successfully!' + ref + ' We will contact you via WhatsApp shortly to confirm payment and shipping.');
+        cart = [];
+        toggleCart(true);
+        updateCartDisplay();
     } catch (error) {
         console.error('Checkout failed:', error);
         alert('There was an error placing your order. Please try again or contact us directly.');
     } finally {
-        if (checkoutBtn) {
-            checkoutBtn.disabled = false;
-            checkoutBtn.textContent = 'Complete Order';
-        }
+        resetBtn();
     }
 }
 
@@ -507,7 +1102,8 @@ async function handleEnquirySubmit(event) {
         if (statusEl) statusEl.textContent = 'Enquiry sent successfully!';
         event.target.reset();
     } catch (error) {
-        if (statusEl) statusEl.textContent = 'An error occurred.';
+        console.error('Enquiry failed:', error);
+        if (statusEl) statusEl.textContent = 'An error occurred. Please try again.';
     }
 }
 
@@ -515,13 +1111,17 @@ async function handleJobApplicationSubmit(event) {
     event.preventDefault();
     const statusEl = document.getElementById('job-application-status');
     const fileInput = document.getElementById('applicant-resume');
-    if (fileInput && fileInput.files.length === 0) {
+    if (!fileInput || fileInput.files.length === 0) {
         if (statusEl) statusEl.textContent = 'Resume upload is mandatory.';
         return;
     }
     if (statusEl) statusEl.textContent = 'Submitting...';
     try {
         const file = fileInput.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+            if (statusEl) statusEl.textContent = 'Resume must be under 5 MB.';
+            return;
+        }
         const base64File = await getBase64(file);
         const payload = {
             action: 'logJobApplication',
@@ -542,7 +1142,8 @@ async function handleJobApplicationSubmit(event) {
         if (statusEl) statusEl.textContent = 'Application submitted successfully!';
         setTimeout(() => { toggleJobModal(false); }, 3000);
     } catch (error) {
-        if (statusEl) statusEl.textContent = 'An error occurred.';
+        console.error('Job application failed:', error);
+        if (statusEl) statusEl.textContent = 'An error occurred. Please try again.';
     }
 }
 
@@ -601,12 +1202,18 @@ async function handleChatSubmit() {
     input.value = '';
     const thinkingMsg = addChatMessage('bot', '<i>Thinking...</i>', 'html');
 
-    if (chatSession.state === 'awaiting_identifier') { await startVerification(text); }
-    else if (chatSession.state === 'awaiting_code') { await submitVerificationCode(text); }
-    else if (chatSession.state === 'my_account_menu') { await handleMyAccountMenu(text); }
-    else { await handleMainMenu(text); }
-
-    if (thinkingMsg) thinkingMsg.remove();
+    try {
+        if (chatSession.state === 'awaiting_identifier') { await startVerification(text); }
+        else if (chatSession.state === 'awaiting_code') { await submitVerificationCode(text); }
+        else if (chatSession.state === 'my_account_menu') { await handleMyAccountMenu(text); }
+        else { await handleMainMenu(text); }
+    } catch (error) {
+        // FIX: network/server errors used to leave "Thinking..." on screen forever
+        console.error('Chat error:', error);
+        addChatMessage('bot', 'Sorry, something went wrong. Please try again in a moment.');
+    } finally {
+        if (thinkingMsg) thinkingMsg.remove();
+    }
 }
 
 async function handleMainMenu(text) {
@@ -618,7 +1225,7 @@ async function handleMainMenu(text) {
             addChatMessage('bot', 'Enter your PAC or Email to verify.');
         }
     } else if (text === '2') {
-        addChatMessage('bot', '<a href="https://wa.me/601111033154" target="_blank">Contact Admin</a>', 'html');
+        addChatMessage('bot', '<a href="https://wa.me/601111033154" target="_blank" rel="noopener">Contact Admin</a>', 'html');
     } else {
         const response = await postToRender('getSmartAnswer', { question: text });
         addChatMessage('bot', response.answer || 'Sorry, I had trouble finding an answer.');
@@ -663,14 +1270,14 @@ async function handleMyAccountMenu(text) {
 
     const token = sessionStorage.getItem('eshop_session_token');
     const result = await postToRender(action, { token: token });
-    if(result.success) {
-        if(action === 'getPurchaseHistory') {
+    if (result.success) {
+        if (action === 'getPurchaseHistory') {
             let historyText = "<strong>Your Last 5 Orders:</strong><br>";
             if (!result.history || result.history.length === 0) { historyText = 'You have no purchase history.'; }
-            else { result.history.forEach(order => { historyText += `<br><strong>ID:</strong> ${order.invoiceId}<br><strong>Date:</strong> ${order.date}<br><strong>Total:</strong> RM ${order.totalAmount}<br><strong>Status:</strong> ${order.status}`; }); }
+            else { result.history.forEach(order => { historyText += `<br><strong>ID:</strong> ${esc(order.invoiceId)}<br><strong>Date:</strong> ${esc(order.date)}<br><strong>Total:</strong> RM ${esc(order.totalAmount)}<br><strong>Status:</strong> ${esc(order.status)}<br>`; }); }
             addChatMessage('bot', historyText, 'html');
         } else {
-            addChatMessage('bot', `Your total points: <strong>${result.currentBalance}</strong>`, 'html');
+            addChatMessage('bot', `Your total points: <strong>${esc(result.currentBalance)}</strong>`, 'html');
         }
     } else {
         addChatMessage('bot', `Error: ${result.message}`);
@@ -686,72 +1293,49 @@ function showTab(tabId) {
     if (target) target.classList.add('active');
 }
 
+// FIX: the old "no-cors" request could never read the server's reply, so the shop showed
+// "order placed" even when the backend rejected the order. A text/plain POST needs no
+// CORS pre-flight with Apps Script and lets us read the real result.
 async function postDataToGScript(payload) {
-    try {
-        await fetch(googleScriptURL, { method: 'POST', mode: 'no-cors', cache: 'no-cache', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), redirect: 'follow' });
-        return { status: 'success' };
-    } catch (error) {
-        console.error('Error posting to Google Script:', error);
-        throw error;
+    const response = await fetch(googleScriptURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        redirect: 'follow'
+    });
+    if (!response.ok) throw new Error('Server responded with ' + response.status);
+    const result = await response.json();
+    if (result.status === 'error' || result.success === false) {
+        throw new Error(result.message || 'Request was rejected by the server.');
     }
+    return result;
 }
 
 async function postToRender(action, data) {
-    try {
-        const response = await fetch(botServerURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, apiKey, data })
-        });
-        if (!response.ok) {
-            const err = await response.json();
-            throw new Error(err.message || 'Server error');
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('Error posting to Render:', error);
-        throw error;
+    const response = await fetch(botServerURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, apiKey, data })
+    });
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'Server error');
     }
+    return await response.json();
 }
 
 // ===========================================================
 // [ 8.0 ] THEME, MARKETING & LOGIN MODAL LOGIC
 // ===========================================================
 function applyTheme(theme) {
-    if (!theme) return;
-    const root = document.documentElement;
-
-    const themes = {
-        'Christmas': { primary: '#d90429', secondary: '#FFD700', accent: '#004B23' },
-        'HariRaya': { primary: '#006400', secondary: '#f0e68c', accent: '#27ae60' },
-        'CNY': { primary: '#E00000', secondary: '#FFD700', accent: '#C04000' },
-        'Thaipusam': { primary: '#FF9933', secondary: '#4B0082', accent: '#F0E68C' },
-        'NationalDay': { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
-        'MalaysiaDay': { primary: '#000066', secondary: '#FFCC00', accent: '#CC0000' },
-        'MooncakeFestival': { primary: '#C04000', secondary: '#FFD700', accent: '#E00000' },
-        'Deepavali': { primary: '#FF8C00', secondary: '#FF00FF', accent: '#FFD700' },
-        'NewYear': { primary: '#111111', secondary: '#FFD700', accent: '#C0C0C0' },
-        'Valentines': { primary: '#D70040', secondary: '#FFC0CB', accent: '#C71585' },
-        'GrandOpening': { primary: '#1a5276', secondary: '#f39c12', accent: '#27ae60' }
-    };
-
-    const colors = themes[theme.ThemeName];
-    if (colors) {
-        root.style.setProperty('--primary-color', colors.primary);
-        root.style.setProperty('--secondary-color', colors.secondary);
-        root.style.setProperty('--accent-color', colors.accent);
-    }
-    
-    if (theme.ThemeName === 'Christmas' && typeof startSnowing === 'function') {
-        startSnowing();
-    }
+    FestivalFX.init(theme || null);
 }
 
 function applyMarketing(marketing, theme) {
     const banner = document.getElementById('promo-running-banner');
     if (!banner) return;
-    let bannerText = marketing.BannerText || (theme ? theme.WelcomeMessage : null);
-    
+    const bannerText = marketing.BannerText || (theme ? theme.WelcomeMessage : null);
+
     if (bannerText) {
         const textElem = document.getElementById('promo-banner-text');
         if (textElem) textElem.textContent = bannerText;
@@ -772,22 +1356,22 @@ function buildPopupModal(message, imageUrl) {
     if (imageUrl) {
         modalHTML = `
         <div class="modal-content" style="max-width: 500px; padding: 0;">
-             <button class="close" style="position: absolute; top: 10px; right: 20px; font-size: 30px; background: white; border-radius: 50%; width: 40px; height: 40px; opacity: 0.8;" onclick="togglePopup(true)">&times;</button>
-             <img src="${imageUrl}" style="width: 100%; border-radius: var(--border-radius);" onerror="this.parentElement.style.display='none'">
+             <button class="close" aria-label="Close" style="position: absolute; top: 10px; right: 20px; font-size: 30px; background: white; border-radius: 50%; width: 40px; height: 40px; opacity: 0.8;" onclick="togglePopup(true)">&times;</button>
+             <img src="${esc(imageUrl)}" style="width: 100%; border-radius: var(--border-radius);" onerror="this.parentElement.style.display='none'">
         </div>`;
     } else {
         modalHTML = `
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
                 <h2>Welcome!</h2>
-                <button class="close" onclick="togglePopup(true)">&times;</button>
+                <button class="close" aria-label="Close" onclick="togglePopup(true)">&times;</button>
             </div>
             <div class="modal-body" style="padding: 30px; font-size: 1.1rem; text-align: center;">
-                ${message}
+                ${esc(message)}
             </div>
         </div>`;
     }
-    
+
     container.innerHTML = modalHTML;
     togglePopup(false);
     sessionStorage.setItem('eshopPopupShown', 'true');
@@ -801,33 +1385,4 @@ function togglePopup(hide = false) {
 function toggleLoginModal(show) {
     const modal = document.getElementById('login-modal');
     if (modal) modal.style.display = show ? 'flex' : 'none';
-}
-
-function calculateMonthlySales() {
-    const orders = JSON.parse(localStorage.getItem('orders_DATA')) || [];
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    
-    let totalSales = 0;
-    let count = 0;
-
-    orders.forEach(order => {
-        const orderDate = new Date(order.timestamp || order.date);
-        if (orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear) {
-            let orderAmount = parseFloat(order.total);
-            if (!isNaN(orderAmount)) {
-                totalSales += orderAmount;
-                count++;
-            }
-        }
-    });
-
-    const salesDisplay = document.getElementById('monthly-sales');
-    const countDisplay = document.getElementById('monthly-orders-count');
-    
-    if (salesDisplay) salesDisplay.innerText = 'RM ' + totalSales.toFixed(2);
-    if (countDisplay) countDisplay.innerText = count;
-    
-    return totalSales;
 }
