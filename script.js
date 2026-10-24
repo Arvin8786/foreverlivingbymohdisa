@@ -1,5 +1,5 @@
 // =================================================================
-// E-Shop Frontend Script - v29.0 (FESTIVAL ENGINE)
+// E-Shop Frontend Script - v30.0 (FESTIVAL ENGINE + PRODUCT PAGES)
 // Features: Festival themes (live backgrounds, graphics, moving animations),
 //           robust price parsing, marketing, cart, chatbot
 // Preview any theme without waiting for its dates:  yoursite.com/?festival=Christmas
@@ -8,7 +8,7 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbyF2KL0ZMZRmoIr5Y66GqsBlIMR1T2wQaqrjxG9nHfe-Ofdnn4XdzBmcdusAiLuY7i5ZQ/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzTTneDgYSmXuPsIl3zIf-POU5n36vC3alU35185l_ryz85SwbSK3CMel3gRECcNZn7SA/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 // SECURITY NOTE: anything in this file is public. Treat this key as non-secret and
 // make sure the bot server does not rely on it alone for sensitive actions.
@@ -165,13 +165,97 @@ const FESTIVAL_MATCHERS = [
     ['NewYear', /newyear/]
 ];
 
+// Scene data per theme: people/characters that parade along the bottom of the screen,
+// props that stand along the ground, ornaments hung on product cards, and the colours
+// that the string lights cycle through. (Lights must be 6-digit hex colours.)
+const FESTIVAL_SCENES = {
+    Christmas: {
+        walkers: ['🎅', '🤶', '🧑‍🎄', '🧒', '👧', '⛄', '🦌', '👨‍👩‍👧', '🐧'],
+        props: ['🎄', '⛄', '🎁', '🎄', '🔔', '🎁', '🎄'],
+        orn: ['🎄', '🎁', '⭐', '🔔', '🍬'], ribbon: 'Christmas Special',
+        ground: 'rgba(255,255,255,.75)', lights: ['#ff3b3b', '#ffd700', '#2ecc71', '#ffffff', '#4da6ff']
+    },
+    HariRaya: {
+        walkers: ['🧕', '👨‍👩‍👧', '🧒', '👧', '👦', '🧑', '🚶‍♀️'],
+        props: ['🕌', '🌙', '🏮', '🕌', '⭐', '🏮', '🌙'],
+        orn: ['🌙', '⭐', '🏮', '🕌'], ribbon: 'Raya Special',
+        ground: 'rgba(39,174,96,.28)', lights: ['#27ae60', '#f1c40f', '#ffffff', '#1abc9c', '#f39c12']
+    },
+    CNY: {
+        walkers: ['🦁', '🐉', '🧧', '👦', '👧', '🧒', '👨‍👩‍👧', '🏮'],
+        props: ['🏮', '🧧', '🏮', '🎋', '🍊', '🏮', '🧧'],
+        orn: ['🧧', '🏮', '🍊', '🪙', '🐉'], ribbon: 'CNY Special',
+        ground: 'rgba(224,0,0,.25)', lights: ['#ff2a2a', '#ffd700', '#ff8c00', '#ff2a2a', '#ffb300']
+    },
+    Thaipusam: {
+        walkers: ['🧑', '👧', '🧒', '🙏', '👨‍👩‍👧'],
+        props: ['🔱', '🪔', '🌼', '🌺', '🪔', '🌼'],
+        orn: ['🌼', '🔱', '🪔', '🌺'], ribbon: 'Thaipusam',
+        ground: 'rgba(255,153,51,.28)', lights: ['#ff9933', '#8e44ad', '#ffd700', '#e67e22']
+    },
+    NationalDay: {
+        walkers: ['🧒', '👧', '👦', '🚶‍♂️', '👨‍👩‍👧', '🚴', '🏃'],
+        props: ['🎆', '🌺', '🎈', '⭐', '🌺', '🎇', '🎈'],
+        orn: ['🎆', '🌺', '🎈', '⭐'], ribbon: 'Merdeka Special',
+        ground: 'rgba(0,0,102,.22)', lights: ['#e02424', '#ffd700', '#2a3cff', '#ffffff', '#e02424']
+    },
+    MalaysiaDay: {
+        walkers: ['🧒', '👧', '👦', '🚶‍♂️', '👨‍👩‍👧', '🚴', '🏃'],
+        props: ['🌺', '🎆', '🎈', '⭐', '🎇', '🌺', '🎈'],
+        orn: ['🌺', '🎆', '🎈', '⭐'], ribbon: 'Malaysia Day',
+        ground: 'rgba(0,0,102,.22)', lights: ['#e02424', '#ffd700', '#2a3cff', '#ffffff']
+    },
+    MooncakeFestival: {
+        walkers: ['🧒', '👧', '🐇', '👨‍👩‍👧', '👦', '🏮'],
+        props: ['🏮', '🥮', '🌕', '🏮', '🍵', '🥮', '🏮'],
+        orn: ['🥮', '🌕', '🏮', '🐇'], ribbon: 'Mid-Autumn',
+        ground: 'rgba(192,64,0,.25)', lights: ['#ffb300', '#ff7043', '#ffd700', '#ff8f00', '#ffe082']
+    },
+    Deepavali: {
+        walkers: ['💃', '🕺', '🧒', '👧', '👨‍👩‍👧‍👦', '🧑', '🪔'],
+        props: ['🪔', '🪔', '🎆', '🌼', '🪔', '🏮', '🪔'],
+        orn: ['🪔', '🌼', '✨', '🎇'], ribbon: 'Deepavali Special',
+        ground: 'rgba(255,140,0,.28)', lights: ['#ff8c00', '#ff2db4', '#ffd700', '#ff5722', '#a855f7']
+    },
+    NewYear: {
+        walkers: ['🥳', '💃', '🕺', '🧒', '👯', '🧑‍🤝‍🧑'],
+        props: ['🎆', '🥂', '🎉', '🎇', '🍾', '🎆', '🎉'],
+        orn: ['🎉', '🥂', '✨', '🎆', '🍾'], ribbon: 'New Year',
+        ground: 'rgba(255,215,0,.25)', lights: ['#ffd700', '#c0c0c0', '#ff5e5e', '#5ec8ff', '#b388ff']
+    },
+    Valentines: {
+        walkers: ['💑', '👫', '💃', '🕺', '🌹'],
+        props: ['🌹', '💖', '💌', '🌹', '💕', '🎀', '💖'],
+        orn: ['💖', '🌹', '💌', '💕'], ribbon: "Valentine's",
+        ground: 'rgba(215,0,64,.2)', lights: ['#ff2d6f', '#ff8fb1', '#d70040', '#ffc0cb']
+    },
+    GrandOpening: {
+        walkers: ['🥳', '💃', '🕺', '👏', '🧑‍💼', '🧒'],
+        props: ['🎊', '🎈', '🎉', '🎈', '🎊', '⭐', '🎈'],
+        orn: ['🎊', '🎈', '⭐', '🎉'], ribbon: 'Grand Opening',
+        ground: 'rgba(243,156,18,.25)', lights: ['#1a8cd8', '#f39c12', '#27ae60', '#e74c3c', '#9b59b6']
+    },
+    Vesak: {
+        walkers: ['🧘', '🙏', '🧒', '👧', '🧑', '🚶'],
+        props: ['🪷', '🏮', '🪷', '🕊️', '🏮', '🪷'],
+        orn: ['🪷', '🏮', '✨'], ribbon: 'Vesak Day',
+        ground: 'rgba(184,134,11,.22)', lights: ['#ffd54f', '#ffb300', '#ce93d8', '#fff59d']
+    },
+    Default: {
+        walkers: ['🥳', '🧒', '👧', '💃', '🕺'],
+        props: ['🎉', '🎈', '🎊', '🎈', '🎉'],
+        orn: ['🎉', '🎈', '⭐'], ribbon: 'Special Offer',
+        ground: 'rgba(0,0,0,.12)', lights: ['#f39c12', '#27ae60', '#e74c3c', '#3498db']
+    }
+};
+
 const FestivalFX = (() => {
     const STORE_KEY = 'fl_fx_enabled';
     const S = {
-        key: null, cfg: null, info: null, enabled: true, running: false,
+        key: null, cfg: null, scene: null, info: null, enabled: true, running: false,
         canvas: null, ctx: null, w: 0, h: 0, dpr: 1, t: 0, last: 0, raf: 0,
-        particles: [], rockets: [], sparks: [], sprites: new Map(), nextFirework: 2,
-        travelerEl: null, garlandEl: null, toggleEl: null,
+        particles: [], rockets: [], sparks: [], glows: [], stars: [], sprites: new Map(), nextFirework: 2,
+        travelerEl: null, garlandEl: null, paradeEl: null, toggleEl: null,
         travelTimer: 0, paletteTimer: 0, paletteIdx: 0, resizeTimer: 0, bound: false
     };
 
@@ -209,16 +293,40 @@ body.fl-on {
     background-attachment: fixed !important;
     animation: flBgDrift 32s ease-in-out infinite;
     transition: --fl-c1 3s ease, --fl-c2 3s ease, --fl-c3 3s ease;
+    padding-bottom: 64px;
 }
 @keyframes flBgDrift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
 #fl-fx-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 55; pointer-events: none; display: none; }
 
-#fl-garland { position: fixed; top: 0; left: 0; right: 0; height: 26px; z-index: 58; pointer-events: none; overflow: hidden; display: none; }
-#fl-garland .fl-wire { position: absolute; top: 2px; left: 0; right: 0; height: 2px; background: rgba(0,0,0,.35); }
-#fl-garland b { position: absolute; top: 4px; width: 10px; height: 14px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    background: var(--c); box-shadow: 0 0 10px 2px var(--c); animation: flTwinkle 1.6s ease-in-out infinite alternate; }
-@keyframes flTwinkle { from { opacity: .4; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
+/* colour-changing string lights */
+#fl-garland { position: fixed; top: 0; left: 0; right: 0; height: 46px; z-index: 58; pointer-events: none; overflow: hidden; display: none; }
+#fl-garland svg { position: absolute; top: 0; left: 0; }
+#fl-garland b { position: absolute; width: 10px; height: 15px; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    background: var(--b1); box-shadow: 0 0 12px 3px var(--b1);
+    animation: flBulb 4.2s linear infinite, flPulse 1.7s ease-in-out infinite alternate; }
+#fl-garland b::before { content: ''; position: absolute; left: 2px; top: -4px; width: 6px; height: 5px; background: #3b3b3b; border-radius: 1px; }
+@keyframes flBulb {
+    0%, 100% { background: var(--b1); box-shadow: 0 0 12px 3px var(--b1); }
+    33% { background: var(--b2); box-shadow: 0 0 12px 3px var(--b2); }
+    66% { background: var(--b3); box-shadow: 0 0 12px 3px var(--b3); }
+}
+@keyframes flPulse { from { opacity: .55; transform: scale(.92); } to { opacity: 1; transform: scale(1.04); } }
+
+/* bottom parade: stays fixed to the bottom of the screen while the page scrolls */
+#fl-parade { position: fixed; left: 0; right: 0; bottom: 0; height: 84px; z-index: 54; pointer-events: none; overflow: hidden; display: none; }
+#fl-parade::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 38px; background: linear-gradient(to top, var(--fl-ground, rgba(0,0,0,.15)), transparent); }
+.fl-prop { position: absolute; bottom: 0; font-size: var(--s, 40px); line-height: 1; transform-origin: 50% 100%;
+    animation: flSway 4.5s ease-in-out infinite alternate; filter: drop-shadow(0 4px 4px rgba(0,0,0,.2)); }
+@keyframes flSway { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+.fl-walker { position: absolute; left: 0; bottom: var(--y, 4px); font-size: var(--s, 34px); line-height: 1;
+    animation: flMarch var(--d, 60s) linear infinite; animation-delay: var(--dl, 0s); will-change: transform; }
+.fl-walker.rev { animation-direction: reverse; }
+.fl-flip, .fl-hop { display: block; }
+.fl-walker.rev .fl-flip { transform: scaleX(-1); }
+.fl-hop { animation: flHop .7s ease-in-out infinite alternate; filter: drop-shadow(0 3px 3px rgba(0,0,0,.25)); }
+@keyframes flMarch { from { transform: translateX(-120px); } to { transform: translateX(calc(100vw + 120px)); } }
+@keyframes flHop { from { transform: translateY(0) rotate(-5deg); } to { transform: translateY(-10px) rotate(5deg); } }
 
 .fl-traveler { position: fixed; left: 0; top: 30vh; z-index: 60; pointer-events: none; opacity: 0; will-change: transform;
     font-size: clamp(34px, 5vw, 58px); white-space: nowrap; filter: drop-shadow(0 4px 6px rgba(0,0,0,.25)); }
@@ -232,7 +340,7 @@ body.fl-on {
 @keyframes flFlyRtl { from { transform: translateX(115vw); opacity: 1; } to { transform: translateX(-30vw); opacity: 1; } }
 @keyframes flBob { 0%, 100% { translate: 0 0; rotate: -3deg; } 50% { translate: 0 -16px; rotate: 3deg; } }
 
-#fl-fx-toggle { position: fixed; left: 16px; bottom: 16px; z-index: 70; width: 44px; height: 44px; border-radius: 50%;
+#fl-fx-toggle { position: fixed; left: 16px; bottom: 92px; z-index: 70; width: 44px; height: 44px; border-radius: 50%;
     border: 2px solid rgba(255,255,255,.9); background: var(--primary-color, #113626); color: #fff; font-size: 20px; line-height: 1;
     cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,.25); transition: transform .2s, opacity .2s; }
 #fl-fx-toggle:hover { transform: scale(1.08); }
@@ -247,10 +355,30 @@ body.fl-on {
 .fl-greeting small { display: block; color: #64748b; font-size: .8rem; }
 @keyframes flGreetIn { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
 
-@media (max-width: 600px) { .fl-greeting { margin: 16px 12px 0; padding: 14px 16px; } .fl-greeting p { font-size: .92rem; } }
+/* product-card decorations (only visible while effects are on) */
+.fl-orn, .fl-pill-sm { display: none; }
+body.fl-on .fl-orn { display: block; position: absolute; top: 0; right: 12px; z-index: 4; transform-origin: 50% 0;
+    animation: flSwing 3.4s ease-in-out infinite alternate; pointer-events: none; }
+.fl-orn i { display: block; width: 2px; height: 16px; background: rgba(0,0,0,.35); margin: 0 auto; }
+.fl-orn b { display: block; font-size: 24px; line-height: 1; margin-top: -2px; font-weight: 400; filter: drop-shadow(0 3px 3px rgba(0,0,0,.25)); }
+@keyframes flSwing { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+body.fl-on .fl-pill-sm { display: inline-block; align-self: flex-start; margin: 0; padding: 2px 9px; border-radius: 999px; font-size: .68rem; font-weight: 700;
+    letter-spacing: .3px; color: #fff; background: linear-gradient(90deg, var(--primary-color, #113626), var(--accent-color, #27ae60));
+    box-shadow: 0 2px 6px rgba(0,0,0,.18); }
+body.fl-on .product-list .product { box-shadow: 0 0 0 1px var(--secondary-color, #ffd700), 0 6px 18px rgba(0,0,0,.1); }
+body.fl-on .product-list .product:hover { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 16px 32px rgba(0,0,0,.2); }
+body.fl-on .product-image-container::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.6) 50%, transparent 60%); transform: translateX(-130%); transition: transform .9s ease; }
+body.fl-on .product-list .product:hover .product-image-container::after { transform: translateX(130%); }
+body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 14px 38px rgba(0,0,0,.14); }
+
+@media (max-width: 600px) {
+    .fl-greeting { margin: 16px 12px 0; padding: 14px 16px; } .fl-greeting p { font-size: .92rem; }
+    #fl-fx-toggle { bottom: 88px; left: 10px; width: 40px; height: 40px; }
+}
 @media (prefers-reduced-motion: reduce) {
     body.fl-on { animation: none; }
-    #fl-garland b, .fl-tv-inner, .fl-greeting { animation: none; }
+    #fl-garland b, .fl-tv-inner, .fl-greeting, .fl-prop, .fl-hop, .fl-orn { animation: none; }
 }`;
         const el = document.createElement('style');
         el.id = 'fl-fx-style';
@@ -265,6 +393,12 @@ body.fl-on {
             S.canvas.setAttribute('aria-hidden', 'true');
             document.body.appendChild(S.canvas);
             S.ctx = S.canvas.getContext('2d');
+        }
+        if (!S.paradeEl) {
+            S.paradeEl = document.createElement('div');
+            S.paradeEl.id = 'fl-parade';
+            S.paradeEl.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(S.paradeEl);
         }
         if (!S.travelerEl) {
             S.travelerEl = document.createElement('div');
@@ -300,7 +434,7 @@ body.fl-on {
             S.bound = true;
             window.addEventListener('resize', () => {
                 clearTimeout(S.resizeTimer);
-                S.resizeTimer = setTimeout(() => { if (S.running) { resize(); seed(); buildGarland(); } }, 200);
+                S.resizeTimer = setTimeout(() => { if (S.running) { resize(); seed(); buildGarland(); buildParade(); } }, 200);
             });
             document.addEventListener('visibilitychange', () => {
                 if (!S.running) return;
@@ -328,6 +462,7 @@ body.fl-on {
         S.sprites.clear();
     }
 
+    // Sprite kinds: '#rrggbb' = confetti, '*#rrggbb' = 4-point twinkle star, '@#rrggbb' = soft glow, anything else = emoji
     function sprite(glyph, size) {
         const key = glyph + '|' + size;
         let s = S.sprites.get(key);
@@ -337,9 +472,29 @@ body.fl-on {
         c.width = c.height = Math.round(d * S.dpr);
         const x = c.getContext('2d');
         x.scale(S.dpr, S.dpr);
-        if (glyph.charAt(0) === '#') {
+        const kind = glyph.charAt(0);
+        if (kind === '#') {
             x.fillStyle = glyph;
             x.fillRect(d / 2 - size * 0.25, d / 2 - size * 0.12, size * 0.5, size * 0.24);
+        } else if (kind === '*') {
+            x.fillStyle = glyph.slice(1);
+            x.shadowColor = glyph.slice(1);
+            x.shadowBlur = size * 0.35;
+            x.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const r = i % 2 ? size * 0.1 : size * 0.5;
+                const a = (Math.PI / 4) * i - Math.PI / 2;
+                x[i ? 'lineTo' : 'moveTo'](d / 2 + Math.cos(a) * r, d / 2 + Math.sin(a) * r);
+            }
+            x.closePath();
+            x.fill();
+        } else if (kind === '@') {
+            const col = glyph.slice(1);
+            const g = x.createRadialGradient(d / 2, d / 2, 0, d / 2, d / 2, d / 2);
+            g.addColorStop(0, col + 'ff');
+            g.addColorStop(1, col + '00');
+            x.fillStyle = g;
+            x.fillRect(0, 0, d, d);
         } else {
             x.font = size + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
             x.textAlign = 'center';
@@ -373,7 +528,7 @@ body.fl-on {
     }
 
     function seed() {
-        S.particles = []; S.rockets = []; S.sparks = [];
+        S.particles = []; S.rockets = []; S.sparks = []; S.glows = []; S.stars = [];
         const cfg = S.cfg;
         let base = 0;
         if (cfg.fall) base += cfg.fall.count;
@@ -382,6 +537,19 @@ body.fl-on {
         const mobile = S.w < 700 ? 0.6 : 1;
         const n = Math.max(14, Math.round(base * Math.min(area, 1.4) * mobile));
         for (let i = 0; i < n; i++) spawn(true);
+
+        // soft colour glows and twinkling stars (white is skipped: invisible on the light background)
+        const cols = S.scene.lights.filter(c => c.toLowerCase() !== '#ffffff');
+        const ng = S.w < 700 ? 4 : 7;
+        for (let i = 0; i < ng; i++) {
+            S.glows.push({ spr: sprite('@' + cols[i % cols.length], 128), x: rand(0, S.w), y: rand(0, S.h),
+                vx: rand(-9, 9), vy: rand(-6, 6), sz: rand(260, 480), a: rand(0.1, 0.2), ph: rand(0, 6.28) });
+        }
+        const ns = S.w < 700 ? 10 : 20;
+        for (let i = 0; i < ns; i++) {
+            S.stars.push({ spr: sprite('*' + cols[i % cols.length], 18), x: rand(0, S.w), y: rand(0, S.h * 0.85),
+                ph: rand(0, 6.28), fr: rand(0.8, 2.0) });
+        }
     }
 
     function launchRocket() {
@@ -413,7 +581,24 @@ body.fl-on {
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, S.canvas.width, S.canvas.height);
 
-        // graphics
+        // drifting colour glows
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        for (const g of S.glows) {
+            g.x += g.vx * dt; g.y += g.vy * dt;
+            const half = g.sz / 2;
+            if (g.x < -half) g.x = S.w + half; else if (g.x > S.w + half) g.x = -half;
+            if (g.y < -half) g.y = S.h + half; else if (g.y > S.h + half) g.y = -half;
+            ctx.globalAlpha = g.a * (0.75 + 0.25 * Math.sin(g.ph + S.t * 0.5));
+            ctx.drawImage(g.spr.c, g.x - half, g.y - half, g.sz, g.sz);
+        }
+        // twinkling stars
+        for (const st of S.stars) {
+            const a = Math.sin(st.ph + S.t * st.fr);
+            ctx.globalAlpha = 0.1 + 0.9 * a * a;
+            ctx.drawImage(st.spr.c, st.x - st.spr.d / 2, st.y - st.spr.d / 2, st.spr.d, st.spr.d);
+        }
+
+        // falling / rising graphics
         for (let i = S.particles.length - 1; i >= 0; i--) {
             const p = S.particles[i];
             p.y += p.vy * dt;
@@ -485,17 +670,54 @@ body.fl-on {
         el.className = 'fl-traveler go' + (rtl ? ' rtl' : '');
     }
 
-    // ---------- string lights ----------
+    // ---------- colour-changing string lights, draped in arcs ----------
     function buildGarland() {
-        const cols = S.cfg && S.cfg.garland;
-        if (!cols) { S.garlandEl.style.display = 'none'; return; }
-        const n = Math.ceil(window.innerWidth / 44) + 1;
-        let html = '<i class="fl-wire"></i>';
-        for (let i = 0; i < n; i++) {
-            html += '<b style="left:' + (i * 44 + 8) + 'px;--c:' + cols[i % cols.length] + ';animation-delay:' + ((i % 7) * 0.25) + 's"></b>';
+        if (!S.scene) return;
+        const cols = S.scene.lights;
+        const arcW = 240, per = 6;
+        const arcs = Math.ceil(window.innerWidth / arcW) + 1;
+        let path = 'M0,4';
+        for (let k = 0; k < arcs; k++) path += ' Q' + (k * arcW + arcW / 2) + ',36 ' + ((k + 1) * arcW) + ',4';
+        let html = '<svg width="' + (arcs * arcW) + '" height="42" aria-hidden="true"><path d="' + path + '" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="2"/></svg>';
+        for (let k = 0; k < arcs; k++) {
+            for (let j = 0; j < per; j++) {
+                const u = (j + 0.5) / per;
+                const idx = k * per + j;
+                const x = k * arcW + u * arcW - 5;
+                const y = 4 + 64 * u * (1 - u);
+                const delay = (-(idx * 0.43) % 4.2).toFixed(2);
+                html += '<b style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px;--b1:' + cols[idx % cols.length] +
+                    ';--b2:' + cols[(idx + 1) % cols.length] + ';--b3:' + cols[(idx + 2) % cols.length] +
+                    ';animation-delay:' + delay + 's,' + delay + 's"></b>';
+            }
         }
         S.garlandEl.innerHTML = html;
         S.garlandEl.style.display = 'block';
+    }
+
+    // ---------- bottom parade: props along the ground + characters strolling past ----------
+    function buildParade() {
+        if (!S.scene || !S.paradeEl) return;
+        const sc = S.scene;
+        const mobile = window.innerWidth < 700;
+        const nProps = mobile ? 3 : 7;
+        const nWalk = mobile ? 4 : 8;
+        let html = '';
+        for (let i = 0; i < nProps; i++) {
+            const left = ((i + 0.5) / nProps * 100 + rand(-3, 3)).toFixed(1);
+            html += '<span class="fl-prop" style="left:' + left + '%;--s:' + rand(34, 52).toFixed(0) + 'px;animation-delay:-' + rand(0, 4).toFixed(2) + 's">' +
+                sc.props[i % sc.props.length] + '</span>';
+        }
+        for (let i = 0; i < nWalk; i++) {
+            const dur = rand(48, 95);
+            const rev = Math.random() < 0.4;
+            html += '<span class="fl-walker' + (rev ? ' rev' : '') + '" style="--d:' + dur.toFixed(0) + 's;--dl:-' + rand(0, dur).toFixed(1) +
+                's;--s:' + rand(26, 40).toFixed(0) + 'px;--y:' + rand(0, 16).toFixed(0) + 'px"><span class="fl-flip"><span class="fl-hop" style="animation-delay:-' +
+                rand(0, 0.7).toFixed(2) + 's;animation-duration:' + rand(0.5, 0.85).toFixed(2) + 's">' + pick(sc.walkers) + '</span></span></span>';
+        }
+        S.paradeEl.innerHTML = html;
+        S.paradeEl.style.setProperty('--fl-ground', sc.ground);
+        S.paradeEl.style.display = 'block';
     }
 
     // ---------- background palette cycling ----------
@@ -518,6 +740,7 @@ body.fl-on {
         setPalette(S.paletteIdx);
         seed();
         buildGarland();
+        buildParade();
         S.last = performance.now();
         S.raf = requestAnimationFrame(frame);
         scheduleTraveler(true);
@@ -536,6 +759,7 @@ body.fl-on {
         if (S.canvas) { S.ctx.setTransform(1, 0, 0, 1, 0, 0); S.ctx.clearRect(0, 0, S.canvas.width, S.canvas.height); S.canvas.style.display = 'none'; }
         if (S.travelerEl) S.travelerEl.className = 'fl-traveler';
         if (S.garlandEl) S.garlandEl.style.display = 'none';
+        if (S.paradeEl) S.paradeEl.style.display = 'none';
     }
 
     function applyColors(colors) {
@@ -552,6 +776,7 @@ body.fl-on {
         const key = resolveKey(info);
         S.key = key;
         S.cfg = FESTIVAL_THEMES[key];
+        S.scene = FESTIVAL_SCENES[key] || FESTIVAL_SCENES.Default;
         S.info = info;
         S.paletteIdx = 0;
         injectStyles();
@@ -568,10 +793,10 @@ body.fl-on {
 
     function destroy() {
         stop();
-        S.cfg = null; S.info = null;
-        ['fl-fx-canvas', 'fl-garland', 'fl-fx-toggle'].forEach(id => { const el = document.getElementById(id); if (el) el.remove(); });
+        S.cfg = null; S.info = null; S.scene = null;
+        ['fl-fx-canvas', 'fl-garland', 'fl-fx-toggle', 'fl-parade'].forEach(id => { const el = document.getElementById(id); if (el) el.remove(); });
         if (S.travelerEl) S.travelerEl.remove();
-        S.canvas = S.ctx = S.travelerEl = S.garlandEl = S.toggleEl = null;
+        S.canvas = S.ctx = S.travelerEl = S.garlandEl = S.paradeEl = S.toggleEl = null;
     }
 
     // Festive greeting card inside the homepage hero (call after the hero has been rendered)
@@ -599,7 +824,17 @@ body.fl-on {
         hero.appendChild(card);
     }
 
-    return { init: init, destroy: destroy, mountHero: mountHero, resolveKey: resolveKey };
+    // Decorations for product cards. They are only displayed while effects are on (CSS hides them otherwise).
+    function cardOrnament(i) {
+        if (!S.scene) return '';
+        return '<span class="fl-orn" aria-hidden="true"><i></i><b>' + S.scene.orn[i % S.scene.orn.length] + '</b></span>';
+    }
+    function cardRibbon() {
+        if (!S.scene || !S.cfg) return '';
+        return '<span class="fl-pill-sm">' + S.cfg.icon + ' ' + esc(S.scene.ribbon) + '</span>';
+    }
+
+    return { init: init, destroy: destroy, mountHero: mountHero, resolveKey: resolveKey, cardOrnament: cardOrnament, cardRibbon: cardRibbon };
 })();
 
 // Lets you preview a theme by adding ?festival=Christmas (or Deepavali, CNY, ...) to the site address.
@@ -612,9 +847,214 @@ function getPreviewTheme() {
 }
 
 // ===========================================================
+// [ 1.8 ] SHOP LAYOUT (5 per row) & PRODUCT PAGES
+// ===========================================================
+const viewState = { current: 'homepage', listScroll: 0, baseTitle: document.title, pdQty: 1 };
+const WHATSAPP_NUMBER = '601111033154';
+
+function injectShopStyles() {
+    if (document.getElementById('fl-shop-style')) return;
+    const css = `
+/* product grid: 5 per row on desktop, stepping down on smaller screens */
+.product-list { display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)) !important; gap: 16px !important; align-items: stretch; }
+@media (max-width: 1280px) { .product-list { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; } }
+@media (max-width: 1024px) { .product-list { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
+@media (max-width: 720px)  { .product-list { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; } }
+@media (max-width: 330px)  { .product-list { grid-template-columns: 1fr !important; } }
+.product-list .product { display: flex !important; flex-direction: column; width: auto !important; max-width: none !important; margin: 0 !important;
+    position: relative; cursor: pointer; background: #fff; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0,0,0,.08); transition: transform .25s ease, box-shadow .25s ease; }
+.product-list .product:hover, .product-list .product:focus-visible { transform: translateY(-5px); box-shadow: 0 14px 28px rgba(0,0,0,.16); outline: none; }
+.product-list .product-image-container { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; background: #f4f7f5;
+    display: flex; align-items: center; justify-content: center; }
+.product-list .product-image-container img { width: 100%; height: 100%; object-fit: contain; transition: transform .4s ease; }
+.product-list .product:hover .product-image-container img { transform: scale(1.06); }
+.product-list .product-info { display: flex; flex-direction: column; flex: 1; padding: 10px 12px 12px; gap: 6px; }
+.product-list .product-info h3 { margin: 0; font-size: .92rem; line-height: 1.3; min-height: 2.6em; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.product-list .price-section { font-size: 1rem; font-weight: 800; }
+.product-list .product-benefits { font-size: .78rem; line-height: 1.4; color: #475569; display: -webkit-box;
+    -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.product-list .product-consumption { display: none !important; }
+.product-list .product-more { font-size: .76rem; font-weight: 700; color: var(--primary-color, #113626); }
+.product-list .product-actions { margin-top: auto; }
+.product-list .product-actions .btn { width: 100%; padding: 8px 10px; font-size: .82rem; }
+
+/* dedicated product page */
+.pd-wrap { max-width: 1100px; margin: 0 auto; padding: 18px 14px 30px; }
+.pd-crumbs { font-size: .85rem; color: #64748b; margin-bottom: 14px; }
+.pd-crumbs a { color: var(--primary-color, #113626); font-weight: 700; text-decoration: none; cursor: pointer; }
+.pd-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 28px; background: #fff; border-radius: 18px;
+    padding: 24px; box-shadow: 0 10px 34px rgba(0,0,0,.1); position: relative; }
+.pd-media { position: relative; border-radius: 14px; background: #f4f7f5; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.pd-media img { width: 100%; height: 100%; object-fit: contain; }
+.pd-info h1 { margin: 6px 0 8px; font-size: 1.7rem; line-height: 1.25; color: #10231b; }
+.pd-price { font-size: 1.7rem; font-weight: 800; color: var(--primary-color, #113626); margin-bottom: 14px; }
+.pd-block { margin: 0 0 14px; padding: 12px 14px; background: #f8fafc; border-left: 4px solid var(--secondary-color, #ffd700); border-radius: 8px; }
+.pd-block h3 { margin: 0 0 4px; font-size: .8rem; text-transform: uppercase; letter-spacing: .6px; color: #475569; }
+.pd-block p { margin: 0; line-height: 1.65; white-space: pre-line; color: #1f2937; }
+.pd-buy { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 18px 0 12px; }
+.pd-qty { display: flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden; }
+.pd-qty button { width: 40px; height: 44px; border: 0; background: #f1f5f9; font-size: 1.2rem; cursor: pointer; }
+.pd-qty span { min-width: 44px; text-align: center; font-weight: 700; }
+.pd-buy .btn { flex: 1; min-width: 160px; padding: 12px 18px; font-size: 1rem; }
+.pd-links { display: flex; gap: 10px; flex-wrap: wrap; }
+.pd-links a, .pd-links button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; border: 1px solid #cbd5e1;
+    background: #fff; color: #1f2937; font-size: .85rem; font-weight: 600; text-decoration: none; cursor: pointer; }
+.pd-links a:hover, .pd-links button:hover { border-color: var(--primary-color, #113626); color: var(--primary-color, #113626); }
+.pd-related h2 { margin: 30px 0 12px; }
+.pd-related-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.pd-mini { background: #fff; border-radius: 12px; overflow: hidden; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.08); transition: transform .2s; }
+.pd-mini:hover { transform: translateY(-4px); }
+.pd-mini img { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; background: #f4f7f5; display: block; }
+.pd-mini div { padding: 8px 10px 10px; font-size: .85rem; font-weight: 600; line-height: 1.3; }
+.pd-mini small { display: block; margin-top: 3px; color: var(--primary-color, #113626); font-weight: 800; }
+@media (max-width: 820px) {
+    .pd-card { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
+    .pd-info h1 { font-size: 1.35rem; }
+    .pd-related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}`;
+    const el = document.createElement('style');
+    el.id = 'fl-shop-style';
+    el.textContent = css;
+    document.head.appendChild(el);
+}
+
+// ---- routing: each product has its own address, e.g.  yoursite.com/#product/12 ----
+function productRoute() {
+    const m = String(window.location.hash || '').match(/^#product\/(.+)$/);
+    if (!m) return null;
+    try { return decodeURIComponent(m[1]); } catch (e) { return m[1]; }
+}
+
+function activateTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    const target = document.getElementById(tabId);
+    if (target) target.classList.add('active');
+    viewState.current = tabId;
+    if (tabId !== 'product-detail') document.title = viewState.baseTitle;
+}
+
+function openProduct(id) {
+    viewState.listScroll = window.scrollY || 0;
+    window.location.hash = 'product/' + encodeURIComponent(id);
+}
+
+function backToProducts() {
+    // always return to the product list, even after browsing through several related products
+    try { window.history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) { /* ignore */ }
+    activateTab('products');
+    window.scrollTo(0, viewState.listScroll || 0);
+}
+
+function handleRoute() {
+    const id = productRoute();
+    if (id !== null) { renderProductPage(id); return; }
+    if (viewState.current === 'product-detail') {
+        activateTab('products');
+        window.scrollTo(0, viewState.listScroll || 0);
+    }
+}
+
+function findProduct(id) {
+    return products.find(p => String(p.id) === String(id));
+}
+
+function renderProductPage(id) {
+    const box = document.getElementById('product-detail');
+    if (!box) return;
+    const p = findProduct(id);
+    viewState.pdQty = 1;
+
+    if (!p) {
+        box.innerHTML = '<div class="pd-wrap"><p>Sorry, we could not find that product.</p><button class="btn btn-primary" onclick="backToProducts()">Back to products</button></div>';
+        activateTab('product-detail');
+        window.scrollTo(0, 0);
+        return;
+    }
+
+    const idx = products.indexOf(p);
+    const related = [];
+    for (let i = 1; related.length < 4 && i < products.length; i++) related.push(products[(idx + i) % products.length]);
+    const waText = 'Hi, I would like to know more about ' + p.name + ' ' + window.location.href;
+    const waUrl = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(waText);
+
+    box.innerHTML = `
+    <div class="pd-wrap">
+        <nav class="pd-crumbs" aria-label="Breadcrumb"><a onclick="backToProducts()">&larr; All products</a> &nbsp;›&nbsp; <span>${esc(p.name)}</span></nav>
+        <article class="pd-card">
+            ${FestivalFX.cardOrnament(idx)}
+            <div class="pd-media"><img src="${esc(p.image)}" alt="${esc(p.name)}" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG"></div>
+            <div class="pd-info">
+                ${FestivalFX.cardRibbon()}
+                <h1>${esc(p.name)}</h1>
+                <div class="pd-price">RM ${Number(p.price || 0).toFixed(2)}</div>
+                ${p.benefits ? `<div class="pd-block"><h3>Benefits</h3><p>${esc(p.benefits)}</p></div>` : ''}
+                ${p.consumption ? `<div class="pd-block"><h3>How to use</h3><p>${esc(p.consumption)}</p></div>` : ''}
+                <div class="pd-buy">
+                    <div class="pd-qty">
+                        <button type="button" aria-label="Decrease quantity" onclick="pdChangeQty(-1)">&minus;</button>
+                        <span id="pd-qty" aria-live="polite">1</span>
+                        <button type="button" aria-label="Increase quantity" onclick="pdChangeQty(1)">+</button>
+                    </div>
+                    <button type="button" id="pd-add" class="btn btn-primary" onclick="pdAddToCart(${jsArg(p.id)})">Add to Cart</button>
+                </div>
+                <div class="pd-links">
+                    <a href="${esc(waUrl)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Ask on WhatsApp</a>
+                    <button type="button" id="pd-share" onclick="shareProduct(${jsArg(p.id)})"><i class="fa-solid fa-share-nodes"></i> Share</button>
+                </div>
+            </div>
+        </article>
+        ${related.length ? `<section class="pd-related"><h2>You may also like</h2><div class="pd-related-grid">${related.map(r => `
+            <div class="pd-mini" role="link" tabindex="0" onclick="openProduct(${jsArg(r.id)})" onkeydown="if(event.key==='Enter')openProduct(${jsArg(r.id)})">
+                <img src="${esc(r.image)}" alt="${esc(r.name)}" loading="lazy" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG">
+                <div>${esc(r.name)}<small>RM ${Number(r.price || 0).toFixed(2)}</small></div>
+            </div>`).join('')}</div></section>` : ''}
+    </div>`;
+
+    document.title = p.name + ' | ' + viewState.baseTitle;
+    activateTab('product-detail');
+    window.scrollTo(0, 0);
+}
+
+function pdChangeQty(delta) {
+    viewState.pdQty = Math.min(99, Math.max(1, viewState.pdQty + delta));
+    const el = document.getElementById('pd-qty');
+    if (el) el.textContent = viewState.pdQty;
+}
+
+function pdAddToCart(id) {
+    addToCart(id, viewState.pdQty);
+    const btn = document.getElementById('pd-add');
+    if (btn) {
+        btn.textContent = 'Added ✓';
+        setTimeout(() => { const b = document.getElementById('pd-add'); if (b) b.textContent = 'Add to Cart'; }, 1400);
+    }
+}
+
+function shareProduct(id) {
+    const p = findProduct(id);
+    if (!p) return;
+    const url = window.location.href;
+    const done = () => {
+        const b = document.getElementById('pd-share');
+        if (b) { b.textContent = 'Link copied ✓'; setTimeout(() => { const x = document.getElementById('pd-share'); if (x) x.innerHTML = '<i class="fa-solid fa-share-nodes"></i> Share'; }, 1600); }
+    };
+    if (navigator.share) {
+        navigator.share({ title: p.name, url: url }).catch(() => { /* cancelled */ });
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done).catch(() => window.prompt('Copy this link:', url));
+    } else {
+        window.prompt('Copy this link:', url);
+    }
+}
+
+// ===========================================================
 // [ 2.0 ] MAIN CONTROLLER & INITIALIZATION
 // ===========================================================
 document.addEventListener('DOMContentLoaded', () => {
+    injectShopStyles();
+    window.addEventListener('hashchange', handleRoute);
     const loginBtn = document.getElementById('nav-login-btn');
     if (loginBtn) loginBtn.addEventListener('click', () => toggleLoginModal(true));
 
@@ -685,7 +1125,7 @@ async function fetchData() {
         }
 
         const updateElem = document.getElementById('update-timestamp');
-        if (updateElem) updateElem.textContent = `${new Date().toLocaleDateString('en-GB')} (v29.0)`;
+        if (updateElem) updateElem.textContent = `${new Date().toLocaleDateString('en-GB')} (v30.0)`;
 
         const enqForm = document.getElementById('enquiry-form');
         if (enqForm) enqForm.addEventListener('submit', handleEnquirySubmit);
@@ -693,7 +1133,7 @@ async function fetchData() {
         const jobForm = document.getElementById('job-application-form');
         if (jobForm) jobForm.addEventListener('submit', handleJobApplicationSubmit);
 
-        showTab('homepage');
+        if (productRoute() !== null) { renderProductPage(productRoute()); } else { showTab('homepage'); }
 
     } catch (error) {
         console.error("Fatal Error fetching store data:", error);
@@ -729,6 +1169,7 @@ function renderMainContentShell() {
             <section id="homepage-featured-jobs" class="dynamic-content-wrapper"><h2>Join Our Team</h2><div id="featured-jobs-container"></div><a onclick="showTab('jobs')" class="btn btn-secondary" style="display: table; margin: 20px auto 0; max-width: 300px;">View All Career Opportunities</a></section>
         </div>
         <div id="products" class="tab-content"><div id="product-list-container"></div></div>
+        <div id="product-detail" class="tab-content"></div>
         <div id="about" class="tab-content"><section id="about-us-content" class="dynamic-content-wrapper"></section></div>
         <div id="jobs" class="tab-content"><section id="jobs-content" class="dynamic-content-wrapper"><h2>All Career Opportunities</h2><div id="job-listings-container"></div></section></div>
         <div id="enquiries" class="tab-content"><section id="enquiries-form-content" class="dynamic-content-wrapper"></section></div>
@@ -804,21 +1245,39 @@ function renderProducts(productsToRender, tagText) {
 
     const tagHtml = tagText ? `<div class="product-tag">${esc(tagText)}</div>` : '';
 
-    container.innerHTML = `<div class="product-list">${productsToRender.map(p => {
+    container.innerHTML = `<div class="product-list">${productsToRender.map((p, i) => {
         const displayPrice = Number(p.price || 0).toFixed(2);
         return `
-        <div class="product" style="position: relative;">
+        <div class="product" data-pid="${esc(p.id)}" role="link" tabindex="0" aria-label="View ${esc(p.name)}" style="position: relative;">
+            ${FestivalFX.cardOrnament(i)}
             ${tagHtml}
             <div class="product-image-container"><img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG"></div>
             <div class="product-info">
+                ${FestivalFX.cardRibbon()}
                 <h3>${esc(p.name)}</h3>
                 <div class="price-section"><span class="new-price">RM ${displayPrice}</span></div>
-                <div class="product-benefits"><strong>Benefits:</strong> ${esc(p.benefits)}</div>
+                <div class="product-benefits">${esc(p.benefits)}</div>
                 <div class="product-consumption"><strong>Usage:</strong> ${esc(p.consumption)}</div>
-                <div class="product-actions"><button class="btn btn-primary" onclick="addToCart(${jsArg(p.id)})">Add to Cart</button></div>
+                <div class="product-more">View details &rarr;</div>
+                <div class="product-actions"><button type="button" class="btn btn-primary" onclick="addToCart(${jsArg(p.id)})">Add to Cart</button></div>
             </div>
         </div>`;
     }).join('')}</div>`;
+
+    // Whole card opens the product page (the Add to Cart button keeps its own action)
+    const list = container.querySelector('.product-list');
+    if (list) {
+        list.addEventListener('click', e => {
+            if (e.target.closest('button, a')) return;
+            const card = e.target.closest('.product');
+            if (card) openProduct(card.dataset.pid);
+        });
+        list.addEventListener('keydown', e => {
+            if (e.key !== 'Enter' || e.target.closest('button, a')) return;
+            const card = e.target.closest('.product');
+            if (card) openProduct(card.dataset.pid);
+        });
+    }
 }
 
 function renderAboutUs(content) {
@@ -937,14 +1396,15 @@ function buildChatbotWidget() {
 // ===========================================================
 // [ 4.0 ] CART LOGIC
 // ===========================================================
-function addToCart(productId) {
+function addToCart(productId, qty = 1) {
     const product = products.find(p => String(p.id) === String(productId));
     if (!product) return;
+    const amount = Math.max(1, parseInt(qty, 10) || 1);
     const existingItem = cart.find(item => String(item.id) === String(productId));
     if (existingItem) {
-        existingItem.quantity++;
+        existingItem.quantity += amount;
     } else {
-        cart.push({ ...product, quantity: 1 });
+        cart.push({ ...product, quantity: amount });
     }
     updateCartDisplay();
 }
@@ -1288,9 +1748,11 @@ async function handleMyAccountMenu(text) {
 // [ 7.0 ] GLOBAL UTILITIES & API HELPERS
 // ===========================================================
 function showTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    const target = document.getElementById(tabId);
-    if (target) target.classList.add('active');
+    // leaving a product page through the menu: drop its address so Back/refresh behave
+    if (productRoute() !== null && tabId !== 'product-detail') {
+        try { window.history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) { /* ignore */ }
+    }
+    activateTab(tabId);
 }
 
 // FIX: the old "no-cors" request could never read the server's reply, so the shop showed
