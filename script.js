@@ -8,7 +8,7 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxjIQmAw_C2p3E09mMcj3HeZWgQDVAjR8hOpR88iUBZjQSxoLAEavDjylcIsejGKCgLcw/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbzVokpOK02K0Qe4D4LTmJv2JmWGLhNzBE9gOYhhArmi16gls99G_ItfHWH5CcRjErd65A/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 // SECURITY NOTE: anything in this file is public. Treat this key as non-secret and
 // make sure the bot server does not rely on it alone for sensitive actions.
@@ -126,6 +126,7 @@ const FESTIVAL_THEMES = {
         icon: '🎊', colors: { primary: '#1a5276', secondary: '#f39c12', accent: '#27ae60' },
         bg: [['#eaf3fa', '#fff5e3', '#eaf8ef'], ['#fff5e3', '#eaf8ef', '#eaf3fa']],
         fall: { glyphs: ['🎈', '🎉'], count: 9, size: [18, 26], speed: [0.5, 1.0], sway: 14, spin: true },
+        fireworks: { colors: ['#1a8cd8', '#f39c12', '#27ae60', '#e74c3c'], every: [5, 9] },
         traveler: { glyph: '🎈', trail: '🎉', duration: 22 }
     },
     Vesak: {
@@ -158,6 +159,324 @@ const FESTIVAL_MATCHERS = [
     ['Vesak', /vesak|wesak/],
     ['NewYear', /newyear/]
 ];
+
+// ===========================================================
+// [ 1.6 ] FESTIVAL BACKGROUND ARTWORK
+// Each festival gets its own full-screen illustration, drawn as scalable SVG (no image files needed).
+// They sit behind the page content at low opacity so text stays easy to read.
+// ===========================================================
+const FestivalArt = (() => {
+    const TAU = Math.PI * 2;
+    const f = n => Math.round(n * 10) / 10;
+    const rng = seed => () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
+
+    // ---- building blocks ----
+    function dots(cx, cy, n, r, dr, fill, op) {
+        let o = '';
+        for (let i = 0; i < n; i++) {
+            const a = TAU * i / n;
+            o += '<circle cx="' + f(cx + Math.cos(a) * r) + '" cy="' + f(cy + Math.sin(a) * r) + '" r="' + f(dr) + '" fill="' + fill + '"' + (op ? ' opacity="' + op + '"' : '') + '/>';
+        }
+        return o;
+    }
+
+    function petals(cx, cy, n, r0, len, wid, fill, stroke, rotDeg) {
+        let o = '';
+        for (let i = 0; i < n; i++) {
+            const a = (rotDeg || 0) + 360 * i / n;
+            o += '<path transform="translate(' + f(cx) + ' ' + f(cy) + ') rotate(' + f(a) + ')" d="M' + f(r0) + ',0 C' + f(r0 + len * 0.3) + ',' + f(-wid) +
+                ' ' + f(r0 + len * 0.8) + ',' + f(-wid) + ' ' + f(r0 + len) + ',0 C' + f(r0 + len * 0.8) + ',' + f(wid) + ' ' + f(r0 + len * 0.3) + ',' + f(wid) +
+                ' ' + f(r0) + ',0Z" fill="' + fill + '" stroke="' + (stroke || 'none') + '" stroke-width="1.2"/>';
+        }
+        return o;
+    }
+
+    function starPoly(cx, cy, R, r, n, fill, op) {
+        const pts = [];
+        for (let i = 0; i < n * 2; i++) {
+            const rad = i % 2 ? r : R;
+            const a = Math.PI * i / n - Math.PI / 2;
+            pts.push(f(cx + Math.cos(a) * rad) + ',' + f(cy + Math.sin(a) * rad));
+        }
+        return '<polygon points="' + pts.join(' ') + '" fill="' + fill + '" opacity="' + (op || 1) + '"/>';
+    }
+
+    // crescent opening to the right
+    function crescent(id, cx, cy, r, fill, op) {
+        return '<mask id="' + id + '"><rect x="' + f(cx - r * 1.3) + '" y="' + f(cy - r * 1.3) + '" width="' + f(r * 2.6) + '" height="' + f(r * 2.6) + '" fill="#fff"/>' +
+            '<circle cx="' + f(cx + r * 0.4) + '" cy="' + f(cy) + '" r="' + f(r * 0.82) + '" fill="#000"/></mask>' +
+            '<circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="' + f(r) + '" fill="' + fill + '" opacity="' + op + '" mask="url(#' + id + ')"/>';
+    }
+
+    // Rangoli: concentric rings of petals, dotted circles and a centre flower (palette: 4 colours)
+    function rangoli(cx, cy, R, pal, cls) {
+        return '<g class="' + (cls || '') + '">' +
+            '<circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="' + f(R) + '" fill="none" stroke="' + pal[0] + '" stroke-width="2"/>' +
+            dots(cx, cy, 48, R * 0.95, R * 0.012, pal[1]) +
+            petals(cx, cy, 16, R * 0.74, R * 0.2, R * 0.06, pal[0], pal[3], 0) +
+            petals(cx, cy, 16, R * 0.6, R * 0.15, R * 0.045, pal[1], pal[3], 11.25) +
+            '<circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="' + f(R * 0.58) + '" fill="none" stroke="' + pal[2] + '" stroke-width="2"/>' +
+            dots(cx, cy, 32, R * 0.5, R * 0.011, pal[3]) +
+            petals(cx, cy, 12, R * 0.3, R * 0.2, R * 0.075, pal[2], pal[3], 0) +
+            petals(cx, cy, 12, R * 0.17, R * 0.13, R * 0.048, pal[0], pal[3], 15) +
+            '<circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="' + f(R * 0.09) + '" fill="' + pal[3] + '"/>' +
+            '<circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="' + f(R * 0.045) + '" fill="' + pal[2] + '"/></g>';
+    }
+
+    // Kolam: a diamond of dots (pulli) with overlapping loops woven around them
+    function kolam(cx, cy, sp, color) {
+        const rows = [1, 3, 5, 7, 5, 3, 1];
+        let o = '';
+        rows.forEach((n, ri) => {
+            const y = cy + (ri - 3) * sp;
+            for (let j = 0; j < n; j++) {
+                const x = cx + (j - (n - 1) / 2) * sp;
+                o += '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + f(sp * 0.08) + '" fill="' + color + '"/>' +
+                    '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + f(sp * 0.62) + '" fill="none" stroke="' + color + '" stroke-width="' + f(Math.max(1.4, sp * 0.05)) + '"/>';
+            }
+        });
+        return '<g class="fl-pulse">' + o + '</g>';
+    }
+
+    // auspicious cloud swirl (Chinese)
+    function cloud(x, y, s, fill, stroke) {
+        return '<g transform="translate(' + f(x) + ' ' + f(y) + ') scale(' + f(s) + ')"><path d="M0,44 C-22,44 -22,14 4,14 C6,-10 40,-12 46,10 C62,-8 96,6 86,30 C108,28 112,52 86,52 L0,52Z" fill="' + fill + '" stroke="' + stroke +
+            '" stroke-width="2"/><path d="M22,40 C14,40 14,28 24,28 M52,34 C44,34 44,22 54,22 M76,42 C68,42 68,32 78,32" fill="none" stroke="' + stroke + '" stroke-width="2"/></g>';
+    }
+
+    // Chinese dragon: a long wavy body with scales and spines, and a head with horns, whiskers and a pearl
+    function dragon(w, h) {
+        const base = h * 0.6, amp = h * 0.085, x0 = -w * 0.06, x1 = w * 0.74, N = 80;
+        const wave = x => base + amp * Math.sin((x / w) * TAU * 1.5);
+        const top = [], bot = [], mid = [];
+        for (let i = 0; i <= N; i++) {
+            const t = i / N, x = x0 + (x1 - x0) * t, cy = wave(x);
+            const th = h * (0.012 + 0.052 * Math.sin(Math.min(1, t * 1.1) * Math.PI / 2));
+            top.push(f(x) + ',' + f(cy - th)); bot.push(f(x) + ',' + f(cy + th)); mid.push([x, cy, th]);
+        }
+        const poly = top.join(' ') + ' ' + bot.reverse().join(' ');
+        let scales = '', spines = '';
+        mid.forEach((m, i) => {
+            if (i % 2 === 0) scales += '<circle cx="' + f(m[0]) + '" cy="' + f(m[1]) + '" r="' + f(m[2] * 0.95) + '" fill="none" stroke="#ffd700" stroke-width="1.6" opacity=".75"/>';
+            if (i % 4 === 1 && i > 6) spines += '<path d="M' + f(m[0] - m[2] * 0.35) + ',' + f(m[1] - m[2]) + ' L' + f(m[0]) + ',' + f(m[1] - m[2] * 1.65) + ' L' + f(m[0] + m[2] * 0.35) + ',' + f(m[1] - m[2]) + 'Z" fill="#ffb300"/>';
+        });
+        const hx = x1, hy = wave(x1);
+        const ang = Math.atan2(wave(x1 + 6) - wave(x1 - 6), 12) * 180 / Math.PI;
+        const sc = h * 0.0017;
+        const head =
+            '<g transform="translate(' + f(hx) + ' ' + f(hy) + ') rotate(' + f(ang) + ') scale(' + f(sc) + ')">' +
+            '<path d="M-20,-48 C-8,-96 22,-116 44,-138 C42,-106 62,-96 74,-86 C60,-76 72,-54 40,-48Z" fill="#ff8c00"/>' +
+            '<path d="M-26,14 C-62,46 -52,78 -20,98 C-30,66 -8,46 4,34Z" fill="#ff8c00"/>' +
+            '<path d="M-14,-46 C20,-62 80,-62 132,-42 C170,-30 200,-32 236,-16 C252,-8 252,12 232,18 C206,28 190,22 170,32 C192,48 176,72 150,68 C120,64 110,78 70,72 C30,68 0,52 -14,46Z" fill="#c1121f"/>' +
+            '<path d="M40,-54 C34,-88 8,-114 -24,-126 C4,-102 12,-82 18,-54Z" fill="#ffd700"/>' +
+            '<path d="M78,-58 C84,-94 62,-124 34,-142 C52,-112 52,-88 52,-58Z" fill="#ffd700"/>' +
+            '<ellipse cx="122" cy="-30" rx="14" ry="10" fill="#fff"/><circle cx="125" cy="-30" r="5.5" fill="#111"/>' +
+            '<path d="M100,-46 C120,-58 142,-52 154,-38" stroke="#ffd700" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+            '<circle cx="224" cy="-6" r="4.5" fill="#7a0a12"/>' +
+            '<path d="M172,28 l6,18 l7,-18 M194,24 l5,16 l6,-16" fill="#fff"/>' +
+            '<path d="M214,14 C252,22 278,54 306,48" stroke="#ffd700" stroke-width="4.5" fill="none" stroke-linecap="round"/>' +
+            '<path d="M204,22 C236,48 246,84 274,92" stroke="#ffd700" stroke-width="4.5" fill="none" stroke-linecap="round"/>' +
+            '<circle cx="300" cy="22" r="17" fill="#fff4b0" stroke="#ffd700" stroke-width="3.5"/></g>';
+        return '<clipPath id="flDragonClip"><polygon points="' + poly + '"/></clipPath>' +
+            '<polygon points="' + poly + '" fill="#c1121f"/>' +
+            '<g clip-path="url(#flDragonClip)">' + scales + '</g>' + spines + head;
+    }
+
+    function coin(cx, cy, r, color, cls) {
+        return '<g class="' + (cls || '') + '"><circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="' + f(r) + '" fill="none" stroke="' + color + '" stroke-width="' + f(r * 0.06) +
+            '"/><circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="' + f(r * 0.86) + '" fill="none" stroke="' + color + '" stroke-width="2"/><rect x="' + f(cx - r * 0.2) + '" y="' + f(cy - r * 0.2) +
+            '" width="' + f(r * 0.4) + '" height="' + f(r * 0.4) + '" fill="none" stroke="' + color + '" stroke-width="' + f(r * 0.05) + '"/>' +
+            [0, 90, 180, 270].map(a => '<path transform="translate(' + f(cx) + ' ' + f(cy) + ') rotate(' + a + ')" d="M' + f(r * 0.3) + ',0 L' + f(r * 0.7) + ',0" stroke="' + color + '" stroke-width="3"/>').join('') + '</g>';
+    }
+
+    function pine(x, y, s) {
+        return '<g transform="translate(' + f(x) + ' ' + f(y) + ') scale(' + f(s) + ')"><rect x="-7" y="-16" width="14" height="18" fill="#6d4c41"/>' +
+            '<path d="M0,-150 L38,-84 L18,-84 L50,-42 L22,-42 L56,-16 L-56,-16 L-22,-42 L-50,-42 L-18,-84 L-38,-84Z" fill="#1b6b3a"/>' +
+            '<path d="M0,-150 L14,-124 L-14,-124Z M-38,-84 L-26,-96 L-18,-84Z M38,-84 L26,-96 L18,-84Z M-50,-42 L-36,-54 L-22,-42Z M50,-42 L36,-54 L22,-42Z" fill="#fff"/></g>';
+    }
+
+    function mosque(cx, baseY, s, fill) {
+        return '<g transform="translate(' + f(cx) + ' ' + f(baseY) + ') scale(' + f(s) + ')" fill="' + fill + '">' +
+            '<rect x="-170" y="-110" width="340" height="110"/>' +
+            '<path d="M-92,-110 A92,92 0 0 1 92,-110Z"/><rect x="-3" y="-232" width="6" height="40"/><circle cx="0" cy="-236" r="7"/>' +
+            '<path d="M-170,-110 A42,42 0 0 1 -86,-110Z"/><path d="M86,-110 A42,42 0 0 1 170,-110Z"/>' +
+            '<rect x="-236" y="-270" width="26" height="270"/><path d="M-242,-270 L-223,-318 L-204,-270Z"/><rect x="-241" y="-232" width="36" height="8"/>' +
+            '<rect x="210" y="-270" width="26" height="270"/><path d="M204,-270 L223,-318 L242,-270Z"/><rect x="205" y="-232" width="36" height="8"/>' +
+            '<path d="M-40,0 L-40,-48 A40,40 0 0 1 40,-48 L40,0Z" fill="#fff" opacity=".35"/></g>';
+    }
+
+    function gopuram(cx, baseY, s, fill) {
+        let o = '', y = 0;
+        const tiers = 7;
+        for (let i = 0; i < tiers; i++) {
+            const w = (tiers - i) * 46 + 50, h = 36;
+            o += '<rect x="' + f(-w / 2) + '" y="' + f(-(y + h)) + '" width="' + w + '" height="' + h + '"/>';
+            o += '<rect x="' + f(-w / 2 - 8) + '" y="' + f(-(y + h) - 5) + '" width="' + (w + 16) + '" height="9"/>';
+            for (let k = -2; k <= 2 && i < tiers - 1; k++) o += '<rect x="' + (k * 26 - 6) + '" y="' + f(-(y + h) + 10) + '" width="12" height="18" fill="#fff" opacity=".35"/>';
+            y += h + 4;
+        }
+        o += '<ellipse cx="0" cy="' + f(-y - 12) + '" rx="22" ry="14"/><ellipse cx="-30" cy="' + f(-y - 6) + '" rx="8" ry="10"/><ellipse cx="30" cy="' + f(-y - 6) + '" rx="8" ry="10"/><rect x="-2" y="' + f(-y - 46) + '" width="4" height="30"/>';
+        return '<g transform="translate(' + f(cx) + ' ' + f(baseY) + ') scale(' + f(s) + ')" fill="' + fill + '">' + o + '</g>';
+    }
+
+    function heart(x, y, s, fill, op, rot) {
+        return '<path transform="translate(' + f(x) + ' ' + f(y) + ') rotate(' + f(rot || 0) + ') scale(' + f(s) + ')" d="M0,30 C-62,-8 -34,-52 0,-20 C34,-52 62,-8 0,30Z" fill="' + fill + '" opacity="' + op + '"/>';
+    }
+
+    function burst(cx, cy, R, color, n) {
+        let o = '';
+        for (let i = 0; i < n; i++) {
+            const a = TAU * i / n, c = Math.cos(a), s = Math.sin(a);
+            o += '<line x1="' + f(cx + c * R * 0.3) + '" y1="' + f(cy + s * R * 0.3) + '" x2="' + f(cx + c * R) + '" y2="' + f(cy + s * R) + '" stroke="' + color + '" stroke-width="2.4" stroke-linecap="round"/>' +
+                '<circle cx="' + f(cx + c * R * 1.08) + '" cy="' + f(cy + s * R * 1.08) + '" r="3.6" fill="' + color + '"/>';
+        }
+        return '<g class="fl-pulse">' + o + '<circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="5" fill="' + color + '"/></g>';
+    }
+
+    function balloon(x, y, r, color) {
+        return '<g class="fl-bob"><ellipse cx="' + f(x) + '" cy="' + f(y) + '" rx="' + f(r) + '" ry="' + f(r * 1.2) + '" fill="' + color + '"/>' +
+            '<ellipse cx="' + f(x - r * 0.35) + '" cy="' + f(y - r * 0.4) + '" rx="' + f(r * 0.18) + '" ry="' + f(r * 0.3) + '" fill="#fff" opacity=".5"/>' +
+            '<path d="M' + f(x) + ',' + f(y + r * 1.2) + ' l-5,9 l10,0Z" fill="' + color + '"/>' +
+            '<path d="M' + f(x) + ',' + f(y + r * 1.2 + 9) + ' c-10,30 10,50 0,90" fill="none" stroke="#777" stroke-width="1.5"/></g>';
+    }
+
+    // ---- one drawing per festival ----
+    const themes = {
+        // Rangoli + kolam: rotating rangoli mandalas with dot-and-loop kolam patterns
+        Deepavali: (w, h) => {
+            const m = Math.min(w, h);
+            const palA = ['#ff8c00', '#ff2db4', '#ffd700', '#7b2cbf'];
+            const palB = ['#ff2db4', '#ff8c00', '#ffd700', '#5b21b6'];
+            return '<g opacity=".24">' + rangoli(w * 0.5, h * 0.5, m * 0.48, palA, 'fl-spin') + '</g>' +
+                '<g opacity=".3">' + rangoli(w * 0.03, h * 0.1, m * 0.26, palB, 'fl-spin2') + rangoli(w * 0.97, h * 0.92, m * 0.3, palA, 'fl-spin2') + '</g>' +
+                '<g opacity=".34">' + kolam(w * 0.93, h * 0.2, m * 0.04, '#ff8c00') + kolam(w * 0.07, h * 0.78, m * 0.04, '#a855f7') + '</g>';
+        },
+
+        // Dragon, auspicious clouds, coins
+        CNY: (w, h) => {
+            const m = Math.min(w, h);
+            return '<g opacity=".16">' + coin(w * 0.12, h * 0.18, m * 0.2, '#d4a017', 'fl-spin') + coin(w * 0.9, h * 0.82, m * 0.26, '#d4a017', 'fl-spin2') + '</g>' +
+                '<g class="fl-drift" opacity=".26">' + cloud(w * 0.08, h * 0.38, m * 0.0034 * 100, 'rgba(255,215,0,.25)', '#d4a017') + cloud(w * 0.72, h * 0.12, m * 0.003 * 100, 'rgba(255,215,0,.25)', '#d4a017') + '</g>' +
+                '<g class="fl-drift2" opacity=".24">' + cloud(w * 0.48, h * 0.86, m * 0.0028 * 100, 'rgba(255,215,0,.25)', '#d4a017') + '</g>' +
+                '<g class="fl-drift" opacity=".38">' + dragon(w, h) + '</g>';
+        },
+
+        // Islamic star pattern, crescent and star, mosque skyline
+        HariRaya: (w, h) => {
+            const s = Math.min(h / 900, w / 760);
+            return '<defs><pattern id="flIslam" width="140" height="140" patternUnits="userSpaceOnUse"><g fill="none" stroke="#0b6b3a" stroke-width="1.6">' +
+                '<rect x="37" y="37" width="66" height="66"/><rect x="37" y="37" width="66" height="66" transform="rotate(45 70 70)"/><circle cx="70" cy="70" r="36"/>' +
+                '<path d="M0,-12 L12,0 L0,12 L-12,0Z"/><path transform="translate(140 0)" d="M0,-12 L12,0 L0,12 L-12,0Z"/><path transform="translate(0 140)" d="M0,-12 L12,0 L0,12 L-12,0Z"/><path transform="translate(140 140)" d="M0,-12 L12,0 L0,12 L-12,0Z"/>' +
+                '</g></pattern></defs>' +
+                '<rect width="' + w + '" height="' + h + '" fill="url(#flIslam)" opacity=".2"/>' +
+                '<g class="fl-pulse">' + crescent('flCres', w * 0.84, h * 0.2, Math.min(w, h) * 0.13, '#d4a017', 0.5) + starPoly(w * 0.9, h * 0.15, Math.min(w, h) * 0.04, Math.min(w, h) * 0.017, 5, '#d4a017', 0.5) + '</g>' +
+                '<g opacity=".34">' + mosque(w * 0.5, h + 4, s * 1.05, '#0b6b3a') + mosque(w * 0.12, h + 4, s * 0.6, '#0b6b3a') + mosque(w * 0.88, h + 4, s * 0.6, '#0b6b3a') + '</g>';
+        },
+
+        // Snowy hills, pine trees, snowflake mandalas
+        Christmas: (w, h) => {
+            const m = Math.min(w, h);
+            const hill1 = 'M0,' + f(h * 0.8) + ' C' + f(w * 0.2) + ',' + f(h * 0.7) + ' ' + f(w * 0.4) + ',' + f(h * 0.86) + ' ' + f(w * 0.62) + ',' + f(h * 0.78) + ' S' + f(w * 0.9) + ',' + f(h * 0.72) + ' ' + w + ',' + f(h * 0.8) + ' L' + w + ',' + h + ' L0,' + h + 'Z';
+            const hill2 = 'M0,' + f(h * 0.88) + ' C' + f(w * 0.25) + ',' + f(h * 0.82) + ' ' + f(w * 0.5) + ',' + f(h * 0.94) + ' ' + f(w * 0.75) + ',' + f(h * 0.87) + ' S' + f(w * 0.95) + ',' + f(h * 0.85) + ' ' + w + ',' + f(h * 0.88) + ' L' + w + ',' + h + ' L0,' + h + 'Z';
+            const flake = (cx, cy, R) => petals(cx, cy, 6, R * 0.1, R * 0.9, R * 0.06, 'none', '#6aa6d8', 0) + petals(cx, cy, 6, R * 0.45, R * 0.35, R * 0.08, 'none', '#6aa6d8', 30) + dots(cx, cy, 6, R * 0.2, R * 0.03, '#6aa6d8');
+            const ps = Math.min(h / 700, 1.3);
+            return '<g opacity=".28" class="fl-spin">' + flake(w * 0.1, h * 0.16, m * 0.2) + '</g><g opacity=".28" class="fl-spin2">' + flake(w * 0.9, h * 0.3, m * 0.16) + '</g>' +
+                '<path d="' + hill1 + '" fill="#dcecfb" opacity=".85"/>' +
+                '<g opacity=".92">' + pine(w * 0.05, h * 0.84, ps * 1.15) + pine(w * 0.13, h * 0.8, ps * 0.8) + pine(w * 0.3, h * 0.83, ps * 0.7) + pine(w * 0.7, h * 0.8, ps * 0.75) + pine(w * 0.87, h * 0.78, ps * 0.85) + pine(w * 0.95, h * 0.83, ps * 1.2) + '</g>' +
+                '<path d="' + hill2 + '" fill="#ffffff" opacity=".95"/>';
+        },
+
+        // Jalur Gemilang colours: faint red/white stripes, blue canton with crescent and 14-point star
+        NationalDay: (w, h) => flag(w, h),
+        MalaysiaDay: (w, h) => flag(w, h),
+
+        // Giant harvest moon, drifting clouds, lantern string
+        MooncakeFestival: (w, h) => {
+            const m = Math.min(w, h), cx = w * 0.78, cy = h * 0.3, r = m * 0.24;
+            return '<defs><radialGradient id="flMoonG" cx="40%" cy="38%"><stop offset="0" stop-color="#fffbe0"/><stop offset=".7" stop-color="#ffe9a0"/><stop offset="1" stop-color="#ffd166"/></radialGradient></defs>' +
+                '<circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="' + f(r * 1.9) + '" fill="#ffd166" opacity=".12"/><circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="' + f(r * 1.4) + '" fill="#ffd166" opacity=".18"/>' +
+                '<g class="fl-bob"><circle cx="' + f(cx) + '" cy="' + f(cy) + '" r="' + f(r) + '" fill="url(#flMoonG)" opacity=".75"/>' +
+                '<circle cx="' + f(cx - r * 0.3) + '" cy="' + f(cy - r * 0.25) + '" r="' + f(r * 0.16) + '" fill="#e8c46a" opacity=".5"/><circle cx="' + f(cx + r * 0.25) + '" cy="' + f(cy + r * 0.2) + '" r="' + f(r * 0.22) + '" fill="#e8c46a" opacity=".4"/>' +
+                '<circle cx="' + f(cx + r * 0.05) + '" cy="' + f(cy - r * 0.5) + '" r="' + f(r * 0.1) + '" fill="#e8c46a" opacity=".45"/></g>' +
+                '<g class="fl-drift" opacity=".4">' + cloud(w * 0.1, h * 0.55, m * 0.0034 * 100, 'rgba(255,255,255,.7)', '#c9a24a') + cloud(w * 0.55, h * 0.72, m * 0.003 * 100, 'rgba(255,255,255,.7)', '#c9a24a') + '</g>' +
+                '<g class="fl-drift2" opacity=".35">' + cloud(w * 0.35, h * 0.12, m * 0.0028 * 100, 'rgba(255,255,255,.7)', '#c9a24a') + '</g>' +
+                '<g class="fl-pulse" opacity=".7">' + starPoly(w * 0.12, h * 0.2, 12, 4, 4, '#d4a017') + starPoly(w * 0.3, h * 0.08, 9, 3, 4, '#d4a017') + starPoly(w * 0.6, h * 0.15, 10, 3.5, 4, '#d4a017') + '</g>';
+        },
+
+        // Gopuram temple tower, saffron rangoli and kolam
+        Thaipusam: (w, h) => {
+            const m = Math.min(w, h), s = Math.min(h / 820, w / 640) * 1.05;
+            const pal = ['#ff9933', '#8e44ad', '#ffd700', '#5b2c83'];
+            return '<g opacity=".24">' + rangoli(w * 0.5, h * 0.42, m * 0.42, pal, 'fl-spin') + '</g>' +
+                '<g opacity=".3">' + rangoli(w * 0.04, h * 0.12, m * 0.2, pal, 'fl-spin2') + '</g>' +
+                '<g opacity=".28">' + gopuram(w * 0.5, h + 6, s, '#8e44ad') + gopuram(w * 0.12, h + 6, s * 0.55, '#ff9933') + gopuram(w * 0.88, h + 6, s * 0.55, '#ff9933') + '</g>' +
+                '<g opacity=".3">' + kolam(w * 0.92, h * 0.22, m * 0.035, '#ff9933') + '</g>';
+        },
+
+        // Firework bursts and rising bubbles
+        NewYear: (w, h) => {
+            const m = Math.min(w, h), R = rng(7);
+            let bubbles = '';
+            for (let i = 0; i < 16; i++) bubbles += '<circle class="fl-bob" cx="' + f(R() * w) + '" cy="' + f(h * (0.45 + R() * 0.5)) + '" r="' + f(4 + R() * 10) + '" fill="none" stroke="#d4a017" stroke-width="1.6" opacity=".4" style="animation-delay:-' + f(R() * 7) + 's"/>';
+            return '<g opacity=".34">' + burst(w * 0.2, h * 0.3, m * 0.16, '#d4a017', 28) + burst(w * 0.78, h * 0.24, m * 0.2, '#e11d48', 32) + burst(w * 0.55, h * 0.62, m * 0.13, '#2563eb', 24) + burst(w * 0.9, h * 0.7, m * 0.1, '#d4a017', 20) + burst(w * 0.06, h * 0.78, m * 0.11, '#7c3aed', 22) + '</g>' + bubbles;
+        },
+
+        // Hearts and rose petals
+        Valentines: (w, h) => {
+            const R = rng(21), m = Math.min(w, h);
+            let o = heart(w * 0.5, h * 0.52, m * 0.0125 * 100 / 10 * 5, '#ff7aa2', 0.1, 0);
+            const cols = ['#ff4d7d', '#ff8fb1', '#d70040', '#ffb3c8'];
+            for (let i = 0; i < 22; i++) o += '<g class="' + (i % 2 ? 'fl-bob' : 'fl-pulse') + '" style="animation-delay:-' + f(R() * 6) + 's">' + heart(R() * w, R() * h, 0.4 + R() * 1.1, cols[i % 4], 0.16 + R() * 0.14, (R() - 0.5) * 50) + '</g>';
+            return o;
+        },
+
+        // Bunting across the top and balloon bunches in the corners
+        GrandOpening: (w, h) => {
+            const cols = ['#1a8cd8', '#f39c12', '#27ae60', '#e74c3c', '#9b59b6'];
+            const arcW = 320, arcs = Math.ceil(w / arcW) + 1;
+            let line = 'M0,40', flags = '';
+            for (let k = 0; k < arcs; k++) {
+                const x0 = k * arcW, cx = x0 + arcW / 2, x2 = x0 + arcW;
+                line += ' Q' + cx + ',110 ' + x2 + ',40';
+                for (let j = 0; j < 8; j++) {
+                    const u = (j + 0.5) / 8;
+                    const px = (1 - u) * (1 - u) * x0 + 2 * u * (1 - u) * cx + u * u * x2;
+                    const py = (1 - u) * (1 - u) * 40 + 2 * u * (1 - u) * 110 + u * u * 40;
+                    flags += '<path d="M' + f(px - 15) + ',' + f(py) + ' L' + f(px + 15) + ',' + f(py) + ' L' + f(px) + ',' + f(py + 38) + 'Z" fill="' + cols[(k * 8 + j) % cols.length] + '"/>';
+                }
+            }
+            const m = Math.min(w, h);
+            return '<g opacity=".4"><path d="' + line + '" fill="none" stroke="#555" stroke-width="2"/>' + flags + '</g>' +
+                '<g opacity=".4">' + balloon(w * 0.05, h * 0.62, m * 0.04, '#e74c3c') + balloon(w * 0.09, h * 0.7, m * 0.036, '#1a8cd8') + balloon(w * 0.03, h * 0.74, m * 0.032, '#f39c12') +
+                balloon(w * 0.95, h * 0.6, m * 0.04, '#27ae60') + balloon(w * 0.91, h * 0.69, m * 0.036, '#9b59b6') + balloon(w * 0.97, h * 0.73, m * 0.032, '#f39c12') + '</g>';
+        },
+
+        // Lotus mandala with a soft halo
+        Vesak: (w, h) => {
+            const m = Math.min(w, h), pal = ['#f48fb1', '#ffd54f', '#ce93d8', '#b8860b'];
+            return '<defs><radialGradient id="flHalo"><stop offset="0" stop-color="#ffe082" stop-opacity=".55"/><stop offset="1" stop-color="#ffe082" stop-opacity="0"/></radialGradient></defs>' +
+                '<circle cx="' + f(w * 0.5) + '" cy="' + f(h * 0.5) + '" r="' + f(m * 0.8) + '" fill="url(#flHalo)"/>' +
+                '<g opacity=".26">' + rangoli(w * 0.5, h * 0.5, m * 0.46, pal, 'fl-spin') + '</g>' +
+                '<g opacity=".28">' + rangoli(w * 0.04, h * 0.88, m * 0.22, pal, 'fl-spin2') + rangoli(w * 0.96, h * 0.1, m * 0.2, pal, 'fl-spin2') + '</g>';
+        }
+    };
+
+    function flag(w, h) {
+        const stripeH = h / 14, m = Math.min(w, h);
+        let stripes = '';
+        for (let i = 0; i < 14; i += 2) stripes += '<rect x="0" y="' + f(i * stripeH) + '" width="' + w + '" height="' + f(stripeH) + '" fill="#cc0001"/>';
+        const cw = w * 0.5, ch = stripeH * 8;
+        return '<g class="fl-wave" opacity=".1">' + stripes + '</g>' +
+            '<rect x="0" y="0" width="' + f(cw) + '" height="' + f(ch) + '" fill="#010066" opacity=".1"/>' +
+            crescent('flCres2', cw * 0.38, ch * 0.5, Math.min(cw, ch) * 0.3, '#f5b800', 0.34) +
+            '<g class="fl-spin">' + starPoly(cw * 0.62, ch * 0.5, Math.min(cw, ch) * 0.26, Math.min(cw, ch) * 0.12, 14, '#f5b800', 0.34) + '</g>';
+    }
+
+    return {
+        has: key => !!themes[key],
+        svg: (key, w, h) => themes[key] ? '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' + themes[key](w, h) + '</svg>' : ''
+    };
+})();
 
 // Scene data per theme: people/characters that stroll along the bottom of the screen, props that stand along
 // the ground, the ornament hung on product cards, and the colours the string lights cycle through.
@@ -249,7 +568,7 @@ const FestivalFX = (() => {
         key: null, cfg: null, scene: null, info: null, enabled: true, running: false,
         canvas: null, ctx: null, w: 0, h: 0, dpr: 1, t: 0, last: 0, raf: 0,
         particles: [], rockets: [], sparks: [], glows: [], stars: [], sprites: new Map(), nextFirework: 2,
-        travelerEl: null, garlandEl: null, paradeEl: null, toggleEl: null,
+        travelerEl: null, garlandEl: null, paradeEl: null, toggleEl: null, backdropEl: null,
         travelTimer: 0, paletteTimer: 0, paletteIdx: 0, resizeTimer: 0, bound: false
     };
 
@@ -290,6 +609,30 @@ body.fl-on {
     padding-bottom: 64px;
 }
 @keyframes flBgDrift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+
+/* full-screen festival artwork sits behind the page */
+#fl-backdrop { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; display: none; }
+#fl-backdrop svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+#fl-backdrop .fl-spin { transform-box: fill-box; transform-origin: center; animation: flSpin 120s linear infinite; }
+#fl-backdrop .fl-spin2 { transform-box: fill-box; transform-origin: center; animation: flSpin 160s linear infinite reverse; }
+#fl-backdrop .fl-pulse { transform-box: fill-box; transform-origin: center; animation: flArtPulse 5s ease-in-out infinite alternate; }
+#fl-backdrop .fl-bob { animation: flBob 7s ease-in-out infinite alternate; }
+#fl-backdrop .fl-drift { animation: flDrift 60s ease-in-out infinite alternate; }
+#fl-backdrop .fl-drift2 { animation: flDrift 80s ease-in-out infinite alternate-reverse; }
+#fl-backdrop .fl-wave { animation: flBob 9s ease-in-out infinite alternate; }
+@keyframes flSpin { to { transform: rotate(360deg); } }
+@keyframes flArtPulse { from { opacity: .6; transform: scale(.96); } to { opacity: 1; transform: scale(1.04); } }
+@keyframes flBob { from { transform: translateY(0); } to { transform: translateY(-14px); } }
+@keyframes flDrift { from { transform: translateX(-3%); } to { transform: translateX(3%); } }
+@media (prefers-reduced-motion: reduce) { #fl-backdrop * { animation: none !important; } }
+
+/* let the artwork show through the shop's white panels while a festival is on */
+body.fl-on .dynamic-content-wrapper,
+body.fl-on .about-section,
+body.fl-on .testimony-card,
+body.fl-on .job-card { background: rgba(255,255,255,.80) !important; backdrop-filter: blur(3px); }
+body.fl-on header { background: rgba(255,255,255,.88) !important; }
 
 #fl-fx-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 55; pointer-events: none; display: none; }
 
@@ -388,6 +731,12 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
             document.body.appendChild(S.canvas);
             S.ctx = S.canvas.getContext('2d');
         }
+        if (!S.backdropEl) {
+            S.backdropEl = document.createElement('div');
+            S.backdropEl.id = 'fl-backdrop';
+            S.backdropEl.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(S.backdropEl);
+        }
         if (!S.paradeEl) {
             S.paradeEl = document.createElement('div');
             S.paradeEl.id = 'fl-parade';
@@ -428,7 +777,7 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
             S.bound = true;
             window.addEventListener('resize', () => {
                 clearTimeout(S.resizeTimer);
-                S.resizeTimer = setTimeout(() => { if (S.running) { resize(); seed(); buildGarland(); buildParade(); } }, 200);
+                S.resizeTimer = setTimeout(() => { if (S.running) { resize(); seed(); buildGarland(); buildParade(); buildBackdrop(); } }, 200);
             });
             document.addEventListener('visibilitychange', () => {
                 if (!S.running) return;
@@ -540,23 +889,32 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
 
     }
 
+    function buildBackdrop() {
+        if (!S.backdropEl) return;
+        const w = Math.max(320, window.innerWidth), h = Math.max(480, window.innerHeight);
+        S.backdropEl.innerHTML = FestivalArt.svg(S.key, w, h);
+        S.backdropEl.style.display = FestivalArt.has(S.key) ? 'block' : 'none';
+    }
+
     function launchRocket() {
         const colors = S.cfg.fireworks.colors;
-        S.rockets.push({ x: edgeX(), y: S.h + 10, ty: rand(0.15, 0.45) * S.h, vy: -rand(420, 560), color: pick(colors) });
+        S.rockets.push({ x: rand(0.1, 0.9) * S.w, y: S.h + 10, ty: rand(0.12, 0.45) * S.h, vy: -rand(480, 640), color: pick(colors) });
     }
 
     function explode(x, y, color) {
-        if (S.sparks.length > 500) return;
+        if (S.sparks.length > 900) return;
         const colors = S.cfg.fireworks.colors;
-        const n = 46;
-        for (let i = 0; i < n; i++) {
-            const a = (Math.PI * 2 * i) / n + rand(-0.08, 0.08);
-            const sp = rand(70, 220);
-            S.sparks.push({
-                x: x, y: y, px: x, py: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
-                life: 1, decay: rand(0.55, 0.95), color: Math.random() < 0.25 ? pick(colors) : color
-            });
-        }
+        const big = S.w > 700 ? 1 : 0.7;
+        const ring = (n, speed, c, decay) => {
+            for (let i = 0; i < n; i++) {
+                const a = (Math.PI * 2 * i) / n + rand(-0.05, 0.05);
+                const sp = speed * rand(0.9, 1.1) * big;
+                S.sparks.push({ x: x, y: y, px: x, py: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1, decay: decay * rand(0.9, 1.1), color: c });
+            }
+        };
+        ring(64, 300, color, 0.5);
+        ring(36, 170, pick(colors), 0.65);
+        ring(16, 80, '#ffffff', 0.9);
     }
 
     function frame(ts) {
@@ -609,6 +967,7 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
                 launchRocket();
                 const ev = S.cfg.fireworks.every;
                 S.nextFirework = rand(ev[0], ev[1]);
+                if (Math.random() < 0.4) setTimeout(() => { if (S.running) launchRocket(); }, 400);
             }
             ctx.lineCap = 'round';
             for (let i = S.rockets.length - 1; i >= 0; i--) {
@@ -628,9 +987,9 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
                 sp.x += sp.vx * dt; sp.y += sp.vy * dt;
                 sp.life -= sp.decay * dt;
                 if (sp.life <= 0) { S.sparks.splice(i, 1); continue; }
-                ctx.globalAlpha = Math.max(0, sp.life) * 0.75;
+                ctx.globalAlpha = Math.max(0, sp.life) * 0.9;
                 ctx.strokeStyle = sp.color;
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 2.6;
                 ctx.beginPath(); ctx.moveTo(sp.px, sp.py); ctx.lineTo(sp.x, sp.y); ctx.stroke();
             }
         }
@@ -730,6 +1089,7 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
         seed();
         buildGarland();
         buildParade();
+        buildBackdrop();
         S.last = performance.now();
         S.raf = requestAnimationFrame(frame);
         scheduleTraveler(true);
@@ -749,6 +1109,7 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
         if (S.travelerEl) S.travelerEl.className = 'fl-traveler';
         if (S.garlandEl) S.garlandEl.style.display = 'none';
         if (S.paradeEl) S.paradeEl.style.display = 'none';
+        if (S.backdropEl) S.backdropEl.style.display = 'none';
     }
 
     function applyColors(colors) {
@@ -783,9 +1144,9 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
     function destroy() {
         stop();
         S.cfg = null; S.info = null; S.scene = null;
-        ['fl-fx-canvas', 'fl-garland', 'fl-fx-toggle', 'fl-parade'].forEach(id => { const el = document.getElementById(id); if (el) el.remove(); });
+        ['fl-fx-canvas', 'fl-garland', 'fl-fx-toggle', 'fl-parade', 'fl-backdrop'].forEach(id => { const el = document.getElementById(id); if (el) el.remove(); });
         if (S.travelerEl) S.travelerEl.remove();
-        S.canvas = S.ctx = S.travelerEl = S.garlandEl = S.paradeEl = S.toggleEl = null;
+        S.canvas = S.ctx = S.travelerEl = S.garlandEl = S.paradeEl = S.toggleEl = S.backdropEl = null;
     }
 
     // Festive greeting card inside the homepage hero (call after the hero has been rendered)
@@ -829,8 +1190,13 @@ body.fl-on .pd-card { box-shadow: 0 0 0 2px var(--secondary-color, #ffd700), 0 1
 // Lets you preview a theme by adding ?festival=Christmas (or Deepavali, CNY, ...) to the site address.
 function getPreviewTheme() {
     try {
-        const wanted = new URLSearchParams(window.location.search).get('festival');
-        if (!wanted || !FESTIVAL_THEMES[wanted]) return null;
+        let wanted = new URLSearchParams(window.location.search).get('festival');
+        if (!wanted) return null;
+        const n = wanted.toLowerCase().replace(/[^a-z0-9]/g, '');
+        let k = FESTIVAL_THEMES[wanted] ? wanted : null;
+        if (!k) { const m = FESTIVAL_MATCHERS.find(x => x[1].test(n)); k = m ? m[0] : null; }
+        if (!k) return null;
+        wanted = k;
         return { FestivalID: wanted.toUpperCase() + '-PREVIEW', EventName: wanted, ThemeName: wanted, WelcomeMessage: 'Preview of the ' + wanted + ' theme.', EndDate: '' };
     } catch (e) { return null; }
 }
