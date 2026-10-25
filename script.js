@@ -8,7 +8,7 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycby-hec18gFJArCVEO0jFidW0xeMuQQbhNoEhZ-3Qsz8NwSo7QhBZfpivBcz3w5CEmSVmg/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwhqlu3qRh4sWu6FeGLU1v06M-moCq6NULxc98e74XrlFkOX4hJNINZe-c9klqWmQvgLA/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 // SECURITY NOTE: anything in this file is public. Treat this key as non-secret and
 // make sure the bot server does not rely on it alone for sensitive actions.
