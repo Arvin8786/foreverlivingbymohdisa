@@ -65,13 +65,22 @@
         <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
         <h1>Customer Portal</h1>
         <p>Login to view your orders, points, and more.</p>
-        <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
+        <form id="login-form">
             <input type="email" id="customer-email-input" placeholder="Your Email" required>
             <input type="password" id="customer-password-input" placeholder="Password" required> 
             <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">
                 <i class="fa-solid fa-right-to-bracket"></i> Login
             </button>
             <p id="login-status"></p>
+        </form>
+        <p style="margin-top:18px; font-size:.9rem;"><a href="#" id="show-register-link">First time? Set your password</a></p>
+        <form id="register-form" class="hidden" onsubmit="event.preventDefault(); handleRegister();" style="margin-top:10px;">
+            <p style="font-size:.85rem;">Use the same email and phone number you gave when you placed an order.</p>
+            <input type="email" id="reg-email" placeholder="Email used on your order" required>
+            <input type="tel" id="reg-phone" placeholder="Phone number used on your order" required>
+            <input type="password" id="reg-password" placeholder="Choose a password (min 6 characters)" minlength="6" required>
+            <button type="submit" id="register-btn" class="btn btn-primary" style="width:100%;">Set Password</button>
+            <p id="register-status"></p>
         </form>
     </div>
 </div>
@@ -164,18 +173,55 @@
 // =================================================================
 // CUSTOMER PORTAL SCRIPT
 // =================================================================
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxgtIUAZT4XOonxdLLCI0ftDpEIT84al5TsTBJ2mlbxzKu21cglHagAyFdafJP-VO8N2w/exec'; 
+// Same web-app deployment as script.js and agent.html. Change it in all three files together.
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzVokpOK02K0Qe4D4LTmJv2JmWGLhNzBE9gOYhhArmi16gls99G_ItfHWH5CcRjErd65A/exec'; 
 
 // --- Global State Variables ---
 let products = [];
 let shippingRules = [];
 let currentCustomer = null; 
 let cart = [];
+let sessionToken = null;
+
+function esc(v) {
+    return String(v === undefined || v === null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+const num = v => { const n = parseFloat(String(v === undefined || v === null ? '' : v).replace(/[^0-9.\-]/g, '')); return isNaN(n) ? 0 : n; };
+
+// ---- Shipping: same rules as the shop and the server ----
+function normaliseShippingRules(raw) {
+    if (!Array.isArray(raw)) return [];
+    return raw.map(r => {
+        let type = String(r.type || r.RuleType || 'tiered').toLowerCase().replace(/[^a-z]/g, '');
+        if (type !== 'free' && type !== 'flatrate') type = 'tiered';
+        const max = num(r.maxSpend !== undefined ? r.maxSpend : r.MaxSpend);
+        return { type: type, minSpend: num(r.minSpend !== undefined ? r.minSpend : r.MinSpend), maxSpend: max > 0 ? max : 999999999,
+                 charge: type === 'free' ? 0 : Math.max(0, num(r.charge !== undefined ? r.charge : r.Charge)) };
+    }).sort((a, b) => a.minSpend - b.minSpend);
+}
+function calcShipping(subtotal) {
+    if (!shippingRules.length) return 0;
+    const amount = Math.round(Number(subtotal) * 100) / 100;
+    const inRange = r => amount >= r.minSpend && amount <= r.maxSpend;
+    const promos = shippingRules.filter(r => r.type !== 'tiered' && inRange(r));
+    if (promos.length) return Math.min(...promos.map(r => r.charge));
+    const tiers = shippingRules.filter(r => r.type === 'tiered');
+    if (!tiers.length) return 0;
+    const hit = tiers.filter(inRange).pop();
+    if (hit) return hit.charge;
+    if (amount < tiers[0].minSpend) return tiers[0].charge;
+    const below = tiers.filter(r => amount > r.maxSpend).pop();
+    return below ? below.charge : tiers[0].charge;
+}
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-form').addEventListener('submit', (e) => { e.preventDefault(); handleLogin(); });
-    document.getElementById('logout-btn').addEventListener('click', () => location.reload());
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+        try { if (sessionToken) await postToGoogleScript('customerLogout', {}); } catch (e) { /* leaving anyway */ }
+        sessionToken = null; location.reload();
+    });
+    document.getElementById('show-register-link').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('register-form').classList.toggle('hidden'); });
     document.getElementById('nav-shop-btn').addEventListener('click', () => showView('shop-view'));
     document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
     document.getElementById('nav-my-rewards-btn').addEventListener('click', () => showView('my-rewards-view'));
@@ -199,29 +245,57 @@ async function handleLogin() {
         const response = await postToGoogleScript('verifyCustomer', { email, password });
         if (response.success) {
             currentCustomer = response.customer;
+            sessionToken = response.token;
+            document.getElementById('customer-password-input').value = '';
             await fetchPortalData();
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
-            document.getElementById('customer-welcome-header').textContent = `Welcome, ${currentCustomer.customerName}`;
+            document.getElementById('customer-welcome-header').textContent = `Welcome, ${currentCustomer.customerName || ''}`;
             document.getElementById('customer-details-display').textContent = `PAC: ${currentCustomer.pac}`;
             
             // Check for a saved cart
             if (response.savedCart && response.savedCart.length > 0) {
-                if (confirm("You have a saved cart. Would you like to load it?")) {
-                    cart = response.savedCart;
+                // The server stores only ids and quantities; rebuild the lines from the current product list
+                const restored = response.savedCart
+                    .map(i => { const p = products.find(x => String(x.id) === String(i.id)); return p ? { ...p, quantity: Math.max(1, parseInt(i.quantity, 10) || 1) } : null; })
+                    .filter(Boolean);
+                if (restored.length && confirm("You have a saved cart. Would you like to load it?")) {
+                    cart = restored;
                     renderCartSummary();
                 }
             }
             showView('shop-view'); 
         } else {
-            loginStatus.textContent = response.message || "Login failed.";
+            loginStatus.textContent = response.message || "Login failed."; loginStatus.style.color = 'var(--danger-color, red)';
         }
     } catch (error) {
-        loginStatus.textContent = "Connection failed. Please try again.";
+        loginStatus.textContent = /Unknown action/i.test(error.message) ? "Customer login is not available yet." : "Connection failed. Please try again.";
         console.error("Login error:", error);
     } finally {
         loginBtn.disabled = false;
     }
+}
+
+async function handleRegister() {
+    const st = document.getElementById('register-status');
+    const btn = document.getElementById('register-btn');
+    btn.disabled = true; st.textContent = 'Please wait...';
+    try {
+        const res = await postToGoogleScript('registerCustomer', {
+            email: document.getElementById('reg-email').value.trim(),
+            phone: document.getElementById('reg-phone').value.trim(),
+            password: document.getElementById('reg-password').value
+        });
+        st.style.color = res.success ? 'var(--success-color, green)' : 'var(--danger-color, red)';
+        st.textContent = res.message || (res.success ? 'Done.' : 'Could not set the password.');
+        if (res.success) {
+            document.getElementById('customer-email-input').value = document.getElementById('reg-email').value.trim();
+            document.getElementById('reg-password').value = '';
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-status').textContent = 'Password set. Please log in.';
+        }
+    } catch (e) { st.style.color = 'var(--danger-color, red)'; st.textContent = 'Connection failed. Please try again.'; }
+    finally { btn.disabled = false; }
 }
 
 async function fetchPortalData() {
@@ -229,7 +303,7 @@ async function fetchPortalData() {
         const response = await postToGoogleScript('getCustomerPortalData');
         if (response.success) {
             products = response.products;
-            shippingRules = (response.shippingRules || []).sort((a, b) => b.minSpend - a.minSpend);
+            shippingRules = normaliseShippingRules(response.shippingRules);
             renderShopView();
         } else { throw new Error(response.message); }
     } catch (error) { console.error(error); alert('Could not load shop data.'); }
@@ -253,7 +327,7 @@ function showView(viewId) {
 function renderShopView() {
     const container = document.getElementById('product-list');
     const searchTerm = document.getElementById('product-search').value.toLowerCase();
-    const filtered = products.filter(p => p.name.toLowerCase().includes(searchTerm));
+    const filtered = products.filter(p => String(p.name || '').toLowerCase().includes(searchTerm));
 
     if (filtered.length === 0) {
         container.innerHTML = "<p style='padding: 15px; text-align: center;'>No products found.</p>";
@@ -261,12 +335,12 @@ function renderShopView() {
     }
     container.innerHTML = filtered.map(p => `
         <div class="product-item">
-            <img src="${p.image}" alt="${p.name}" onerror="this.src='FL.jpg';">
+            <img src="${esc(p.image)}" alt="${esc(p.name)}" onerror="this.src='FL.jpg';">
             <div>
-                <strong>${p.name}</strong>
-                <p style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">RM ${p.price.toFixed(2)}</p>
+                <strong>${esc(p.name)}</strong>
+                <p style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">RM ${num(p.price).toFixed(2)}</p>
             </div>
-            <button class="btn btn-primary" onclick="addToCart('${p.id}')">Add</button>
+            <button class="btn btn-primary" data-id="${esc(p.id)}" onclick="addToCart(this.dataset.id)">Add</button>
         </div>
     `).join('');
 }
@@ -275,10 +349,10 @@ async function renderMyOrders() {
     const container = document.getElementById('my-orders-list');
     container.innerHTML = '<p>Loading order history...</p>';
     try {
-        const response = await postToGoogleScript('getCustomerOrders', { pac: currentCustomer.pac });
+        const response = await postToGoogleScript('getCustomerOrders', {});
         if (response.success && response.orders.length > 0) {
             container.innerHTML = `<table><thead><tr><th>Invoice ID</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
-                <tbody>${response.orders.map(o => `<tr><td>${o.invoiceId}</td><td>${o.date}</td><td>RM ${o.total}</td><td>${o.status}</td></tr>`).join('')}</tbody>
+                <tbody>${response.orders.map(o => `<tr><td>${esc(o.invoiceId)}</td><td>${esc(o.date)}</td><td>RM ${esc(o.total)}</td><td>${esc(o.status)}</td></tr>`).join('')}</tbody>
             </table>`;
         } else { container.innerHTML = '<p>You have no past orders.</p>'; }
     } catch(e) { container.innerHTML = `<p style="color:var(--danger-color);">Could not load orders.</p>`; }
@@ -342,13 +416,13 @@ function renderCartSummary() {
         container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Your cart is empty.</p>";
     } else {
         container.innerHTML = cart.map(item => `
-            <div class="summary-item">
+ <div class="summary-item" data-id="${esc(item.id)}">
                 <div>
-                    <strong>${item.name}</strong>
-                    <p>RM ${item.price.toFixed(2)}</p>
+                    <strong>${esc(item.name)}</strong>
+                    <p>RM ${num(item.price).toFixed(2)}</p>
                 </div>
-                <input type="number" value="${item.quantity}" onchange="updateQuantity('${item.id}', this.value)" style="width: 60px; padding: 5px;">
-                <span onclick="removeItemFromCart('${item.id}')" style="cursor:pointer; text-align:center; color: var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
+                <input type="number" min="1" max="999" value="${item.quantity}" onchange="updateQuantity(this.parentNode.dataset.id, this.value)" style="width: 60px; padding: 5px;">
+                <span onclick="removeItemFromCart(this.parentNode.dataset.id)" style="cursor:pointer; text-align:center; color: var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
             </div>
         `).join('');
     }
@@ -356,10 +430,8 @@ function renderCartSummary() {
 }
 
 function calculateTotals() {
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    let shippingFee = 0;
-    const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
-    if (bestRule) shippingFee = bestRule.charge;
+    const subtotal = Math.round(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 100) / 100;
+    const shippingFee = cart.length ? calcShipping(subtotal) : 0;
     const finalTotal = subtotal + shippingFee;
 
     document.getElementById('summary-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
@@ -368,8 +440,10 @@ function calculateTotals() {
 }
 
 async function saveCart() {
-    const response = await postToGoogleScript('saveCustomerCart', { pac: currentCustomer.pac, cart: cart });
-    alert(response.message);
+    try {
+        const response = await postToGoogleScript('saveCustomerCart', { cart: cart.map(i => ({ id: i.id, quantity: i.quantity })) });
+        alert(response.message || 'Saved.');
+    } catch (e) { if (e.message !== 'SESSION_EXPIRED') alert('Could not save the cart.'); }
 }
 
 async function initiateCheckout() {
@@ -378,27 +452,21 @@ async function initiateCheckout() {
     const statusEl = document.getElementById('checkout-status');
     statusEl.textContent = 'Processing...';
 
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    let shippingFee = 0;
-    const bestRule = shippingRules.find(rule => subtotal >= rule.minSpend);
-    if (bestRule) shippingFee = bestRule.charge;
-    const totalAmount = subtotal + shippingFee;
-    
+    // Only ids and quantities are sent. The server prices the order and works out shipping itself.
     const payload = {
+        token: sessionToken,
         customerName: currentCustomer.customerName,
         customerEmail: currentCustomer.customerEmail,
         customerPhone: currentCustomer.customerPhone,
         customerAddress: currentCustomer.customerAddress,
-        itemsPurchased: cart.map(item => `${item.id}x${item.quantity}`).join(', '),
-        totalAmount: totalAmount,
-        shippingFee: shippingFee,
-        cart: cart,
+        cart: cart.map(i => ({ id: i.id, quantity: i.quantity }))
     };
 
     try {
         const response = await postToGoogleScript('logInitialOrder', payload);
         if (response.status === 'success') {
             statusEl.textContent = "Order Placed!";
+            alert(`Order ${response.invoiceId} placed.\nShipping: RM ${num(response.shippingFee).toFixed(2)}\nTotal: RM ${num(response.totalAmount).toFixed(2)}`);
             cart = [];
             renderCartSummary();
             alert("Your order has been placed successfully! We will contact you shortly to confirm payment.");
@@ -406,20 +474,21 @@ async function initiateCheckout() {
         } else { throw new Error(response.message); }
     } catch (e) {
         statusEl.textContent = "Checkout failed.";
-        alert(`Error: ${e.message}`);
+        if (e.message !== 'SESSION_EXPIRED') alert(`Error: ${e.message}`);
     }
 }
 
 async function saveProfile() {
     const statusEl = document.getElementById('profile-status');
     const payload = {
-        pac: currentCustomer.pac,
         customerName: document.getElementById('prof-name').value,
         customerPhone: document.getElementById('prof-phone').value,
         customerAddress: document.getElementById('prof-address').value
     };
     statusEl.textContent = 'Saving...';
-    const response = await postToGoogleScript('updateCustomerProfile', payload);
+    let response;
+    try { response = await postToGoogleScript('updateCustomerProfile', payload); }
+    catch (e) { if (e.message !== 'SESSION_EXPIRED') statusEl.textContent = 'Could not save. Please try again.'; return; }
     if (response.success) {
         statusEl.style.color = 'var(--success-color)';
         // Update local state
@@ -429,14 +498,14 @@ async function saveProfile() {
     } else {
         statusEl.style.color = 'var(--danger-color)';
     }
-    statusEl.textContent = response.message;
+    statusEl.textContent = response.message || '';
 }
 
 // =================================================================
 // UTILITY FUNCTIONS 
 // =================================================================
 async function postToGoogleScript(action, data = {}) {
-    const payload = { action, data };
+    const payload = { action, data: Object.assign({}, data, sessionToken && data.token === undefined ? { token: sessionToken } : {}) };
     try {
         const response = await fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST', mode: 'cors', credentials: 'omit',
@@ -445,7 +514,7 @@ async function postToGoogleScript(action, data = {}) {
         });
         if (!response.ok) { throw new Error(`HTTP Error ${response.status}`); }
         const responseText = await response.text();
-        try { return JSON.parse(responseText); } catch (e) { console.error("Invalid JSON response:", responseText); throw new Error("Invalid server response."); }
+        try { const out = JSON.parse(responseText); if (out && out.success === false && out.message === 'SESSION_EXPIRED') { sessionToken = null; alert('Your session has expired. Please log in again.'); location.reload(); throw new Error('SESSION_EXPIRED'); } if (out && out.success === false && /Unknown action/i.test(out.message || '')) throw new Error(out.message); return out; } catch (e) { if (/Unknown action|SESSION_EXPIRED/i.test(e.message)) throw e; console.error("Invalid JSON response:", responseText); throw new Error("Invalid server response."); }
     } catch (error) { throw error; }
 }
 </script>
