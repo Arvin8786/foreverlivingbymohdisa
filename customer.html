@@ -7,58 +7,12 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/jpeg" href="FL.jpg">
-    
-    <style>
-        /* All styles from agent.html are reused for a consistent look and feel */
-        :root {
-            --primary-color: #1a5276; --secondary-color: #f39c12; --success-color: #198754;
-            --light-gray: #f4f6f8; --mid-gray: #e9ecef; --dark-text: #333; --light-text: #fff;
-            --danger-color: #dc3545; --border-radius-lg: 12px; --border-radius-sm: 8px;
-            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08); --font-family: 'Poppins', sans-serif;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0;}
-        body { font-family: var(--font-family); background: var(--light-gray); color: var(--dark-text); line-height: 1.5; }
-        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
-        h1, h2, h3 { color: var(--dark-text); font-weight: 600; }
-        h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
-        .btn { 
-            display: inline-flex; align-items: center; justify-content: center; padding: 12px 25px; 
-            font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; gap: 8px; 
-        }
-        .btn-primary { background: var(--primary-color); color: var(--light-text); border-radius: 50px; box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3); }
-        .btn-primary:hover:not(:disabled) { background: #113a56; box-shadow: 0 6px 12px rgba(26, 82, 118, 0.4); transform: translateY(-2px); }
-        .btn-secondary { background: var(--mid-gray); color: var(--dark-text); border-radius: var(--border-radius-sm); }
-        .btn-secondary:hover:not(:disabled) { background: #d0d7dd; }
-        .btn:disabled { background-color: #ccc !important; cursor: not-allowed !important; box-shadow: none; transform: none; }
-        .card { background: var(--light-text); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); padding: 30px; margin-bottom: 25px; }
-        .card h3 { border-bottom: 2px solid var(--mid-gray); padding-bottom: 10px; margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: var(--border-radius-sm); font-family: inherit; font-size: 1rem; }
-        .hidden { display: none !important; }
-        #login-view { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1a5276 0%, #34495e 100%); }
-        #login-box { padding: 50px; max-width: 400px; text-align: center; background: #fff; border-radius: 15px; border-top: 5px solid var(--primary-color); }
-        #portal-view header { padding: 15px 30px; display: flex; align-items: center; justify-content: space-between; }
-        #portal-view nav { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 25px; background-color: var(--primary-color); border-radius: var(--border-radius-sm); overflow: hidden; box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3); }
-        #portal-view nav .btn { background: transparent; color: var(--light-text); border: none; border-radius: 0; flex-grow: 1; padding: 15px 20px; }
-        #portal-view nav .btn.active { background: var(--secondary-color); color: var(--dark-text); box-shadow: none; }
-        #portal-view nav .btn:hover:not(.active) { background: rgba(255, 255, 255, 0.1); }
-        #shop-workflow { display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: flex-start; }
-        #product-list { max-height: 800px; overflow-y: auto; border: 1px solid var(--mid-gray); border-radius: var(--border-radius-sm); }
-        .product-item { display: grid; grid-template-columns: 80px 1fr auto; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid var(--mid-gray); }
-        .product-item img { width: 70px; height: 70px; object-fit: contain; border-radius: 4px; }
-        .summary-item { display: grid; grid-template-columns: 1fr 60px 30px; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--mid-gray); }
-        .summary-line { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .summary-line.total { font-size: 1.6rem; color: var(--primary-color); font-weight: 700; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: var(--mid-gray); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
-        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
-        .profile-item label { font-weight: 600; display: block; color: #666; margin-bottom: 5px; font-size: 0.9rem;}
-    </style>
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
-<body>
+<body class="portal">
 
 <div id="login-view">
     <div class="card" id="login-box">
@@ -174,7 +128,7 @@
 // CUSTOMER PORTAL SCRIPT
 // =================================================================
 // Same web-app deployment as script.js and agent.html. Change it in all three files together.
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-hec18gFJArCVEO0jFidW0xeMuQQbhNoEhZ-3Qsz8NwSo7QhBZfpivBcz3w5CEmSVmg/exec'; 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhqlu3qRh4sWu6FeGLU1v06M-moCq6NULxc98e74XrlFkOX4hJNINZe-c9klqWmQvgLA/exec'; 
 
 // --- Global State Variables ---
 let products = [];
@@ -345,6 +299,11 @@ function renderShopView() {
     `).join('');
 }
 
+function statusBadge(st) {
+    const v = String(st || '').toLowerCase();
+    const cls = (v === 'completed' || v === 'paid') ? 'badge-success' : v.indexOf('pending') >= 0 ? 'badge-warn' : v.indexOf('open') >= 0 ? 'badge-info' : v === 'cancelled' ? 'badge-danger' : '';
+    return `<span class="badge ${cls}">${esc(st || '-')}</span>`;
+}
 async function renderMyOrders() {
     const container = document.getElementById('my-orders-list');
     container.innerHTML = '<p>Loading order history...</p>';
@@ -352,7 +311,7 @@ async function renderMyOrders() {
         const response = await postToGoogleScript('getCustomerOrders', {});
         if (response.success && response.orders.length > 0) {
             container.innerHTML = `<table><thead><tr><th>Invoice ID</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
-                <tbody>${response.orders.map(o => `<tr><td>${esc(o.invoiceId)}</td><td>${esc(o.date)}</td><td>RM ${esc(o.total)}</td><td>${esc(o.status)}</td></tr>`).join('')}</tbody>
+                <tbody>${response.orders.map(o => `<tr><td><strong>${esc(o.invoiceId)}</strong></td><td>${esc(o.date)}</td><td class="num">RM ${esc(o.total)}</td><td>${statusBadge(o.status)}</td></tr>`).join('')}</tbody>
             </table>`;
         } else { container.innerHTML = '<p>You have no past orders.</p>'; }
     } catch(e) { container.innerHTML = `<p style="color:var(--danger-color);">Could not load orders.</p>`; }
