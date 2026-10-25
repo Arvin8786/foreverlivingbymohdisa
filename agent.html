@@ -470,7 +470,7 @@
 // AGENT PORTAL SCRIPT - LUXURY EDITION (CORRECTED)
 // =================================================================
 // Same web-app deployment as script.js and customer.html. Change it in all three files together.
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzVokpOK02K0Qe4D4LTmJv2JmWGLhNzBE9gOYhhArmi16gls99G_ItfHWH5CcRjErd65A/exec'; 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-hec18gFJArCVEO0jFidW0xeMuQQbhNoEhZ-3Qsz8NwSo7QhBZfpivBcz3w5CEmSVmg/exec'; 
 
 let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
 let currentProfile = {}, canEditProfile = false, allAgentsList = [], sessionToken = null;
@@ -897,8 +897,9 @@ async function fetchPortalData() {
             renderCustomerDropdown(); 
             if (!document.getElementById('create-order-view').classList.contains('hidden')) calculateTotals();
         }
-        else { throw new Error(res.message); }
-    } catch (error) { if (error.message !== 'SESSION_EXPIRED') alert('Could not load portal data.'); }
+        else { throw new Error(res.message || 'The server returned no data.'); }
+        if (res.warnings && res.warnings.length) console.warn('Portal data warnings:', res.warnings);
+    } catch (error) { if (error.message !== 'SESSION_EXPIRED') alert('Could not load portal data.\n\nDetails: ' + (error.message || error)); }
 }
 function sessionExpired() {
     sessionToken = null;
