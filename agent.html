@@ -8,289 +8,15 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/jpeg" href="FL.jpg">
-    
-    <style>
-        /* [ 1.0 ] LUXURY VARIABLES */
-        :root {
-            /* Palette */
-            --primary-dark: #0F1F1C;       /* Obsidian Green */
-            --primary-main: #1A3C34;       /* Deep Emerald */
-            --accent-gold: #D4AF37;        /* Metallic Gold */
-            --accent-gold-dim: #C5A059;    /* Muted Gold */
-            --bg-body: #F4F5F7;            /* Mist Gray */
-            --bg-card: #FFFFFF;            /* Pure White */
-            
-            /* Text */
-            --text-heading: #111111;
-            --text-body: #4A4A4A;
-            --text-muted: #888888;
-            
-            /* Status */
-            --success: #2E7D32;
-            --danger: #9e2b25;
-
-            /* Typography */
-            --font-heading: 'Cormorant Garamond', serif;
-            --font-body: 'Montserrat', sans-serif;
-
-            /* UI Elements */
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --shadow-subtle: 0 4px 20px rgba(0,0,0,0.04);
-            --shadow-elevated: 0 10px 40px rgba(0,0,0,0.08);
-            --border-light: 1px solid rgba(0,0,0,0.08);
-            --transition: all 0.3s ease;
-
-            /* aliases: older rules in this page use these names */
-            --primary-color: var(--primary-main);
-            --secondary-color: var(--accent-gold-dim);
-            --accent-color: var(--accent-gold);
-            --text-main: var(--text-body);
-            --danger-color: var(--danger);
-            --success-color: var(--success);
-        }
-        
-        /* [ 2.0 ] RESET & TYPOGRAPHY */
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-        
-        body { 
-            font-family: var(--font-body); 
-            background-color: var(--bg-body); 
-            color: var(--text-body); 
-            line-height: 1.7; 
-            font-size: 14px;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-        
-        h1, h2, h3, h4 { 
-            font-family: var(--font-heading); 
-            color: var(--text-heading); 
-            font-weight: 600; 
-            letter-spacing: -0.02em;
-        }
-
-        h1 { font-size: 3rem; }
-        h2 { font-size: 2.2rem; }
-        h3 { font-size: 1.5rem; margin-bottom: 15px; color: var(--primary-main); }
-        h4 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-gold-dim); margin-top: 10px; }
-
-        /* [ 3.0 ] UI COMPONENTS */
-        
-        /* Buttons */
-        .btn { 
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px 28px; 
-            text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.7rem; font-weight: 600;
-            border: 1px solid transparent; cursor: pointer; transition: var(--transition); 
-            border-radius: var(--radius-sm);
-        }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(1); }
-        
-        .btn-primary { 
-            background: var(--primary-main); 
-            color: #fff; 
-            box-shadow: 0 4px 15px rgba(26, 60, 52, 0.3);
-        }
-        .btn-primary:hover:not(:disabled) { 
-            background: var(--primary-dark); 
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(26, 60, 52, 0.4);
-        }
-        
-        .btn-secondary { 
-            background: transparent; 
-            border-color: var(--accent-gold); 
-            color: var(--accent-gold-dim); 
-        }
-        .btn-secondary:hover:not(:disabled) { 
-            background: var(--accent-gold); 
-            color: #fff; 
-        }
-
-        /* Cards */
-        .card { 
-            background: var(--bg-card); 
-            border-radius: var(--radius-md); 
-            box-shadow: var(--shadow-subtle); 
-            padding: 40px; 
-            margin-bottom: 30px; 
-            border: var(--border-light);
-            position: relative;
-            overflow: hidden;
-        }
-        /* Top gold line on cards for flair */
-        .card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, var(--primary-main), var(--accent-gold), var(--primary-main));
-            opacity: 0.8;
-        }
-
-        /* Inputs */
-        input, select, textarea { 
-            width: 100%; padding: 15px 0; margin-bottom: 25px; border: none;
-            border-bottom: 1px solid #ddd; background: transparent; font-size: 1rem;
-            font-family: var(--font-body); transition: var(--transition); 
-            color: var(--text-heading);
-        }
-        input::placeholder { color: #aaa; font-weight: 300; font-family: var(--font-heading); font-style: italic;}
-        input:focus, select:focus, textarea:focus { 
-            border-bottom-color: var(--accent-gold); 
-            outline: none;
-        }
-        
-        /* Select Dropdown styling fix */
-        select { -webkit-appearance: none; cursor: pointer; border-radius: 0; }
-        
-        .hidden { display: none !important; }
-
-        /* [ 4.0 ] LOGIN SCREEN */
-        #login-view { 
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; 
-            background: var(--primary-dark);
-            background-image: radial-gradient(circle at 50% 50%, #234 0%, #0F1F1C 100%);
-        }
-        #login-box { 
-            width: 420px; text-align: center; 
-            box-shadow: var(--shadow-elevated);
-            border: none;
-        }
-        #login-box img { 
-            border-radius: 50%; box-shadow: 0 0 0 5px rgba(212, 175, 55, 0.1); 
-        }
-
-        /* [ 5.0 ] HEADER & NAV */
-        header { 
-            display: flex; justify-content: space-between; align-items: flex-start; 
-            padding-bottom: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); margin-bottom: 40px; 
-        }
-        #agent-welcome-header { margin: 0; font-size: 2.5rem; color: var(--primary-main); }
-        #agent-details-display { 
-            font-size: 0.85rem; color: var(--accent-gold-dim); 
-            font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; margin-top: 5px;
-        }
-
-        /* Target Bar */
-        .target-bar-container { 
-            width: 100%; height: 4px; background: #eee; 
-            border-radius: 2px; margin-top: 15px; overflow: hidden; 
-        }
-        .target-progress { 
-            height: 100%; 
-            background: linear-gradient(90deg, var(--primary-main), var(--accent-gold)); 
-            transition: width 1s ease-in-out; 
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-        }
-
-        /* Navigation */
-        nav { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
-            gap: 15px; margin-bottom: 40px; 
-        }
-        nav .btn { 
-            flex-direction: column; gap: 8px; padding: 15px 10px;
-            background: #fff; border: 1px solid transparent; 
-            color: var(--text-muted); box-shadow: var(--shadow-subtle);
-            font-size: 0.65rem; height: 100%;
-        }
-        nav .btn i { font-size: 1.2rem; margin-bottom: 2px; transition: var(--transition); }
-        nav .btn:hover { 
-            color: var(--primary-main); transform: translateY(-3px); 
-            box-shadow: var(--shadow-elevated);
-        }
-        nav .btn.active { 
-            background: var(--primary-main); color: #fff; 
-            border-color: var(--primary-main);
-            box-shadow: inset 0 3px 10px rgba(0,0,0,0.2);
-        }
-        nav .btn.active i { color: var(--accent-gold); }
-
-        /* [ 6.0 ] TABLES */
-        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; }
-        th { 
-            text-align: left; padding: 18px; 
-            background: #fafafa; color: var(--text-heading); 
-            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
-            border-bottom: 2px solid #eee;
-        }
-        td { 
-            padding: 18px; border-bottom: 1px solid #f0f0f0; 
-            font-size: 0.95rem; color: var(--text-body);
-        }
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background: #fcfcfc; color: var(--primary-main); }
-        
-        /* [ 7.0 ] MARKETPLACE & LISTS */
-        .open-order-card { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 25px; border: 1px solid #f0f0f0; margin-bottom: 20px; 
-            background: #fff; transition: var(--transition);
-            border-radius: var(--radius-sm);
-            border-left: 3px solid transparent;
-        }
-        .open-order-card:hover { 
-            border-left-color: var(--accent-gold); 
-            box-shadow: var(--shadow-elevated); 
-            transform: translateX(5px);
-        }
-        .open-order-info strong { 
-            color: var(--primary-main); font-family: var(--font-heading); 
-            font-size: 1.4rem; display: block; margin-bottom: 5px;
-        }
-        
-        /* [ 8.0 ] CREATE ORDER WORKFLOW */
-        #order-creation-workflow { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; }
-        
-        .product-item-selectable { 
-            display: flex; align-items: center; gap: 20px; padding: 20px; 
-            border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: 0.2s;
-        }
-        .product-item-selectable:hover { background: #fbfbfb; }
-        .product-item-selectable img { 
-            width: 60px; height: 60px; object-fit: cover; 
-            border-radius: 4px; box-shadow: var(--shadow-subtle); 
-        }
-
-        #summary-items-list { background: #f9f9f9; padding: 20px; border-radius: var(--radius-sm); }
-        
-        #summary-total { color: var(--accent-gold-dim) !important; font-family: var(--font-heading); font-size: 1.8rem !important; }
-
-        /* [ 9.0 ] PROFILE & DASHBOARD */
-        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-        .profile-item label { 
-            font-size: 0.7rem; text-transform: uppercase; color: var(--accent-gold-dim); 
-            font-weight: 600; letter-spacing: 0.1em; display: block; margin-bottom: 8px; 
-        }
-        .profile-item input { font-size: 1.1rem; color: var(--text-heading); font-weight: 500; border-bottom: 1px solid #eee; padding-bottom: 10px;}
-        .profile-item input:disabled { background: transparent; color: var(--text-muted); border-bottom: 1px dotted #ddd; }
-        
-        /* Stats Box */
-        .stat-box {
-            background: #fff; border: 1px solid #f0f0f0; padding: 25px;
-            text-align: center; border-radius: var(--radius-sm);
-            transition: var(--transition);
-        }
-        .stat-box:hover { box-shadow: var(--shadow-elevated); transform: translateY(-5px); }
-        .stat-label { font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block;}
-        .stat-value { font-size: 2rem; font-family: var(--font-heading); font-weight: 700; color: var(--primary-main); }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            #order-creation-workflow { grid-template-columns: 1fr; }
-            header { flex-direction: column; gap: 20px; text-align: center; align-items: center; }
-            h1 { font-size: 2.5rem; }
-            #login-box { width: 90%; }
-        }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
-<body>
+<body class="portal">
 <div id="login-view">
     <div class="card" id="login-box">
         <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
@@ -331,14 +57,14 @@
     </header>
 
     <nav>
-        <button id="nav-open-orders-btn" class="btn active">Open Orders</button>
-        <button id="nav-create-order-btn" class="btn">New Order</button>
-        <button id="nav-products-btn" class="btn">Products</button>
-        <button id="nav-my-orders-btn" class="btn">My Orders</button>
-        <button id="nav-my-commission-btn" class="btn">Commission</button>
-        <button id="nav-profile-btn" class="btn">Profile</button>
-        <button id="nav-team-btn" class="btn hidden">Team</button> 
-        <button id="nav-admin-dashboard-btn" class="btn hidden">Admin</button> 
+        <button id="nav-open-orders-btn" class="btn active"><i class="fa-solid fa-inbox"></i> Open Orders</button>
+        <button id="nav-create-order-btn" class="btn"><i class="fa-solid fa-circle-plus"></i> New Order</button>
+        <button id="nav-products-btn" class="btn"><i class="fa-solid fa-box-open"></i> Products</button>
+        <button id="nav-my-orders-btn" class="btn"><i class="fa-solid fa-receipt"></i> My Orders</button>
+        <button id="nav-my-commission-btn" class="btn"><i class="fa-solid fa-sack-dollar"></i> Commission</button>
+        <button id="nav-profile-btn" class="btn"><i class="fa-solid fa-user-circle"></i> Profile</button>
+        <button id="nav-team-btn" class="btn hidden"><i class="fa-solid fa-users"></i> Team</button> 
+        <button id="nav-admin-dashboard-btn" class="btn hidden"><i class="fa-solid fa-chart-line"></i> Admin</button> 
     </nav>
 
     <div id="open-orders-view" class="view">
@@ -360,9 +86,9 @@
                     <select id="customer-dropdown"></select>
                     <button id="new-customer-btn" class="btn btn-secondary" style="width:100%; margin-top:10px;">New Customer</button>
                     <div id="new-customer-form" class="hidden" style="margin-top: 20px;">
-                        <input type="text" id="new-customer-name" placeholder="Name">
+                        <input type="text" id="new-customer-name" placeholder="Full name *">
                         <input type="email" id="new-customer-email" placeholder="Email">
-                        <input type="tel" id="new-customer-phone" placeholder="Phone">
+                        <input type="tel" id="new-customer-phone" placeholder="Phone / WhatsApp *">
                         <textarea id="new-customer-address" placeholder="Address" rows="2"></textarea>
                     </div>
                 </div>
@@ -375,13 +101,15 @@
             <div class="card" id="order-summary-card">
                 <h3>Summary</h3>
                 <div id="summary-items-list"></div>
-                <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-                    <div style="display:flex; justify-content:space-between;"><span>Subtotal:</span><span id="summary-subtotal">RM 0.00</span></div>
-                    <div style="display:flex; justify-content:space-between;"><span>Shipping:</span><span id="summary-shipping">RM 0.00</span></div>
-                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.2rem; color:var(--primary-color); margin-top:10px;"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
+                <div>
+                    <div class="summary-line"><span>Subtotal</span><span id="summary-subtotal">RM 0.00</span></div>
+                    <div class="summary-line"><span>Shipping</span><span id="summary-shipping">RM 0.00</span></div>
+                    <div class="summary-line total"><span>Total</span><span id="summary-total">RM 0.00</span></div>
                 </div>
-                <div style="margin-top: 30px;">
-                    <label style="font-size:0.8rem; font-weight:700; text-transform:uppercase; color:#999;">Payment Proof</label>
+                <div style="margin-top: 22px;">
+                    <label for="order-remarks">Special remarks (shown on the invoice)</label>
+                    <textarea id="order-remarks" rows="2" maxlength="500" placeholder="e.g. deliver after 5pm, gift wrap"></textarea>
+                    <label for="payment-proof">Payment proof</label>
                     <input type="file" id="payment-proof">
                     <button id="submit-order-btn" class="btn btn-primary" style="width:100%;">Submit Order</button>
                     <p id="submit-status" style="text-align: center; margin-top: 10px; font-weight: 600;"></p>
@@ -465,12 +193,28 @@
     </div>
 </div>
 
+<div id="order-modal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="order-modal-title">Order</h2>
+            <button class="close" id="order-modal-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body" id="order-modal-body"></div>
+        <div class="modal-footer">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="order-modal-cancel">Close</button>
+                <button class="btn btn-primary" id="order-modal-save">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 // =================================================================
 // AGENT PORTAL SCRIPT - LUXURY EDITION (CORRECTED)
 // =================================================================
 // Same web-app deployment as script.js and customer.html. Change it in all three files together.
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-hec18gFJArCVEO0jFidW0xeMuQQbhNoEhZ-3Qsz8NwSo7QhBZfpivBcz3w5CEmSVmg/exec'; 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhqlu3qRh4sWu6FeGLU1v06M-moCq6NULxc98e74XrlFkOX4hJNINZe-c9klqWmQvgLA/exec'; 
 
 let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
 let currentProfile = {}, canEditProfile = false, allAgentsList = [], sessionToken = null;
@@ -525,6 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
     document.getElementById('product-order-search').addEventListener('keyup', renderProductSelectionList);
     document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
+    document.getElementById('order-modal-close').addEventListener('click', closeOrderModal);
+    document.getElementById('order-modal-cancel').addEventListener('click', closeOrderModal);
+    document.getElementById('order-modal-save').addEventListener('click', saveOrderChanges);
+    document.getElementById('order-modal').addEventListener('click', (e) => { if (e.target.id === 'order-modal') closeOrderModal(); });
 });
 
 async function handleLogin() {
@@ -775,12 +523,126 @@ function renderOrderSummary() {
     }
     calculateTotals();
 }
+function statusBadge(st) {
+    const v = String(st || '').toLowerCase();
+    const cls = (v === 'completed' || v === 'paid') ? 'badge-success' : v.indexOf('pending') >= 0 ? 'badge-warn' : v.indexOf('open') >= 0 ? 'badge-info' : v === 'cancelled' ? 'badge-danger' : '';
+    return `<span class="badge ${cls}">${esc(st || '-')}</span>`;
+}
 async function renderMyOrders() {
     const list = document.getElementById('my-orders-list');
+    list.innerHTML = '<p class="loader">Loading...</p>';
     try {
         const res = await postToGoogleScript('getAgentOrders', {});
-        list.innerHTML = res.orders.length ? `<table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>${res.orders.map(o => `<tr><td>${esc(o.invoiceId)}</td><td>${esc(o.date)}</td><td>${esc(o.customerName)}</td><td>RM ${esc(o.total)}</td><td>${esc(o.status)}</td></tr>`).join('')}</tbody></table>` : '<p>No orders assigned to you.</p>';
-    } catch(e) { list.innerHTML = '<p>Error loading your orders.</p>'; }
+        if (!res.success) { list.innerHTML = `<p>${esc(res.message || 'Could not load your orders.')}</p>`; return; }
+        list.innerHTML = res.orders.length ? `<table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th class="num">Total</th><th>Status</th><th></th></tr></thead><tbody>${res.orders.map(o => `<tr>
+            <td><strong>${esc(o.invoiceId)}</strong></td><td>${esc(o.date)}</td><td>${esc(o.customerName) || '<em style="color:var(--bad)">No customer</em>'}</td>
+            <td class="num">RM ${esc(o.total)}</td><td>${statusBadge(o.status)}</td>
+            <td><button class="btn btn-secondary btn-sm" data-id="${esc(o.invoiceId)}" onclick="openOrder(this.dataset.id)"><i class="fa-solid ${o.editable ? 'fa-pen' : 'fa-eye'}"></i> ${o.editable ? 'View / Edit' : 'View'}</button></td></tr>`).join('')}</tbody></table>` : '<p>No orders assigned to you.</p>';
+    } catch(e) { if (e.message !== 'SESSION_EXPIRED') list.innerHTML = '<p>Error loading your orders.</p>'; }
+}
+
+// ---------- View / edit an order ----------
+let editingOrder = null;
+async function openOrder(id) {
+    const modal = document.getElementById('order-modal');
+    document.getElementById('order-modal-title').textContent = 'Order ' + id;
+    document.getElementById('order-modal-body').innerHTML = '<p class="loader">Loading order...</p>';
+    document.getElementById('order-modal-save').classList.add('hidden');
+    modal.style.display = 'flex';
+    try {
+        const res = await postToGoogleScript('getOrderDetail', { invoiceId: id });
+        if (!res.success) { document.getElementById('order-modal-body').innerHTML = `<div class="alert alert-bad">${esc(res.message || 'Could not load this order.')}</div>`; return; }
+        const o = res.order;
+        editingOrder = {
+            invoiceId: o.invoiceId, date: o.date, status: o.status, editable: o.editable, customer: o.customer, remarks: o.remarks, proof: o.paymentProofURL,
+            items: o.items.map(i => { const p = products.find(x => String(x.id) === String(i.id)); return { id: i.id, name: i.name || (p && p.name) || i.id, quantity: i.quantity, customPrice: i.customPrice, rsp: i.price || (p && p.rsp) || 0, minPrice: p ? money(p.minPrice) : 0 }; })
+        };
+        renderOrderModal();
+    } catch(e) { if (e.message !== 'SESSION_EXPIRED') document.getElementById('order-modal-body').innerHTML = '<div class="alert alert-bad">Could not load this order. Please try again.</div>'; }
+}
+function closeOrderModal() { document.getElementById('order-modal').style.display = 'none'; editingOrder = null; }
+function orderEditTotals() {
+    const sub = Math.round(editingOrder.items.reduce((s, i) => s + i.customPrice * i.quantity, 0) * 100) / 100;
+    const ship = editingOrder.items.length ? calcShipping(sub) : 0;
+    return { sub, ship, total: sub + ship };
+}
+function renderOrderModal() {
+    const o = editingOrder, ro = o.editable ? '' : 'disabled';
+    const t = orderEditTotals();
+    const rows = o.items.map((i, idx) => `<tr>
+        <td><strong>${esc(i.name)}</strong><br><small>${esc(i.id)}</small>${i.minPrice > 0 && i.customPrice < i.minPrice ? `<br><span class="low-price">Below minimum RM ${i.minPrice.toFixed(2)}</span>` : ''}</td>
+        <td><input class="qty" type="number" min="1" max="999" step="1" value="${i.quantity}" ${ro} onchange="editOrderItem(${idx}, 'quantity', this.value)"></td>
+        <td><input class="price" type="number" min="0" step="0.01" value="${i.customPrice}" ${ro} onchange="editOrderItem(${idx}, 'customPrice', this.value)"></td>
+        <td class="num">RM ${(i.customPrice * i.quantity).toFixed(2)}</td>
+        <td>${o.editable ? `<button class="btn btn-ghost btn-sm" onclick="removeOrderItem(${idx})" aria-label="Remove">&times;</button>` : ''}</td></tr>`).join('');
+    const addRow = o.editable ? `<div style="display:flex; gap:10px; margin-bottom:6px;"><select id="order-add-product" style="margin:0;"><option value="">+ Add a product...</option>${products.map(p => `<option value="${esc(p.id)}">${esc(p.name)} (RM ${money(p.rsp).toFixed(2)})</option>`).join('')}</select><button class="btn btn-secondary" onclick="addOrderItem()">Add</button></div>` : '';
+    document.getElementById('order-modal-body').innerHTML = `
+        <div class="order-meta"><strong>${esc(o.invoiceId)}</strong><span>${esc(o.date)}</span>${statusBadge(o.status)}
+            ${o.proof ? `<a href="${esc(o.proof)}" target="_blank" rel="noopener"><i class="fa-solid fa-paperclip"></i> Payment proof</a>` : ''}</div>
+        ${o.editable ? '' : `<div class="alert alert-warn">This order is ${esc(o.status)}, so it can no longer be edited.</div>`}
+        <h4 style="margin:6px 0 10px;">Customer</h4>
+        <div class="order-grid">
+            <div><label>Full name</label><input id="oe-name" value="${esc(o.customer.name)}" ${ro}></div>
+            <div><label>Phone</label><input id="oe-phone" value="${esc(o.customer.phone)}" ${ro}></div>
+            <div><label>Email</label><input id="oe-email" value="${esc(o.customer.email)}" ${ro}></div>
+            <div><label>Customer ID</label><input value="${esc(o.customer.pac)}" disabled></div>
+            <div class="full"><label>Delivery address</label><textarea id="oe-address" rows="2" ${ro}>${esc(o.customer.address)}</textarea></div>
+        </div>
+        <h4 style="margin:6px 0 10px;">Items</h4>
+        ${addRow}
+        <div style="overflow-x:auto;"><table class="order-items"><thead><tr><th>Product</th><th>Qty</th><th>Unit price (RM)</th><th class="num">Line total</th><th></th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="5" style="text-align:center; color:var(--ink-500);">No items on this order.</td></tr>'}</tbody></table></div>
+        <div class="order-totals">
+            <div class="summary-line"><span>Subtotal</span><span>RM ${t.sub.toFixed(2)}</span></div>
+            <div class="summary-line"><span>Shipping</span><span>RM ${t.ship.toFixed(2)}</span></div>
+            <div class="summary-line total"><span>Total</span><span>RM ${t.total.toFixed(2)}</span></div>
+        </div>
+        <label for="oe-remarks" style="margin-top:14px;">Special remarks</label>
+        <textarea id="oe-remarks" rows="2" maxlength="500" ${ro}>${esc(o.remarks)}</textarea>`;
+    document.getElementById('order-modal-save').classList.toggle('hidden', !o.editable);
+}
+function syncOrderFields() {
+    if (!editingOrder || !editingOrder.editable) return;
+    const g = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+    editingOrder.customer.name = g('oe-name'); editingOrder.customer.phone = g('oe-phone');
+    editingOrder.customer.email = g('oe-email'); editingOrder.customer.address = g('oe-address');
+    editingOrder.remarks = g('oe-remarks');
+}
+function editOrderItem(idx, field, val) {
+    syncOrderFields();
+    const i = editingOrder.items[idx]; if (!i) return;
+    if (field === 'quantity') i.quantity = Math.min(999, Math.max(1, parseInt(val, 10) || 1));
+    else i.customPrice = Math.max(0, Math.round((parseFloat(val) || 0) * 100) / 100);
+    renderOrderModal();
+}
+function removeOrderItem(idx) { syncOrderFields(); editingOrder.items.splice(idx, 1); renderOrderModal(); }
+function addOrderItem() {
+    syncOrderFields();
+    const id = document.getElementById('order-add-product').value; if (!id) return;
+    if (editingOrder.items.some(i => String(i.id) === String(id))) { alert('That product is already on the order. Change its quantity instead.'); return; }
+    const p = products.find(x => String(x.id) === String(id)); if (!p) return;
+    editingOrder.items.push({ id: p.id, name: p.name, quantity: 1, customPrice: money(p.rsp), rsp: money(p.rsp), minPrice: money(p.minPrice) });
+    renderOrderModal();
+}
+async function saveOrderChanges() {
+    if (!editingOrder || !editingOrder.editable) return;
+    syncOrderFields();
+    const o = editingOrder;
+    if (!o.customer.name.trim() || !o.customer.phone.trim()) { alert('Customer name and phone are required.'); return; }
+    if (!o.items.length) { alert('An order needs at least one item.'); return; }
+    const low = o.items.find(i => !(i.customPrice > 0) || (i.minPrice > 0 && i.customPrice < i.minPrice));
+    if (low) { alert(`The price for ${low.name} is below the minimum allowed (RM ${money(low.minPrice).toFixed(2)}).`); return; }
+    const btn = document.getElementById('order-modal-save');
+    btn.disabled = true; btn.textContent = 'Saving...';
+    try {
+        const res = await postToGoogleScript('updateAgentOrder', {
+            invoiceId: o.invoiceId, customer: { name: o.customer.name, email: o.customer.email, phone: o.customer.phone, address: o.customer.address },
+            items: o.items.map(i => ({ id: i.id, quantity: i.quantity, customPrice: i.customPrice })), remarks: o.remarks
+        });
+        if (res.success) { alert(`Order updated.\nTotal: RM ${money(res.totalAmount).toFixed(2)} (shipping RM ${money(res.shippingFee).toFixed(2)})`); closeOrderModal(); renderMyOrders(); }
+        else alert(res.message || 'Could not save the changes.');
+    } catch(e) { if (e.message !== 'SESSION_EXPIRED') alert('Could not save the changes. Please check your connection and try again.'); }
+    finally { btn.disabled = false; btn.textContent = 'Save Changes'; }
 }
 function renderMyCommission() {
     const list = document.getElementById('my-commission-list');
@@ -799,6 +661,7 @@ function renderCreateOrder() {
     document.getElementById('new-customer-phone').value = '';
     document.getElementById('new-customer-address').value = '';
     document.getElementById('payment-proof').value = '';
+    document.getElementById('order-remarks').value = '';
     document.getElementById('submit-status').textContent = '';
     document.getElementById('submit-order-btn').disabled = false;
     renderOrderSummary();
@@ -854,6 +717,7 @@ async function submitOrder() {
         // Only ids, quantities and agreed prices are sent. The server re-prices everything and works out shipping itself.
         const payload = {
             customer: cust,
+            remarks: document.getElementById('order-remarks').value.trim(),
             items: currentOrder.items.map(i => ({ id: i.id, quantity: i.quantity, customPrice: i.customPrice })),
             paymentProof: { file: base64.split(',')[1], mimeType: file.type }
         };
