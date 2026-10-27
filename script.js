@@ -1524,7 +1524,11 @@ async function fetchData() {
     } catch (error) {
         console.error("Fatal Error fetching store data:", error);
         const main = document.getElementById('main-content');
-        if (main) main.innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p>`;
+        let why = String(error && error.message || error);
+        if (!googleScriptURL) why = 'config.js was not found. Upload config.js next to index.html.';
+        else if (/Failed to fetch|NetworkError|Load failed/i.test(why)) why = 'The store server could not be reached. In Apps Script, deploy as Web app with access set to "Anyone", then check the address in config.js.';
+        else if (/JSON|Unexpected token/i.test(why)) why = 'The store server did not return store data. Check that config.js has the latest Web app address and that access is set to "Anyone".';
+        if (main) main.innerHTML = `<p style="text-align: center; color: red;">Error loading store. Please try again later.</p><p style="text-align:center;color:#888;font-size:.85rem;max-width:560px;margin:10px auto;">${esc(why)}</p>`;
     }
 }
 
