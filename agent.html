@@ -14,13 +14,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/jpeg" href="FL.jpg">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body class="portal">
 <div id="login-view">
     <div class="card" id="login-box">
         <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
         <h1>Business Partner Access</h1>
+        <p class="help-line login-links"></p>
         <p>Sign in to manage your sales and team.</p>
         <form id="login-form">
             <input type="text" id="agent-id-input" placeholder="Agent ID" required>
@@ -214,7 +215,7 @@
 // AGENT PORTAL SCRIPT - LUXURY EDITION (CORRECTED)
 // =================================================================
 // Same web-app deployment as script.js and customer.html. Change it in all three files together.
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhqlu3qRh4sWu6FeGLU1v06M-moCq6NULxc98e74XrlFkOX4hJNINZe-c9klqWmQvgLA/exec'; 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxauBwBuI4JwDfn_LTQa7U8F_u6hli6PlENQD_KCAEo3rbAqmp8Vqo98Sfli_8zKtLhWQ/exec'; 
 
 let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
 let currentProfile = {}, canEditProfile = false, allAgentsList = [], sessionToken = null;
@@ -253,6 +254,7 @@ function calcShipping(subtotal) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadContactHelp();
     document.getElementById('login-form').addEventListener('submit', (event) => { event.preventDefault(); handleLogin(); });
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
     document.getElementById('refresh-data-btn').addEventListener('click', refreshPageData);
@@ -537,7 +539,9 @@ async function renderMyOrders() {
         list.innerHTML = res.orders.length ? `<table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th class="num">Total</th><th>Status</th><th></th></tr></thead><tbody>${res.orders.map(o => `<tr>
             <td><strong>${esc(o.invoiceId)}</strong></td><td>${esc(o.date)}</td><td>${esc(o.customerName) || '<em style="color:var(--bad)">No customer</em>'}</td>
             <td class="num">RM ${esc(o.total)}</td><td>${statusBadge(o.status)}</td>
-            <td><button class="btn btn-secondary btn-sm" data-id="${esc(o.invoiceId)}" onclick="openOrder(this.dataset.id)"><i class="fa-solid ${o.editable ? 'fa-pen' : 'fa-eye'}"></i> ${o.editable ? 'View / Edit' : 'View'}</button></td></tr>`).join('')}</tbody></table>` : '<p>No orders assigned to you.</p>';
+            <td><button class="btn btn-secondary btn-sm" data-id="${esc(o.invoiceId)}" onclick="openOrder(this.dataset.id)"><i class="fa-solid ${o.editable ? 'fa-pen' : 'fa-eye'}"></i> ${o.editable ? 'View / Edit' : 'View'}</button>
+                <button class="btn btn-secondary btn-sm" data-id="${esc(o.invoiceId)}" data-type="invoice" onclick="openDocument(this)" title="Invoice"><i class="fa-solid fa-file-invoice"></i></button>
+                ${/paid|completed/i.test(o.status) || o.paid ? `<button class="btn btn-primary btn-sm" data-id="${esc(o.invoiceId)}" data-type="receipt" onclick="openDocument(this)" title="Receipt"><i class="fa-solid fa-receipt"></i></button>` : ''}</td></tr>`).join('')}</tbody></table>` : '<p>No orders assigned to you.</p>';
     } catch(e) { if (e.message !== 'SESSION_EXPIRED') list.innerHTML = '<p>Error loading your orders.</p>'; }
 }
 
@@ -770,6 +774,34 @@ function sessionExpired() {
     alert('Your session has expired. Please log in again.');
     location.reload();
 }
+
+// Contact number comes from the AboutUs sheet (cell M2) via the server, so it never needs editing here.
+async function loadContactHelp() {
+    try {
+        const r = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'cors', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'getContactInfo', data: {} }), redirect: 'follow' });
+        const c = await r.json();
+        if (!c || !c.success) return;
+        document.querySelectorAll('.help-line').forEach(el => {
+            el.innerHTML = 'Need help? <a href="https://wa.me/' + encodeURIComponent(c.whatsappNumber) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp ' + esc(c.contactNumber) + '</a>';
+        });
+    } catch (e) { /* the help line simply stays empty */ }
+}
+
+async function openDocument(btn) {
+    const id = btn.dataset.id, type = btn.dataset.type, label = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    const w = window.open('', '_blank');
+    if (w) w.document.write('<p style="font-family:sans-serif;padding:24px">Preparing ' + type + '...</p>');
+    try {
+        const res = await postToGoogleScript('getAgentDocument', { invoiceId: id, type });
+        if (!res.success) { if (w) w.close(); alert(res.message || 'Document not available yet.'); return; }
+        const bytes = Uint8Array.from(atob(res.base64), c => c.charCodeAt(0));
+        const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+        if (w) w.location.href = url; else { const l = document.createElement('a'); l.href = url; l.download = res.filename || (type + '.pdf'); l.click(); }
+    } catch (e) { if (w) w.close(); if (e.message !== 'SESSION_EXPIRED') alert('Could not open the document.'); }
+    finally { btn.disabled = false; btn.innerHTML = label; }
+}
+
 async function postToGoogleScript(action, data = {}) {
     const payload = { action, data: Object.assign({}, data, sessionToken ? { token: sessionToken } : {}) };
     const res = await fetch(GOOGLE_SCRIPT_URL, {
