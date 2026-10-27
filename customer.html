@@ -3,478 +3,385 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Customer Portal</title>
+    <title>My Account | Forever Living by Muhd Isa</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/jpeg" href="FL.jpg">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body class="portal">
 
 <div id="login-view">
     <div class="card" id="login-box">
-        <img src="FL.jpg" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
-        <h1>Customer Portal</h1>
-        <p>Login to view your orders, points, and more.</p>
+        <img src="FL.jpg" alt="Logo">
+        <h1>My Account</h1>
+        <p>Track your orders, view invoices and receipts, and collect reward points.</p>
+
         <form id="login-form">
-            <input type="email" id="customer-email-input" placeholder="Your Email" required>
-            <input type="password" id="customer-password-input" placeholder="Password" required> 
-            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%;">
-                <i class="fa-solid fa-right-to-bracket"></i> Login
-            </button>
+            <input type="email" id="customer-email-input" placeholder="Your email" autocomplete="username" required>
+            <input type="password" id="customer-password-input" placeholder="Password" autocomplete="current-password" required>
+            <button type="submit" id="login-btn" class="btn btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Log in</button>
             <p id="login-status"></p>
         </form>
-        <p style="margin-top:18px; font-size:.9rem;"><a href="#" id="show-register-link">First time? Set your password</a></p>
-        <form id="register-form" class="hidden" onsubmit="event.preventDefault(); handleRegister();" style="margin-top:10px;">
-            <p style="font-size:.85rem;">Use the same email and phone number you gave when you placed an order.</p>
+        <p class="help-line login-links"></p>
+        <p class="login-links">
+            <a href="#" id="show-reset-link">Forgot password?</a>
+            <span>&middot;</span>
+            <a href="#" id="show-register-link">First time? Set your password</a>
+        </p>
+
+        <form id="register-form" class="hidden">
+            <h4>Set your password</h4>
+            <p class="field-hint">Use the same email and phone number you gave when you placed an order.</p>
             <input type="email" id="reg-email" placeholder="Email used on your order" required>
             <input type="tel" id="reg-phone" placeholder="Phone number used on your order" required>
-            <input type="password" id="reg-password" placeholder="Choose a password (min 6 characters)" minlength="6" required>
-            <button type="submit" id="register-btn" class="btn btn-primary" style="width:100%;">Set Password</button>
+            <input type="password" id="reg-password" placeholder="Choose a password (min 6 characters)" minlength="6" autocomplete="new-password" required>
+            <button type="submit" id="register-btn" class="btn btn-primary">Set password</button>
             <p id="register-status"></p>
+        </form>
+
+        <form id="reset-form" class="hidden">
+            <h4>Reset your password</h4>
+            <div id="reset-step-1">
+                <p class="field-hint">Enter your email and we will send you a 6-digit code.</p>
+                <input type="email" id="reset-email" placeholder="Your email" required>
+                <button type="button" id="reset-send-btn" class="btn btn-primary">Send code</button>
+            </div>
+            <div id="reset-step-2" class="hidden">
+                <p class="field-hint">Check your inbox (and spam folder) for the code.</p>
+                <input type="text" id="reset-code" placeholder="6-digit code" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+                <input type="password" id="reset-password" placeholder="New password (min 6 characters)" minlength="6" autocomplete="new-password">
+                <button type="submit" id="reset-save-btn" class="btn btn-primary">Change password</button>
+            </div>
+            <p id="reset-status"></p>
         </form>
     </div>
 </div>
 
 <div id="portal-view" class="container hidden">
     <header>
-        <div>
+        <div style="display:flex;align-items:center;gap:14px;">
+            <img src="FL.jpg" alt="Logo" style="width:52px;height:52px;border-radius:50%;border:2px solid var(--gold-500,#d4af37);" onerror="this.style.display='none'">
+            <div>
             <h2 id="customer-welcome-header"></h2>
-            <p id="customer-details-display" style="font-size: 1.1rem; color: #555; font-weight: 500; margin-top: -10px;"></p>
+            <p id="customer-details-display"></p>
+            </div>
         </div>
-        <button id="logout-btn" class="btn btn-primary"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        <div><span class="help-line"></span> <button id="logout-btn" class="btn btn-secondary"><i class="fa-solid fa-right-from-bracket"></i> Log out</button></div>
     </header>
 
     <nav>
-        <button id="nav-shop-btn" class="btn active"><i class="fa-solid fa-store"></i> Shop</button>
-        <button id="nav-my-orders-btn" class="btn"><i class="fa-solid fa-receipt"></i> My Orders</button>
-        <button id="nav-my-rewards-btn" class="btn"><i class="fa-solid fa-star"></i> My Rewards</button>
-        <button id="nav-my-profile-btn" class="btn"><i class="fa-solid fa-user-circle"></i> My Profile</button>
+        <button id="nav-my-orders-btn" class="btn active"><i class="fa-solid fa-receipt"></i> My Orders</button>
+        <button id="nav-my-rewards-btn" class="btn"><i class="fa-solid fa-gift"></i> My Rewards</button>
+        <button id="nav-my-profile-btn" class="btn"><i class="fa-solid fa-user-circle"></i> My Account</button>
     </nav>
 
-    <!-- START: CUSTOMER VIEWS -->
-    <div id="shop-view" class="view">
-        <div id="shop-workflow">
-            <div>
-                <div class="card">
-                    <h3>Our Products</h3>
-                    <input type="text" id="product-search" placeholder="Search for products...">
-                    <div id="product-list"></div>
-                </div>
-            </div>
-            <div id="cart-summary-card" class="card">
-                <h3>Your Cart</h3>
-                <div id="summary-items-list"></div>
-                <div class="summary-total">
-                    <div class="summary-line"><span>Subtotal:</span><span id="summary-subtotal">RM 0.00</span></div>
-                    <div class="summary-line"><span>Shipping:</span><span id="summary-shipping">RM 0.00</span></div>
-                    <div class="summary-line total"><span>Total:</span><span id="summary-total">RM 0.00</span></div>
-                </div>
-                <div id="checkout-section" style="margin-top: 20px;">
-                    <button onclick="saveCart()" class="btn btn-secondary" style="width:100%; margin-bottom: 10px;"><i class="fa-solid fa-save"></i> Save Cart for Later</button>
-                    <button onclick="initiateCheckout()" class="btn btn-primary" style="width:100%;"><i class="fa-solid fa-check"></i> Proceed to Checkout</button>
-                    <p id="checkout-status" style="text-align: center; margin-top: 10px; font-weight: 600;"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="my-orders-view" class="view hidden card">
-        <h2>My Order History</h2>
+    <div id="my-orders-view" class="view">
+        <h2>My Orders</h2>
         <div id="my-orders-list"></div>
     </div>
-    
-    <div id="my-rewards-view" class="view hidden card">
-        <h2>My Rewards & Points</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+
+    <div id="my-rewards-view" class="view hidden">
+        <div class="rewards-hero card">
             <div>
-                <h3>Available Rewards</h3>
-                <div id="rewards-list"></div>
+                <span class="stat-label">Your points balance</span>
+                <div class="points-big" id="points-balance">0</div>
+                <p id="points-rule" class="field-hint"></p>
             </div>
-            <div>
-                <h3>Points Balance</h3>
-                <div class="card" style="background:var(--light-gray); text-align: center;">
-                    <p style="font-size: 3rem; font-weight: 700; color: var(--primary-color);" id="points-balance">0</p>
-                    <p style="font-weight: 600;">Points Available</p>
-                </div>
-                <h3>Points History</h3>
-                <div id="points-history-list"></div>
-            </div>
+            <div class="redeem-soon"><i class="fa-solid fa-crown"></i><strong>Redemption opens soon</strong><span>Keep collecting. Your points will be exchangeable for rewards.</span></div>
+        </div>
+        <div class="card">
+            <h3>Points history</h3>
+            <div id="points-history-list"></div>
         </div>
     </div>
 
-    <div id="my-profile-view" class="view hidden card">
-        <h2>My Profile</h2>
-        <p>Update your contact and shipping information here.</p>
-        <div class="profile-grid">
-            <div class="profile-section">
-                <div class="profile-item"><label>Full Name</label><input type="text" id="prof-name"></div>
-                <div class="profile-item"><label>Email</label><input type="email" id="prof-email" disabled></div>
-                <div class="profile-item"><label>Phone Number (WhatsApp)</label><input type="tel" id="prof-phone"></div>
-                <div class="profile-item"><label>Shipping Address</label><textarea id="prof-address" rows="4"></textarea></div>
+    <div id="my-profile-view" class="view hidden">
+        <div class="card">
+            <h3>My details</h3>
+            <p class="field-hint">Update your contact and delivery information.</p>
+            <div class="profile-grid">
+                <div class="profile-item"><label for="prof-name">Full name</label><input type="text" id="prof-name"></div>
+                <div class="profile-item"><label for="prof-email">Email</label><input type="email" id="prof-email" disabled></div>
+                <div class="profile-item"><label for="prof-phone">Phone (WhatsApp)</label><input type="tel" id="prof-phone"></div>
+                <div class="profile-item"><label for="prof-address">Delivery address</label><textarea id="prof-address" rows="3"></textarea></div>
             </div>
+            <button id="save-profile-btn" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save changes</button>
+            <p id="profile-status" class="form-status"></p>
         </div>
-        <button onclick="saveProfile()" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Changes</button>
-        <p id="profile-status" style="margin-top: 15px; font-weight: 600;"></p>
+        <div class="card">
+            <h3>Change password</h3>
+            <div class="profile-grid">
+                <div class="profile-item"><label for="pw-old">Current password</label><input type="password" id="pw-old" autocomplete="current-password"></div>
+                <div class="profile-item"><label for="pw-new">New password</label><input type="password" id="pw-new" minlength="6" autocomplete="new-password" placeholder="At least 6 characters"></div>
+                <div class="profile-item"><label for="pw-new2">Confirm new password</label><input type="password" id="pw-new2" autocomplete="new-password"></div>
+            </div>
+            <button id="change-pw-btn" class="btn btn-secondary"><i class="fa-solid fa-key"></i> Change password</button>
+            <p id="pw-status" class="form-status"></p>
+        </div>
     </div>
-    <!-- END: CUSTOMER VIEWS -->
 </div>
 
 <script>
 // =================================================================
-// CUSTOMER PORTAL SCRIPT
+// CUSTOMER ACCOUNT PORTAL
 // =================================================================
 // Same web-app deployment as script.js and agent.html. Change it in all three files together.
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhqlu3qRh4sWu6FeGLU1v06M-moCq6NULxc98e74XrlFkOX4hJNINZe-c9klqWmQvgLA/exec'; 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxauBwBuI4JwDfn_LTQa7U8F_u6hli6PlENQD_KCAEo3rbAqmp8Vqo98Sfli_8zKtLhWQ/exec';
 
-// --- Global State Variables ---
-let products = [];
-let shippingRules = [];
-let currentCustomer = null; 
-let cart = [];
+let currentCustomer = null;
 let sessionToken = null;
+let stages = ['Processed', 'Paid', 'Awaiting Shipment', 'On the Way', 'Delivered'];
 
 function esc(v) {
     return String(v === undefined || v === null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 const num = v => { const n = parseFloat(String(v === undefined || v === null ? '' : v).replace(/[^0-9.\-]/g, '')); return isNaN(n) ? 0 : n; };
+const $ = id => document.getElementById(id);
 
-// ---- Shipping: same rules as the shop and the server ----
-function normaliseShippingRules(raw) {
-    if (!Array.isArray(raw)) return [];
-    return raw.map(r => {
-        let type = String(r.type || r.RuleType || 'tiered').toLowerCase().replace(/[^a-z]/g, '');
-        if (type !== 'free' && type !== 'flatrate') type = 'tiered';
-        const max = num(r.maxSpend !== undefined ? r.maxSpend : r.MaxSpend);
-        return { type: type, minSpend: num(r.minSpend !== undefined ? r.minSpend : r.MinSpend), maxSpend: max > 0 ? max : 999999999,
-                 charge: type === 'free' ? 0 : Math.max(0, num(r.charge !== undefined ? r.charge : r.Charge)) };
-    }).sort((a, b) => a.minSpend - b.minSpend);
-}
-function calcShipping(subtotal) {
-    if (!shippingRules.length) return 0;
-    const amount = Math.round(Number(subtotal) * 100) / 100;
-    const inRange = r => amount >= r.minSpend && amount <= r.maxSpend;
-    const promos = shippingRules.filter(r => r.type !== 'tiered' && inRange(r));
-    if (promos.length) return Math.min(...promos.map(r => r.charge));
-    const tiers = shippingRules.filter(r => r.type === 'tiered');
-    if (!tiers.length) return 0;
-    const hit = tiers.filter(inRange).pop();
-    if (hit) return hit.charge;
-    if (amount < tiers[0].minSpend) return tiers[0].charge;
-    const below = tiers.filter(r => amount > r.maxSpend).pop();
-    return below ? below.charge : tiers[0].charge;
-}
+function setStatus(el, text, ok) { el.textContent = text || ''; el.style.color = ok ? 'var(--ok)' : 'var(--bad)'; }
 
-// --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('login-form').addEventListener('submit', (e) => { e.preventDefault(); handleLogin(); });
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-        try { if (sessionToken) await postToGoogleScript('customerLogout', {}); } catch (e) { /* leaving anyway */ }
-        sessionToken = null; location.reload();
-    });
-    document.getElementById('show-register-link').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('register-form').classList.toggle('hidden'); });
-    document.getElementById('nav-shop-btn').addEventListener('click', () => showView('shop-view'));
-    document.getElementById('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
-    document.getElementById('nav-my-rewards-btn').addEventListener('click', () => showView('my-rewards-view'));
-    document.getElementById('nav-my-profile-btn').addEventListener('click', () => showView('my-profile-view'));
-    document.getElementById('product-search').addEventListener('keyup', renderShopView);
+    $('login-form').addEventListener('submit', (e) => { e.preventDefault(); handleLogin(); });
+    $('register-form').addEventListener('submit', (e) => { e.preventDefault(); handleRegister(); });
+    $('reset-form').addEventListener('submit', (e) => { e.preventDefault(); handleResetSave(); });
+    $('reset-send-btn').addEventListener('click', handleResetSend);
+    $('show-register-link').addEventListener('click', (e) => { e.preventDefault(); showLoginPanel('register'); });
+    $('show-reset-link').addEventListener('click', (e) => { e.preventDefault(); showLoginPanel('reset'); });
+    $('logout-btn').addEventListener('click', handleLogout);
+    $('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
+    $('nav-my-rewards-btn').addEventListener('click', () => showView('my-rewards-view'));
+    $('nav-my-profile-btn').addEventListener('click', () => showView('my-profile-view'));
+    $('save-profile-btn').addEventListener('click', saveProfile);
+    $('change-pw-btn').addEventListener('click', changePassword);
+    loadContactHelp();
+    if (location.hash === '#reset') showLoginPanel('reset');
+    if (location.hash === '#register') showLoginPanel('register');
 });
 
-// =================================================================
-// LOGIN & DATA FETCHING
-// =================================================================
+function showLoginPanel(which) {
+    const other = which === 'reset' ? 'register' : 'reset';
+    $(other + '-form').classList.add('hidden');
+    $(which + '-form').classList.toggle('hidden');
+    if (which === 'reset' && $('customer-email-input').value) $('reset-email').value = $('customer-email-input').value;
+}
+
+// ---------- Log in / register / reset ----------
 async function handleLogin() {
-    const email = document.getElementById('customer-email-input').value.trim();
-    const password = document.getElementById('customer-password-input').value;
-    const loginBtn = document.getElementById('login-btn');
-    const loginStatus = document.getElementById('login-status');
-    
-    if (!email || !password) { loginStatus.textContent = "Email and Password are required."; return; }
-    loginBtn.disabled = true; loginStatus.textContent = "Verifying...";
-    
+    const email = $('customer-email-input').value.trim();
+    const password = $('customer-password-input').value;
+    const btn = $('login-btn'), st = $('login-status');
+    if (!email || !password) { setStatus(st, 'Email and password are required.'); return; }
+    btn.disabled = true; setStatus(st, 'Checking...', true);
     try {
-        const response = await postToGoogleScript('verifyCustomer', { email, password });
-        if (response.success) {
-            currentCustomer = response.customer;
-            sessionToken = response.token;
-            document.getElementById('customer-password-input').value = '';
-            await fetchPortalData();
-            document.getElementById('login-view').classList.add('hidden');
-            document.getElementById('portal-view').classList.remove('hidden');
-            document.getElementById('customer-welcome-header').textContent = `Welcome, ${currentCustomer.customerName || ''}`;
-            document.getElementById('customer-details-display').textContent = `PAC: ${currentCustomer.pac}`;
-            
-            // Check for a saved cart
-            if (response.savedCart && response.savedCart.length > 0) {
-                // The server stores only ids and quantities; rebuild the lines from the current product list
-                const restored = response.savedCart
-                    .map(i => { const p = products.find(x => String(x.id) === String(i.id)); return p ? { ...p, quantity: Math.max(1, parseInt(i.quantity, 10) || 1) } : null; })
-                    .filter(Boolean);
-                if (restored.length && confirm("You have a saved cart. Would you like to load it?")) {
-                    cart = restored;
-                    renderCartSummary();
-                }
-            }
-            showView('shop-view'); 
-        } else {
-            loginStatus.textContent = response.message || "Login failed."; loginStatus.style.color = 'var(--danger-color, red)';
-        }
+        const res = await postToGoogleScript('verifyCustomer', { email, password });
+        if (!res.success) { setStatus(st, res.message || 'Login failed.'); return; }
+        currentCustomer = res.customer; sessionToken = res.token;
+        $('customer-password-input').value = '';
+        $('login-view').classList.add('hidden');
+        $('portal-view').classList.remove('hidden');
+        $('customer-welcome-header').textContent = 'Welcome, ' + (currentCustomer.customerName || '');
+        $('customer-details-display').textContent = 'Customer ID: ' + currentCustomer.pac;
+        showView('my-orders-view');
     } catch (error) {
-        loginStatus.textContent = /Unknown action/i.test(error.message) ? "Customer login is not available yet." : "Connection failed. Please try again.";
-        console.error("Login error:", error);
-    } finally {
-        loginBtn.disabled = false;
-    }
+        setStatus(st, 'Connection failed. Please try again.');
+        console.error('Login error:', error);
+    } finally { btn.disabled = false; }
 }
 
 async function handleRegister() {
-    const st = document.getElementById('register-status');
-    const btn = document.getElementById('register-btn');
-    btn.disabled = true; st.textContent = 'Please wait...';
+    const st = $('register-status'), btn = $('register-btn');
+    btn.disabled = true; setStatus(st, 'Please wait...', true);
     try {
-        const res = await postToGoogleScript('registerCustomer', {
-            email: document.getElementById('reg-email').value.trim(),
-            phone: document.getElementById('reg-phone').value.trim(),
-            password: document.getElementById('reg-password').value
-        });
-        st.style.color = res.success ? 'var(--success-color, green)' : 'var(--danger-color, red)';
-        st.textContent = res.message || (res.success ? 'Done.' : 'Could not set the password.');
+        const res = await postToGoogleScript('registerCustomer', { email: $('reg-email').value.trim(), phone: $('reg-phone').value.trim(), password: $('reg-password').value });
+        setStatus(st, res.message || (res.success ? 'Done.' : 'Could not set the password.'), res.success);
         if (res.success) {
-            document.getElementById('customer-email-input').value = document.getElementById('reg-email').value.trim();
-            document.getElementById('reg-password').value = '';
-            document.getElementById('register-form').classList.add('hidden');
-            document.getElementById('login-status').textContent = 'Password set. Please log in.';
+            $('customer-email-input').value = $('reg-email').value.trim();
+            $('reg-password').value = '';
+            $('register-form').classList.add('hidden');
+            setStatus($('login-status'), 'Password set. Please log in.', true);
         }
-    } catch (e) { st.style.color = 'var(--danger-color, red)'; st.textContent = 'Connection failed. Please try again.'; }
+    } catch (e) { setStatus(st, 'Connection failed. Please try again.'); }
     finally { btn.disabled = false; }
 }
 
-async function fetchPortalData() {
+async function handleResetSend() {
+    const email = $('reset-email').value.trim(), st = $('reset-status'), btn = $('reset-send-btn');
+    if (!email) { setStatus(st, 'Please enter your email.'); return; }
+    btn.disabled = true; setStatus(st, 'Sending...', true);
     try {
-        const response = await postToGoogleScript('getCustomerPortalData');
-        if (response.success) {
-            products = response.products;
-            shippingRules = normaliseShippingRules(response.shippingRules);
-            renderShopView();
-        } else { throw new Error(response.message); }
-    } catch (error) { console.error(error); alert('Could not load shop data.'); }
+        const res = await postToGoogleScript('requestPasswordReset', { email });
+        setStatus(st, res.message, res.success);
+        if (res.success) { $('reset-step-2').classList.remove('hidden'); $('reset-email').disabled = true; btn.textContent = 'Send a new code'; }
+    } catch (e) { setStatus(st, 'Connection failed. Please try again.'); }
+    finally { btn.disabled = false; }
 }
 
-// =================================================================
-// UI RENDERING & VIEW MANAGEMENT
-// =================================================================
-function showView(viewId) {
-    document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
-    document.querySelectorAll('nav .btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(viewId).classList.remove('hidden');
-    document.getElementById(`nav-${viewId.replace('-view', '-btn')}`).classList.add('active');
+async function handleResetSave() {
+    const st = $('reset-status'), btn = $('reset-save-btn');
+    const code = $('reset-code').value.trim(), pw = $('reset-password').value;
+    if (!/^\d{6}$/.test(code)) { setStatus(st, 'Enter the 6-digit code from your email.'); return; }
+    if (pw.length < 6) { setStatus(st, 'Password must be at least 6 characters.'); return; }
+    btn.disabled = true; setStatus(st, 'Saving...', true);
+    try {
+        const res = await postToGoogleScript('resetPassword', { email: $('reset-email').value.trim(), code, newPassword: pw });
+        setStatus(st, res.message, res.success);
+        if (res.success) {
+            $('customer-email-input').value = $('reset-email').value.trim();
+            $('reset-form').classList.add('hidden'); $('reset-email').disabled = false;
+            $('reset-code').value = ''; $('reset-password').value = ''; $('reset-step-2').classList.add('hidden');
+            setStatus($('login-status'), 'Password changed. Please log in.', true);
+        }
+    } catch (e) { setStatus(st, 'Connection failed. Please try again.'); }
+    finally { btn.disabled = false; }
+}
 
-    // Fetch data for specific views when they are opened
+async function handleLogout() {
+    try { if (sessionToken) await postToGoogleScript('customerLogout', {}); } catch (e) { /* leaving anyway */ }
+    sessionToken = null; location.hash = ''; location.reload();
+}
+
+// ---------- Views ----------
+function showView(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+    document.querySelectorAll('nav .btn').forEach(b => b.classList.remove('active'));
+    $(viewId).classList.remove('hidden');
+    $('nav-' + viewId.replace('-view', '-btn')).classList.add('active');
     if (viewId === 'my-orders-view') renderMyOrders();
     if (viewId === 'my-rewards-view') renderMyRewards();
     if (viewId === 'my-profile-view') renderMyProfile();
 }
 
-function renderShopView() {
-    const container = document.getElementById('product-list');
-    const searchTerm = document.getElementById('product-search').value.toLowerCase();
-    const filtered = products.filter(p => String(p.name || '').toLowerCase().includes(searchTerm));
-
-    if (filtered.length === 0) {
-        container.innerHTML = "<p style='padding: 15px; text-align: center;'>No products found.</p>";
-        return;
-    }
-    container.innerHTML = filtered.map(p => `
-        <div class="product-item">
-            <img src="${esc(p.image)}" alt="${esc(p.name)}" onerror="this.src='FL.jpg';">
-            <div>
-                <strong>${esc(p.name)}</strong>
-                <p style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">RM ${num(p.price).toFixed(2)}</p>
-            </div>
-            <button class="btn btn-primary" data-id="${esc(p.id)}" onclick="addToCart(this.dataset.id)">Add</button>
-        </div>
-    `).join('');
+function trackerHtml(status) {
+    const idx = Math.max(0, stages.indexOf(status));
+    return '<ol class="tracker">' + stages.map((s, i) => `<li class="${i < idx ? 'done' : i === idx ? 'now' : ''}"><span class="dot">${i < idx ? '<i class="fa-solid fa-check"></i>' : i + 1}</span><span class="lbl">${esc(s)}</span></li>`).join('') + '</ol>';
 }
 
-function statusBadge(st) {
-    const v = String(st || '').toLowerCase();
-    const cls = (v === 'completed' || v === 'paid') ? 'badge-success' : v.indexOf('pending') >= 0 ? 'badge-warn' : v.indexOf('open') >= 0 ? 'badge-info' : v === 'cancelled' ? 'badge-danger' : '';
-    return `<span class="badge ${cls}">${esc(st || '-')}</span>`;
-}
 async function renderMyOrders() {
-    const container = document.getElementById('my-orders-list');
-    container.innerHTML = '<p>Loading order history...</p>';
+    const box = $('my-orders-list');
+    box.innerHTML = '<p class="loader">Loading your orders...</p>';
     try {
-        const response = await postToGoogleScript('getCustomerOrders', {});
-        if (response.success && response.orders.length > 0) {
-            container.innerHTML = `<table><thead><tr><th>Invoice ID</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
-                <tbody>${response.orders.map(o => `<tr><td><strong>${esc(o.invoiceId)}</strong></td><td>${esc(o.date)}</td><td class="num">RM ${esc(o.total)}</td><td>${statusBadge(o.status)}</td></tr>`).join('')}</tbody>
-            </table>`;
-        } else { container.innerHTML = '<p>You have no past orders.</p>'; }
-    } catch(e) { container.innerHTML = `<p style="color:var(--danger-color);">Could not load orders.</p>`; }
+        const res = await postToGoogleScript('getCustomerOrders', {});
+        if (!res.success) { box.innerHTML = `<div class="alert alert-bad">${esc(res.message || 'Could not load your orders.')}</div>`; return; }
+        if (res.stages && res.stages.length) stages = res.stages;
+        if (!res.orders.length) { box.innerHTML = '<div class="card"><p>You have no orders yet. Once you place an order on our website, it will appear here.</p></div>'; return; }
+        box.innerHTML = res.orders.map(o => `
+            <div class="card order-card">
+                <div class="order-top">
+                    <div><strong class="order-no">${esc(o.invoiceId)}</strong><span class="order-date">${esc(o.date)}</span></div>
+                    <span class="badge ${o.status === 'Delivered' ? 'badge-success' : o.status === 'Processed' ? 'badge-warn' : 'badge-info'}">${esc(o.status)}</span>
+                </div>
+                ${trackerHtml(o.status)}
+                <div class="order-items-line"><i class="fa-solid fa-box"></i> ${esc(o.items)}</div>
+                ${o.remarks ? `<div class="order-items-line"><i class="fa-solid fa-note-sticky"></i> ${esc(o.remarks)}</div>` : ''}
+                <div class="order-bottom">
+                    <div class="order-total"><span>Total</span><strong>RM ${esc(o.total)}</strong>${num(o.shippingFee) > 0 ? `<small>incl. shipping RM ${esc(o.shippingFee)}</small>` : '<small>free shipping</small>'}${o.points > 0 ? `<small class="pts">+${esc(o.points)} points earned</small>` : ''}</div>
+                    <div class="order-actions">
+                        <button class="btn btn-secondary btn-sm" data-id="${esc(o.invoiceId)}" data-type="invoice" onclick="openDocument(this)"><i class="fa-solid fa-file-invoice"></i> Invoice</button>
+                        ${o.paid ? `<button class="btn btn-primary btn-sm" data-id="${esc(o.invoiceId)}" data-type="receipt" onclick="openDocument(this)"><i class="fa-solid fa-receipt"></i> Receipt</button>` : ''}
+                    </div>
+                </div>
+            </div>`).join('');
+    } catch (e) { if (e.message !== 'SESSION_EXPIRED') box.innerHTML = '<div class="alert alert-bad">Could not load your orders. Please try again.</div>'; }
+}
+
+// Opens the PDF in a new tab. The tab is opened first so the browser does not block it.
+async function openDocument(btn) {
+    const id = btn.dataset.id, type = btn.dataset.type;
+    const label = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    const w = window.open('', '_blank');
+    if (w) w.document.write('<p style="font-family:sans-serif;padding:24px">Preparing your ' + type + '...</p>');
+    try {
+        const res = await postToGoogleScript('getCustomerDocument', { invoiceId: id, type });
+        if (!res.success) { if (w) w.close(); alert(res.message || 'Document not available.'); return; }
+        const bytes = Uint8Array.from(atob(res.base64), c => c.charCodeAt(0));
+        const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+        if (w) { w.location.href = url; }
+        else { const a = document.createElement('a'); a.href = url; a.download = res.filename || (type + '.pdf'); a.click(); }
+    } catch (e) { if (w) w.close(); if (e.message !== 'SESSION_EXPIRED') alert('Could not open the document. Please try again.'); }
+    finally { btn.disabled = false; btn.innerHTML = label; }
 }
 
 async function renderMyRewards() {
-    document.getElementById('points-balance').textContent = '...';
-    document.getElementById('rewards-list').innerHTML = '<p>Loading...</p>';
-    
-    // In a real scenario, these would be separate calls
-    document.getElementById('points-balance').textContent = currentCustomer.totalPoints || 0;
-    
-    // Mockup for reward list and history
-    document.getElementById('rewards-list').innerHTML = `<div class="card"><strong>Free Shipping Voucher</strong><p>1000 Points</p><button class="btn btn-primary" disabled>Redeem</button></div>`;
-    document.getElementById('points-history-list').innerHTML = `<p>Feature coming soon!</p>`;
+    $('points-balance').textContent = '...';
+    $('points-history-list').innerHTML = '<p class="loader">Loading...</p>';
+    try {
+        const res = await postToGoogleScript('getCustomerRewards', {});
+        if (!res.success) { $('points-history-list').innerHTML = '<p>Could not load your points.</p>'; return; }
+        $('points-balance').textContent = Number(res.balance || 0).toLocaleString();
+        $('points-rule').textContent = `Earn ${res.pointsPerRm} point for every RM1 you spend on products. Points are added once your payment is confirmed.`;
+        $('points-history-list').innerHTML = res.history.length
+            ? `<table><thead><tr><th>Date</th><th>Order</th><th>Activity</th><th class="num">Points</th><th class="num">Balance</th></tr></thead><tbody>${res.history.map(h => `<tr><td>${esc(h.date)}</td><td>${esc(h.invoiceId) || '-'}</td><td>${esc(h.type === 'EARN' ? 'Earned' : h.type === 'REDEEM' ? 'Redeemed' : 'Adjustment')}${h.note ? ' <small>(' + esc(h.note) + ')</small>' : ''}</td><td class="num"><strong style="color:${h.points >= 0 ? 'var(--ok)' : 'var(--bad)'}">${h.points > 0 ? '+' : ''}${esc(h.points)}</strong></td><td class="num">${esc(h.balance)}</td></tr>`).join('')}</tbody></table>`
+            : '<p>No points yet. Your first points arrive when your first order is paid.</p>';
+    } catch (e) { if (e.message !== 'SESSION_EXPIRED') $('points-history-list').innerHTML = '<p>Could not load your points.</p>'; }
 }
 
 function renderMyProfile() {
-    document.getElementById('prof-name').value = currentCustomer.customerName || '';
-    document.getElementById('prof-email').value = currentCustomer.customerEmail || '';
-    document.getElementById('prof-phone').value = currentCustomer.customerPhone || '';
-    document.getElementById('prof-address').value = currentCustomer.customerAddress || '';
-    document.getElementById('profile-status').textContent = '';
-}
-
-// =================================================================
-// CART & CHECKOUT LOGIC
-// =================================================================
-function addToCart(productIdStr) {
-    const productId = String(productIdStr);
-    const product = products.find(p => String(p.id) === productId);
-    if (!product) return;
-    
-    const existingItem = cart.find(item => String(item.id) === productId);
-    if (existingItem) {
-        existingItem.quantity++;
-    } else {
-        cart.push({ ...product, quantity: 1 });
-    }
-    renderCartSummary();
-}
-function removeItemFromCart(productIdStr) {
-    const productId = String(productIdStr);
-    cart = cart.filter(item => String(item.id) !== productId);
-    renderCartSummary();
-}
-function updateQuantity(productIdStr, newQuantity) {
-    const productId = String(productIdStr);
-    const item = cart.find(i => String(i.id) === productId);
-    const qty = parseInt(newQuantity, 10);
-    if (item) {
-        if (qty > 0) item.quantity = qty;
-        else removeItemFromCart(productId);
-    }
-    renderCartSummary();
-}
-
-function renderCartSummary() {
-    const container = document.getElementById('summary-items-list');
-    if (cart.length === 0) {
-        container.innerHTML = "<p style='text-align:center; padding: 20px 0;'>Your cart is empty.</p>";
-    } else {
-        container.innerHTML = cart.map(item => `
- <div class="summary-item" data-id="${esc(item.id)}">
-                <div>
-                    <strong>${esc(item.name)}</strong>
-                    <p>RM ${num(item.price).toFixed(2)}</p>
-                </div>
-                <input type="number" min="1" max="999" value="${item.quantity}" onchange="updateQuantity(this.parentNode.dataset.id, this.value)" style="width: 60px; padding: 5px;">
-                <span onclick="removeItemFromCart(this.parentNode.dataset.id)" style="cursor:pointer; text-align:center; color: var(--danger-color);"><i class="fa-solid fa-trash"></i></span>
-            </div>
-        `).join('');
-    }
-    calculateTotals();
-}
-
-function calculateTotals() {
-    const subtotal = Math.round(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 100) / 100;
-    const shippingFee = cart.length ? calcShipping(subtotal) : 0;
-    const finalTotal = subtotal + shippingFee;
-
-    document.getElementById('summary-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
-    document.getElementById('summary-shipping').textContent = `RM ${shippingFee.toFixed(2)}`;
-    document.getElementById('summary-total').textContent = `RM ${finalTotal.toFixed(2)}`;
-}
-
-async function saveCart() {
-    try {
-        const response = await postToGoogleScript('saveCustomerCart', { cart: cart.map(i => ({ id: i.id, quantity: i.quantity })) });
-        alert(response.message || 'Saved.');
-    } catch (e) { if (e.message !== 'SESSION_EXPIRED') alert('Could not save the cart.'); }
-}
-
-async function initiateCheckout() {
-    if (cart.length === 0) { alert("Your cart is empty."); return; }
-    
-    const statusEl = document.getElementById('checkout-status');
-    statusEl.textContent = 'Processing...';
-
-    // Only ids and quantities are sent. The server prices the order and works out shipping itself.
-    const payload = {
-        token: sessionToken,
-        customerName: currentCustomer.customerName,
-        customerEmail: currentCustomer.customerEmail,
-        customerPhone: currentCustomer.customerPhone,
-        customerAddress: currentCustomer.customerAddress,
-        cart: cart.map(i => ({ id: i.id, quantity: i.quantity }))
-    };
-
-    try {
-        const response = await postToGoogleScript('logInitialOrder', payload);
-        if (response.status === 'success') {
-            statusEl.textContent = "Order Placed!";
-            alert(`Order ${response.invoiceId} placed.\nShipping: RM ${num(response.shippingFee).toFixed(2)}\nTotal: RM ${num(response.totalAmount).toFixed(2)}`);
-            cart = [];
-            renderCartSummary();
-            alert("Your order has been placed successfully! We will contact you shortly to confirm payment.");
-            showView('my-orders-view');
-        } else { throw new Error(response.message); }
-    } catch (e) {
-        statusEl.textContent = "Checkout failed.";
-        if (e.message !== 'SESSION_EXPIRED') alert(`Error: ${e.message}`);
-    }
+    $('prof-name').value = currentCustomer.customerName || '';
+    $('prof-email').value = currentCustomer.customerEmail || '';
+    $('prof-phone').value = currentCustomer.customerPhone || '';
+    $('prof-address').value = currentCustomer.customerAddress || '';
+    $('profile-status').textContent = ''; $('pw-status').textContent = '';
 }
 
 async function saveProfile() {
-    const statusEl = document.getElementById('profile-status');
-    const payload = {
-        customerName: document.getElementById('prof-name').value,
-        customerPhone: document.getElementById('prof-phone').value,
-        customerAddress: document.getElementById('prof-address').value
-    };
-    statusEl.textContent = 'Saving...';
-    let response;
-    try { response = await postToGoogleScript('updateCustomerProfile', payload); }
-    catch (e) { if (e.message !== 'SESSION_EXPIRED') statusEl.textContent = 'Could not save. Please try again.'; return; }
-    if (response.success) {
-        statusEl.style.color = 'var(--success-color)';
-        // Update local state
-        currentCustomer.customerName = payload.customerName;
-        currentCustomer.customerPhone = payload.customerPhone;
-        currentCustomer.customerAddress = payload.customerAddress;
-    } else {
-        statusEl.style.color = 'var(--danger-color)';
-    }
-    statusEl.textContent = response.message || '';
+    const st = $('profile-status');
+    const payload = { customerName: $('prof-name').value.trim(), customerPhone: $('prof-phone').value.trim(), customerAddress: $('prof-address').value.trim() };
+    if (!payload.customerName || !payload.customerPhone) { setStatus(st, 'Name and phone are required.'); return; }
+    setStatus(st, 'Saving...', true);
+    try {
+        const res = await postToGoogleScript('updateCustomerProfile', payload);
+        if (res.success) { Object.assign(currentCustomer, payload); $('customer-welcome-header').textContent = 'Welcome, ' + payload.customerName; }
+        setStatus(st, res.message || '', res.success);
+    } catch (e) { if (e.message !== 'SESSION_EXPIRED') setStatus(st, 'Could not save. Please try again.'); }
 }
 
-// =================================================================
-// UTILITY FUNCTIONS 
-// =================================================================
-async function postToGoogleScript(action, data = {}) {
-    const payload = { action, data: Object.assign({}, data, sessionToken && data.token === undefined ? { token: sessionToken } : {}) };
+async function changePassword() {
+    const st = $('pw-status'), oldP = $('pw-old').value, n1 = $('pw-new').value, n2 = $('pw-new2').value;
+    if (!oldP) { setStatus(st, 'Enter your current password.'); return; }
+    if (n1.length < 6) { setStatus(st, 'New password must be at least 6 characters.'); return; }
+    if (n1 !== n2) { setStatus(st, 'The new passwords do not match.'); return; }
+    setStatus(st, 'Saving...', true);
     try {
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST', mode: 'cors', credentials: 'omit',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-            body: JSON.stringify(payload), redirect: 'follow'
+        const res = await postToGoogleScript('changeCustomerPassword', { oldPassword: oldP, newPassword: n1 });
+        setStatus(st, res.message || '', res.success);
+        if (res.success) { $('pw-old').value = ''; $('pw-new').value = ''; $('pw-new2').value = ''; }
+    } catch (e) { if (e.message !== 'SESSION_EXPIRED') setStatus(st, 'Could not change the password. Please try again.'); }
+}
+
+
+// Contact number comes from the AboutUs sheet (cell M2) via the server, so it never needs editing here.
+async function loadContactHelp() {
+    try {
+        const r = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'cors', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'getContactInfo', data: {} }), redirect: 'follow' });
+        const c = await r.json();
+        if (!c || !c.success) return;
+        document.querySelectorAll('.help-line').forEach(el => {
+            el.innerHTML = 'Need help? <a href="https://wa.me/' + encodeURIComponent(c.whatsappNumber) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp ' + esc(c.contactNumber) + '</a>';
         });
-        if (!response.ok) { throw new Error(`HTTP Error ${response.status}`); }
-        const responseText = await response.text();
-        try { const out = JSON.parse(responseText); if (out && out.success === false && out.message === 'SESSION_EXPIRED') { sessionToken = null; alert('Your session has expired. Please log in again.'); location.reload(); throw new Error('SESSION_EXPIRED'); } if (out && out.success === false && /Unknown action/i.test(out.message || '')) throw new Error(out.message); return out; } catch (e) { if (/Unknown action|SESSION_EXPIRED/i.test(e.message)) throw e; console.error("Invalid JSON response:", responseText); throw new Error("Invalid server response."); }
-    } catch (error) { throw error; }
+    } catch (e) { /* the help line simply stays empty */ }
+}
+
+// ---------- Server calls ----------
+async function postToGoogleScript(action, data = {}) {
+    const payload = { action, data: Object.assign({}, data, sessionToken ? { token: sessionToken } : {}) };
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST', mode: 'cors', credentials: 'omit',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload), redirect: 'follow'
+    });
+    if (!response.ok) throw new Error('HTTP Error ' + response.status);
+    const text = await response.text();
+    let out;
+    try { out = JSON.parse(text); } catch (e) { console.error('Invalid JSON response:', text.slice(0, 200)); throw new Error('Invalid server response.'); }
+    if (out && out.success === false && out.message === 'SESSION_EXPIRED') {
+        sessionToken = null; alert('Your session has expired. Please log in again.'); location.reload(); throw new Error('SESSION_EXPIRED');
+    }
+    return out;
 }
 </script>
 </body>
