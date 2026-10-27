@@ -775,3 +775,40 @@ body.shop .modal { background: rgba(5, 63, 49, .6); }
     nav, .fab-container, #eshop-chat-widget, .btn { display: none !important; }
     .card { box-shadow: none; border: 1px solid #ddd; }
 }
+
+
+/* ===== Customer account: tracker, orders, rewards (v2.1) ===== */
+body.portal .login-links { text-align:center; font-size:.85rem; margin-top:14px; color:var(--ink-500); }
+body.portal .login-links a { color:var(--emerald-700,#064e3b); font-weight:600; }
+body.portal .login-links span { margin:0 8px; }
+body.portal .form-status { min-height:1.3em; margin-top:10px; font-size:.88rem; font-weight:500; }
+body.portal #reset-status { text-align:center; min-height:1.4em; margin-top:12px; font-size:.88rem; font-weight:500; }
+.order-card { margin-bottom:16px; }
+.order-top { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+.order-no { font-family:'Playfair Display',serif; font-size:1.1rem; }
+.order-date { margin-left:10px; color:var(--ink-500); font-size:.85rem; }
+.order-items-line { margin:8px 0; font-size:.9rem; color:var(--ink-700,#333); }
+.order-items-line i { color:var(--gold-500,#d4af37); margin-right:8px; width:16px; }
+.order-bottom { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-top:12px; padding-top:12px; border-top:1px solid var(--line,#e5e7eb); }
+.order-total span { display:block; font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-500); }
+.order-total strong { font-size:1.25rem; }
+.order-total small { display:block; color:var(--ink-500); font-size:.78rem; }
+.order-total small.pts { color:var(--ok); font-weight:600; }
+.order-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.tracker { list-style:none; display:flex; margin:18px 0 8px; padding:0; }
+.tracker li { flex:1; text-align:center; position:relative; font-size:.74rem; color:var(--ink-500); }
+.tracker li::before { content:''; position:absolute; top:13px; left:-50%; width:100%; height:3px; background:#e5e7eb; z-index:0; }
+.tracker li:first-child::before { display:none; }
+.tracker li.done::before, .tracker li.now::before { background:var(--ok); }
+.tracker .dot { position:relative; z-index:1; display:inline-flex; width:28px; height:28px; border-radius:50%; background:#e5e7eb; color:#6b7280; align-items:center; justify-content:center; font-weight:700; font-size:.75rem; }
+.tracker li.done .dot { background:var(--ok); color:#fff; }
+.tracker li.now .dot { background:var(--gold-500,#d4af37); color:#053f31; box-shadow:0 0 0 4px rgba(212,175,55,.25); }
+.tracker li.now .lbl { color:#053f31; font-weight:700; }
+.tracker .lbl { display:block; margin-top:6px; }
+.rewards-hero { display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; background:linear-gradient(135deg,#064e3b,#053f31); color:#fff; }
+.rewards-hero .stat-label { color:#d4af37; text-transform:uppercase; letter-spacing:.1em; font-size:.75rem; }
+.rewards-hero .field-hint { color:#cfe8dd; margin:6px 0 0; }
+.points-big { font-family:'Playfair Display',serif; font-size:3.2rem; color:#fff; line-height:1.1; }
+.redeem-soon { background:rgba(255,255,255,.1); border:1px dashed #d4af37; padding:14px 18px; border-radius:12px; max-width:280px; display:flex; flex-direction:column; gap:4px; font-size:.85rem; }
+.redeem-soon i { color:#d4af37; font-size:1.3rem; }
+@media (max-width:600px){ .tracker li .lbl{font-size:.62rem} .tracker li::before{top:13px} }
