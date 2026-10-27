@@ -125,12 +125,13 @@
     </div>
 </div>
 
+<script src="config.js?v=1"></script>
 <script>
 // =================================================================
 // CUSTOMER ACCOUNT PORTAL
 // =================================================================
 // Same web-app deployment as script.js and agent.html. Change it in all three files together.
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxauBwBuI4JwDfn_LTQa7U8F_u6hli6PlENQD_KCAEo3rbAqmp8Vqo98Sfli_8zKtLhWQ/exec';
+const GOOGLE_SCRIPT_URL = (window.FL_CONFIG && window.FL_CONFIG.SCRIPT_URL) || '';   // set in config.js
 
 let currentCustomer = null;
 let sessionToken = null;
