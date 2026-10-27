@@ -4,5 +4,5 @@
 // After you deploy a new version of Code.gs, change ONLY this line.
 // =====================================================================
 window.FL_CONFIG = {
-    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz-tbstdD97r8FOWjysjkcRd8DXYmB7LMnSHKpT8HIvgC_vP4cUc5wK4XGvFiNfzpSghQ/exec'
+    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxmiGmppx1ERVglyRfrruEqsUwfP1c4JSdSivOMzTlYRt2hRW0ve7sDvx2ZpXvZpbxRZw/exec'
 };
