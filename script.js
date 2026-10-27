@@ -8,7 +8,7 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwhqlu3qRh4sWu6FeGLU1v06M-moCq6NULxc98e74XrlFkOX4hJNINZe-c9klqWmQvgLA/exec';
+const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxauBwBuI4JwDfn_LTQa7U8F_u6hli6PlENQD_KCAEo3rbAqmp8Vqo98Sfli_8zKtLhWQ/exec';
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 // SECURITY NOTE: anything in this file is public. Treat this key as non-secret and
 // make sure the bot server does not rely on it alone for sensitive actions.
@@ -22,7 +22,7 @@ let shippingRules = []; // [{ minSpend, charge }] from the ShippingRules sheet
 
 const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="250" height="250"><rect width="100%" height="100%" fill="#eef2f0"/>' +
-    '<text x="50%" y="50%" fill="#7a8a83" font-family="sans-serif" font-size="18" text-anchor="middle" dominant-baseline="middle">Forever Living</text></svg>'
+    '<text x="50%" y="50%" fill="#7a8a83" font-family="sans-serif" font-size="18" text-anchor="middle" dominant-baseline="middle">Forever Living by Muhd Isa</text></svg>'
 );
 
 // Escape text before putting it into HTML (stops broken markup and script injection from sheet data)
@@ -1205,7 +1205,15 @@ function getPreviewTheme() {
 // [ 1.8 ] SHOP LAYOUT (5 per row) & PRODUCT PAGES
 // ===========================================================
 const viewState = { current: 'homepage', listScroll: 0, baseTitle: document.title, pdQty: 1 };
-const WHATSAPP_NUMBER = '601111033154';
+// Contact number comes from the AboutUs sheet (cell M2) and is set when the shop data loads.
+const BRAND_NAME = 'Forever Living by Muhd Isa';   // always shown in full, never just "Forever Living"
+let WHATSAPP_NUMBER = '601154443154';
+let CONTACT_DISPLAY = '+60 11-5444 3154';
+function applyContactNumber(content) {
+    if (!content) return;
+    if (content.WhatsAppNumber) WHATSAPP_NUMBER = String(content.WhatsAppNumber).replace(/\D/g, '');
+    if (content.ContactNumber) CONTACT_DISPLAY = content.ContactNumber;
+}
 
 function injectShopStyles() {
     if (document.getElementById('fl-shop-style')) return;
@@ -1482,6 +1490,7 @@ async function fetchData() {
         shippingRules = normaliseShippingRules(data.shippingRules);
         allJobs = data.jobsListings || [];
 
+        applyContactNumber(data.aboutUsContent);
         renderMainContentShell();
         renderStaticContent(data.aboutUsContent);
         renderHomepageContent(data.aboutUsContent, allJobs, data.testimonies);
@@ -1525,11 +1534,11 @@ function renderStaticContent(content) {
     if (!content) return;
     const headerElem = document.getElementById('company-name-header');
     if (headerElem) {
-        headerElem.innerHTML = `${esc(content.CompanyName)} <span class="by-line">${esc(content.Owner)} - ${esc(content.Role)}</span> <span class="slogan">${esc(content.Slogan)}</span>`;
+        headerElem.innerHTML = `${esc(BRAND_NAME)} <span class="by-line">${esc(content.Owner)} - ${esc(content.Role)}</span> <span class="slogan">${esc(content.Slogan)}</span>`;
     }
     const footerElem = document.getElementById('footer-text');
     if (footerElem) {
-        footerElem.textContent = content.Footer || `© ${new Date().getFullYear()} ${content.CompanyName || 'Forever Living'}`;
+        footerElem.innerHTML = esc(content.Footer || `© ${new Date().getFullYear()} ${BRAND_NAME}`) + ` &nbsp;|&nbsp; <a href="https://wa.me/${esc(WHATSAPP_NUMBER)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp ${esc(CONTACT_DISPLAY)}</a>`;
     }
 }
 
@@ -1595,7 +1604,7 @@ function ytThumbFailed(img) {
 }
 
 function renderHomepageContent(about, jobs, testimonies) {
-    about = about || { CompanyName: "Forever Living", Slogan: "Premium Wellness & Beauty" };
+    about = about || { CompanyName: "Forever Living by Muhd Isa", Slogan: "Premium Wellness & Beauty" };
     const heroContainer = document.getElementById('homepage-hero');
     if (heroContainer) heroContainer.innerHTML = `<h2>${esc(about.CompanyName || 'Welcome')}</h2><p>${esc(about.Slogan || 'High-quality wellness products')}</p>`;
 
@@ -1693,7 +1702,7 @@ function renderAboutUs(content) {
     if (!content) { container.innerHTML = '<p>About information is unavailable.</p>'; return; }
     const historySection = content.History ? `<div class="about-section"><h4>Our History</h4><p>${esc(content.History)}</p></div>` : '';
     container.innerHTML = `
-        <h2>About ${esc(content.CompanyName || 'Us')}</h2>
+        <h2>About ${esc(BRAND_NAME)}</h2>
         <div class="owner-profile">
             <img src="arvind.jpg" alt="${esc(content.Owner || 'Owner')}" class="owner-image" onerror="this.style.display='none'">
             <div class="owner-details">
@@ -2152,7 +2161,7 @@ async function handleMainMenu(text) {
             addChatMessage('bot', 'Enter your PAC or Email to verify.');
         }
     } else if (text === '2') {
-        addChatMessage('bot', '<a href="https://wa.me/601111033154" target="_blank" rel="noopener">Contact Admin</a>', 'html');
+        addChatMessage('bot', '<a href="https://wa.me/' + WHATSAPP_NUMBER + '" target="_blank" rel="noopener">Contact Admin</a>', 'html');
     } else {
         const response = await postToRender('getSmartAnswer', { question: text });
         addChatMessage('bot', response.answer || 'Sorry, I had trouble finding an answer.');
