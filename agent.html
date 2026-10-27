@@ -13,6 +13,7 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/jpeg" href="FL.jpg">
+    <script src="config.js?v=1"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
     <link rel="stylesheet" href="style.css?v=3">
 </head>
@@ -215,7 +216,7 @@
 // AGENT PORTAL SCRIPT - LUXURY EDITION (CORRECTED)
 // =================================================================
 // Same web-app deployment as script.js and customer.html. Change it in all three files together.
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxauBwBuI4JwDfn_LTQa7U8F_u6hli6PlENQD_KCAEo3rbAqmp8Vqo98Sfli_8zKtLhWQ/exec'; 
+const GOOGLE_SCRIPT_URL = (window.FL_CONFIG && window.FL_CONFIG.SCRIPT_URL) || '';   // set in config.js 
 
 let products = [], customers = [], shippingRules = [], currentAgent = null, currentOrder = { items: [] }, performanceChartInstance = null;
 let currentProfile = {}, canEditProfile = false, allAgentsList = [], sessionToken = null;
@@ -728,6 +729,7 @@ async function submitOrder() {
         const res = await postToGoogleScript('submitAgentOrder', payload);
         if(res.success) {
             status.textContent = '';
+            if (res.invoicePdf && res.invoicePdf.base64) { try { const b = Uint8Array.from(atob(res.invoicePdf.base64), c => c.charCodeAt(0)); const u = URL.createObjectURL(new Blob([b], { type: 'application/pdf' })); const l = document.createElement('a'); l.href = u; l.download = res.invoicePdf.filename || 'Invoice.pdf'; document.body.appendChild(l); l.click(); l.remove(); } catch (e) { console.error(e); } }
             alert(`Success! Invoice ${res.invoiceId}\nTotal: RM ${money(res.totalAmount).toFixed(2)} (shipping RM ${money(res.shippingFee).toFixed(2)})`);
             renderCreateOrder();
         } else { status.textContent = ''; alert(res.message || 'Order could not be saved.'); btn.disabled = false; }
