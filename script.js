@@ -8,7 +8,8 @@
 // ===========================================================
 // [ 1.0 ] GLOBAL CONFIGURATION & STATE
 // ===========================================================
-const googleScriptURL = 'https://script.google.com/macros/s/AKfycbxauBwBuI4JwDfn_LTQa7U8F_u6hli6PlENQD_KCAEo3rbAqmp8Vqo98Sfli_8zKtLhWQ/exec';
+const googleScriptURL = (window.FL_CONFIG && window.FL_CONFIG.SCRIPT_URL) || '';   // set in config.js
+if (!googleScriptURL) console.error('config.js is missing. Upload it next to index.html.');
 const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
 // SECURITY NOTE: anything in this file is public. Treat this key as non-secret and
 // make sure the bot server does not rely on it alone for sensitive actions.
@@ -632,7 +633,7 @@ body.fl-on .dynamic-content-wrapper,
 body.fl-on .about-section,
 body.fl-on .testimony-card,
 body.fl-on .job-card { background: rgba(255,255,255,.80) !important; backdrop-filter: blur(3px); }
-body.fl-on header { background: rgba(255,255,255,.88) !important; }
+/* header stays deep emerald with gold type, festival or not (see style.css) */
 
 #fl-fx-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 55; pointer-events: none; display: none; }
 
@@ -1995,7 +1996,8 @@ async function initiateCheckout() {
         const result = await postDataToGScript(payload);
         const ref = result && result.invoiceId ? ` Your order reference is ${result.invoiceId}.` : '';
         const paid = result && result.totalAmount !== undefined ? ` Order total: RM ${Number(result.totalAmount).toFixed(2)} (including shipping RM ${Number(result.shippingFee || 0).toFixed(2)}).` : '';
-        alert('Your order has been placed successfully!' + ref + paid + ' We will contact you via WhatsApp shortly to confirm payment and shipping.');
+        const gotPdf = result && result.invoicePdf && result.invoicePdf.base64 && downloadPdfBase64(result.invoicePdf.base64, result.invoicePdf.filename);
+        alert('Your order has been placed successfully!' + ref + paid + (gotPdf ? ' Your invoice PDF has been downloaded. Scan the QR code on it to pay.' : ' You can view your invoice in My Account.') + ' We will contact you via WhatsApp shortly to confirm payment and shipping.');
         cart = [];
         toggleCart(true);
         updateCartDisplay();
@@ -2234,6 +2236,19 @@ function showTab(tabId) {
 // FIX: the old "no-cors" request could never read the server's reply, so the shop showed
 // "order placed" even when the backend rejected the order. A text/plain POST needs no
 // CORS pre-flight with Apps Script and lets us read the real result.
+// Saves a PDF sent as base64 straight to the customer's downloads
+function downloadPdfBase64(base64, filename) {
+    try {
+        const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+        const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+        const a = document.createElement('a');
+        a.href = url; a.download = filename || 'Invoice.pdf';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        return true;
+    } catch (e) { console.error('PDF download failed:', e); return false; }
+}
+
 async function postDataToGScript(payload) {
     const response = await fetch(googleScriptURL, {
         method: 'POST',
