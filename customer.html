@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow">
     <title>My Account | Forever Living by Muhd Isa</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/jpeg" href="FL.jpg">
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="icon" type="image/webp" href="assets/logo.webp">
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body class="portal">
 
 <div id="login-view">
     <div class="card" id="login-box">
-        <img src="FL.jpg" alt="Logo">
+        <img src="assets/logo.webp" alt="Logo">
         <h1>My Account</h1>
         <p>Track your orders, view invoices and receipts, and collect reward points.</p>
 
@@ -64,7 +65,7 @@
 <div id="portal-view" class="container hidden">
     <header>
         <div style="display:flex;align-items:center;gap:14px;">
-            <img src="FL.jpg" alt="Logo" style="width:52px;height:52px;border-radius:50%;border:2px solid var(--gold-500,#d4af37);" onerror="this.style.display='none'">
+            <img src="assets/logo.webp" alt="Logo" style="width:52px;height:52px;border-radius:50%;border:2px solid var(--gold-500,#d4af37);" onerror="this.style.display='none'">
             <div>
             <h2 id="customer-welcome-header"></h2>
             <p id="customer-details-display"></p>
@@ -126,6 +127,9 @@
 </div>
 
 <script src="config.js?v=1"></script>
+<script src="store-core.js?v=1"></script>
+<script src="image-map.js?v=1"></script>
+<script src="store-ui.js?v=1"></script>
 <script>
 // =================================================================
 // CUSTOMER ACCOUNT PORTAL
@@ -257,7 +261,8 @@ function showView(viewId) {
 }
 
 function trackerHtml(status) {
-    const idx = Math.max(0, stages.indexOf(status));
+    const idx = stages.indexOf(status);
+    if (idx < 0) return '<p class="order-status-note">Current status: <strong>' + esc(status || 'Awaiting update') + '</strong></p>';
     return '<ol class="tracker">' + stages.map((s, i) => `<li class="${i < idx ? 'done' : i === idx ? 'now' : ''}"><span class="dot">${i < idx ? '<i class="fa-solid fa-check"></i>' : i + 1}</span><span class="lbl">${esc(s)}</span></li>`).join('') + '</ol>';
 }
 
@@ -268,6 +273,7 @@ async function renderMyOrders() {
         const res = await postToGoogleScript('getCustomerOrders', {});
         if (!res.success) { box.innerHTML = `<div class="alert alert-bad">${esc(res.message || 'Could not load your orders.')}</div>`; return; }
         if (res.stages && res.stages.length) stages = res.stages;
+        if (!Array.isArray(res.orders)) throw new Error('Invalid order response.');
         if (!res.orders.length) { box.innerHTML = '<div class="card"><p>You have no orders yet. Once you place an order on our website, it will appear here.</p></div>'; return; }
         box.innerHTML = res.orders.map(o => `
             <div class="card order-card">
@@ -373,12 +379,12 @@ async function postToGoogleScript(action, data = {}) {
     const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST', mode: 'cors', credentials: 'omit',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload), redirect: 'follow'
+        body: JSON.stringify(payload), signal: AbortSignal.timeout(25000), redirect: 'follow'
     });
     if (!response.ok) throw new Error('HTTP Error ' + response.status);
     const text = await response.text();
     let out;
-    try { out = JSON.parse(text); } catch (e) { console.error('Invalid JSON response:', text.slice(0, 200)); throw new Error('Invalid server response.'); }
+    try { out = JSON.parse(text); } catch (e) { console.error('Customer service returned an invalid response.'); throw new Error('Invalid server response.'); }
     if (out && out.success === false && out.message === 'SESSION_EXPIRED') {
         sessionToken = null; alert('Your session has expired. Please log in again.'); location.reload(); throw new Error('SESSION_EXPIRED');
     }

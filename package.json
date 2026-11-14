@@ -1,0 +1,12 @@
+{
+  "name": "forever-living-storefront",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node --test tests/core.test.cjs",
+    "test:browser": "playwright test",
+    "images": "node tools/optimize-images.cjs",
+    "build": "node --use-env-proxy tools/build-site.cjs"
+  },
+  "devDependencies": { "@playwright/test": "1.65.1", "sharp": "0.35.5" }
+}
