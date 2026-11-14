@@ -9,7 +9,7 @@ const catalog = {
     shippingRules: [{ MinSpend: 0, MaxSpend: 99.99, Charge: 10 }, { MinSpend: 100, Charge: 0 }]
 };
 async function setup(page) {
-    const state = { failed: false, reply: {}, requests: [], catalog: structuredClone(catalog), bot: [] };
+    const state = { failed: false, reply: {}, requests: [], catalog: structuredClone(catalog), bot: [], customerOrders: [{ invoiceId: 'INV-1', date: 'Today', status: 'Cancelled', total: 40, items: 'Aloe cream', paid: false }] };
     await page.route('**/*', async route => {
         const req = route.request(); const url = new URL(req.url());
         if (url.hostname === 'script.google.com') {
@@ -19,7 +19,7 @@ async function setup(page) {
             const replies = {
                 logInitialOrder: state.reply, getContactInfo: { success: true, whatsappNumber: '601234', contactNumber: 'Test contact' },
                 verifyCustomer: { success: true, token: 'portal-session', customer: { customerName: 'Test customer', pac: 'C1' } },
-                getCustomerOrders: { success: true, orders: [{ invoiceId: 'INV-1', date: 'Today', status: 'Cancelled', total: 40, items: 'Aloe cream', paid: false }] },
+                getCustomerOrders: { success: true, orders: state.customerOrders, stages: ['Processed', 'Paid', 'Awaiting Shipment', 'On the Way', 'Delivered'] },
                 verifyAgent: { success: true, token: 'agent-session', agent: { name: 'Test agent', id: 'AG1' }, target: 100, currentSales: 0, profile: {}, isAdmin: false, isManager: false },
                 getPortalData: { success: true, products: [], customers: [], shippingRules: [] }, getOpenOrders: { success: true, orders: [] }
             };
@@ -166,4 +166,40 @@ test('catalog toolbar and confirmation fit a phone viewport', async ({ page }) =
     await expect(page.locator('.order-confirmation')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await page.screenshot({ path: 'test-results/confirmation-mobile.png', fullPage: true });
+});
+
+
+test('customer history displays product names and remains pending until payment verification', async ({ page }) => {
+    const state = await setup(page);
+    state.customerOrders = [{ invoiceId: 'INV-PENDING', date: 'Today', status: 'Delivered', total: 95, shippingFee: 0, items: 'A1x2, T1x1', paid: false, points: 95 }];
+    await page.goto('/customer.html');
+    await page.locator('#customer-email-input').fill('test@example.com'); await page.locator('#customer-password-input').fill('test-password');
+    await page.getByRole('button', { name: 'Log in', exact: true }).click();
+    const order = page.locator('.order-card');
+    await expect(order.locator('.order-items-line').first()).toHaveText('Aloe cream × 2, Herbal tea × 1');
+    await expect(order.locator('.badge')).toHaveText('Pending payment');
+    await expect(order.locator('.tracker .now .lbl')).toHaveText('Pending payment');
+    await expect(order.getByRole('button', { name: 'Receipt', exact: true })).toHaveCount(0);
+    await expect(order.locator('.pts')).toHaveCount(0);
+    state.customerOrders[0].paid = true; state.customerOrders[0].status = 'Processed';
+    await page.locator('#nav-my-orders-btn').click();
+    await expect(order.locator('.badge')).toHaveText('Paid');
+    await expect(order.getByRole('button', { name: 'Receipt', exact: true })).toBeVisible();
+    state.customerOrders[0].paymentStatus = 'Unpaid'; state.customerOrders[0].status = 'On the Way';
+    await page.locator('#nav-my-orders-btn').click();
+    await expect(order.locator('.badge')).toHaveText('Pending payment');
+    state.customerOrders[0].paymentStatus = 'Paid';
+    await page.locator('#nav-my-orders-btn').click();
+    await expect(order.locator('.badge')).toHaveText('On the Way');
+});
+
+test('historical saved names work without the public catalog and remain escaped', async ({ page }) => {
+    const state = await setup(page); state.failed = true;
+    state.customerOrders = [{ invoiceId: 'OLD', status: 'Processed', paid: false, total: 10, itemDetails: [{ id: 'DELISTED', name: '<img src=x onerror=alert(1)> Saved product', quantity: 2 }] }];
+    await page.goto('/customer.html');
+    await page.locator('#customer-email-input').fill('test@example.com'); await page.locator('#customer-password-input').fill('test-password');
+    await page.getByRole('button', { name: 'Log in', exact: true }).click();
+    await expect(page.locator('.order-items-line').first()).toHaveText('<img src=x onerror=alert(1)> Saved product × 2');
+    await expect(page.locator('.order-items-line img')).toHaveCount(0);
+    await expect(page.locator('.order-card .badge')).toHaveText('Pending payment');
 });

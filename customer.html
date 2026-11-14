@@ -127,7 +127,7 @@
 </div>
 
 <script src="config.js?v=1"></script>
-<script src="store-core.js?v=1"></script>
+<script src="store-core.js?v=2"></script>
 <script src="image-map.js?v=1"></script>
 <script src="store-ui.js?v=1"></script>
 <script>
@@ -139,7 +139,7 @@ const GOOGLE_SCRIPT_URL = (window.FL_CONFIG && window.FL_CONFIG.SCRIPT_URL) || '
 
 let currentCustomer = null;
 let sessionToken = null;
-let stages = ['Processed', 'Paid', 'Awaiting Shipment', 'On the Way', 'Delivered'];
+let stages = ['Pending payment', 'Paid', 'Awaiting Shipment', 'On the Way', 'Delivered'];
 
 function esc(v) {
     return String(v === undefined || v === null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -266,26 +266,43 @@ function trackerHtml(status) {
     return '<ol class="tracker">' + stages.map((s, i) => `<li class="${i < idx ? 'done' : i === idx ? 'now' : ''}"><span class="dot">${i < idx ? '<i class="fa-solid fa-check"></i>' : i + 1}</span><span class="lbl">${esc(s)}</span></li>`).join('') + '</ol>';
 }
 
+let orderProductCatalog = null;
+async function loadOrderProductNames() {
+    if (orderProductCatalog) return orderProductCatalog;
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL, { signal: AbortSignal.timeout(10000), credentials: 'omit' });
+        if (!response.ok) return [];
+        const data = await response.json();
+        if (data.status === 'success' && Array.isArray(data.products)) {
+            orderProductCatalog = data.products;
+            return orderProductCatalog;
+        }
+    } catch { /* Saved item names still work if the public catalog is unavailable. */ }
+    return [];
+}
+
 async function renderMyOrders() {
     const box = $('my-orders-list');
     box.innerHTML = '<p class="loader">Loading your orders...</p>';
     try {
         const res = await postToGoogleScript('getCustomerOrders', {});
         if (!res.success) { box.innerHTML = `<div class="alert alert-bad">${esc(res.message || 'Could not load your orders.')}</div>`; return; }
-        if (res.stages && res.stages.length) stages = res.stages;
         if (!Array.isArray(res.orders)) throw new Error('Invalid order response.');
         if (!res.orders.length) { box.innerHTML = '<div class="card"><p>You have no orders yet. Once you place an order on our website, it will appear here.</p></div>'; return; }
-        box.innerHTML = res.orders.map(o => `
+        const needsNames = res.orders.some(order => StoreCore.customerOrderItems(order).some(item => item.name === 'Product name unavailable'));
+        const catalog = needsNames ? await loadOrderProductNames() : [];
+        const orders = res.orders.map(order => ({ ...order, paid: StoreCore.paymentVerified(order), status: StoreCore.customerOrderStatus(order), itemNames: StoreCore.customerOrderItems(order, catalog) }));
+        box.innerHTML = orders.map(o => `
             <div class="card order-card">
                 <div class="order-top">
                     <div><strong class="order-no">${esc(o.invoiceId)}</strong><span class="order-date">${esc(o.date)}</span></div>
-                    <span class="badge ${o.status === 'Delivered' ? 'badge-success' : o.status === 'Processed' ? 'badge-warn' : 'badge-info'}">${esc(o.status)}</span>
+                    <span class="badge ${o.status === 'Delivered' ? 'badge-success' : o.status === 'Pending payment' ? 'badge-warn' : 'badge-info'}">${esc(o.status)}</span>
                 </div>
                 ${trackerHtml(o.status)}
-                <div class="order-items-line"><i class="fa-solid fa-box"></i> ${esc(o.items)}</div>
+                <div class="order-items-line"><i class="fa-solid fa-box"></i> ${o.itemNames.map(item => esc(item.name) + ' × ' + esc(item.quantity)).join(', ') || 'No item details available.'}</div>
                 ${o.remarks ? `<div class="order-items-line"><i class="fa-solid fa-note-sticky"></i> ${esc(o.remarks)}</div>` : ''}
                 <div class="order-bottom">
-                    <div class="order-total"><span>Total</span><strong>RM ${esc(o.total)}</strong>${num(o.shippingFee) > 0 ? `<small>incl. shipping RM ${esc(o.shippingFee)}</small>` : '<small>free shipping</small>'}${o.points > 0 ? `<small class="pts">+${esc(o.points)} points earned</small>` : ''}</div>
+                    <div class="order-total"><span>Total</span><strong>RM ${esc(o.total)}</strong>${num(o.shippingFee) > 0 ? `<small>incl. shipping RM ${esc(o.shippingFee)}</small>` : '<small>free shipping</small>'}${o.paid && o.points > 0 ? `<small class="pts">+${esc(o.points)} points earned</small>` : ''}</div>
                     <div class="order-actions">
                         <button class="btn btn-secondary btn-sm" data-id="${esc(o.invoiceId)}" data-type="invoice" onclick="openDocument(this)"><i class="fa-solid fa-file-invoice"></i> Invoice</button>
                         ${o.paid ? `<button class="btn btn-primary btn-sm" data-id="${esc(o.invoiceId)}" data-type="receipt" onclick="openDocument(this)"><i class="fa-solid fa-receipt"></i> Receipt</button>` : ''}

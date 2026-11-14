@@ -82,6 +82,37 @@
         if (!tiers.length) return 0;
         return (tiers.filter(inRange).pop() || tiers.filter(r => amount > r.maxSpend).pop() || tiers[0]).charge;
     }
+    function paymentVerified(order) {
+        if (Object.hasOwn(order, 'paymentStatus')) return /^(paid|approved|completed|yes|true)$/i.test(text(order.paymentStatus).trim());
+        return order.paid === true;
+    }
+    function customerOrderStatus(order) {
+        const raw = text(order.status).trim();
+        const status = raw.toLowerCase().replace(/[^a-z]/g, '');
+        if (['cancelled', 'canceled', 'refunded'].includes(status)) return status === 'refunded' ? 'Refunded' : 'Cancelled';
+        if (!paymentVerified(order)) return 'Pending payment';
+        if (['', 'processed', 'pendingpayment', 'unpaid', 'paid', 'approved', 'completed'].includes(status)) return 'Paid';
+        if (['awaitingshipment', 'toship', 'preparing'].includes(status)) return 'Awaiting Shipment';
+        if (['ontheway', 'shipped', 'outfordelivery', 'intransit'].includes(status)) return 'On the Way';
+        if (status === 'delivered') return 'Delivered';
+        return raw;
+    }
+    function customerOrderItems(order, catalog = []) {
+        const names = new Map(catalog.map(p => [text(p.id ?? p.sku ?? p.SKU).trim(), text(p.name ?? p.ProductName).trim()]));
+        const details = Array.isArray(order.itemDetails) && order.itemDetails.length ? order.itemDetails : Array.isArray(order.items) ? order.items : null;
+        if (details) return details.map(item => {
+            const id = text(item.id ?? item.sku ?? item.SKU).trim();
+            const savedName = text(item.name ?? item.productName).trim();
+            const name = (savedName && savedName !== id ? savedName : names.get(id)) || 'Product name unavailable';
+            const quantity = Number(item.quantity ?? item.qty);
+            return { name, quantity: Number.isFinite(quantity) && quantity > 0 ? Math.floor(quantity) || 1 : 1 };
+        });
+        return text(order.items).split(',').map(item => item.trim()).filter(Boolean).map(item => {
+            const match = item.match(/^(.+?)\s*[xX×*]\s*(\d+)$/);
+            if (match) return { name: names.get(match[1].trim()) || 'Product name unavailable', quantity: Math.max(1, Number(match[2])) };
+            return { name: names.get(item) || item, quantity: 1 };
+        });
+    }
     function productPath(product) { return `products/p-${encodeURIComponent(product.id).replace(/~/g, '%7E').replace(/%/g, '~')}/`; }
-    return { normalizeProduct, filterProducts, relatedProducts, savedCart, restoreCart, confirmedOrder, normaliseShippingRules, calcShipping, productPath };
+    return { paymentVerified, customerOrderStatus, customerOrderItems, normalizeProduct, filterProducts, relatedProducts, savedCart, restoreCart, confirmedOrder, normaliseShippingRules, calcShipping, productPath };
 });

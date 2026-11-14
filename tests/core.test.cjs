@@ -64,3 +64,44 @@ test('static build emits crawler-visible metadata, safe content, sitemap and che
 test('invalid catalog build fails without publishing empty product pages', async () => {
     await assert.rejects(() => build({ catalog: { status: 'error' }, siteUrl: 'https://example.com/' }), /Catalog response/);
 });
+
+test('customer history resolves legacy SKUs and preserves saved historical names', () => {
+    assert.deepEqual(Core.customerOrderItems({ items: '1x2, 3X1' }, products), [{ name: 'Aloe cream', quantity: 2 }, { name: 'Herbal tea', quantity: 1 }]);
+    assert.deepEqual(Core.customerOrderItems({ itemDetails: [{ id: '1', name: 'Original cream name', quantity: 3 }] }, products), [{ name: 'Original cream name', quantity: 3 }]);
+    assert.deepEqual(Core.customerOrderItems({ items: 'REMOVEDx2' }, products), [{ name: 'Product name unavailable', quantity: 2 }]);
+});
+test('payment must be verified before fulfilment stages or a paid receipt are shown', () => {
+    for (const status of ['Processed', 'Paid', 'Awaiting Shipment', 'On the Way', 'Delivered']) {
+        assert.equal(Core.customerOrderStatus({ status, paid: false }), 'Pending payment');
+    }
+    assert.equal(Core.customerOrderStatus({ status: 'Processed', paid: true }), 'Paid');
+    assert.equal(Core.customerOrderStatus({ status: 'On the Way', paid: true }), 'On the Way');
+    assert.equal(Core.customerOrderStatus({ status: 'Cancelled', paid: false }), 'Cancelled');
+    assert.equal(Core.customerOrderStatus({ status: 'Refunded', paid: true }), 'Refunded');
+    assert.equal(Core.paymentVerified({ paid: 'false' }), false);
+    assert.equal(Core.paymentVerified({ paid: true, paymentStatus: 'Unpaid' }), false);
+    assert.equal(Core.paymentVerified({ paymentStatus: 'Paid' }), true);
+});
+
+test('Apps Script patch returns names and pending payment only for the authenticated customer', async () => {
+    const vm = require('node:vm');
+    const columns = ['PAC', 'InvoiceID', 'Timestamp', 'ItemsPurchased', 'Cart_Data', 'PaymentStatus', 'Status', 'DeliveryStatus', 'TotalAmount', 'ShippingFee', 'SpecialRemarks', 'PointsEarned'];
+    const h = Object.fromEntries(columns.map((name, i) => [name, i + 1]));
+    const row = values => columns.map(name => values[name] ?? '');
+    const orderRows = [columns,
+        row({ PAC: 'C1', InvoiceID: 'PENDING', ItemsPurchased: 'HIDDENx2', PaymentStatus: 'Unpaid', Status: 'Completed', DeliveryStatus: 'Delivered', TotalAmount: 30, PointsEarned: 20 }),
+        row({ PAC: 'C1', InvoiceID: 'PAID', Cart_Data: JSON.stringify([{ id: 'OLD', name: 'Historical name', quantity: 1 }]), PaymentStatus: 'Paid', Status: 'Processed', TotalAmount: 10 }),
+        row({ PAC: 'OTHER', InvoiceID: 'PRIVATE', ItemsPurchased: 'HIDDENx3', PaymentStatus: 'Paid' })];
+    const sheets = { OrderLog: { getDataRange: () => ({ getValues: () => orderRows }) }, ProductMaster: { getDataRange: () => ({ getValues: () => [['SKU', 'ProductName', 'IsPublished'], ['HIDDEN', 'Retired product', false]] }) } };
+    const context = vm.createContext({ SpreadsheetApp: { getActiveSpreadsheet: () => ({ getSheetByName: name => sheets[name] }) }, SHEET_ORDER_LOG: 'OrderLog', SHEET_PRODUCT_MASTER: 'ProductMaster', ORDER_COLS: columns,
+        ensureHeaders_: () => h, getColumnIndexes: () => ({ SKU: 1, ProductName: 2 }), sameId_: (a, b) => a === b,
+        isPaidValue_: value => /^(paid|approved|completed|yes|true)$/i.test(value),
+        customerStatus_: () => 'Paid', parseMoney_: value => Number(value) || 0, formatDateSafe_: () => 'Today' });
+    vm.runInContext(await fs.readFile(path.join(__dirname, '../apps-script/customer-orders.gs'), 'utf8'), context);
+    const result = JSON.parse(JSON.stringify(context.getCustomerOrders('C1')));
+    assert.equal(result.orders.length, 2);
+    const pending = result.orders.find(o => o.invoiceId === 'PENDING');
+    assert.equal(pending.items, 'Retired product × 2'); assert.equal(pending.status, 'Pending payment'); assert.equal(pending.paid, false); assert.equal(pending.points, 0);
+    assert.equal(result.orders.find(o => o.invoiceId === 'PAID').items, 'Historical name × 1');
+    assert.equal(result.stages[0], 'Pending payment');
+});

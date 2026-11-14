@@ -87,3 +87,19 @@ The Apps Script code lives in the owner's editor and is absent from this repo.
 The website cannot guarantee its password hashing, customer authorization,
 agent/admin roles, upload safety, server pricing or atomic duplicate prevention.
 See [the backend handoff](docs/apps-script-handoff.md) before making backend changes.
+
+## Customer order names and payment display
+
+The customer portal displays names/quantities rather than legacy `SKUxQty` lists.
+Existing responses are resolved through the public catalog; saved `itemDetails`
+names take precedence. Unresolved historical names are labelled explicitly.
+Active unpaid orders show **Pending payment** regardless of delivery progress;
+receipts and earned points are shown only after the API confirms payment.
+Cancelled/refunded orders retain their terminal status. Reopen My Orders or refresh
+the page after an administrator updates payment in Sheets.
+
+The owner-supplied Apps Script has a legacy paid-status fallback. The optional
+[customer orders replacement](apps-script/README.md) exposes `PaymentStatus`
+explicitly and resolves unpublished/historical product names from saved carts and
+ProductMaster. Applying this replacement requires updating the existing Apps
+Script deployment; the frontend GitHub deployment does not change that service.
