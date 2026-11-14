@@ -648,20 +648,33 @@ function buildJobApplicationModal() {
 function buildFabButtons() {
     const container = document.getElementById('fab-container');
     if (!container) return;
-    container.innerHTML = `<div id="floating-cart" class="fab floating-cart-btn" onclick="toggleCart()"><i class="fa-solid fa-cart-shopping"></i><span id="cart-count">0</span></div><div class="fab chatbot-fab" onclick="toggleChatWidget(true)"><i class="fa-solid fa-robot"></i></div>`;
+    container.innerHTML = `<div id="floating-cart" class="fab floating-cart-btn" onclick="toggleCart()"><i class="fa-solid fa-cart-shopping"></i><span id="cart-count">0</span></div><button type="button" class="fab chatbot-fab" aria-label="Open shop assistant" aria-controls="eshop-chat-widget" aria-expanded="false" onclick="toggleChatWidget(true)">${chatIcon('chat')}</button>`;
 }
 
 function buildChatbotWidget() {
     const container = document.getElementById('eshop-chat-widget');
     if (!container) return;
-    container.innerHTML = `<div id="chat-header"><span>FL e-Shop Assistant</span><button id="close-chat-btn" onclick="toggleChatWidget(false)">&times;</button></div><div id="chat-body"></div><div id="chat-input-container"><input type="text" id="chat-input" placeholder="Type your message..."><button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button></div>`;
-
-    // FIX: these elements only exist after this function runs, so the listeners
-    // must be attached here (they were previously attached before the elements existed).
-    const chatSend = document.getElementById('chat-send-btn');
-    if (chatSend) chatSend.addEventListener('click', handleChatSubmit);
-    const chatInput = document.getElementById('chat-input');
-    if (chatInput) chatInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') handleChatSubmit(); });
+    container.setAttribute('role', 'dialog'); container.setAttribute('aria-labelledby', 'chat-title');
+    container.setAttribute('aria-hidden', 'true'); container.inert = true;
+    container.innerHTML = `
+        <div id="chat-header">
+            <div class="chat-brand"><span class="chat-brandmark">${chatIcon('leaf')}</span><div><span class="chat-brand-label">FOREVER LIVING</span><h2 id="chat-title">Shop assistant</h2><span id="chat-account-state">Shopping & account support</span></div></div>
+            <div class="chat-header-actions"><button type="button" id="chat-menu-btn" aria-label="Show assistant options" title="Options">${chatIcon('menu')}</button><button type="button" id="close-chat-btn" aria-label="Close assistant" title="Close">${chatIcon('close')}</button></div>
+        </div>
+        <div id="chat-body" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation"></div>
+        <form id="chat-input-container"><label for="chat-input" class="chat-sr-only">Your message</label><input type="text" id="chat-input" placeholder="Ask me anything about the shop…" autocomplete="off" maxlength="2000"><button type="submit" id="chat-send-btn" aria-label="Send message">${chatIcon('send')}</button></form>
+        <div class="chat-footer">Your shopping companion, every step of the way.</div>`;
+    container.querySelector('#chat-input-container').addEventListener('submit', handleChatSubmit);
+    container.querySelector('#close-chat-btn').addEventListener('click', () => toggleChatWidget(false));
+    container.querySelector('#chat-menu-btn').addEventListener('click', displayMainMenu);
+    container.addEventListener('keydown', event => { if (event.key === 'Escape') toggleChatWidget(false); });
+    container.addEventListener('click', event => {
+        const button = event.target.closest('[data-chat-action]');
+        if (!button || button.disabled || chatBusy) return;
+        const option = chatOptions.find(item => item.id === button.dataset.chatAction);
+        addChatMessage('user', option?.title || 'Sign out');
+        runChatTask(() => handleChatAction(button.dataset.chatAction));
+    });
 }
 
 // ===========================================================
@@ -949,114 +962,205 @@ function getBase64(file) {
 // ===========================================================
 // [ 6.0 ] CHATBOT LOGIC
 // ===========================================================
+function chatIcon(name) {
+    const paths = {
+        leaf: '<path d="M20 4c0 10-4 16-10 16a6 6 0 0 1-6-6C4 8 10 4 20 4Z"/><path d="m4 20 10-10M10 14v-4m0 4h4"/>',
+        chat: '<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-1 1v-8.5A8.5 8.5 0 0 1 11.5 4h1a8.5 8.5 0 0 1 8.5 7.5Z"/><path d="M8 11h8M8 15h5"/>',
+        orders: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h3"/>',
+        status: '<path d="M3 6h11v12H3zM14 10h4l3 4v4h-7M3 10h5"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
+        rewards: '<path d="M3 8h18v4H3zM5 12v9h14v-9M12 8v13"/><path d="M12 8H8a3 3 0 1 1 3-3l1 3Zm0 0h4a3 3 0 1 0-3-3l-1 3Z"/>',
+        profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
+        shop: '<path d="M5 7h14l2 14H3L5 7Z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/>',
+        browse: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+        human: '<path d="M21 11.5A9 9 0 0 1 8 19.6L3 21l1.4-5A9 9 0 1 1 21 11.5Z"/><path d="M8 7c0 4 2 7 6 9l2-2-3-2-1 1c-1.5-.8-2.5-1.8-3-3l1-1-2-2Z"/>',
+        lock: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>',
+        close: '<path d="m6 6 12 12M6 18 18 6"/>',
+        menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+        send: '<path d="m3 3 18 9-18 9 4-9-4-9ZM7 12h14"/>',
+        arrow: '<path d="M5 12h14m-5-5 5 5-5 5"/>',
+        external: '<path d="M14 3h7v7m0-7L10 14M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/>',
+        check: '<path d="m5 12 4 4L19 6"/>',
+        logout: '<path d="M9 4H4v16h5m5-12 4 4-4 4M8 12h12"/>'
+    };
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths[name] || paths.chat}</svg>`;
+}
+
+function scrollChatToEnd() {
+    const body = document.getElementById('chat-body');
+    if (body) body.scrollTop = body.scrollHeight;
+}
+
+function updateChatIdentity() {
+    const state = document.getElementById('chat-account-state');
+    if (state) state.textContent = chatSession.token ? 'Signed in · Your personal account' : 'Shopping & account support';
+}
+
 function toggleChatWidget(show) {
-    const chatWidget = document.getElementById('eshop-chat-widget');
-    const fabContainer = document.getElementById('fab-container');
-    if (!chatWidget) return;
+    const widget = document.getElementById('eshop-chat-widget');
+    if (!widget) return;
+    widget.classList.toggle('active', !!show);
+    widget.setAttribute('aria-hidden', String(!show));
+    widget.inert = !show;
+    const launcher = document.querySelector('.chatbot-fab');
+    if (launcher) launcher.setAttribute('aria-expanded', String(!!show));
     if (show) {
-        chatWidget.classList.add('active');
-        if (fabContainer) fabContainer.style.right = '370px';
         const body = document.getElementById('chat-body');
-        if (body && body.innerHTML.trim() === '') {
-            displayMainMenu();
-        }
-    } else {
-        chatWidget.classList.remove('active');
-        if (fabContainer) fabContainer.style.right = '20px';
+        if (body && !body.children.length) displayMainMenu();
+    } else if (widget.contains(document.activeElement)) {
+        launcher?.focus({ preventScroll: true });
     }
 }
 
 function addChatMessage(sender, text, type = 'text') {
-    const chatBody = document.getElementById('chat-body');
-    if (!chatBody) return null;
-    const msg = document.createElement('div');
-    msg.classList.add('chat-message', sender === 'bot' ? 'bot-message' : 'user-message');
-    if (type === 'html') { msg.innerHTML = text; } else { msg.textContent = text; }
-    chatBody.appendChild(msg);
-    chatBody.scrollTop = chatBody.scrollHeight;
-    return msg;
+    const body = document.getElementById('chat-body');
+    if (!body) return null;
+    const message = document.createElement('div');
+    message.classList.add('chat-message', sender === 'bot' ? 'bot-message' : 'user-message');
+    if (type === 'html') message.innerHTML = text;
+    else message.textContent = text;
+    body.appendChild(message);
+    scrollChatToEnd();
+    return message;
+}
+
+const chatOptions = [
+    { id: 'orders', title: 'Check orders', detail: 'Your purchase history', icon: 'orders', personal: true },
+    { id: 'status', title: 'Order status', detail: 'Follow your delivery', icon: 'status', personal: true },
+    { id: 'rewards', title: 'Reward points', detail: 'See your balance', icon: 'rewards', personal: true },
+    { id: 'profile', title: 'My profile', detail: 'Update your details', icon: 'profile', personal: true },
+    { id: 'shop', title: 'Place an order', detail: 'Help with your cart', icon: 'shop' },
+    { id: 'browse', title: 'Browse products', detail: 'Explore the collection', icon: 'browse' }
+];
+let chatBusy = false;
+
+function chatWhatsAppUrl() {
+    return 'https://wa.me/' + String(WHATSAPP_NUMBER || '').replace(/\D/g, '');
 }
 
 function displayMainMenu() {
+    // Clear abandoned password/profile forms when returning to the options.
+    document.querySelectorAll('#chat-body .chat-form-card').forEach(card => {
+        card.querySelector('form')?.reset(); card.remove();
+    });
+    document.querySelectorAll('#chat-body .chat-menu-card').forEach(card => card.remove());
+    delete chatSession.pendingAction;
     chatSession.state = 'main_menu';
-    const menu = `<strong>Welcome!</strong><br>1. My Account<br>2. Talk to a Human<br>Or ask a question.`;
-    addChatMessage('bot', menu, 'html');
+    updateChatIdentity();
+    const customerName = chatSession.customer?.customerName?.trim().split(/\s+/)[0];
+    const title = chatSession.token && customerName ? `Welcome back, ${esc(customerName)}.` : 'How can I help you?';
+    const host = addChatMessage('bot', `
+        <div class="chat-menu-intro"><span class="chat-eyebrow">A LITTLE HELP, ANYTIME</span><h3>${title}</h3><p>Choose an option, or ask a question below.</p>${chatSession.token ? `<button type="button" class="chat-signout" data-chat-action="logout">${chatIcon('logout')} Sign out of my account</button>` : ''}</div>
+        <div class="chat-options">${chatOptions.map(option => `
+            <button type="button" class="chat-option" data-chat-action="${option.id}">
+                <span class="chat-option-icon">${chatIcon(option.icon)}</span>
+                <span class="chat-option-copy"><strong>${option.title}</strong><small>${option.detail}</small></span>
+                ${option.personal && !chatSession.token ? `<span class="chat-option-lock" title="Sign in for personal details">${chatIcon('lock')}</span>` : ''}
+            </button>`).join('')}
+            <a class="chat-human-link" href="${chatWhatsAppUrl()}" target="_blank" rel="noopener noreferrer">
+                <span class="chat-human-icon">${chatIcon('human')}</span><span><strong>Talk to a human</strong><small>Continue on WhatsApp</small></span>${chatIcon('external')}
+            </a>
+        </div>
+        ${!chatSession.token ? '<p class="chat-menu-note">'+chatIcon('lock')+' Sign in only for personal details.</p>' : ''}
+    `, 'html');
+    host.classList.add('chat-menu-card');
+    scrollChatToEnd();
 }
 
-async function handleChatSubmit() {
-    const input = document.getElementById('chat-input');
-    if (!input) return;
-    const text = input.value.trim();
-    if (!text) return;
-    addChatMessage('user', text);
-    input.value = '';
-    const thinkingMsg = addChatMessage('bot', '<i>Thinking...</i>', 'html');
+function displayMyAccountMenu() { displayMainMenu(); }
 
-    try {
-        if (chatSession.state === 'login') { addChatMessage('bot', 'Use the email and password form above. Do not type your password into the chat.'); }
-        else if (chatSession.state === 'my_account_menu') { await handleMyAccountMenu(text); }
-        else { await handleMainMenu(text); }
-    } catch (error) {
-        // FIX: network/server errors used to leave "Thinking..." on screen forever
-        console.error('Chat error:', error);
-        addChatMessage('bot', 'Sorry, something went wrong. Please try again in a moment.');
+function setChatBusy(busy) {
+    chatBusy = busy;
+    document.querySelectorAll('#eshop-chat-widget [data-chat-action], #chat-send-btn, #chat-menu-btn').forEach(button => { button.disabled = busy; });
+    document.getElementById('chat-body')?.setAttribute('aria-busy', String(busy));
+}
+
+async function runChatTask(task) {
+    if (chatBusy) return;
+    setChatBusy(true);
+    const thinking = addChatMessage('bot', '<span class="chat-typing" aria-hidden="true"><span></span><span></span><span></span></span><span class="chat-sr-only">Getting your answer…</span>', 'html');
+    thinking.classList.add('chat-thinking');
+    try { await task(); }
+    catch (error) {
+        if (error.message !== 'SESSION_EXPIRED') addChatMessage('bot', error.message || 'Sorry, I couldn’t load that. Please try again.');
     } finally {
-        if (thinkingMsg) thinkingMsg.remove();
+        thinking.remove(); setChatBusy(false); scrollChatToEnd();
     }
+}
+
+async function handleChatSubmit(event) {
+    event?.preventDefault();
+    const input = document.getElementById('chat-input');
+    const text = input?.value.trim();
+    if (!text || chatBusy) return;
+    input.value = '';
+    addChatMessage('user', text);
+    await runChatTask(() => handleMainMenu(text));
 }
 
 async function handleMainMenu(text) {
-    const intent = text.toLowerCase();
-    if (text === '1' || /order status|previous orders|my orders|my account|my points|update.*profile/.test(intent)) {
-        if (chatSession.token) displayMyAccountMenu();
-        else showChatLogin();
-    } else if (text === '2') {
-        addChatMessage('bot', '<a href="https://wa.me/' + WHATSAPP_NUMBER + '" target="_blank" rel="noopener">Contact Admin</a>', 'html');
-    } else if (/place.*order|how.*order|buy/.test(intent)) {
-        addChatMessage('bot', 'Choose products in the catalog and add them to your cart. Sign in through My Account here to fill your saved delivery details, then review the cart and press Complete Order. No order is submitted by chatting.');
-    } else {
-        const response = await postToRender('getSmartAnswer', { question: text });
-        addChatMessage('bot', response.answer || 'Sorry, I had trouble finding an answer.');
-    }
+    const intent = text.toLowerCase().trim();
+    const numeric = { '1': 'orders', '2': 'status', '3': 'rewards', '4': 'profile', '5': 'shop', '6': 'browse', '7': 'human' };
+    if (numeric[intent]) return handleChatAction(numeric[intent]);
+    if (/^(menu|home|help|my account|options)$/.test(intent)) return displayMainMenu();
+    if (/^(sign out|log out|logout)$/.test(intent)) return handleChatAction('logout');
+    if (/talk.*human|speak.*(human|person)|contact.*(admin|support)|^whatsapp$/.test(intent)) return handleChatAction('human');
+    if (/order status|delivery status|track.*order|where.*(order|parcel)/.test(intent)) return handleChatAction('status');
+    if (/^(orders|my orders|check orders|previous orders|order history)$/.test(intent)) return handleChatAction('orders');
+    if (/^(points|rewards|my points|reward points|my rewards|check.*points)$/.test(intent)) return handleChatAction('rewards');
+    if (/my profile|update.*profile|change.*(address|phone)|^profile$/.test(intent)) return handleChatAction('profile');
+    if (/place.*order|how.*order|^buy$|checkout|^cart$/.test(intent)) return handleChatAction('shop');
+    if (/^(browse products|browse|catalog|catalogue|products|collections)$/.test(intent)) return handleChatAction('browse');
+    const response = await postToRender('getSmartAnswer', { question: text });
+    addChatMessage('bot', response.answer || 'I couldn’t find an answer. Try another question, or choose an option from the menu.');
 }
 
-// Passwords only enter a masked form; they never become chat messages or stored state.
-function showChatLogin() {
-    chatSession.state = 'login';
-    const host = addChatMessage('bot', 'Sign in with the email and password registered in the customer portal.');
-    const form = document.createElement('form');
-    const email = document.createElement('input');
-    email.type = 'email'; email.autocomplete = 'username'; email.required = true;
-    const password = document.createElement('input');
-    password.type = 'password'; password.autocomplete = 'current-password'; password.required = true;
-    for (const [labelText, field] of [['Email', email], ['Password', password]]) {
-        const label = document.createElement('label');
-        label.textContent = labelText; label.style.display = 'block';
-        field.style.cssText = 'display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:8px';
-        label.appendChild(field); form.appendChild(label);
-    }
-    const submit = document.createElement('button');
-    submit.type = 'submit'; submit.textContent = 'Sign in'; form.appendChild(submit);
-    const cancel = document.createElement('button');
-    cancel.type = 'button'; cancel.textContent = 'Cancel'; form.appendChild(cancel);
-    const status = document.createElement('p'); status.setAttribute('role', 'status'); form.appendChild(status);
-    cancel.addEventListener('click', () => { password.value = ''; form.remove(); displayMainMenu(); });
+function chatFormField(form, labelText, type, value = '') {
+    const label = document.createElement('label');
+    label.textContent = labelText;
+    const field = document.createElement(type === 'textarea' ? 'textarea' : 'input');
+    if (type !== 'textarea') field.type = type;
+    field.value = value;
+    label.appendChild(field); form.appendChild(label);
+    return field;
+}
+
+// Passwords stay in a masked form, never in chat messages or persistent storage.
+function showChatLogin(action) {
+    document.querySelectorAll('#chat-body .chat-form-card').forEach(card => { card.querySelector('form')?.reset(); card.remove(); });
+    chatSession.pendingAction = action;
+    const host = addChatMessage('bot', `<span class="chat-form-icon">${chatIcon('lock')}</span><h3>Let’s make it personal.</h3><p>Sign in with your customer portal email and password to view your account.</p>`, 'html');
+    host.classList.add('chat-form-card');
+    const form = document.createElement('form'); form.className = 'chat-form';
+    const email = chatFormField(form, 'Email', 'email'); email.autocomplete = 'username'; email.required = true;
+    const password = chatFormField(form, 'Password', 'password'); password.autocomplete = 'current-password'; password.required = true;
+    const actions = document.createElement('div'); actions.className = 'chat-form-actions';
+    actions.innerHTML = '<button type="submit" class="chat-primary-btn">Sign in</button><button type="button" class="chat-secondary-btn">Cancel</button>';
+    form.appendChild(actions);
+    const submit = actions.querySelector('[type="submit"]');
+    const cancel = actions.querySelector('[type="button"]');
+    const status = document.createElement('p'); status.className = 'chat-form-status'; status.setAttribute('role', 'status'); form.appendChild(status);
+    const reset = document.createElement('a'); reset.href = 'customer.html#reset'; reset.target = '_blank'; reset.rel = 'noopener';
+    reset.className = 'chat-form-help'; reset.textContent = 'Forgot password?'; form.appendChild(reset);
+    cancel.addEventListener('click', () => { form.reset(); host.remove(); displayMainMenu(); });
     form.addEventListener('submit', async event => {
-        event.preventDefault(); submit.disabled = true; cancel.disabled = true; status.textContent = 'Checking...';
+        event.preventDefault(); if (chatBusy) return;
+        submit.disabled = true; cancel.disabled = true; setChatBusy(true); status.textContent = 'Checking your details…';
         try {
             const result = await postToRender('customerLogin', { email: email.value.trim(), password: password.value });
             if (!result.success || !result.token) throw new Error(result.message || 'Login failed.');
-            chatSession.token = result.token; chatSession.customer = result.customer;
-            form.remove(); addChatMessage('bot', 'Signed in.'); displayMyAccountMenu();
-        } catch (error) { status.textContent = error.message || 'Could not sign in. Please try again.'; }
-        finally { password.value = ''; submit.disabled = false; cancel.disabled = false; }
+            const pending = chatSession.pendingAction;
+            chatSession.token = result.token; chatSession.customer = result.customer || {};
+            delete chatSession.pendingAction;
+            host.remove(); updateChatIdentity(); addChatMessage('bot', 'Signed in. Your account is ready.');
+            if (pending) await handleChatAction(pending);
+            else displayMainMenu();
+        } catch (error) {
+            if (host.isConnected) status.textContent = error.message || 'Could not sign in. Please try again.';
+            else if (error.message !== 'SESSION_EXPIRED') addChatMessage('bot', error.message || 'Could not load your account. Please try again.');
+        }
+        finally { password.value = ''; submit.disabled = false; cancel.disabled = false; setChatBusy(false); scrollChatToEnd(); }
     });
-    host.appendChild(form);
-}
-
-function displayMyAccountMenu() {
-    chatSession.state = 'my_account_menu';
-    addChatMessage('bot', '<strong>My Account</strong><br>1. My orders and status<br>2. My reward points<br>3. Update profile<br>4. Help place an order<br>5. Sign out<br>6. Back to main menu', 'html');
+    host.appendChild(form); scrollChatToEnd();
 }
 
 async function customerChatRequest(action, data = {}) {
@@ -1068,68 +1172,90 @@ async function customerChatRequest(action, data = {}) {
 }
 
 function showChatProfile() {
+    document.querySelectorAll('#chat-body .chat-form-card').forEach(card => card.remove());
     const customer = chatSession.customer || {};
-    const host = addChatMessage('bot', 'Update your delivery details. Email stays unchanged, as in the customer portal.');
-    const form = document.createElement('form');
+    const host = addChatMessage('bot', '<span class="chat-form-icon">'+chatIcon('profile')+'</span><h3>Your delivery details</h3><p>Keep your name, phone and address up to date. Your account email stays the same.</p>', 'html');
+    host.classList.add('chat-form-card');
+    const form = document.createElement('form'); form.className = 'chat-form';
     const fields = {};
     for (const [key, labelText] of [['customerName', 'Full name'], ['customerPhone', 'Phone'], ['customerAddress', 'Delivery address']]) {
-        const label = document.createElement('label'); label.textContent = labelText;
-        label.style.display = 'block';
-        const field = document.createElement(key === 'customerAddress' ? 'textarea' : 'input');
-        if (key === 'customerPhone') field.type = 'tel';
-        field.value = customer[key] || ''; field.required = key !== 'customerAddress'; field.maxLength = 2000;
-        field.style.cssText = 'display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:8px';
-        fields[key] = field; label.appendChild(field); form.appendChild(label);
+        const field = chatFormField(form, labelText, key === 'customerAddress' ? 'textarea' : key === 'customerPhone' ? 'tel' : 'text', customer[key] || '');
+        field.required = key !== 'customerAddress'; field.maxLength = 2000; fields[key] = field;
     }
-    const save = document.createElement('button'); save.type = 'submit'; save.textContent = 'Save profile'; form.appendChild(save);
-    const cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'Cancel'; form.appendChild(cancel);
-    cancel.addEventListener('click', () => form.remove());
-    const status = document.createElement('p'); status.setAttribute('role', 'status'); form.appendChild(status);
+    const actions = document.createElement('div'); actions.className = 'chat-form-actions';
+    actions.innerHTML = '<button type="submit" class="chat-primary-btn">Save profile</button><button type="button" class="chat-secondary-btn">Cancel</button>'; form.appendChild(actions);
+    const save = actions.querySelector('[type="submit"]'); const cancel = actions.querySelector('[type="button"]');
+    cancel.addEventListener('click', () => host.remove());
+    const status = document.createElement('p'); status.className = 'chat-form-status'; status.setAttribute('role', 'status'); form.appendChild(status);
     form.addEventListener('submit', async event => {
-        event.preventDefault(); save.disabled = true; cancel.disabled = true;
+        event.preventDefault(); if (chatBusy) return;
+        save.disabled = true; cancel.disabled = true; setChatBusy(true); status.textContent = 'Saving…';
         const payload = Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value.trim()]));
         try {
             const result = await customerChatRequest('updateCustomerProfile', payload);
-            if (!result || !result.success) throw new Error(result?.message || 'Profile was not saved.');
-            Object.assign(chatSession.customer, payload); form.remove(); addChatMessage('bot', 'Profile saved.');
+            if (!result?.success) throw new Error(result?.message || 'Profile was not saved.');
+            Object.assign(chatSession.customer, payload); host.remove(); addChatMessage('bot', 'Profile saved.');
         } catch (error) { status.textContent = error.message || 'Could not save profile.'; }
-        finally { save.disabled = false; cancel.disabled = false; }
+        finally { save.disabled = false; cancel.disabled = false; setChatBusy(false); scrollChatToEnd(); }
     });
-    host.appendChild(form);
+    host.appendChild(form); scrollChatToEnd();
 }
 
-async function handleMyAccountMenu(text) {
-    const intent = text.toLowerCase();
-    if (!chatSession.token) { showChatLogin(); return; }
-    if (text === '1' || /orders|order status/.test(intent)) {
+function renderChatOrders(result, tracking) {
+    const orders = Array.isArray(result.orders) ? result.orders : [];
+    if (!orders.length) { addChatMessage('bot', 'No orders yet. Browse the collection to find something you’ll love.'); return; }
+    const stages = Array.isArray(result.stages) && result.stages.length ? result.stages : ['Processed', 'Paid', 'Awaiting Shipment', 'On the Way', 'Delivered'];
+    const host = addChatMessage('bot', `<div class="chat-result-heading">${chatIcon(tracking ? 'status' : 'orders')}<h3>${tracking ? 'Your order status' : 'Your orders'}</h3></div>` + orders.map(order => {
+        const stage = stages.indexOf(order.status);
+        return `<article class="chat-order-card">
+            <div class="chat-order-top"><strong>${esc(order.invoiceId)}</strong><span class="chat-status-badge${order.status === 'Delivered' ? ' is-delivered' : ''}">${esc(order.status)}</span></div>
+            <span class="chat-order-date">${esc(order.date)}</span>
+            ${tracking && stage >= 0 ? `<ol class="chat-order-timeline" aria-label="Order progress">${stages.map((label, i) => `<li class="${i < stage ? 'is-done' : i === stage ? 'is-current' : ''}"${i === stage ? ' aria-current="step"' : ''}><span class="chat-step-dot">${i < stage ? chatIcon('check') : ''}</span><span>${esc(label)}</span></li>`).join('')}</ol>` : `<p class="chat-order-items">${esc(order.items)}</p><div class="chat-order-total"><span>Order total</span><strong>RM ${esc(order.total)}</strong></div>`}
+            ${order.remarks ? `<p class="chat-order-remarks">${esc(order.remarks)}</p>` : ''}
+        </article>`;
+    }).join(''), 'html');
+    host.classList.add('chat-results'); scrollChatToEnd();
+}
+
+async function handleChatAction(action) {
+    const option = chatOptions.find(item => item.id === action);
+    if (option?.personal && !chatSession.token) { showChatLogin(action); return; }
+    if (option?.personal) chatSession.lastPersonalAction = action;
+    if (action === 'orders' || action === 'status') {
         const result = await customerChatRequest('getCustomerOrders');
-        if (!result?.success) { addChatMessage('bot', result?.message || 'Could not load orders.'); return; }
-        const orders = Array.isArray(result.orders) ? result.orders : [];
-        addChatMessage('bot', orders.length ? '<strong>Your orders:</strong>' + orders.map(order =>
-            `<br><br><strong>${esc(order.invoiceId)}</strong><br>${esc(order.date)}<br>Status: ${esc(order.status)}<br>Items: ${esc(order.items)}<br>Total: RM ${esc(order.total)}${order.remarks ? '<br>' + esc(order.remarks) : ''}`
-        ).join('') : 'You have no orders yet.', 'html');
-    } else if (text === '2' || /points|rewards/.test(intent)) {
+        if (!result?.success) { addChatMessage('bot', result?.message || 'Could not load orders. Please try again.'); return; }
+        renderChatOrders(result, action === 'status');
+    } else if (action === 'rewards') {
         const result = await customerChatRequest('getCustomerRewards');
-        addChatMessage('bot', result?.success ? `Your reward points balance: ${result.balance ?? 0}` : result?.message || 'Could not load rewards.');
-    } else if (text === '3' || /profile/.test(intent)) { showChatProfile(); }
-    else if (text === '4' || /place.*order|buy/.test(intent)) {
+        if (!result?.success) { addChatMessage('bot', result?.message || 'Could not load rewards.'); return; }
+        const balance = Number(result.balance);
+        const host = addChatMessage('bot', `<div class="chat-result-heading">${chatIcon('rewards')}<h3>Your rewards</h3></div><div class="chat-rewards-card"><span>AVAILABLE POINTS</span><strong>${Number.isFinite(balance) ? balance.toLocaleString() : '—'}</strong><p>Thank you for shopping with us.</p></div>`, 'html');
+        host.classList.add('chat-results');
+    } else if (action === 'profile') { showChatProfile(); }
+    else if (action === 'shop') {
         toggleCart(false);
         const customer = chatSession.customer || {};
         for (const [id, key] of [['customer-name', 'customerName'], ['customer-phone', 'customerPhone'], ['customer-email', 'customerEmail'], ['customer-address', 'customerAddress']]) {
             const input = document.getElementById(id);
-            if (input && !input.value.trim()) input.value = customer[key] || '';
+            if (chatSession.token && input && !input.value.trim()) input.value = customer[key] || '';
         }
-        addChatMessage('bot', 'Your cart is open. Add products from the catalog if it is empty. Review quantities, prices, delivery details and shipping, then press Complete Order to submit. Existing entries in your cart form have been kept.');
+        addChatMessage('bot', 'Your cart is open. Add products from the collection, review your items and delivery details, then press Complete Order when you’re ready. You can shop without signing in.');
         toggleChatWidget(false);
-    } else if (text === '5' || /log ?out|sign out/.test(intent)) {
-        try { await customerChatRequest('customerLogout'); }
+    } else if (action === 'browse') {
+        showTab('products'); toggleChatWidget(false);
+        document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (action === 'human') {
+        addChatMessage('bot', `<a class="chat-human-link" href="${chatWhatsAppUrl()}" target="_blank" rel="noopener noreferrer"><span class="chat-human-icon">${chatIcon('human')}</span><span><strong>Talk to a human</strong><small>Continue on WhatsApp</small></span>${chatIcon('external')}</a>`, 'html');
+    } else if (action === 'logout') {
+        try { if (chatSession.token) await customerChatRequest('customerLogout'); }
         finally {
-            chatSession = {}; const body = document.getElementById('chat-body'); if (body) body.replaceChildren();
-            addChatMessage('bot', 'Signed out.'); displayMainMenu();
+            chatSession = {}; document.getElementById('chat-body')?.replaceChildren(); updateChatIdentity();
+            addChatMessage('bot', 'You’re signed out. You can still browse and ask questions.'); displayMainMenu();
         }
-    } else if (text === '6') { displayMainMenu(); }
-    else { await handleMainMenu(text); }
+    }
 }
+
+async function handleMyAccountMenu(text) { return handleMainMenu(text); }
 
 // ===========================================================
 // [ 7.0 ] GLOBAL UTILITIES & API HELPERS
@@ -1182,10 +1308,11 @@ async function postToRender(action, data) {
     if (!response.ok) {
         const err = await response.json().catch(() => ({}));
         if (response.status === 401 && err.message === 'SESSION_EXPIRED' && data.token === chatSession.token) {
-            chatSession = {};
+            const pendingAction = chatSession.lastPersonalAction;
+            chatSession = {}; updateChatIdentity();
             const body = document.getElementById('chat-body'); if (body) body.replaceChildren();
             addChatMessage('bot', 'Your session expired. Please sign in again.');
-            showChatLogin();
+            showChatLogin(pendingAction);
         }
         throw new Error(err.message || 'Server error');
     }
