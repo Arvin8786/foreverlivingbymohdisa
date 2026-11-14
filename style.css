@@ -1207,3 +1207,11 @@ body.portal nav .btn.active i { color: var(--onyx); }
     .pd-info h1 { font-size: 1.35rem; }
     .pd-related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Guided assistant follow-ups and unobscured conversation. */
+#chat-body .chat-help-actions { display: flex; flex-wrap: wrap; gap: 7px; border: 0; background: transparent; padding: 0; max-width: 100%; box-shadow: none; }
+#chat-body .chat-help-button { display: inline-block; margin: 9px 5px 0 0; padding: 9px 12px; min-height: 38px; border: 1px solid #cadfd0; border-radius: 9px; background: #f0f7f1; color: #205b38; font-size: 11px; line-height: 1.4; text-align: left; cursor: pointer; }
+#chat-body .chat-help-button:hover { background: #dfefe3; border-color: #83af91; }
+#chat-body .chat-request-note { display: block; margin-top: 8px; color: #6a7d6e; font-size: 10px; }
+body:has(#eshop-chat-widget.active) #fl-fx-canvas { z-index: 999 !important; }
+#chat-body .chat-text { white-space: pre-line; }

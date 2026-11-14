@@ -105,3 +105,12 @@ test('Apps Script patch returns names and pending payment only for the authentic
     assert.equal(result.orders.find(o => o.invoiceId === 'PAID').items, 'Historical name × 1');
     assert.equal(result.stages[0], 'Pending payment');
 });
+
+test('assistant knowledge separates product variants and avoids unsupported operational claims', () => {
+    const knowledge = require('../assistant-knowledge');
+    assert.equal(knowledge.intent('can i cancel this order ?'), 'cancel');
+    assert.match(knowledge.answer('I already paid').answer, /do not pay again/);
+    assert.match(knowledge.answer('delivery time').answer, /not|cannot|ask/i);
+    assert.equal(knowledge.intent('can aloe cure diabetes'), 'health');
+    assert.deepEqual(knowledge.productMatches('benefits of aloe vera gel', [{ id: '1', name: 'Forever Aloe Vera Gel' }, { id: '2', name: 'Forever Aloe Vera Gelly' }]).map(p => p.id), ['1']);
+});

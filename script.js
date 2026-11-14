@@ -594,10 +594,30 @@ function buildChatbotWidget() {
     container.querySelector('#chat-menu-btn').addEventListener('click', displayMainMenu);
     container.addEventListener('keydown', event => { if (event.key === 'Escape') toggleChatWidget(false); });
     container.addEventListener('click', event => {
+        const orderButton = event.target.closest('[data-chat-order]');
+        if (orderButton && !chatBusy && chatSession.token) {
+            const order = chatSession.recentOrders?.find(item => item.invoiceId === orderButton.dataset.chatOrder);
+            if (!order) return;
+            chatSession.selectedOrderId = order.invoiceId;
+            const topic = chatSession.pendingOrderTopic;
+            delete chatSession.pendingOrderTopic;
+            addChatMessage('user', 'Order ' + order.invoiceId);
+            runChatTask(() => topic ? chatOrderHelp(topic) : Promise.resolve(addChatMessage('bot', `Order ${order.invoiceId} selected. You can ask about payment, an invoice, cancellation, a return or delivery status.`)));
+            return;
+        }
+        const productButton = event.target.closest('[data-chat-product], [data-chat-view-product]');
+        if (productButton && !chatBusy) {
+            const product = findProduct(productButton.dataset.chatProduct || productButton.dataset.chatViewProduct);
+            if (!product) return;
+            chatSession.selectedProductId = product.id;
+            if (productButton.dataset.chatViewProduct) { openProduct(product.id); toggleChatWidget(false); }
+            else { addChatMessage('user', product.name); chatProductAnswer(productButton.dataset.chatQuestion || product.name, productButton.dataset.chatTopic || 'product', product.id); }
+            return;
+        }
         const button = event.target.closest('[data-chat-action]');
         if (!button || button.disabled || chatBusy) return;
         const option = chatOptions.find(item => item.id === button.dataset.chatAction);
-        addChatMessage('user', option?.title || 'Sign out');
+        addChatMessage('user', option?.title || button.textContent.trim());
         runChatTask(() => handleChatAction(button.dataset.chatAction));
     });
 }
@@ -927,7 +947,7 @@ function addChatMessage(sender, text, type = 'text') {
     const message = document.createElement('div');
     message.classList.add('chat-message', sender === 'bot' ? 'bot-message' : 'user-message');
     if (type === 'html') message.innerHTML = text;
-    else message.textContent = text;
+    else { message.textContent = text; message.classList.add('chat-text'); }
     body.appendChild(message);
     scrollChatToEnd();
     return message;
@@ -980,7 +1000,7 @@ function displayMyAccountMenu() { displayMainMenu(); }
 
 function setChatBusy(busy) {
     chatBusy = busy;
-    document.querySelectorAll('#eshop-chat-widget [data-chat-action], #chat-send-btn, #chat-menu-btn').forEach(button => { button.disabled = busy; });
+    document.querySelectorAll('#eshop-chat-widget [data-chat-action], #eshop-chat-widget [data-chat-order], #eshop-chat-widget [data-chat-product], #eshop-chat-widget [data-chat-view-product], #chat-send-btn, #chat-menu-btn').forEach(button => { button.disabled = busy; });
     document.getElementById('chat-body')?.setAttribute('aria-busy', String(busy));
 }
 
@@ -1014,14 +1034,17 @@ async function handleMainMenu(text) {
     if (/^(menu|home|help|my account|options)$/.test(intent)) return displayMainMenu();
     if (/^(sign out|log out|logout)$/.test(intent)) return handleChatAction('logout');
     if (/talk.*human|speak.*(human|person)|contact.*(admin|support)|^whatsapp$/.test(intent)) return handleChatAction('human');
-    if (/order status|delivery status|track.*order|where.*(order|parcel)/.test(intent)) return handleChatAction('status');
+    if (await answerShopQuestion(text)) return;
+    if (/order status|delivery status|track.*order|where.*(order|parcel)/.test(intent)) return chatOrderHelp('status', text);
     if (/^(orders|my orders|check orders|previous orders|order history)$/.test(intent)) return handleChatAction('orders');
     if (/^(points|rewards|my points|reward points|my rewards|check.*points)$/.test(intent)) return handleChatAction('rewards');
     if (/my profile|update.*profile|change.*(address|phone)|^profile$/.test(intent)) return handleChatAction('profile');
     if (/place.*order|how.*order|^buy$|checkout|^cart$/.test(intent)) return handleChatAction('shop');
     if (/^(browse products|browse|catalog|catalogue|products|collections)$/.test(intent)) return handleChatAction('browse');
-    const response = await postToRender('getSmartAnswer', { question: text });
-    addChatMessage('bot', response.answer || 'I couldn’t find an answer. Try another question, or choose an option from the menu.');
+    const productMatches = AssistantKnowledge.productMatches(text, products);
+    if (productMatches.length) { chatProductAnswer(text, 'product'); return; }
+    addChatMessage('bot', AssistantKnowledge.answer(text).answer);
+    chatHelpSuggestions([['browse', 'Find a product'], ['orders', 'My orders'], ['human', 'Ask the shop']]);
 }
 
 function chatFormField(form, labelText, type, value = '') {
@@ -1111,10 +1134,12 @@ function showChatProfile() {
     host.appendChild(form); scrollChatToEnd();
 }
 
-function renderChatOrders(result, tracking) {
-    const orders = Array.isArray(result.orders) ? result.orders : [];
+function renderChatOrders(result, tracking, selectionOnly = false) {
+    const rawOrders = Array.isArray(result.orders) ? result.orders : [];
+    if (!selectionOnly) { chatSession.recentOrders = rawOrders; if (rawOrders.length === 1) chatSession.selectedOrderId = rawOrders[0].invoiceId; }
+    const orders = rawOrders.map(order => ({ ...order, status: StoreCore.customerOrderStatus(order), items: StoreCore.customerOrderItems(order, products).map(item => item.name + ' × ' + item.quantity).join(', ') }));
     if (!orders.length) { addChatMessage('bot', 'No orders yet. Browse the collection to find something you’ll love.'); return; }
-    const stages = Array.isArray(result.stages) && result.stages.length ? result.stages : ['Processed', 'Paid', 'Awaiting Shipment', 'On the Way', 'Delivered'];
+    const stages = ['Pending payment', 'Paid', 'Awaiting Shipment', 'On the Way', 'Delivered'];
     const host = addChatMessage('bot', `<div class="chat-result-heading">${chatIcon(tracking ? 'status' : 'orders')}<h3>${tracking ? 'Your order status' : 'Your orders'}</h3></div>` + orders.map(order => {
         const stage = stages.indexOf(order.status);
         return `<article class="chat-order-card">
@@ -1122,12 +1147,18 @@ function renderChatOrders(result, tracking) {
             <span class="chat-order-date">${esc(order.date)}</span>
             ${tracking && stage >= 0 ? `<ol class="chat-order-timeline" aria-label="Order progress">${stages.map((label, i) => `<li class="${i < stage ? 'is-done' : i === stage ? 'is-current' : ''}"${i === stage ? ' aria-current="step"' : ''}><span class="chat-step-dot">${i < stage ? chatIcon('check') : ''}</span><span>${esc(label)}</span></li>`).join('')}</ol>` : `<p class="chat-order-items">${esc(order.items)}</p><div class="chat-order-total"><span>Order total</span><strong>RM ${esc(order.total)}</strong></div>`}
             ${order.remarks ? `<p class="chat-order-remarks">${esc(order.remarks)}</p>` : ''}
+            <button type="button" class="chat-help-button" data-chat-order="${esc(order.invoiceId)}">Ask about this order</button>
         </article>`;
     }).join(''), 'html');
     host.classList.add('chat-results'); scrollChatToEnd();
 }
 
 async function handleChatAction(action) {
+    if (action.startsWith('help-') && ['cancel', 'returns', 'amend', 'invoice', 'receipt', 'payment', 'status'].includes(action.slice(5))) return chatOrderHelp(action.slice(5));
+    if (action === 'choose-orders') {
+        delete chatSession.selectedOrderId;
+        return handleChatAction('orders');
+    }
     const option = chatOptions.find(item => item.id === action);
     if (option?.personal && !chatSession.token) { showChatLogin(action); return; }
     if (option?.personal) chatSession.lastPersonalAction = action;

@@ -103,3 +103,28 @@ The owner-supplied Apps Script has a legacy paid-status fallback. The optional
 explicitly and resolves unpublished/historical product names from saved carts and
 ProductMaster. Applying this replacement requires updating the existing Apps
 Script deployment; the frontend GitHub deployment does not change that service.
+
+## Grounded assistant answers
+
+`assistant-knowledge.js` contains the same versioned, dependency-free shop rules as
+`knowledge.js` in the bot repository. The website answers product questions using
+its loaded public catalog, preserving the actual Benefits/Consumption and price
+fields. Similar products require selection; missing details are disclosed rather
+than replaced with medical claims, purity claims, stock guarantees or guesses.
+No paid model/API or additional Apps Script deployment is needed for this update.
+
+`assistant-help.js` fetches current authenticated orders for private follow-ups.
+An explicit order reference must belong to that returned account; multiple orders
+require selection. Context is in memory and is cleared with the chat session.
+Cancellation, return/refund and amendment answers explain the limitation and open
+a WhatsApp draft containing only the order reference and request type. The
+customer reviews/sends it and the shop must confirm it. No mutation endpoint or
+automatic WhatsApp send is used. A profile edit does not amend an existing order.
+
+Payment help distinguishes invoice/order confirmation from verified payment and
+warns against paying twice while verification is pending. Invoices and receipts
+use the authenticated `getCustomerDocument` action; unpaid receipts are not
+requested. The bot must be deployed for that newly allowlisted document action.
+Festival foreground effects are lowered while chat is open so they do not cover
+messages. General shop help remains available even if Render is asleep or the
+public catalog is unavailable; factual product/order answers require their data.

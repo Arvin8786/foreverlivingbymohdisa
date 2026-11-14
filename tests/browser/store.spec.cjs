@@ -9,7 +9,7 @@ const catalog = {
     shippingRules: [{ MinSpend: 0, MaxSpend: 99.99, Charge: 10 }, { MinSpend: 100, Charge: 0 }]
 };
 async function setup(page) {
-    const state = { failed: false, reply: {}, requests: [], catalog: structuredClone(catalog), bot: [], customerOrders: [{ invoiceId: 'INV-1', date: 'Today', status: 'Cancelled', total: 40, items: 'Aloe cream', paid: false }] };
+    const state = { failed: false, reply: {}, requests: [], catalog: structuredClone(catalog), bot: [], botExpired: false, botOrders: [{ invoiceId: 'INV-1', status: 'On the Way', total: 40, items: 'Aloe cream', paid: true }], customerOrders: [{ invoiceId: 'INV-1', date: 'Today', status: 'Cancelled', total: 40, items: 'Aloe cream', paid: false }] };
     await page.route('**/*', async route => {
         const req = route.request(); const url = new URL(req.url());
         if (url.hostname === 'script.google.com') {
@@ -27,9 +27,11 @@ async function setup(page) {
         }
         if (url.hostname === 'whatsapp-eshop-bot.onrender.com') {
             const body = req.postDataJSON(); state.bot.push(body);
+            if (state.botExpired && body.action !== 'customerLogin') return route.fulfill({ status: 401, json: { success: false, message: 'SESSION_EXPIRED' } });
             if (body.action === 'getSmartAnswer') return route.fulfill({ json: { success: true, answer: 'Catalog help is available.' } });
             if (body.action === 'customerLogin') return route.fulfill({ json: { success: true, token: 'bot-session', customer: { customerName: 'Test customer', customerEmail: 'test@example.com', customerPhone: '60123', customerAddress: 'Test address' } } });
-            if (body.action === 'getCustomerOrders') return route.fulfill({ json: { success: true, orders: [{ invoiceId: 'INV-1', status: 'On the Way', total: 40, items: 'Aloe cream' }] } });
+            if (body.action === 'getCustomerOrders') return route.fulfill({ json: { success: true, orders: state.botOrders } });
+            if (body.action === 'getCustomerDocument') return route.fulfill({ json: { success: true, filename: 'invoice-test.pdf', base64: Buffer.from('%PDF-1.4\nTest invoice').toString('base64') } });
             return route.fulfill({ json: { success: false, message: 'SESSION_EXPIRED' }, status: 401 });
         }
         if (url.hostname !== '127.0.0.1') return route.abort();
@@ -117,7 +119,8 @@ test('catalog failures leave assistant available and recover with retry', async 
     await page.getByRole('button', { name: 'Open shop assistant', exact: true }).click();
     await page.getByRole('textbox', { name: 'Your message', exact: true }).fill('What can you help with?');
     await page.getByRole('button', { name: 'Send message', exact: true }).click();
-    await expect(page.getByText('Catalog help is available.', { exact: true })).toBeVisible();
+    await expect(page.locator('#chat-body')).toContainText('Could you tell me a little more?');
+    expect(state.bot).toHaveLength(0);
     await page.getByRole('button', { name: 'Close assistant', exact: true }).click();
     state.failed = false; await page.getByRole('button', { name: 'Try loading again', exact: true }).first().click();
     await expect(page.locator('#catalog-count')).toContainText('4 of 4');
@@ -202,4 +205,109 @@ test('historical saved names work without the public catalog and remain escaped'
     await expect(page.locator('.order-items-line').first()).toHaveText('<img src=x onerror=alert(1)> Saved product × 2');
     await expect(page.locator('.order-items-line img')).toHaveCount(0);
     await expect(page.locator('.order-card .badge')).toHaveText('Pending payment');
+});
+
+
+async function chatText(page, text) {
+    await page.getByRole('textbox', { name: 'Your message', exact: true }).fill(text);
+    await page.getByRole('button', { name: 'Send message', exact: true }).click();
+    await expect(page.locator('#chat-body')).toHaveAttribute('aria-busy', 'false');
+}
+async function signIntoChat(page) {
+    await page.getByRole('button', { name: 'Open shop assistant', exact: true }).click();
+    await page.getByRole('button', { name: /Check orders/ }).click();
+    await page.locator('#chat-body').getByLabel('Email', { exact: true }).fill('test@example.com');
+    await page.locator('#chat-body').getByLabel('Password', { exact: true }).fill('test-password');
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Your orders', exact: true })).toBeVisible();
+}
+test('screenshot cancellation question uses the current order and only prepares a request draft', async ({ page }) => {
+    const state = await setup(page);
+    state.botOrders = [{ invoiceId: 'INV-2026-ONE', status: 'Processed', paid: false, total: 240, items: 'A1x2' }];
+    await loaded(page); await signIntoChat(page);
+    await chatText(page, 'can i cancel this order ?');
+    await expect(page.locator('#chat-body')).toContainText('INV-2026-ONE is currently Pending payment');
+    await expect(page.locator('#chat-body')).toContainText('I have not cancelled this order or sent a request');
+    const link = page.getByRole('link', { name: 'Ask the shop on WhatsApp', exact: true });
+    const url = new URL(await link.getAttribute('href'));
+    expect(url.hostname).toBe('wa.me'); expect(url.searchParams.get('text')).toContain('INV-2026-ONE');
+    expect(url.searchParams.get('text')).not.toMatch(/test@example|Test address/);
+    expect(state.bot.every(r => ['customerLogin', 'getCustomerOrders'].includes(r.action))).toBe(true);
+    await chatText(page, 'I have already paid');
+    await expect(page.locator('#chat-body')).toContainText('do not pay again');
+    expect(state.bot.some(r => /cancel|refund|update|submit/i.test(r.action))).toBe(false);
+});
+test('multiple orders require explicit selection; unknown references do not select another account record', async ({ page }) => {
+    const state = await setup(page);
+    state.botOrders = [
+        { invoiceId: 'INV-ONE', status: 'Processed', paid: false, items: 'A1x1' },
+        { invoiceId: 'INV-TWO', status: 'Delivered', paid: true, items: 'T1x1' }
+    ];
+    await loaded(page); await signIntoChat(page); await chatText(page, 'can I cancel this order');
+    await expect(page.locator('#chat-body')).toContainText('Which order do you mean?');
+    await page.getByRole('button', { name: 'INV-TWO · Delivered', exact: true }).click();
+    await expect(page.locator('#chat-body')).toContainText('INV-TWO is currently Delivered');
+    await chatText(page, 'cancel INV-NOT-MINE');
+    await expect(page.locator('#chat-body')).toContainText('not in the orders returned for your signed-in account');
+    expect(state.bot.some(r => r.action === 'cancelOrder')).toBe(false);
+});
+test('screenshot product question uses matching Sheets benefits, context price, and no invented claims', async ({ page }) => {
+    const state = await setup(page);
+    state.catalog.products = [
+        { id: 'GEL', name: 'Forever Aloe Vera Gel', price: 99, benefits: 'Published benefit one. Published benefit two.', consumption: 'Follow the bottle label.', image: 'aloe-vera-gel.jpg' },
+        { id: 'GELLY', name: 'Forever Aloe Vera Gelly', price: 55, benefits: 'External skin product.', image: 'aloe-vera-gelly.jpg' }
+    ];
+    await page.goto('/'); await expect(page.locator('#catalog-count')).toContainText('2 of 2');
+    await page.getByRole('button', { name: 'Open shop assistant', exact: true }).click();
+    await chatText(page, 'what are the benefits of aloe vera gel');
+    await expect(page.locator('#chat-body')).toContainText('Published benefit one. Published benefit two.');
+    await expect(page.locator('#chat-body')).not.toContainText('100% pure');
+    await expect(page.locator('#chat-body')).not.toContainText('External skin product');
+    await chatText(page, 'how much?');
+    await expect(page.locator('#chat-body')).toContainText('RM 99.00');
+    await chatText(page, 'can it cure diabetes');
+    await expect(page.locator('#chat-body')).toContainText('qualified healthcare professional');
+    await chatText(page, 'how do I use aloe');
+    await page.getByRole('button', { name: 'Forever Aloe Vera Gel', exact: true }).click();
+    await expect(page.locator('#chat-body')).toContainText('Follow the bottle label.');
+    expect(state.bot).toHaveLength(0);
+});
+test('unpaid receipt requests do not download receipts; missing benefits are disclosed', async ({ page }) => {
+    const state = await setup(page); state.botOrders = [{ invoiceId: 'INV-UNPAID', paid: false, status: 'Processed', items: 'T1x1' }];
+    await loaded(page); await signIntoChat(page); await chatText(page, 'can I get my receipt');
+    await expect(page.locator('#chat-body')).toContainText('receipt is available only after');
+    expect(state.bot.some(r => r.action === 'getCustomerDocument')).toBe(false);
+    await chatText(page, 'what are the benefits of herbal tea');
+    await expect(page.locator('#chat-body')).toContainText('does not include benefit information');
+    await page.evaluate(() => { const c = document.createElement('canvas'); c.id = 'fl-fx-canvas'; c.style.cssText = 'position:fixed;inset:0;z-index:1000;pointer-events:none'; document.body.appendChild(c); });
+    await expect(page.locator('#eshop-chat-widget')).toHaveCSS('z-index', '1000');
+    await expect(page.locator('#fl-fx-canvas')).toHaveCSS('z-index', '999');
+});
+
+
+test('invoice downloads use the selected authenticated order and no mutation action', async ({ page }) => {
+    const state = await setup(page); state.botOrders = [{ invoiceId: 'INV-DOC', status: 'Processed', paid: false, items: 'A1x1' }];
+    await loaded(page); await signIntoChat(page);
+    const downloaded = page.waitForEvent('download');
+    await chatText(page, 'download my invoice');
+    const doc = await downloaded;
+    expect(doc.suggestedFilename()).toBe('invoice-test.pdf');
+    expect(state.bot.find(r => r.action === 'getCustomerDocument').data).toEqual({ invoiceId: 'INV-DOC', type: 'invoice', token: 'bot-session' });
+    await expect(page.locator('#chat-body')).toContainText('Your invoice download for INV-DOC has started');
+});
+
+
+test('expired order-help context is cleared and a new login uses only newly returned orders', async ({ page }) => {
+    const state = await setup(page); state.botOrders = [{ invoiceId: 'INV-PRIVATE-OLD', paid: false, status: 'Processed', items: 'A1x1' }];
+    await loaded(page); await signIntoChat(page);
+    state.botExpired = true;
+    await chatText(page, 'cancel my order');
+    await expect(page.locator('#chat-body').getByLabel('Email', { exact: true })).toBeVisible();
+    await expect(page.locator('#chat-body')).not.toContainText('INV-PRIVATE-OLD');
+    state.botExpired = false; state.botOrders = [{ invoiceId: 'INV-NEW', paid: false, status: 'Processed', items: 'T1x1' }];
+    await page.locator('#chat-body').getByLabel('Email', { exact: true }).fill('different@example.com');
+    await page.locator('#chat-body').getByLabel('Password', { exact: true }).fill('test-password');
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await expect(page.locator('#chat-body')).toContainText('INV-NEW is currently Pending payment');
+    await expect(page.locator('#chat-body')).not.toContainText('INV-PRIVATE-OLD');
 });
