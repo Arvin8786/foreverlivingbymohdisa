@@ -602,14 +602,14 @@ function buildChatbotWidget() {
             const topic = chatSession.pendingOrderTopic;
             delete chatSession.pendingOrderTopic;
             addChatMessage('user', 'Order ' + order.invoiceId);
-            runChatTask(() => topic ? chatOrderHelp(topic) : Promise.resolve(addChatMessage('bot', `Order ${order.invoiceId} selected. You can ask about payment, an invoice, cancellation, a return or delivery status.`)));
+            runChatTask(() => chatOrderHelp(topic || 'summary'));
             return;
         }
         const productButton = event.target.closest('[data-chat-product], [data-chat-view-product]');
         if (productButton && !chatBusy) {
             const product = findProduct(productButton.dataset.chatProduct || productButton.dataset.chatViewProduct);
             if (!product) return;
-            chatSession.selectedProductId = product.id;
+            chatSession.selectedProductId = product.id; chatSession.focus = 'product'; delete chatSession.pendingProductChoice;
             if (productButton.dataset.chatViewProduct) { openProduct(product.id); toggleChatWidget(false); }
             else { addChatMessage('user', product.name); chatProductAnswer(productButton.dataset.chatQuestion || product.name, productButton.dataset.chatTopic || 'product', product.id); }
             return;
@@ -1029,6 +1029,20 @@ async function handleChatSubmit(event) {
 
 async function handleMainMenu(text) {
     const intent = text.toLowerCase().trim();
+    if (chatSession.pendingProductChoice) {
+        const choice = chatSession.pendingProductChoice;
+        const selected = AssistantKnowledge.selection(text, choice.ids.length);
+        if (selected !== null) { chatProductAnswer(choice.question, choice.topic, choice.ids[selected]); return; }
+    }
+    if (chatSession.pendingOrderTopic) {
+        const ids = chatSession.recentOrders?.map(order => order.invoiceId) || [];
+        const selected = AssistantKnowledge.selection(text, ids.length);
+        if (selected !== null) {
+            const topic = chatSession.pendingOrderTopic;
+            chatSession.selectedOrderId = ids[selected]; delete chatSession.pendingOrderTopic;
+            await chatOrderHelp(topic); return;
+        }
+    }
     const numeric = { '1': 'orders', '2': 'status', '3': 'rewards', '4': 'profile', '5': 'shop', '6': 'browse', '7': 'human' };
     if (numeric[intent]) return handleChatAction(numeric[intent]);
     if (/^(menu|home|help|my account|options)$/.test(intent)) return displayMainMenu();
@@ -1136,8 +1150,8 @@ function showChatProfile() {
 
 function renderChatOrders(result, tracking, selectionOnly = false) {
     const rawOrders = Array.isArray(result.orders) ? result.orders : [];
-    if (!selectionOnly) { chatSession.recentOrders = rawOrders; if (rawOrders.length === 1) chatSession.selectedOrderId = rawOrders[0].invoiceId; }
-    const orders = rawOrders.map(order => ({ ...order, status: StoreCore.customerOrderStatus(order), items: StoreCore.customerOrderItems(order, products).map(item => item.name + ' × ' + item.quantity).join(', ') }));
+    if (!selectionOnly) { chatSession.focus = 'order'; chatSession.displayedOrderIds = rawOrders.map(order => order.invoiceId); chatSession.recentOrders = rawOrders; if (rawOrders.length === 1) chatSession.selectedOrderId = rawOrders[0].invoiceId; }
+    const orders = rawOrders.map(order => ({ ...order, status: StoreCore.customerOrderStatus(order), items: chatOrderLines(order).map(item => item.name + (item.quantity === null ? ' (quantity not provided)' : ' × ' + item.quantity)).join(', ') }));
     if (!orders.length) { addChatMessage('bot', 'No orders yet. Browse the collection to find something you’ll love.'); return; }
     const stages = ['Pending payment', 'Paid', 'Awaiting Shipment', 'On the Way', 'Delivered'];
     const host = addChatMessage('bot', `<div class="chat-result-heading">${chatIcon(tracking ? 'status' : 'orders')}<h3>${tracking ? 'Your order status' : 'Your orders'}</h3></div>` + orders.map(order => {
@@ -1154,7 +1168,7 @@ function renderChatOrders(result, tracking, selectionOnly = false) {
 }
 
 async function handleChatAction(action) {
-    if (action.startsWith('help-') && ['cancel', 'returns', 'amend', 'invoice', 'receipt', 'payment', 'status'].includes(action.slice(5))) return chatOrderHelp(action.slice(5));
+    if (action.startsWith('help-') && ['cancel', 'returns', 'amend', 'invoice', 'receipt', 'payment', 'status', 'summary', 'items', 'quantity', 'total', 'shipping', 'date', 'address', 'prices', 'products', 'count'].includes(action.slice(5))) return chatOrderHelp(action.slice(5));
     if (action === 'choose-orders') {
         delete chatSession.selectedOrderId;
         return handleChatAction('orders');
@@ -1174,6 +1188,7 @@ async function handleChatAction(action) {
         host.classList.add('chat-results');
     } else if (action === 'profile') { showChatProfile(); }
     else if (action === 'shop') {
+        chatSession.focus = 'cart'; delete chatSession.pendingProductChoice;
         toggleCart(false);
         const customer = chatSession.customer || {};
         for (const [id, key] of [['customer-name', 'customerName'], ['customer-phone', 'customerPhone'], ['customer-email', 'customerEmail'], ['customer-address', 'customerAddress']]) {
@@ -1183,6 +1198,7 @@ async function handleChatAction(action) {
         addChatMessage('bot', 'Your cart is open. Add products from the collection, review your items and delivery details, then press Complete Order when you’re ready. You can shop without signing in.');
         toggleChatWidget(false);
     } else if (action === 'browse') {
+        chatSession.focus = 'product'; delete chatSession.pendingProductChoice;
         showTab('products'); toggleChatWidget(false);
         document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else if (action === 'human') {

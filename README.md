@@ -128,3 +128,20 @@ requested. The bot must be deployed for that newly allowlisted document action.
 Festival foreground effects are lowered while chat is open so they do not cover
 messages. General shop help remains available even if Render is asleep or the
 public catalog is unavailable; factual product/order answers require their data.
+
+### Detailed order conversations
+
+Selecting an order immediately fetches and shows its recorded summary. Follow-up
+questions resolve order items, quantities, totals, historical shipping charges,
+date, delivery address and item prices without requiring an exact menu phrase.
+Examples include “what did I buy?”, “what are the items ordered?”, “how many?”,
+“how much was shipping?”, “when was it placed?” and “tell me more”. Short follow-ups
+use the current order/product focus; explicit product names and order references
+override it. Clarification lists also accept “the second one”.
+
+Only fields returned for the authenticated order are used. Missing quantities,
+amounts or addresses are disclosed. A current catalog price is never used as a
+historical price, and a current profile address is never used as an order address.
+When unit prices are absent, the invoice remains the source for that breakdown.
+Ordered products can be selected for their current published benefits/usage/price;
+that switches the conversation to product information rather than order totals.

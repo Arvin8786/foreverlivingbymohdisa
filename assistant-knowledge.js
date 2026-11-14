@@ -1,4 +1,4 @@
-/* Website assistant knowledge v2. Shared verbatim with assistant-knowledge.js. */
+/* Website assistant knowledge v3. Shared verbatim with assistant-knowledge.js. */
 (function (root, factory) {
     const api = factory();
     if (typeof module === 'object' && module.exports) module.exports = api;
@@ -8,12 +8,54 @@
     function normalize(question) {
         return String(question || '').toLowerCase().replace(/[’']/g, '').replace(/\b(cancle|cansel|cancal|cancell)\b/g, 'cancel').replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim();
     }
-    function intent(question) {
+    // Resolve questions by the information being requested, with explicit scope.
+    // Context contains only focus/previous topic; it never supplies private records.
+    function orderQuestion(question, context = {}) {
+        const q = normalize(question);
+        if (/\b(cart|checkout|new order)\b/.test(q) && !/\b(placed|previous|old|existing)\b/.test(q)) return null;
+        const explicit = /\b(orders?|ordered|purchases?|purchased|bought|pesanan|INV-[a-z0-9-]+)\b/i.test(q) || /\b(what|which)\b.*\b(did i|have i|i have)\b.*\b(buy|order|purchase)\b/.test(q);
+        const focused = context.focus === 'order';
+        if (/\b(points?|rewards?)\b/.test(q)) return null;
+        const followup = focused && (/\b(items?|contents?|quantity|quantities|how many|how much|how long|total|shipping|delivery|details|date|summary|breakdown)\b/.test(q) || /\b(it|its|this|that|those|them|one|ones)\b/.test(q) || /^(and |what about |how about )?(the )?(items|products|quantity|quantities|how many|how much|shipping|delivery charge|total|date|details|more|tell me more|show me everything)$/.test(q));
+        const scope = explicit || followup;
+        if (!scope) return null;
+        if (/\b(change|amend|edit|update)\b/.test(q)) return null;
+        if (focused && /^(the )?(order )?date$/.test(q)) return 'date';
+        if (/\b(when|date)\b/.test(q) && /\b(placed|ordered|order|bought|purchased|purchase|made)\b/.test(q) && !/\b(will|arrive|arrival|deliver|delivery|ship|shipped)\b/.test(q)) return 'date';
+        if (/\b(address|going|destination)\b/.test(q) || /\b(ship|deliver|sent) to\b/.test(q)) return 'address';
+        if (/\b(shipping|delivery|postage)\b/.test(q) && (/\b(fee|fees|charge|charges|cost|amount|how much)\b/.test(q) || /^(and |what about )?(the )?(shipping|delivery charge)$/.test(q))) return 'shipping';
+        if (/\b(how many|number of|count)\b.*\borders\b/.test(q)) return 'count';
+        if (/\bhow many (days|weeks)\b/.test(q) || /\bhow long\b/.test(q)) return 'status';
+        if (/\b(each|per item|per product|unit price|individual price|item prices)\b/.test(q)) return 'prices';
+        if (/\b(how many|quantity|quantities|count|number of|units|pieces|bottles)\b/.test(q)) return 'quantity';
+        if (/\b(benefits|usage|ingredients|used for)\b/.test(q) || /\bmore about\b.*\b(items?|products?|them)\b/.test(q)) return 'products';
+        if (/\b(total|amount|how much|cost|payable|price)\b/.test(q) && !/\b(is it paid|have paid|already paid|payment status)\b/.test(q)) return 'total';
+        if (/\b(items?|products?|contents?|contains?|included)\b/.test(q) || /\bwhat\b.*\b(did i|have i|i have|i|was|is in)\b.*\b(order|buy|purchase|bought|purchased)\b/.test(q) || /\bwhat\b.*\b(in|inside)\b.*\border\b/.test(q)) return 'items';
+        if (/\b(status|track|where|arrive|arrival|delivery|shipment|shipped|pending|progress)\b/.test(q)) return 'status';
+        if (/\b(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth) order\b/.test(q)) return 'summary';
+        if (/\b(tell|show|explain)\b.*\b(about|this|that|my)\b.*\border\b/.test(q)) return 'summary';
+        if (/\b(summary|details|detail|breakdown|everything|information|latest|recent|last order)\b/.test(q) || (focused && /^(tell me more|more|details|show me everything)$/.test(q)) || /^inv-[a-z0-9-]+$/.test(q)) return 'summary';
+        return null;
+    }
+    function selection(question, count, embedded = false) {
+        const q = normalize(question);
+        const words = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'];
+        const direct = q.match(/^(?:(?:show|choose|select|pick|use)(?: me)? )?(?:the )?(\d+|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|last)(?: (?:one|order|item|product))?(?: please)?$/);
+        const match = direct || (embedded ? q.match(/\b(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth) order\b/) : null);
+        if (!match) return null;
+        const word = match[1];
+        const index = word === 'last' ? count - 1 : /^\d+$/.test(word) ? Number(word) - 1 : words.indexOf(word);
+        return index >= 0 && index < count ? index : null;
+    }
+    function intent(question, context = {}) {
         const q = normalize(question);
         if (/\b(cancer|diabetes|pregnan\w*|breastfeed\w*|medication|medicine|cure|diagnos\w*|disease|side effects?|allerg\w*)\b/.test(q)) return 'health';
         if (/\b(cancel\w*|batal\w*)\b/.test(q)) return 'cancel';
         if (/\b(refund\w*|return\w*|damaged|broken|wrong item|missing item|pulangkan)\b/.test(q)) return 'returns';
         if (/\b(change|amend|edit|update|tukar|ubah)\b/.test(q) && /\b(order|pesanan)\b/.test(q)) return 'amend';
+        if (context.focus === 'product' && /^(tell me more|more|details|product details|what about it|tell me about it)$/.test(q)) return 'product';
+        const orderTopic = orderQuestion(question, context);
+        if (orderTopic) return 'order-' + orderTopic;
         if (/\b(receipt|resit)\b/.test(q)) return 'receipt';
         if (/\b(invoice|invois|qr code|payment instructions)\b/.test(q)) return 'invoice';
         if (/\b(pay\w*|paid|bayar\w*|bank transfer|duitnow|proof)\b/.test(q)) return 'payment';
@@ -57,7 +99,8 @@
     };
     function answer(question) {
         const topic = intent(question);
-        return { success: true, intent: topic || 'unknown', answer: answers[topic || 'unknown'] };
+        const orderAnswer = topic?.startsWith('order-') ? 'Sign in and choose an order. I can show its recorded items and quantities, order date, totals, shipping charge, payment and delivery status. Historical details come from the order record or invoice, not today’s catalog prices.' : null;
+        return { success: true, intent: topic || 'unknown', answer: orderAnswer || answers[topic || 'unknown'] };
     }
     function productMatches(question, products) {
         const q = normalize(question);
@@ -76,5 +119,5 @@
         const best = Math.max(0, ...scored.map(p => p.score));
         return best ? scored.filter(p => p.score === best).map(p => p.product) : [];
     }
-    return { normalize, intent, answer, productMatches, version: 2 };
+    return { normalize, intent, answer, orderQuestion, selection, productMatches, version: 3 };
 });

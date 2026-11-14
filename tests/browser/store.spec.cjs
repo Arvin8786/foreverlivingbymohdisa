@@ -311,3 +311,95 @@ test('expired order-help context is cleared and a new login uses only newly retu
     await expect(page.locator('#chat-body')).toContainText('INV-NEW is currently Pending payment');
     await expect(page.locator('#chat-body')).not.toContainText('INV-PRIVATE-OLD');
 });
+
+test('selected order immediately shows a summary and answers the screenshot item question with recorded detail', async ({ page }) => {
+    const state = await setup(page);
+    state.botOrders = [{ invoiceId: 'INV-DETAILED', date: '14 Nov 2026', status: 'Processed', paid: false, total: '125.00', shippingFee: '10.00', itemDetails: [
+        { id: 'A1', name: 'Historical Aloe cream', quantity: 2, customPrice: 35 }, { id: 'T1', name: 'Herbal tea', quantity: 3, price: 15 }
+    ] }];
+    state.catalog.products[2].benefits = 'Published tea information.'; state.catalog.products[2].consumption = 'Tea label directions.';
+    await loaded(page); await signIntoChat(page);
+    await page.getByRole('button', { name: 'Ask about this order', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Your order details', exact: true })).toBeVisible();
+    await expect(page.locator('.chat-results').last()).toContainText('Historical Aloe cream');
+    await expect(page.locator('.chat-results').last()).toContainText('14 Nov 2026');
+    await expect(page.locator('.chat-results').last()).toContainText('RM 125.00');
+    await chatText(page, 'what are the items ordered');
+    let answer = page.locator('.chat-results').last();
+    await expect(answer.getByRole('heading', { name: 'Items in this order', exact: true })).toBeVisible();
+    await expect(answer.locator('.chat-order-line-list li')).toHaveCount(2);
+    await expect(answer).toContainText('Quantity: 2'); await expect(answer).toContainText('Quantity: 3');
+    await chatText(page, 'how many?');
+    await expect(page.locator('.chat-results').last()).toContainText('5 units in total');
+    await chatText(page, 'how much?');
+    await expect(page.locator('.chat-results').last()).toContainText('Order total');
+    await expect(page.locator('.chat-results').last()).toContainText('RM 125.00');
+    await chatText(page, 'how much was shipping?');
+    await expect(page.locator('.chat-results').last()).toContainText('RM 10.00');
+    await chatText(page, 'when was it placed?');
+    await expect(page.locator('.chat-results').last()).toContainText('14 Nov 2026');
+    await chatText(page, 'where is it going?');
+    await expect(page.locator('.chat-results').last()).toContainText('current profile address may differ');
+    await expect(page.locator('.chat-results').last()).not.toContainText('Test address');
+    await chatText(page, 'what was the price of each item in this order');
+    await expect(page.locator('.chat-results').last()).toContainText('RM 35.00');
+    await expect(page.locator('.chat-results').last()).not.toContainText('RM 40.00');
+    await chatText(page, 'tell me more about those items');
+    await expect(page.locator('#chat-body')).toContainText('Which item from this order');
+    await chatText(page, 'the second one');
+    await expect(page.locator('#chat-body')).toContainText('Published tea information.');
+    await chatText(page, 'how much?');
+    await expect(page.locator('.chat-text').last()).toContainText('Herbal tea is listed at RM 15.00');
+    await chatText(page, 'tell me more');
+    await expect(page.locator('.chat-text').last()).toContainText('Published tea information.');
+    await expect(page.locator('.chat-text').last()).toContainText('Tea label directions.');
+    await expect(page.locator('.chat-text').last()).toContainText('Current catalog price: RM 15.00');
+    expect(state.bot.every(request => ['customerLogin', 'getCustomerOrders'].includes(request.action))).toBe(true);
+});
+
+test('order clarification accepts ordinals and keeps explicit references ahead of latest-order wording', async ({ page }) => {
+    const state = await setup(page);
+    state.botOrders = [{ invoiceId: 'INV-RECENT', status: 'Processed', paid: false, items: 'A1x1', total: 50, shippingFee: 10 }, { invoiceId: 'INV-OLDER', status: 'Paid', paid: true, items: 'T1x2', total: 30, shippingFee: 0 }];
+    await loaded(page); await signIntoChat(page); await chatText(page, 'how many orders do I have?');
+    await expect(page.locator('.chat-text').last()).toContainText('2 orders for your account');
+    await chatText(page, 'what did I buy?');
+    await expect(page.locator('#chat-body')).toContainText('Which order do you mean?');
+    await chatText(page, 'the second one');
+    await expect(page.locator('.chat-results').last()).toContainText('INV-OLDER');
+    await expect(page.locator('.chat-results').last()).toContainText('Herbal tea');
+    await chatText(page, 'show my latest order');
+    await expect(page.locator('.chat-results').last()).toContainText('INV-RECENT');
+    await chatText(page, 'show my latest order INV-NOT-MINE');
+    await expect(page.locator('.chat-text').filter({ hasText: 'That reference is not in the orders' }).last()).toBeVisible();
+});
+
+test('missing historical quantities and prices are disclosed without guessing or replacing them with current prices', async ({ page }) => {
+    const state = await setup(page); state.botOrders = [{ invoiceId: 'INV-INCOMPLETE', status: 'Processed', paid: false, items: 'Aloe cream' }];
+    await loaded(page); await signIntoChat(page); await chatText(page, 'give me the order details');
+    await expect(page.locator('.chat-results').last()).toContainText('Quantity not provided');
+    await expect(page.locator('.chat-results').last()).toContainText('Not provided in this order record');
+    await expect(page.locator('.chat-results').last()).not.toContainText('RM 0.00');
+    await chatText(page, 'item prices');
+    await expect(page.locator('.chat-results').last()).toContainText('today’s catalog prices may be different');
+    await expect(page.locator('.chat-results').last()).not.toContainText('RM 40.00');
+    const reads = state.bot.length;
+    await chatText(page, 'how much is shipping for the cart');
+    expect(state.bot.length).toBe(reads);
+    await expect(page.locator('.chat-text').last()).toContainText('Add the products');
+});
+
+test('order-item questions require login and use fresh state after the session expires', async ({ page }) => {
+    const state = await setup(page); state.botOrders = [{ invoiceId: 'INV-SECRET', paid: false, items: 'A1x1' }];
+    await loaded(page); await page.getByRole('button', { name: 'Open shop assistant', exact: true }).click();
+    await chatText(page, 'what are the items ordered');
+    await expect(page.locator('#chat-body').getByLabel('Email', { exact: true })).toBeVisible();
+    expect(state.bot).toHaveLength(0);
+    await page.locator('#chat-body').getByLabel('Email', { exact: true }).fill('test@example.com');
+    await page.locator('#chat-body').getByLabel('Password', { exact: true }).fill('test-password');
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await expect(page.locator('.chat-results').last()).toContainText('INV-SECRET');
+    state.botExpired = true;
+    await chatText(page, 'how many items?');
+    await expect(page.locator('#chat-body').getByLabel('Email', { exact: true })).toBeVisible();
+    await expect(page.locator('#chat-body')).not.toContainText('INV-SECRET');
+});

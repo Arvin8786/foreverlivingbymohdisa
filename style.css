@@ -1215,3 +1215,14 @@ body.portal nav .btn.active i { color: var(--onyx); }
 #chat-body .chat-request-note { display: block; margin-top: 8px; color: #6a7d6e; font-size: 10px; }
 body:has(#eshop-chat-widget.active) #fl-fx-canvas { z-index: 999 !important; }
 #chat-body .chat-text { white-space: pre-line; }
+
+/* Readable factual order breakdowns inside the assistant. */
+#chat-body .chat-order-line-list { list-style: none; margin: 14px 0 0; padding: 0; }
+#chat-body .chat-order-line-list li { display: flex; flex-direction: column; gap: 4px; padding: 10px 0; border-bottom: 1px solid #edf1eb; }
+#chat-body .chat-order-line-list strong { font-size: 12px; color: #294b36; }
+#chat-body .chat-order-line-list span { font-size: 11px; color: #62786a; }
+#chat-body .chat-order-facts { margin: 14px 0 0; }
+#chat-body .chat-order-facts > div { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 1px solid #edf1eb; font-size: 11px; }
+#chat-body .chat-order-facts dt { color: #6a7d6e; }
+#chat-body .chat-order-facts dd { max-width: 60%; margin: 0; text-align: right; color: #294b36; font-weight: 600; }
+#chat-body .chat-order-note { margin: 12px 0 0; color: #62786a; font-size: 11px; }
