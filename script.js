@@ -993,8 +993,7 @@ async function handleChatSubmit() {
     const thinkingMsg = addChatMessage('bot', '<i>Thinking...</i>', 'html');
 
     try {
-        if (chatSession.state === 'awaiting_identifier') { await startVerification(text); }
-        else if (chatSession.state === 'awaiting_code') { await submitVerificationCode(text); }
+        if (chatSession.state === 'login') { addChatMessage('bot', 'Use the email and password form above. Do not type your password into the chat.'); }
         else if (chatSession.state === 'my_account_menu') { await handleMyAccountMenu(text); }
         else { await handleMainMenu(text); }
     } catch (error) {
@@ -1007,71 +1006,129 @@ async function handleChatSubmit() {
 }
 
 async function handleMainMenu(text) {
-    if (text === '1') {
-        if (sessionStorage.getItem('eshop_session_token')) {
-            displayMyAccountMenu();
-        } else {
-            chatSession.state = 'awaiting_identifier';
-            addChatMessage('bot', 'Enter your PAC or Email to verify.');
-        }
+    const intent = text.toLowerCase();
+    if (text === '1' || /order status|previous orders|my orders|my account|my points|update.*profile/.test(intent)) {
+        if (chatSession.token) displayMyAccountMenu();
+        else showChatLogin();
     } else if (text === '2') {
         addChatMessage('bot', '<a href="https://wa.me/' + WHATSAPP_NUMBER + '" target="_blank" rel="noopener">Contact Admin</a>', 'html');
+    } else if (/place.*order|how.*order|buy/.test(intent)) {
+        addChatMessage('bot', 'Choose products in the catalog and add them to your cart. Sign in through My Account here to fill your saved delivery details, then review the cart and press Complete Order. No order is submitted by chatting.');
     } else {
         const response = await postToRender('getSmartAnswer', { question: text });
         addChatMessage('bot', response.answer || 'Sorry, I had trouble finding an answer.');
     }
 }
 
-async function startVerification(identifier) {
-    const result = await postToRender('issueChatVerificationCode', { identifier: identifier });
-    if (result.success) {
-        chatSession.state = 'awaiting_code';
-        chatSession.pac = result.pac;
-        addChatMessage('bot', 'A code has been sent to your WhatsApp. Please enter it here.');
-    } else {
-        addChatMessage('bot', `Verification failed: ${result.message}`);
-        chatSession.state = 'main_menu';
+// Passwords only enter a masked form; they never become chat messages or stored state.
+function showChatLogin() {
+    chatSession.state = 'login';
+    const host = addChatMessage('bot', 'Sign in with the email and password registered in the customer portal.');
+    const form = document.createElement('form');
+    const email = document.createElement('input');
+    email.type = 'email'; email.autocomplete = 'username'; email.required = true;
+    const password = document.createElement('input');
+    password.type = 'password'; password.autocomplete = 'current-password'; password.required = true;
+    for (const [labelText, field] of [['Email', email], ['Password', password]]) {
+        const label = document.createElement('label');
+        label.textContent = labelText; label.style.display = 'block';
+        field.style.cssText = 'display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:8px';
+        label.appendChild(field); form.appendChild(label);
     }
-}
-
-async function submitVerificationCode(code) {
-    const result = await postToRender('verifyChatCode', { pac: chatSession.pac, code: code });
-    if (result.success) {
-        sessionStorage.setItem('eshop_session_token', result.token);
-        addChatMessage('bot', 'Verified!');
-        displayMyAccountMenu();
-    } else {
-        addChatMessage('bot', `Verification failed: ${result.message}`);
-        chatSession.state = 'main_menu';
-    }
+    const submit = document.createElement('button');
+    submit.type = 'submit'; submit.textContent = 'Sign in'; form.appendChild(submit);
+    const cancel = document.createElement('button');
+    cancel.type = 'button'; cancel.textContent = 'Cancel'; form.appendChild(cancel);
+    const status = document.createElement('p'); status.setAttribute('role', 'status'); form.appendChild(status);
+    cancel.addEventListener('click', () => { password.value = ''; form.remove(); displayMainMenu(); });
+    form.addEventListener('submit', async event => {
+        event.preventDefault(); submit.disabled = true; cancel.disabled = true; status.textContent = 'Checking...';
+        try {
+            const result = await postToRender('customerLogin', { email: email.value.trim(), password: password.value });
+            if (!result.success || !result.token) throw new Error(result.message || 'Login failed.');
+            chatSession.token = result.token; chatSession.customer = result.customer;
+            form.remove(); addChatMessage('bot', 'Signed in.'); displayMyAccountMenu();
+        } catch (error) { status.textContent = error.message || 'Could not sign in. Please try again.'; }
+        finally { password.value = ''; submit.disabled = false; cancel.disabled = false; }
+    });
+    host.appendChild(form);
 }
 
 function displayMyAccountMenu() {
     chatSession.state = 'my_account_menu';
-    addChatMessage('bot', '<strong>My Account</strong><br>1. View My Last 5 Orders<br>2. Check My Total Points<br>3. Back to Main Menu', 'html');
+    addChatMessage('bot', '<strong>My Account</strong><br>1. My orders and status<br>2. My reward points<br>3. Update profile<br>4. Help place an order<br>5. Sign out<br>6. Back to main menu', 'html');
+}
+
+async function customerChatRequest(action, data = {}) {
+    if (!chatSession.token) { showChatLogin(); return null; }
+    const token = chatSession.token;
+    const result = await postToRender(action, { ...data, token });
+    if (chatSession.token !== token) throw new Error('Your session changed. Please try again.');
+    return result;
+}
+
+function showChatProfile() {
+    const customer = chatSession.customer || {};
+    const host = addChatMessage('bot', 'Update your delivery details. Email stays unchanged, as in the customer portal.');
+    const form = document.createElement('form');
+    const fields = {};
+    for (const [key, labelText] of [['customerName', 'Full name'], ['customerPhone', 'Phone'], ['customerAddress', 'Delivery address']]) {
+        const label = document.createElement('label'); label.textContent = labelText;
+        label.style.display = 'block';
+        const field = document.createElement(key === 'customerAddress' ? 'textarea' : 'input');
+        if (key === 'customerPhone') field.type = 'tel';
+        field.value = customer[key] || ''; field.required = key !== 'customerAddress'; field.maxLength = 2000;
+        field.style.cssText = 'display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:8px';
+        fields[key] = field; label.appendChild(field); form.appendChild(label);
+    }
+    const save = document.createElement('button'); save.type = 'submit'; save.textContent = 'Save profile'; form.appendChild(save);
+    const cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'Cancel'; form.appendChild(cancel);
+    cancel.addEventListener('click', () => form.remove());
+    const status = document.createElement('p'); status.setAttribute('role', 'status'); form.appendChild(status);
+    form.addEventListener('submit', async event => {
+        event.preventDefault(); save.disabled = true; cancel.disabled = true;
+        const payload = Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value.trim()]));
+        try {
+            const result = await customerChatRequest('updateCustomerProfile', payload);
+            if (!result || !result.success) throw new Error(result?.message || 'Profile was not saved.');
+            Object.assign(chatSession.customer, payload); form.remove(); addChatMessage('bot', 'Profile saved.');
+        } catch (error) { status.textContent = error.message || 'Could not save profile.'; }
+        finally { save.disabled = false; cancel.disabled = false; }
+    });
+    host.appendChild(form);
 }
 
 async function handleMyAccountMenu(text) {
-    let action = '';
-    if (text === '1') action = 'getPurchaseHistory';
-    else if (text === '2') action = 'getPointsHistory';
-    else if (text === '3') { displayMainMenu(); return; }
-    else { addChatMessage('bot', 'Invalid option.'); return; }
-
-    const token = sessionStorage.getItem('eshop_session_token');
-    const result = await postToRender(action, { token: token });
-    if (result.success) {
-        if (action === 'getPurchaseHistory') {
-            let historyText = "<strong>Your Last 5 Orders:</strong><br>";
-            if (!result.history || result.history.length === 0) { historyText = 'You have no purchase history.'; }
-            else { result.history.forEach(order => { historyText += `<br><strong>ID:</strong> ${esc(order.invoiceId)}<br><strong>Date:</strong> ${esc(order.date)}<br><strong>Total:</strong> RM ${esc(order.totalAmount)}<br><strong>Status:</strong> ${esc(order.status)}<br>`; }); }
-            addChatMessage('bot', historyText, 'html');
-        } else {
-            addChatMessage('bot', `Your total points: <strong>${esc(result.currentBalance)}</strong>`, 'html');
+    const intent = text.toLowerCase();
+    if (!chatSession.token) { showChatLogin(); return; }
+    if (text === '1' || /orders|order status/.test(intent)) {
+        const result = await customerChatRequest('getCustomerOrders');
+        if (!result?.success) { addChatMessage('bot', result?.message || 'Could not load orders.'); return; }
+        const orders = Array.isArray(result.orders) ? result.orders : [];
+        addChatMessage('bot', orders.length ? '<strong>Your orders:</strong>' + orders.map(order =>
+            `<br><br><strong>${esc(order.invoiceId)}</strong><br>${esc(order.date)}<br>Status: ${esc(order.status)}<br>Items: ${esc(order.items)}<br>Total: RM ${esc(order.total)}${order.remarks ? '<br>' + esc(order.remarks) : ''}`
+        ).join('') : 'You have no orders yet.', 'html');
+    } else if (text === '2' || /points|rewards/.test(intent)) {
+        const result = await customerChatRequest('getCustomerRewards');
+        addChatMessage('bot', result?.success ? `Your reward points balance: ${result.balance ?? 0}` : result?.message || 'Could not load rewards.');
+    } else if (text === '3' || /profile/.test(intent)) { showChatProfile(); }
+    else if (text === '4' || /place.*order|buy/.test(intent)) {
+        toggleCart(false);
+        const customer = chatSession.customer || {};
+        for (const [id, key] of [['customer-name', 'customerName'], ['customer-phone', 'customerPhone'], ['customer-email', 'customerEmail'], ['customer-address', 'customerAddress']]) {
+            const input = document.getElementById(id);
+            if (input && !input.value.trim()) input.value = customer[key] || '';
         }
-    } else {
-        addChatMessage('bot', `Error: ${result.message}`);
-    }
+        addChatMessage('bot', 'Your cart is open. Add products from the catalog if it is empty. Review quantities, prices, delivery details and shipping, then press Complete Order to submit. Existing entries in your cart form have been kept.');
+        toggleChatWidget(false);
+    } else if (text === '5' || /log ?out|sign out/.test(intent)) {
+        try { await customerChatRequest('customerLogout'); }
+        finally {
+            chatSession = {}; const body = document.getElementById('chat-body'); if (body) body.replaceChildren();
+            addChatMessage('bot', 'Signed out.'); displayMainMenu();
+        }
+    } else if (text === '6') { displayMainMenu(); }
+    else { await handleMainMenu(text); }
 }
 
 // ===========================================================
@@ -1124,6 +1181,12 @@ async function postToRender(action, data) {
     });
     if (!response.ok) {
         const err = await response.json().catch(() => ({}));
+        if (response.status === 401 && err.message === 'SESSION_EXPIRED' && data.token === chatSession.token) {
+            chatSession = {};
+            const body = document.getElementById('chat-body'); if (body) body.replaceChildren();
+            addChatMessage('bot', 'Your session expired. Please sign in again.');
+            showChatLogin();
+        }
         throw new Error(err.message || 'Server error');
     }
     return await response.json();
