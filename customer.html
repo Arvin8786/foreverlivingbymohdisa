@@ -84,6 +84,9 @@
 
     <div id="my-orders-view" class="view">
         <h2>My Orders</h2>
+        <p>Download your invoice here. Your receipt becomes available after the shop verifies payment.</p>
+        <button type="button" id="refresh-orders-btn" class="btn btn-secondary">Refresh orders</button>
+        <p id="document-status" role="status"></p>
         <div id="my-orders-list"></div>
     </div>
 
@@ -137,7 +140,7 @@
 // =================================================================
 // CUSTOMER ACCOUNT PORTAL
 // =================================================================
-// Same web-app deployment as script.js and agent.html. Change it in all three files together.
+// All pages use config.js for the web-app deployment.
 const GOOGLE_SCRIPT_URL = (window.FL_CONFIG && window.FL_CONFIG.SCRIPT_URL) || '';
 
 let currentCustomer = null;
@@ -161,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('show-reset-link').addEventListener('click', (e) => { e.preventDefault(); showLoginPanel('reset'); });
     $('logout-btn').addEventListener('click', handleLogout);
     $('nav-my-orders-btn').addEventListener('click', () => showView('my-orders-view'));
+    $('refresh-orders-btn').addEventListener('click', renderMyOrders);
     $('nav-my-rewards-btn').addEventListener('click', () => showView('my-rewards-view'));
     $('nav-my-profile-btn').addEventListener('click', () => showView('my-profile-view'));
     $('save-profile-btn').addEventListener('click', saveProfile);
@@ -185,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             currentCustomer = null; renderedSession = null;
             $('portal-view').classList.add('hidden'); $('login-view').classList.remove('hidden');
-            for (const id of ['my-orders-list', 'points-history-list']) $(id).replaceChildren();
+            for (const id of ['my-orders-list', 'points-history-list', 'document-status']) $(id).replaceChildren();
             for (const id of ['prof-name', 'prof-email', 'prof-phone', 'prof-address', 'pw-old', 'pw-new', 'pw-new2']) $(id).value = '';
             $('customer-welcome-header').textContent = ''; $('customer-details-display').textContent = ''; $('points-balance').textContent = '—';
             $('retry-customer-session').classList.toggle('hidden', state.status !== 'unavailable');
@@ -333,29 +337,32 @@ async function renderMyOrders() {
                 <div class="order-bottom">
                     <div class="order-total"><span>Total</span><strong>RM ${esc(o.total)}</strong>${num(o.shippingFee) > 0 ? `<small>incl. shipping RM ${esc(o.shippingFee)}</small>` : '<small>free shipping</small>'}${o.paid && o.points > 0 ? `<small class="pts">+${esc(o.points)} points earned</small>` : ''}</div>
                     <div class="order-actions">
-                        <button class="btn btn-secondary btn-sm" data-id="${esc(o.invoiceId)}" data-type="invoice" onclick="openDocument(this)"><i class="fa-solid fa-file-invoice"></i> Invoice</button>
-                        ${o.paid ? `<button class="btn btn-primary btn-sm" data-id="${esc(o.invoiceId)}" data-type="receipt" onclick="openDocument(this)"><i class="fa-solid fa-receipt"></i> Receipt</button>` : ''}
+                        <button class="btn btn-secondary btn-sm" data-id="${esc(o.invoiceId)}" data-type="invoice" onclick="openDocument(this)"><i class="fa-solid fa-file-invoice"></i> Download invoice</button>
+                        ${o.paid ? `<button class="btn btn-primary btn-sm" data-id="${esc(o.invoiceId)}" data-type="receipt" onclick="openDocument(this)"><i class="fa-solid fa-receipt"></i> Download receipt</button>` : ''}
                     </div>
                 </div>
             </div>`).join('');
     } catch (e) { if (stillCurrent() && !['SESSION_EXPIRED', 'SESSION_CHANGED'].includes(e.message)) box.innerHTML = '<div class="alert alert-bad">Could not load your orders. Please try again.</div>'; }
 }
 
-// Opens the PDF in a new tab. The tab is opened first so the browser does not block it.
+// Download authenticated PDF bytes without sharing a public Drive URL.
 async function openDocument(btn) {
     const id = btn.dataset.id, type = btn.dataset.type;
-    const label = btn.innerHTML;
+    const label = btn.innerHTML, status = $('document-status');
     btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
-    const w = window.open('', '_blank');
-    if (w) w.document.write('<p style="font-family:sans-serif;padding:24px">Preparing your ' + type + '...</p>');
+    setStatus(status, 'Preparing your ' + type + '…', true);
     try {
         const res = await postToGoogleScript('getCustomerDocument', { invoiceId: id, type });
-        if (!res.success) { if (w) w.close(); alert(res.message || 'Document not available.'); return; }
-        const bytes = Uint8Array.from(atob(res.base64), c => c.charCodeAt(0));
+        if (!res.success) { setStatus(status, res.message || 'Document not available.'); return; }
+        const decoded = atob(res.base64 || '');
+        if (!decoded.startsWith('%PDF-')) throw new Error('Invalid PDF response.');
+        const bytes = Uint8Array.from(decoded, c => c.charCodeAt(0));
         const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-        if (w) { w.location.href = url; }
-        else { const a = document.createElement('a'); a.href = url; a.download = res.filename || (type + '.pdf'); a.click(); }
-    } catch (e) { if (w) w.close(); if (!['SESSION_EXPIRED', 'SESSION_CHANGED'].includes(e.message)) alert('Could not open the document. Please try again.'); }
+        const link = document.createElement('a'); link.href = url; link.download = res.filename || (type + '.pdf');
+        document.body.appendChild(link); link.click(); link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        setStatus(status, 'Your ' + type + ' download has started.', true);
+    } catch (e) { if (!['SESSION_EXPIRED', 'SESSION_CHANGED'].includes(e.message)) setStatus(status, 'Could not download the document. Please try again.'); }
     finally { btn.disabled = false; btn.innerHTML = label; }
 }
 

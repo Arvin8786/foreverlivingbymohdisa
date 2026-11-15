@@ -177,3 +177,18 @@ historical price, and a current profile address is never used as an order addres
 When unit prices are absent, the invoice remains the source for that breakdown.
 Ordered products can be selected for their current published benefits/usage/price;
 that switches the conversation to product information rather than order totals.
+
+### Transaction PDFs and customer downloads
+
+The [transaction document backend patch](apps-script/transaction-documents.gs)
+embeds `FL.jpg` beside the business name and replaces the printed GitHub URL with
+a clickable **Forever Living by Muhd Isa Eshop** link on invoices and receipts.
+It must be applied and deployed in the existing Apps Script project; see the
+[deployment notes](apps-script/README.md). The website alone cannot change PDFs
+stored in Drive. Older documents adopt the new template on their next authorized
+portal/admin download; previous files are retained.
+
+Customer My Orders includes **Refresh orders** and direct invoice/receipt
+PDF downloads. **Download receipt** is shown after payment verification from the
+account API. The patched backend also enforces PaymentStatus verification, so
+fulfilment progress alone cannot unlock a receipt.

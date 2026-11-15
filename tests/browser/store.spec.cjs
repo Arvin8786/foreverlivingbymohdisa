@@ -48,7 +48,7 @@ async function setup(page) {
                 logInitialOrder: state.reply, getContactInfo: { success: true, whatsappNumber: '601234', contactNumber: 'Test contact' },
                 getCustomerOrders: { success: true, orders: ordersAtRequest, stages: ['Processed', 'Paid', 'Awaiting Shipment', 'On the Way', 'Delivered'] },
                 getCustomerRewards: { success: true, balance: 50, history: [], pointsPerRm: 1 },
-                getCustomerDocument: { success: true, filename: 'invoice-test.pdf', base64: Buffer.from('%PDF-1.4\nTest invoice').toString('base64') },
+                getCustomerDocument: { success: true, filename: body.data.type === 'receipt' ? 'Receipt_' + body.data.invoiceId + '.pdf' : 'invoice-test.pdf', base64: Buffer.from('%PDF-1.4\nTest invoice').toString('base64') },
                 changeCustomerPassword: { success: true },
                 verifyAgent: { success: true, token: 'agent-session', agent: { name: 'Test agent', id: 'AG1' }, target: 100, currentSales: 0, profile: {}, isAdmin: false, isManager: false },
                 getPortalData: { success: true, products: [], customers: [], shippingRules: [] }, getOpenOrders: { success: true, orders: [] }
@@ -213,12 +213,12 @@ test('customer history displays product names and remains pending until payment 
     await expect(order.locator('.order-items-line').first()).toHaveText('Aloe cream × 2, Herbal tea × 1');
     await expect(order.locator('.badge')).toHaveText('Pending payment');
     await expect(order.locator('.tracker .now .lbl')).toHaveText('Pending payment');
-    await expect(order.getByRole('button', { name: 'Receipt', exact: true })).toHaveCount(0);
+    await expect(order.getByRole('button', { name: 'Download receipt', exact: true })).toHaveCount(0);
     await expect(order.locator('.pts')).toHaveCount(0);
     state.orders[0].paid = true; state.orders[0].status = 'Processed';
     await page.locator('#nav-my-orders-btn').click();
     await expect(order.locator('.badge')).toHaveText('Paid');
-    await expect(order.getByRole('button', { name: 'Receipt', exact: true })).toBeVisible();
+    await expect(order.getByRole('button', { name: 'Download receipt', exact: true })).toBeVisible();
     state.orders[0].paymentStatus = 'Unpaid'; state.orders[0].status = 'On the Way';
     await page.locator('#nav-my-orders-btn').click();
     await expect(order.locator('.badge')).toHaveText('Pending payment');
@@ -570,4 +570,26 @@ test('logging out during historical product-name lookup prevents late private or
     await expect(page.locator('#login-form')).toBeVisible();
     release(); await page.evaluate(() => window.pendingPortalOrder);
     await expect(page.locator('#my-orders-list')).toBeEmpty();
+});
+
+test('customer receipts download only after verified payment and a refresh uses the shared account session', async ({ page }) => {
+    const state = await setup(page);
+    state.orders = [{ invoiceId: 'INV-RECEIPT', items: 'A1x1', paid: false, paymentStatus: 'Unpaid', status: 'Delivered' }];
+    await page.goto('/customer.html'); await openAccountOrders(page);
+    await expect(page.getByRole('button', { name: 'Download receipt', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Download invoice', exact: true })).toBeVisible();
+    state.orders[0].paymentStatus = 'Paid'; state.orders[0].paid = true;
+    await page.getByRole('button', { name: 'Refresh orders', exact: true }).click();
+    const receipt = page.getByRole('button', { name: 'Download receipt', exact: true });
+    await expect(receipt).toBeVisible();
+    const downloadEvent = page.waitForEvent('download'); await receipt.click();
+    const download = await downloadEvent;
+    expect(download.suggestedFilename()).toBe('Receipt_INV-RECEIPT.pdf');
+    expect(await download.failure()).toBeNull();
+    await expect(page.locator('#document-status')).toHaveText('Your receipt download has started.');
+    const request = state.customerRequests.find(request => request.action === 'getCustomerDocument');
+    expect(request.data).toMatchObject({ invoiceId: 'INV-RECEIPT', type: 'receipt', token: 'portal-session' });
+    state.orders[0].paymentStatus = 'Unpaid';
+    await page.getByRole('button', { name: 'Refresh orders', exact: true }).click();
+    await expect(receipt).toHaveCount(0);
 });

@@ -53,3 +53,36 @@ Keep the earlier order-history replacement and all other project code. Save and
 update the existing deployment with **Manage deployments → Edit → New version →
 Deploy**. Reusing the deployment keeps the URL in `config.js` unchanged. The full
 owner-supplied project remains outside version control.
+
+## Invoice and receipt branding
+
+`transaction-documents.gs` contains replacement PDF functions and three new
+helpers. It relies on the existing company settings, payment QR, folder IDs and
+authenticated customer/agent dispatcher; it is **not a complete Code.gs**.
+Use the complete updated Code.gs supplied separately, or replace existing
+same-named declarations with this snippet and add its new declarations once.
+Do not append duplicate logo constants or function definitions.
+
+This update:
+
+- Embeds the repository's exact `FL.jpg` next to the business name on invoices
+  and receipts. Its contents are PNG, so the image MIME type is detected from
+  its bytes rather than its filename or HTTP Content-Type.
+- Prints **Forever Living by Muhd Isa Eshop** as a clickable link to the storefront.
+- Requires a verified **OrderLog.PaymentStatus** before serving a receipt.
+  `Status=Completed` or `DeliveryStatus=Delivered` alone does not qualify.
+- Tags newly generated files with a template version in Drive metadata. Existing
+  PDFs requested through customer/agent APIs or the spreadsheet admin download
+  dialog are regenerated once when their template is old. New links are saved
+  to InvoiceURL/FinalReceiptURL; previous issued files remain in Drive.
+- Uses stored historical amounts. Missing line prices are labelled “Not recorded”
+  rather than replaced with today's catalog prices. A branding refresh of an
+  existing receipt does not award points again or change its payment date.
+
+After saving the complete project, use **Deploy → Manage deployments → Edit →
+New version → Deploy** on the existing deployment. Keep the current `config.js`
+URL. A GitHub push cannot update the Apps Script PDF generator.
+
+After an administrator verifies payment, the customer opens **My profile → My
+Orders → Refresh orders → Download receipt**. The existing invoice/receipt
+triggers remain supported; no new paid service or Render deployment is needed.
