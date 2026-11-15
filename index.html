@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body class="shop">
 
@@ -56,10 +56,13 @@
         <li><a onclick="showTab('jobs')">Careers</a></li>
         <li><a onclick="showTab('enquiries')">Contact Us</a></li>
         <li><a onclick="showTab('rewards')">Rewards</a></li>
-        <li><a id="nav-login-btn" class="nav-login-btn"><i class="fa-solid fa-user" style="margin-right: 8px;"></i> Login</a></li>
+        <li id="nav-login-item"><a id="nav-login-btn" class="nav-login-btn" href="customer.html?login=1">Login</a></li>
+        <li id="nav-profile-item" hidden><a class="nav-login-btn" href="customer.html#profile">My profile</a></li>
+        <li id="nav-logout-item" hidden><button id="nav-logout-btn" class="nav-account-action" type="button">Logout</button></li>
       </ul>
     </div>
   </nav>
+  <p id="shop-account-notice" class="account-notice container" role="status"></p>
 
   <noscript><p class="container">Please enable JavaScript to browse the live collection, use your cart and access your account.</p></noscript>
   <main id="main-content" class="container"></main>
@@ -78,37 +81,17 @@
 <div id="eshop-chat-widget"></div>
 <div id="popup-modal" class="modal"></div>
 
-<div id="login-modal" class="modal">
-    <div class="modal-content" id="login-modal-content">
-        <div class="modal-header">
-            <h2 style="margin: 0;">Portal Access</h2>
-            <button id="close-login-modal-btn" class="close">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="login-option">
-                <h3>Customer Access</h3>
-                <p>Track orders, view rewards, and manage your wellness profile.</p>
-                <a href="customer.html" target="_blank" class="btn btn-secondary" style="width: 100%; border-radius: 50px;">Customer Login <i class="fa-solid fa-arrow-right" style="margin-left: 10px;"></i></a>
-                <p style="text-align:center;margin-top:12px;font-size:.85rem;"><a href="customer.html#reset" target="_blank">Forgot your password?</a></p>
-            </div>
-            <div class="login-option">
-                <h3>Business Partner</h3>
-                <p>Access the Agent Dashboard, sales tools, and commission tracking.</p>
-                <a href="agent.html" target="_blank" class="btn btn-primary" style="width: 100%;">Agent Login <i class="fa-solid fa-arrow-right" style="margin-left: 10px;"></i></a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script src="config.js?v=1"></script>
+<script src="customer-auth.js?v=1"></script>
 <script src="store-core.js?v=2"></script>
 <script src="image-map.js?v=1"></script>
 <script src="store-ui.js?v=1"></script>
 <script src="festival.js?v=1"></script>
 <script src="assistant-knowledge.js?v=3"></script>
-<script src="assistant-help.js?v=2"></script>
-<script src="script.js?v=assistant-details-5"></script>
+<script src="assistant-help.js?v=shared-3"></script>
+<script src="script.js?v=shared-customer-6"></script>
 <script src="store-features.js?v=1"></script>
+<script src="shop-account.js?v=1"></script>
 
 </body>
 </html>

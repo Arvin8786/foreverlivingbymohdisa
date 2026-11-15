@@ -1226,3 +1226,12 @@ body:has(#eshop-chat-widget.active) #fl-fx-canvas { z-index: 999 !important; }
 #chat-body .chat-order-facts dt { color: #6a7d6e; }
 #chat-body .chat-order-facts dd { max-width: 60%; margin: 0; text-align: right; color: #294b36; font-weight: 600; }
 #chat-body .chat-order-note { margin: 12px 0 0; color: #62786a; font-size: 11px; }
+
+/* Shared customer account navigation. */
+#main-nav li[hidden] { display: none !important; }
+body.shop nav .nav-account-action { display: inline-flex; align-items: center; padding: 14px; background: transparent; color: var(--gold-100); border: 1px solid #ffffff35; border-radius: 8px; font: 600 .75rem var(--font-body); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+body.shop nav .nav-account-action:hover { background: #ffffff12; }
+#shop-account-notice { margin-top: 10px; margin-bottom: 0; color: var(--ink-500); font-size: .82rem; }
+#shop-account-notice:empty { display: none; }
+.cart-account-note { padding: 10px; margin: 0 0 12px; border-radius: 8px; background: #edf5ef; color: #315d3d; font-size: .8rem; }
+.cart-account-note a { text-decoration: underline; }

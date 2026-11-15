@@ -114,3 +114,12 @@ test('assistant knowledge separates product variants and avoids unsupported oper
     assert.equal(knowledge.intent('can aloe cure diabetes'), 'health');
     assert.deepEqual(knowledge.productMatches('benefits of aloe vera gel', [{ id: '1', name: 'Forever Aloe Vera Gel' }, { id: '2', name: 'Forever Aloe Vera Gelly' }]).map(p => p.id), ['1']);
 });
+
+test('shared-session Apps Script endpoint derives the profile from its token and excludes password fields', async () => {
+    const vm = require('node:vm');
+    const context = vm.createContext({ requireCustomerSession_: data => { if (data.token !== 'valid') throw new Error('SESSION_EXPIRED'); return 'C1'; }, getCustomerRow_: pac => ({ pac, name: 'Customer', email: 'customer@example.com', phone: '123', address: 'Address', points: 10, password: 'must-not-be-returned' }) });
+    vm.runInContext(await fs.readFile(path.join(__dirname, '../apps-script/customer-session.gs'), 'utf8'), context);
+    const result = JSON.parse(JSON.stringify(context.getCustomerSession({ token: 'valid', pac: 'OTHER' })));
+    assert.equal(result.customer.pac, 'C1'); assert.equal(result.customer.password, undefined);
+    assert.throws(() => context.getCustomerSession({ token: 'invalid' }), /SESSION_EXPIRED/);
+});

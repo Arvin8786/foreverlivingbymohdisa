@@ -17,7 +17,7 @@ runtime npm dependencies: all storefront scripts are served as ordinary JS.
   executable. CI installs the Playwright-managed browser instead.
 - `npm run images`: refresh optimized assets after replacing original images.
 
-Tests intercept Google and bot requests; they do not create production orders,
+Tests intercept account and catalog requests; they do not create production orders,
 send messages, or verify the deployed backend's authorization. The normal-agent
 UI test checks visible controls and session propagation, not server permissions.
 
@@ -45,9 +45,9 @@ before retrying. Concurrent submits in one tab are blocked. An additive `request
 is reused for identical retries in the same page; the server must honor it for
 cross-request duplicate protection. No unsafe automatic mutation retries are used.
 
-Only personal assistant features require a customer portal password. Guest
-questions, browsing and shopping help remain open. Customer/agent portals continue
-to use their existing Apps Script sessions and actions.
+Guest browsing, checkout and general assistant questions remain open. Personal
+account features require the customer portal password through one shared login.
+See the shared-session behavior below. Agent authentication remains separate.
 
 Sheet HTML is sanitized by an allowlist that preserves basic paragraphs, lists,
 emphasis and HTTP(S)/email links. Scripts, images, embeds, event handlers, unsafe
@@ -81,6 +81,37 @@ the upgraded root files, but **static product pages and sitemap require deployin
 run the workflow with Publish enabled. For another static host, publish `_site/`.
 No hosting plan is upgraded or paid AI/WhatsApp service added by this change.
 
+## Shared customer sign-in
+
+`customer-auth.js` owns the Apps Script customer session used by the storefront,
+customer portal and assistant. Login in `customer.html?login=1` returns to
+`index.html`; a signed-in header shows **My profile** and **Logout**. My profile
+opens `customer.html#profile`, with the existing orders/rewards/profile interface.
+Guest assistant requests for private data link to this same login and resume the
+chosen account action after sign-in. There is no second assistant password form.
+
+The browser remembers the opaque token, its endpoint and an expiry for up to six
+hours, matching the existing Apps Script session lifetime. It validates that token
+with `getCustomerSession` before displaying account details on a returning visit.
+The server can expire a session earlier. Only the token metadata is persisted in
+localStorage (sessionStorage fallback); passwords and customer profiles are not
+persisted. This is a browser-readable bearer token, not an HttpOnly cookie. Sign
+out on shared devices. Logout clears browser state, account-owned checkout fields
+and private chat context across open tabs, and attempts server revocation.
+
+Signed-in checkout sends that same token and uses the saved customer details,
+matching the backend's existing behavior. Update My profile before ordering to
+change those details. Guest checkout sends no customer token. A temporary session
+validation outage preserves the remembered token and blocks checkout until the
+customer retries validation or signs out; it does not silently change an account
+order into a guest order. Late private responses from another session are dropped.
+
+The backend must include [the session helper](apps-script/customer-session.gs) and
+its authenticated `getCustomerSession` dispatch case, documented in
+[Apps Script deployment notes](apps-script/README.md). The owner deploys the full
+project in the Apps Script editor. Update the existing deployment to keep
+`config.js` unchanged. This website change needs no Render redeployment.
+
 ## Backend verification still required
 
 The Apps Script code lives in the owner's editor and is absent from this repo.
@@ -111,7 +142,7 @@ Script deployment; the frontend GitHub deployment does not change that service.
 its loaded public catalog, preserving the actual Benefits/Consumption and price
 fields. Similar products require selection; missing details are disclosed rather
 than replaced with medical claims, purity claims, stock guarantees or guesses.
-No paid model/API or additional Apps Script deployment is needed for this update.
+These answers use local rules and published data; no paid model/API is used.
 
 `assistant-help.js` fetches current authenticated orders for private follow-ups.
 An explicit order reference must belong to that returned account; multiple orders
@@ -124,7 +155,8 @@ automatic WhatsApp send is used. A profile edit does not amend an existing order
 Payment help distinguishes invoice/order confirmation from verified payment and
 warns against paying twice while verification is pending. Invoices and receipts
 use the authenticated `getCustomerDocument` action; unpaid receipts are not
-requested. The bot must be deployed for that newly allowlisted document action.
+requested. Customer requests go directly to the existing Apps Script service
+through the shared session; the website no longer needs a separate Render login.
 Festival foreground effects are lowered while chat is open so they do not cover
 messages. General shop help remains available even if Render is asleep or the
 public catalog is unavailable; factual product/order answers require their data.

@@ -10,10 +10,6 @@
 // ===========================================================
 const googleScriptURL = (window.FL_CONFIG && window.FL_CONFIG.SCRIPT_URL) || '';   // set in config.js
 if (!googleScriptURL) console.error('config.js is missing. Upload it next to index.html.');
-const botServerURL = 'https://whatsapp-eshop-bot.onrender.com/eshop-chat';
-// SECURITY NOTE: anything in this file is public. Treat this key as non-secret and
-// make sure the bot server does not rely on it alone for sensitive actions.
-const apiKey = '9582967';
 
 let products = [];
 let allJobs = [];
@@ -208,14 +204,8 @@ function shareProduct(id) {
 document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('hashchange', handleRoute);
     window.addEventListener('popstate', handleRoute);
-    const loginBtn = document.getElementById('nav-login-btn');
-    if (loginBtn) loginBtn.addEventListener('click', () => toggleLoginModal(true));
-
-    const closeLoginBtn = document.getElementById('close-login-modal-btn');
-    if (closeLoginBtn) closeLoginBtn.addEventListener('click', () => toggleLoginModal(false));
-
     renderMainContentShell();
-    buildEnquiryForm(); buildCartModal(); buildJobApplicationModal(); buildFabButtons(); buildChatbotWidget(); updateCartDisplay(false);
+    buildEnquiryForm(); buildCartModal(); buildJobApplicationModal(); buildFabButtons(); buildChatbotWidget(); updateCartDisplay(false); setupShopAccount();
     document.getElementById('enquiry-form')?.addEventListener('submit', handleEnquirySubmit);
     document.getElementById('job-application-form')?.addEventListener('submit', handleJobApplicationSubmit);
     activateTab('homepage');
@@ -315,7 +305,7 @@ function renderStaticContent(content) {
     }
     const footerElem = document.getElementById('footer-text');
     if (footerElem) {
-        footerElem.innerHTML = esc(content.Footer || `© ${new Date().getFullYear()} ${BRAND_NAME}`) + ` &nbsp;|&nbsp; <a href="https://wa.me/${esc(WHATSAPP_NUMBER)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp ${esc(CONTACT_DISPLAY)}</a>`;
+        footerElem.innerHTML = esc(content.Footer || `© ${new Date().getFullYear()} ${BRAND_NAME}`) + ` &nbsp;|&nbsp; <a href="https://wa.me/${esc(WHATSAPP_NUMBER)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp ${esc(CONTACT_DISPLAY)}</a> &nbsp;|&nbsp; <a href="agent.html">Business partner</a>`;
     }
 }
 
@@ -539,7 +529,7 @@ function buildCartModal() {
 
             <div style="overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; padding:14px 18px; flex:1 1 auto;">
                 <div id="cart-items" style="display:flex; flex-direction:column; gap:10px; margin-bottom:12px;"><p style="text-align:center; padding:15px 0;">Your cart is empty.</p></div>
-                <div id="cart-checkout-area"><p id="checkout-status" class="checkout-status" role="alert"></p>
+                <div id="cart-checkout-area"><p id="cart-account-note" class="cart-account-note" hidden></p><p id="checkout-status" class="checkout-status" role="alert"></p>
                     <div style="border-top:1px dashed #cbd5e1; border-bottom:1px dashed #cbd5e1; padding:10px 0; margin-bottom:12px;">
                         <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#475569; margin-bottom:3px;"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
                         <div id="cart-shipping-row" style="display:none; justify-content:space-between; font-size:0.85rem; color:#475569; margin-bottom:3px;"><span>Shipping</span><span id="cart-shipping">RM 0.00</span></div>
@@ -752,7 +742,7 @@ async function initiateCheckout() {
     const email = document.getElementById('customer-email')?.value.trim();
 
     if (!name || !phone || !address) {
-        alert('Please fill in all required customer details: Name, Phone, and Address.');
+        alert(CustomerAuth.getState().authenticated ? 'Your saved profile needs a name, phone and delivery address. Update My profile before ordering.' : 'Please fill in all required customer details: Name, Phone, and Address.');
         return;
     }
 
@@ -783,11 +773,11 @@ async function initiateCheckout() {
         }
     };
 
-    const signature = JSON.stringify(payload.data);
+    const signature = JSON.stringify({ session: CustomerAuth.getState().sessionId, data: payload.data });
     if (!checkoutAttempt || checkoutAttempt.signature !== signature) checkoutAttempt = { signature, requestId: crypto.randomUUID() };
     payload.data.requestId = checkoutAttempt.requestId;
     try {
-        const result = await postDataToGScript(payload);
+        const result = await CustomerAuth.submitOrder(payload.data);
         if (!StoreCore.confirmedOrder(result)) throw new Error('The shop did not return a confirmed order reference.');
         lastConfirmedOrder = result;
         renderOrderConfirmation(result);
@@ -797,7 +787,8 @@ async function initiateCheckout() {
         updateCartDisplay();
     } catch (error) {
         console.error('Checkout failed:', error);
-        if (status) status.innerHTML = 'Your order could not be confirmed. Your cart has been kept. Check <a href="customer.html" target="_blank" rel="noopener">My Account</a> or contact the shop before submitting again if you may already have placed this order.';
+        if (status && error.code === 'ACCOUNT_UNVERIFIED') status.textContent = error.message;
+        else if (status) status.innerHTML = 'Your order could not be confirmed. Your cart has been kept. Check <a href="customer.html" target="_blank" rel="noopener">My Account</a> or contact the shop before submitting again if you may already have placed this order.';
     } finally {
         checkoutInFlight = false;
         resetBtn();
@@ -1071,51 +1062,31 @@ function chatFormField(form, labelText, type, value = '') {
     return field;
 }
 
-// Passwords stay in a masked form, never in chat messages or persistent storage.
+// Personal requests use the same sign-in as the storefront and customer portal.
 function showChatLogin(action) {
-    document.querySelectorAll('#chat-body .chat-form-card').forEach(card => { card.querySelector('form')?.reset(); card.remove(); });
-    chatSession.pendingAction = action;
-    const host = addChatMessage('bot', `<span class="chat-form-icon">${chatIcon('lock')}</span><h3>Let’s make it personal.</h3><p>Sign in with your customer portal email and password to view your account.</p>`, 'html');
-    host.classList.add('chat-form-card');
-    const form = document.createElement('form'); form.className = 'chat-form';
-    const email = chatFormField(form, 'Email', 'email'); email.autocomplete = 'username'; email.required = true;
-    const password = chatFormField(form, 'Password', 'password'); password.autocomplete = 'current-password'; password.required = true;
-    const actions = document.createElement('div'); actions.className = 'chat-form-actions';
-    actions.innerHTML = '<button type="submit" class="chat-primary-btn">Sign in</button><button type="button" class="chat-secondary-btn">Cancel</button>';
-    form.appendChild(actions);
-    const submit = actions.querySelector('[type="submit"]');
-    const cancel = actions.querySelector('[type="button"]');
-    const status = document.createElement('p'); status.className = 'chat-form-status'; status.setAttribute('role', 'status'); form.appendChild(status);
-    const reset = document.createElement('a'); reset.href = 'customer.html#reset'; reset.target = '_blank'; reset.rel = 'noopener';
-    reset.className = 'chat-form-help'; reset.textContent = 'Forgot password?'; form.appendChild(reset);
-    cancel.addEventListener('click', () => { form.reset(); host.remove(); displayMainMenu(); });
-    form.addEventListener('submit', async event => {
-        event.preventDefault(); if (chatBusy) return;
-        submit.disabled = true; cancel.disabled = true; setChatBusy(true); status.textContent = 'Checking your details…';
-        try {
-            const result = await postToRender('customerLogin', { email: email.value.trim(), password: password.value });
-            if (!result.success || !result.token) throw new Error(result.message || 'Login failed.');
-            const pending = chatSession.pendingAction;
-            chatSession.token = result.token; chatSession.customer = result.customer || {};
-            delete chatSession.pendingAction;
-            host.remove(); updateChatIdentity(); addChatMessage('bot', 'Signed in. Your account is ready.');
-            if (pending) await handleChatAction(pending);
-            else displayMainMenu();
-        } catch (error) {
-            if (host.isConnected) status.textContent = error.message || 'Could not sign in. Please try again.';
-            else if (error.message !== 'SESSION_EXPIRED') addChatMessage('bot', error.message || 'Could not load your account. Please try again.');
-        }
-        finally { password.value = ''; submit.disabled = false; cancel.disabled = false; setChatBusy(false); scrollChatToEnd(); }
-    });
-    host.appendChild(form); scrollChatToEnd();
+    if (CustomerAuth.getState().authenticated) {
+        chatSession.token = CustomerAuth.getState().sessionId; chatSession.customer = CustomerAuth.getState().customer;
+        if (action) handleChatAction(action); return;
+    }
+    document.querySelectorAll('#chat-body .chat-form-card').forEach(card => card.remove());
+    const host = addChatMessage('bot', 'Sign in to your customer account to view personal details. The shop, your profile and this assistant use the same login.');
+    const link = document.createElement('a'); link.href = 'customer.html?login=1'; link.className = 'chat-help-button'; link.textContent = 'Sign in to my account';
+    link.addEventListener('click', () => rememberChatReturn(action || 'orders')); host.appendChild(link);
+    scrollChatToEnd();
 }
 
 async function customerChatRequest(action, data = {}) {
     if (!chatSession.token) { showChatLogin(); return null; }
-    const token = chatSession.token;
-    const result = await postToRender(action, { ...data, token });
-    if (chatSession.token !== token) throw new Error('Your session changed. Please try again.');
-    return result;
+    const identity = chatSession.token;
+    const pending = chatSession.lastPersonalAction;
+    try {
+        const result = await CustomerAuth.request(action, data);
+        if (chatSession.token !== identity) throw new Error('Your session changed. Please try again.');
+        return result;
+    } catch (failure) {
+        if (failure.code === 'SESSION_EXPIRED') { showChatLogin(pending || 'orders'); throw new Error('SESSION_EXPIRED'); }
+        throw failure;
+    }
 }
 
 function showChatProfile() {
@@ -1204,7 +1175,7 @@ async function handleChatAction(action) {
     } else if (action === 'human') {
         addChatMessage('bot', `<a class="chat-human-link" href="${chatWhatsAppUrl()}" target="_blank" rel="noopener noreferrer"><span class="chat-human-icon">${chatIcon('human')}</span><span><strong>Talk to a human</strong><small>Continue on WhatsApp</small></span>${chatIcon('external')}</a>`, 'html');
     } else if (action === 'logout') {
-        try { if (chatSession.token) await customerChatRequest('customerLogout'); }
+        try { await CustomerAuth.logout(); }
         finally {
             chatSession = {}; document.getElementById('chat-body')?.replaceChildren(); updateChatIdentity();
             addChatMessage('bot', 'You’re signed out. You can still browse and ask questions.'); displayMainMenu();
@@ -1258,28 +1229,8 @@ async function postDataToGScript(payload) {
     return result;
 }
 
-async function postToRender(action, data) {
-    const response = await fetch(botServerURL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, apiKey, data })
-    });
-    if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        if (response.status === 401 && err.message === 'SESSION_EXPIRED' && data.token === chatSession.token) {
-            const pendingAction = chatSession.lastPersonalAction;
-            chatSession = {}; updateChatIdentity();
-            const body = document.getElementById('chat-body'); if (body) body.replaceChildren();
-            addChatMessage('bot', 'Your session expired. Please sign in again.');
-            showChatLogin(pendingAction);
-        }
-        throw new Error(err.message || 'Server error');
-    }
-    return await response.json();
-}
-
 // ===========================================================
-// [ 8.0 ] THEME, MARKETING & LOGIN MODAL LOGIC
+// [ 8.0 ] THEME & MARKETING
 // ===========================================================
 function applyTheme(theme) {
     FestivalFX.init(theme || null);
@@ -1334,9 +1285,4 @@ function buildPopupModal(message, imageUrl) {
 function togglePopup(hide = false) {
     const modal = document.getElementById('popup-modal');
     if (modal) modal.style.display = hide ? 'none' : 'flex';
-}
-
-function toggleLoginModal(show) {
-    const modal = document.getElementById('login-modal');
-    if (modal) modal.style.display = show ? 'flex' : 'none';
 }

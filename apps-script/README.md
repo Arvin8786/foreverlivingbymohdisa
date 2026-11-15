@@ -30,3 +30,26 @@ The existing source's `onOrderEdit`/`confirmPayment_` workflow handles admin pay
 updates in Sheets. This patch does not change triggers, passwords, pricing or
 server authorization. The editor deployment still has to be done by the owner;
 a GitHub push alone does not update Apps Script.
+
+
+## Shared customer session
+
+`customer-session.gs` is an additive helper for the existing customer session
+implementation (`requireCustomerSession_` and `getCustomerRow_`). Add the function
+to the existing project, then add this case to the Customer Portal switch in
+`doPost`, alongside `getCustomerOrders`:
+
+```js
+case 'getCustomerSession': response = getCustomerSession(data.data); break;
+```
+
+The helper derives the customer ID from the validated token. It returns only the
+safe profile fields used by the storefront; passwords, password hashes and raw
+sheet rows are excluded. It does not extend or renew the existing six-hour
+CacheService session. Invalid/expired tokens return the existing SESSION_EXPIRED
+error through the dispatcher.
+
+Keep the earlier order-history replacement and all other project code. Save and
+update the existing deployment with **Manage deployments → Edit → New version →
+Deploy**. Reusing the deployment keeps the URL in `config.js` unchanged. The full
+owner-supplied project remains outside version control.

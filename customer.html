@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/webp" href="assets/logo.webp">
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body class="portal">
 
@@ -19,13 +19,15 @@
     <div class="card" id="login-box">
         <img src="assets/logo.webp" alt="Logo">
         <h1>My Account</h1>
-        <p>Track your orders, view invoices and receipts, and collect reward points.</p>
+        <p>Sign in once to shop, use your assistant, and manage your account.</p>
+        <p class="field-hint">Your sign-in is remembered on this browser while the session remains valid (up to six hours). Your password is never saved.</p>
+        <p><a href="index.html">Continue browsing as a guest</a></p>
 
         <form id="login-form">
             <input type="email" id="customer-email-input" placeholder="Your email" autocomplete="username" required>
             <input type="password" id="customer-password-input" placeholder="Password" autocomplete="current-password" required>
             <button type="submit" id="login-btn" class="btn btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Log in</button>
-            <p id="login-status"></p>
+            <p id="login-status" role="status"></p><button type="button" id="retry-customer-session" class="btn btn-secondary hidden">Retry existing sign-in</button><button type="button" id="forget-customer-session" class="btn btn-secondary hidden">Sign out on this browser</button>
         </form>
         <p class="help-line login-links"></p>
         <p class="login-links">
@@ -71,7 +73,7 @@
             <p id="customer-details-display"></p>
             </div>
         </div>
-        <div><span class="help-line"></span> <button id="logout-btn" class="btn btn-secondary"><i class="fa-solid fa-right-from-bracket"></i> Log out</button></div>
+        <div><a href="index.html" class="btn btn-secondary">Back to shop</a> <span class="help-line"></span> <button id="logout-btn" class="btn btn-secondary"><i class="fa-solid fa-right-from-bracket"></i> Log out</button></div>
     </header>
 
     <nav>
@@ -127,6 +129,7 @@
 </div>
 
 <script src="config.js?v=1"></script>
+<script src="customer-auth.js?v=1"></script>
 <script src="store-core.js?v=2"></script>
 <script src="image-map.js?v=1"></script>
 <script src="store-ui.js?v=1"></script>
@@ -135,10 +138,10 @@
 // CUSTOMER ACCOUNT PORTAL
 // =================================================================
 // Same web-app deployment as script.js and agent.html. Change it in all three files together.
-const GOOGLE_SCRIPT_URL = (window.FL_CONFIG && window.FL_CONFIG.SCRIPT_URL) || '';   // set in config.js
+const GOOGLE_SCRIPT_URL = (window.FL_CONFIG && window.FL_CONFIG.SCRIPT_URL) || '';
 
 let currentCustomer = null;
-let sessionToken = null;
+let renderedSession = null;
 let stages = ['Pending payment', 'Paid', 'Awaiting Shipment', 'On the Way', 'Delivered'];
 
 function esc(v) {
@@ -165,6 +168,34 @@ document.addEventListener('DOMContentLoaded', () => {
     loadContactHelp();
     if (location.hash === '#reset') showLoginPanel('reset');
     if (location.hash === '#register') showLoginPanel('register');
+    $('retry-customer-session').addEventListener('click', () => CustomerAuth.refresh());
+    $('forget-customer-session').addEventListener('click', handleLogout);
+    CustomerAuth.subscribe((state, reason) => {
+        if (state.authenticated) {
+            if (reason === 'login') return; // handleLogin redirects to the storefront.
+            if (new URLSearchParams(location.search).has('login')) { location.replace('index.html'); return; }
+            currentCustomer = state.customer;
+            $('login-view').classList.add('hidden'); $('portal-view').classList.remove('hidden');
+            $('customer-welcome-header').textContent = 'Welcome, ' + currentCustomer.customerName;
+            $('customer-details-display').textContent = 'Customer ID: ' + currentCustomer.pac;
+            if (renderedSession !== state.sessionId) {
+                renderedSession = state.sessionId;
+                showView(location.hash === '#profile' ? 'my-profile-view' : 'my-orders-view');
+            }
+        } else {
+            currentCustomer = null; renderedSession = null;
+            $('portal-view').classList.add('hidden'); $('login-view').classList.remove('hidden');
+            for (const id of ['my-orders-list', 'points-history-list']) $(id).replaceChildren();
+            for (const id of ['prof-name', 'prof-email', 'prof-phone', 'prof-address', 'pw-old', 'pw-new', 'pw-new2']) $(id).value = '';
+            $('customer-welcome-header').textContent = ''; $('customer-details-display').textContent = ''; $('points-balance').textContent = '—';
+            $('retry-customer-session').classList.toggle('hidden', state.status !== 'unavailable');
+            $('forget-customer-session').classList.toggle('hidden', state.status !== 'unavailable');
+            if (state.status === 'checking') setStatus($('login-status'), 'Checking your existing sign-in…', true);
+            else if (state.status === 'unavailable') setStatus($('login-status'), 'Your existing sign-in could not be checked. Retry, or sign in again.');
+            else if (reason === 'expired') setStatus($('login-status'), 'Your session expired. Please sign in again.');
+        }
+    });
+    CustomerAuth.initialize();
 });
 
 function showLoginPanel(which) {
@@ -180,21 +211,13 @@ async function handleLogin() {
     const password = $('customer-password-input').value;
     const btn = $('login-btn'), st = $('login-status');
     if (!email || !password) { setStatus(st, 'Email and password are required.'); return; }
-    btn.disabled = true; setStatus(st, 'Checking...', true);
+    btn.disabled = true; setStatus(st, 'Checking…', true);
     try {
-        const res = await postToGoogleScript('verifyCustomer', { email, password });
-        if (!res.success) { setStatus(st, res.message || 'Login failed.'); return; }
-        currentCustomer = res.customer; sessionToken = res.token;
+        await CustomerAuth.login(email, password);
         $('customer-password-input').value = '';
-        $('login-view').classList.add('hidden');
-        $('portal-view').classList.remove('hidden');
-        $('customer-welcome-header').textContent = 'Welcome, ' + (currentCustomer.customerName || '');
-        $('customer-details-display').textContent = 'Customer ID: ' + currentCustomer.pac;
-        showView('my-orders-view');
-    } catch (error) {
-        setStatus(st, 'Connection failed. Please try again.');
-        console.error('Login error:', error);
-    } finally { btn.disabled = false; }
+        location.replace('index.html');
+    } catch (failure) { setStatus(st, failure.message || 'Connection failed. Please try again.'); }
+    finally { $('customer-password-input').value = ''; btn.disabled = false; }
 }
 
 async function handleRegister() {
@@ -245,8 +268,9 @@ async function handleResetSave() {
 }
 
 async function handleLogout() {
-    try { if (sessionToken) await postToGoogleScript('customerLogout', {}); } catch (e) { /* leaving anyway */ }
-    sessionToken = null; location.hash = ''; location.reload();
+    const result = await CustomerAuth.logout();
+    location.hash = '';
+    setStatus($('login-status'), result.serverConfirmed ? 'You are signed out.' : 'You are signed out on this browser. The account service could not confirm server logout.', result.serverConfirmed);
 }
 
 // ---------- Views ----------
@@ -267,6 +291,7 @@ function trackerHtml(status) {
 }
 
 let orderProductCatalog = null;
+let orderRenderRevision = 0;
 async function loadOrderProductNames() {
     if (orderProductCatalog) return orderProductCatalog;
     try {
@@ -282,15 +307,19 @@ async function loadOrderProductNames() {
 }
 
 async function renderMyOrders() {
+    const identity = renderedSession, revision = ++orderRenderRevision;
+    const stillCurrent = () => identity && identity === CustomerAuth.getState().sessionId && revision === orderRenderRevision;
     const box = $('my-orders-list');
     box.innerHTML = '<p class="loader">Loading your orders...</p>';
     try {
         const res = await postToGoogleScript('getCustomerOrders', {});
+        if (!stillCurrent()) return;
         if (!res.success) { box.innerHTML = `<div class="alert alert-bad">${esc(res.message || 'Could not load your orders.')}</div>`; return; }
         if (!Array.isArray(res.orders)) throw new Error('Invalid order response.');
         if (!res.orders.length) { box.innerHTML = '<div class="card"><p>You have no orders yet. Once you place an order on our website, it will appear here.</p></div>'; return; }
         const needsNames = res.orders.some(order => StoreCore.customerOrderItems(order).some(item => item.name === 'Product name unavailable'));
         const catalog = needsNames ? await loadOrderProductNames() : [];
+        if (!stillCurrent()) return;
         const orders = res.orders.map(order => ({ ...order, paid: StoreCore.paymentVerified(order), status: StoreCore.customerOrderStatus(order), itemNames: StoreCore.customerOrderItems(order, catalog) }));
         box.innerHTML = orders.map(o => `
             <div class="card order-card">
@@ -309,7 +338,7 @@ async function renderMyOrders() {
                     </div>
                 </div>
             </div>`).join('');
-    } catch (e) { if (e.message !== 'SESSION_EXPIRED') box.innerHTML = '<div class="alert alert-bad">Could not load your orders. Please try again.</div>'; }
+    } catch (e) { if (stillCurrent() && !['SESSION_EXPIRED', 'SESSION_CHANGED'].includes(e.message)) box.innerHTML = '<div class="alert alert-bad">Could not load your orders. Please try again.</div>'; }
 }
 
 // Opens the PDF in a new tab. The tab is opened first so the browser does not block it.
@@ -326,7 +355,7 @@ async function openDocument(btn) {
         const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
         if (w) { w.location.href = url; }
         else { const a = document.createElement('a'); a.href = url; a.download = res.filename || (type + '.pdf'); a.click(); }
-    } catch (e) { if (w) w.close(); if (e.message !== 'SESSION_EXPIRED') alert('Could not open the document. Please try again.'); }
+    } catch (e) { if (w) w.close(); if (!['SESSION_EXPIRED', 'SESSION_CHANGED'].includes(e.message)) alert('Could not open the document. Please try again.'); }
     finally { btn.disabled = false; btn.innerHTML = label; }
 }
 
@@ -341,7 +370,7 @@ async function renderMyRewards() {
         $('points-history-list').innerHTML = res.history.length
             ? `<table><thead><tr><th>Date</th><th>Order</th><th>Activity</th><th class="num">Points</th><th class="num">Balance</th></tr></thead><tbody>${res.history.map(h => `<tr><td>${esc(h.date)}</td><td>${esc(h.invoiceId) || '-'}</td><td>${esc(h.type === 'EARN' ? 'Earned' : h.type === 'REDEEM' ? 'Redeemed' : 'Adjustment')}${h.note ? ' <small>(' + esc(h.note) + ')</small>' : ''}</td><td class="num"><strong style="color:${h.points >= 0 ? 'var(--ok)' : 'var(--bad)'}">${h.points > 0 ? '+' : ''}${esc(h.points)}</strong></td><td class="num">${esc(h.balance)}</td></tr>`).join('')}</tbody></table>`
             : '<p>No points yet. Your first points arrive when your first order is paid.</p>';
-    } catch (e) { if (e.message !== 'SESSION_EXPIRED') $('points-history-list').innerHTML = '<p>Could not load your points.</p>'; }
+    } catch (e) { if (!['SESSION_EXPIRED', 'SESSION_CHANGED'].includes(e.message)) $('points-history-list').innerHTML = '<p>Could not load your points.</p>'; }
 }
 
 function renderMyProfile() {
@@ -361,7 +390,7 @@ async function saveProfile() {
         const res = await postToGoogleScript('updateCustomerProfile', payload);
         if (res.success) { Object.assign(currentCustomer, payload); $('customer-welcome-header').textContent = 'Welcome, ' + payload.customerName; }
         setStatus(st, res.message || '', res.success);
-    } catch (e) { if (e.message !== 'SESSION_EXPIRED') setStatus(st, 'Could not save. Please try again.'); }
+    } catch (e) { if (!['SESSION_EXPIRED', 'SESSION_CHANGED'].includes(e.message)) setStatus(st, 'Could not save. Please try again.'); }
 }
 
 async function changePassword() {
@@ -373,8 +402,8 @@ async function changePassword() {
     try {
         const res = await postToGoogleScript('changeCustomerPassword', { oldPassword: oldP, newPassword: n1 });
         setStatus(st, res.message || '', res.success);
-        if (res.success) { $('pw-old').value = ''; $('pw-new').value = ''; $('pw-new2').value = ''; }
-    } catch (e) { if (e.message !== 'SESSION_EXPIRED') setStatus(st, 'Could not change the password. Please try again.'); }
+        if (res.success) { $('pw-old').value = ''; $('pw-new').value = ''; $('pw-new2').value = ''; await CustomerAuth.logout(); setStatus($('login-status'), 'Password changed. Please sign in with your new password.', true); }
+    } catch (e) { if (!['SESSION_EXPIRED', 'SESSION_CHANGED'].includes(e.message)) setStatus(st, 'Could not change the password. Please try again.'); }
 }
 
 
@@ -392,21 +421,15 @@ async function loadContactHelp() {
 
 // ---------- Server calls ----------
 async function postToGoogleScript(action, data = {}) {
-    const payload = { action, data: Object.assign({}, data, sessionToken ? { token: sessionToken } : {}) };
-    const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST', mode: 'cors', credentials: 'omit',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload), signal: AbortSignal.timeout(25000), redirect: 'follow'
-    });
-    if (!response.ok) throw new Error('HTTP Error ' + response.status);
-    const text = await response.text();
-    let out;
-    try { out = JSON.parse(text); } catch (e) { console.error('Customer service returned an invalid response.'); throw new Error('Invalid server response.'); }
-    if (out && out.success === false && out.message === 'SESSION_EXPIRED') {
-        sessionToken = null; alert('Your session has expired. Please log in again.'); location.reload(); throw new Error('SESSION_EXPIRED');
+    try {
+        if (['registerCustomer', 'requestPasswordReset', 'resetPassword', 'getContactInfo'].includes(action)) return await CustomerAuth.publicRequest(action, data);
+        return await CustomerAuth.request(action, data);
+    } catch (failure) {
+        if (['SESSION_EXPIRED', 'SESSION_CHANGED'].includes(failure.code)) throw new Error(failure.code);
+        throw failure;
     }
-    return out;
 }
+
 </script>
 </body>
 </html>
